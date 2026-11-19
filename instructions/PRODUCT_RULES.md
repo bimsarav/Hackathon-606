@@ -53,6 +53,7 @@ products/
   2. A clean clone-style build from an empty Docker state succeeds.
   3. A secret and junk scan finds nothing.
   4. The README steps work exactly as written.
+- Delivery finishes with the log lifecycle step (CHECKPOINT_PROTOCOL §9): commit the product, then run `scripts/archive-product-logs.sh <product-name> --status delivered --yes` and commit the reset, so the next product starts with empty logs. Archives stay local (git-ignored); logs of unfinished work are always committed.
 - Input files in `input/` are never modified. A copy of any seed or sample data the product needs goes inside the repository.
 
 ## 6. Confluence page (`products/<product-name>/CONFLUENCE_PAGE.md`)

@@ -8,3 +8,5 @@ products/**/build/
 products/**/test-results/
 products/**/playwright-report/
 products/**/.env
+# Archived logs of finished product runs are local only; the live (unfinished-run) logs ARE committed
+execution/archive/
