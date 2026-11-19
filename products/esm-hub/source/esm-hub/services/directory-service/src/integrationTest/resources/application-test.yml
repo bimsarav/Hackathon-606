@@ -1,0 +1,9 @@
+# Integration tests: Testcontainers provide DB and Kafka. The service signs and verifies with the TEST-ONLY key,
+# so tokens minted by TestJwt (esm-test-support) are accepted too.
+esm:
+  jwt:
+    private-key-location: classpath:test-jwt/private.pem
+    public-key-location: classpath:test-jwt/public.pem
+  outbox:
+    poll-ms: 200
+    initial-delay-ms: 200

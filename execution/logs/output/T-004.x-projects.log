@@ -1,0 +1,48 @@
+
+Projects:
+
+------------------------------------------------------------
+Root project 'esm-hub'
+------------------------------------------------------------
+
+Location: /workspace
+
+Project hierarchy:
+
+Root project 'esm-hub'
++--- Project ':libs'
+|    +--- Project ':libs:esm-common'
+|    +--- Project ':libs:esm-directory-replica'
+|    \--- Project ':libs:esm-test-support'
+\--- Project ':services'
+     +--- Project ':services:asset-service'
+     +--- Project ':services:audit-service'
+     +--- Project ':services:change-service'
+     +--- Project ':services:directory-service'
+     +--- Project ':services:gateway'
+     +--- Project ':services:incident-service'
+     +--- Project ':services:knowledge-service'
+     +--- Project ':services:notification-service'
+     +--- Project ':services:reporting-service'
+     \--- Project ':services:request-service'
+
+Project locations:
+
+project ':libs' - /libs
+project ':libs:esm-common' - /libs/esm-common
+project ':libs:esm-directory-replica' - /libs/esm-directory-replica
+project ':libs:esm-test-support' - /libs/esm-test-support
+project ':services' - /services
+project ':services:asset-service' - /services/asset-service
+project ':services:audit-service' - /services/audit-service
+project ':services:change-service' - /services/change-service
+project ':services:directory-service' - /services/directory-service
+project ':services:gateway' - /services/gateway
+project ':services:incident-service' - /services/incident-service
+project ':services:knowledge-service' - /services/knowledge-service
+project ':services:notification-service' - /services/notification-service
+project ':services:reporting-service' - /services/reporting-service
+project ':services:request-service' - /services/request-service
+
+To see a list of the tasks of a project, run gradlew <project-path>:tasks
+For example, try running gradlew :libs:tasks

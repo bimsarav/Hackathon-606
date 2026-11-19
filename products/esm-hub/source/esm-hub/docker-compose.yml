@@ -1,0 +1,159 @@
+# esm-hub full stack (local, demo and single-host deployments).
+#   cp .env.example .env && scripts/gen-jwt-keys.sh >> .env   (then set POSTGRES_PASSWORD)
+#   scripts/package.sh                                        (builds jars + images)
+#   docker compose up -d                                      UI/API: http://localhost:${ESM_HTTP_PORT:-8080}
+name: esm-hub
+
+x-service: &service
+  build:
+    context: .
+    dockerfile: infrastructure/docker/service.Dockerfile
+  restart: unless-stopped
+  mem_limit: 768m
+  read_only: true
+  tmpfs: [/tmp]
+  security_opt: [no-new-privileges:true]
+  cap_drop: [ALL]
+  depends_on:
+    postgres: { condition: service_healthy }
+    kafka: { condition: service_healthy }
+
+x-env: &env
+  SPRING_PROFILES_ACTIVE: ${ESM_PROFILES:-}
+  ESM_DB_USER: ${POSTGRES_USER:-esm}
+  ESM_DB_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+  ESM_KAFKA: kafka:9092
+  ESM_JWKS_URI: http://directory-service:8081/.well-known/jwks.json
+  ESM_LOG_FORMAT: ecs
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-esm}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  kafka:
+    image: apache/kafka:4.4.0
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_NUM_PARTITIONS: 3
+    volumes: [kafkadata:/var/lib/kafka/data]
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports: ["8025:8025"]          # mail UI (local/demo only)
+    restart: unless-stopped
+
+  directory-service:
+    <<: *service
+    build: { context: ., dockerfile: infrastructure/docker/service.Dockerfile, args: { SERVICE: directory-service } }
+    image: esm-hub/directory-service:latest
+    environment:
+      <<: *env
+      SERVER_PORT: 8081
+      ESM_DB_URL: jdbc:postgresql://postgres:5432/esm_directory
+      ESM_JWT_PRIVATE_KEY: ${ESM_JWT_PRIVATE_KEY:?run scripts/gen-jwt-keys.sh >> .env}
+      ESM_JWT_PUBLIC_KEY: ${ESM_JWT_PUBLIC_KEY:?run scripts/gen-jwt-keys.sh >> .env}
+      ESM_JWT_TTL_MINUTES: ${ESM_JWT_TTL_MINUTES:-60}
+
+  incident-service:
+    <<: *service
+    build: { context: ., dockerfile: infrastructure/docker/service.Dockerfile, args: { SERVICE: incident-service } }
+    image: esm-hub/incident-service:latest
+    environment: { <<: *env, SERVER_PORT: 8082, ESM_DB_URL: "jdbc:postgresql://postgres:5432/esm_incident" }
+
+  request-service:
+    <<: *service
+    build: { context: ., dockerfile: infrastructure/docker/service.Dockerfile, args: { SERVICE: request-service } }
+    image: esm-hub/request-service:latest
+    environment: { <<: *env, SERVER_PORT: 8083, ESM_DB_URL: "jdbc:postgresql://postgres:5432/esm_request" }
+
+  change-service:
+    <<: *service
+    build: { context: ., dockerfile: infrastructure/docker/service.Dockerfile, args: { SERVICE: change-service } }
+    image: esm-hub/change-service:latest
+    environment: { <<: *env, SERVER_PORT: 8084, ESM_DB_URL: "jdbc:postgresql://postgres:5432/esm_change" }
+
+  asset-service:
+    <<: *service
+    build: { context: ., dockerfile: infrastructure/docker/service.Dockerfile, args: { SERVICE: asset-service } }
+    image: esm-hub/asset-service:latest
+    environment: { <<: *env, SERVER_PORT: 8085, ESM_DB_URL: "jdbc:postgresql://postgres:5432/esm_asset" }
+
+  knowledge-service:
+    <<: *service
+    build: { context: ., dockerfile: infrastructure/docker/service.Dockerfile, args: { SERVICE: knowledge-service } }
+    image: esm-hub/knowledge-service:latest
+    environment: { <<: *env, SERVER_PORT: 8086, ESM_DB_URL: "jdbc:postgresql://postgres:5432/esm_knowledge" }
+
+  notification-service:
+    <<: *service
+    build: { context: ., dockerfile: infrastructure/docker/service.Dockerfile, args: { SERVICE: notification-service } }
+    image: esm-hub/notification-service:latest
+    environment:
+      <<: *env
+      SERVER_PORT: 8087
+      ESM_DB_URL: jdbc:postgresql://postgres:5432/esm_notification
+      SPRING_MAIL_HOST: ${ESM_SMTP_HOST:-mailpit}
+      SPRING_MAIL_PORT: ${ESM_SMTP_PORT:-1025}
+      ESM_MAIL_FROM: ${ESM_MAIL_FROM:-esm-hub@example.test}
+
+  audit-service:
+    <<: *service
+    build: { context: ., dockerfile: infrastructure/docker/service.Dockerfile, args: { SERVICE: audit-service } }
+    image: esm-hub/audit-service:latest
+    environment: { <<: *env, SERVER_PORT: 8088, ESM_DB_URL: "jdbc:postgresql://postgres:5432/esm_audit" }
+
+  reporting-service:
+    <<: *service
+    build: { context: ., dockerfile: infrastructure/docker/service.Dockerfile, args: { SERVICE: reporting-service } }
+    image: esm-hub/reporting-service:latest
+    environment: { <<: *env, SERVER_PORT: 8089, ESM_DB_URL: "jdbc:postgresql://postgres:5432/esm_reporting" }
+
+  gateway:
+    <<: *service
+    build: { context: ., dockerfile: infrastructure/docker/service.Dockerfile, args: { SERVICE: gateway } }
+    image: esm-hub/gateway:latest
+    depends_on: { directory-service: { condition: service_started } }
+    environment:
+      SERVER_PORT: 8080
+      ESM_LOG_FORMAT: ecs
+      ESM_DIRECTORY_URL: http://directory-service:8081
+      ESM_INCIDENT_URL: http://incident-service:8082
+      ESM_REQUEST_URL: http://request-service:8083
+      ESM_CHANGE_URL: http://change-service:8084
+      ESM_ASSET_URL: http://asset-service:8085
+      ESM_KNOWLEDGE_URL: http://knowledge-service:8086
+      ESM_NOTIFICATION_URL: http://notification-service:8087
+      ESM_AUDIT_URL: http://audit-service:8088
+      ESM_REPORTING_URL: http://reporting-service:8089
+    ports: ["${ESM_HTTP_PORT:-8080}:8080"]   # replaced by the web (nginx) container once the frontend is added
+
+volumes:
+  pgdata:
+  kafkadata:

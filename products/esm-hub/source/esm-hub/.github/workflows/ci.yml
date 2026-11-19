@@ -1,0 +1,66 @@
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+permissions: { contents: read }
+
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "27" }
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build, unit and integration tests (Testcontainers)
+        run: ./gradlew build --no-daemon
+      - name: Dependency vulnerability scan (Trivy, HIGH/CRITICAL fail the build)
+        uses: aquasecurity/trivy-action@0.33.1
+        with: { scan-type: fs, scan-ref: ., scanners: vuln, severity: "HIGH,CRITICAL", exit-code: "1", ignore-unfixed: true }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports
+          path: |
+            **/build/reports/tests/
+            **/build/test-results/
+            docs/api/*.json
+
+  frontend:
+    runs-on: ubuntu-24.04
+    defaults: { run: { working-directory: frontend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "24", cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test -- --run
+      - run: npm run build
+      - run: npm audit --audit-level=high
+
+  e2e:
+    runs-on: ubuntu-24.04
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "27" }
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Package jars and images
+        run: ./gradlew bootJar --no-daemon && docker compose build
+      - name: Start the demo stack
+        run: |
+          cp .env.example .env
+          sed -i "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 16)/" .env
+          sed -i '/^ESM_JWT_/d' .env && scripts/gen-jwt-keys.sh >> .env
+          docker compose up -d
+          scripts/wait-healthy.sh 600
+      - name: Playwright E2E
+        working-directory: e2e
+        run: npm ci && npx playwright install --with-deps chromium && npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: playwright-report, path: e2e/playwright-report/ }
+      - if: always()
+        run: docker compose logs --no-color > compose.log; docker compose down -v

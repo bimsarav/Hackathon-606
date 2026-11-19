@@ -1,0 +1,84 @@
+docker.io/library/gradle:9.9.1-jdk27
+gradlew
+
+gradle/wrapper:
+gradle-wrapper.jar
+gradle-wrapper.properties
+Fetching distribution.
+Downloading https://services.gradle.org/distributions/gradle-9.9.1-bin.zip
+............10%.............20%.............30%.............40%.............50%.............60%.............70%............80%.............90%.............100%
+
+Welcome to Gradle 9.9.1!
+
+Here are the highlights of this release:
+ - Performance improvements for Kotlin DSL compilation
+ - Test filtering for non-method JUnit Platform tests
+ - Wrapper settings preserved on upgrade
+ - Predefined groups in the Problems API
+
+For more details see https://docs.gradle.org/9.9.1/release-notes.html
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.9.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Kotlin does not yet support 27 JDK target, falling back to Kotlin JVM_26 JVM target
+> Task :buildSrc:checkKotlinCompilerVersion
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:generateExternalPluginSpecBuilders
+> Task :buildSrc:extractPrecompiledScriptPluginPlugins
+> Task :buildSrc:generateScriptPluginAdapters
+> Task :buildSrc:pluginDescriptors
+> Task :buildSrc:processResources
+> Task :buildSrc:compilePluginsBlocks
+> Task :buildSrc:generatePrecompiledScriptPluginAccessors
+
+> Task :buildSrc:compileKotlin
+Kotlin does not yet support 27 JDK target, falling back to Kotlin JVM_26 JVM target
+w: ⚠️ Inconsistent JVM Target Compatibility Between Java and Kotlin Tasks
+Inconsistent JVM-target compatibility detected for tasks 'compileJava' (27) and 'compileKotlin' (26).
+Solution: Consider using JVM Toolchain: https://kotl.in/gradle/jvm/toolchain
+Learn more about JVM-target validation: https://kotl.in/gradle/jvm/target-validation
+
+
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:classes
+> Task :buildSrc:jar
+> Task :libs:esm-common:compileJava
+> Task :libs:esm-common:processResources
+> Task :libs:esm-common:classes
+> Task :libs:esm-common:jar
+> Task :libs:esm-common:assemble
+> Task :libs:esm-common:compileTestJava
+> Task :libs:esm-common:processTestResources NO-SOURCE
+> Task :libs:esm-common:testClasses
+> Task :libs:esm-common:test
+> Task :libs:esm-common:check
+> Task :libs:esm-common:build
+> Task :libs:esm-test-support:compileJava
+> Task :libs:esm-test-support:processResources
+> Task :libs:esm-test-support:classes
+> Task :libs:esm-test-support:jar
+> Task :libs:esm-test-support:assemble
+> Task :libs:esm-test-support:compileTestJava NO-SOURCE
+> Task :libs:esm-test-support:processTestResources NO-SOURCE
+> Task :libs:esm-test-support:testClasses UP-TO-DATE
+> Task :libs:esm-test-support:test NO-SOURCE
+> Task :libs:esm-test-support:check UP-TO-DATE
+> Task :libs:esm-test-support:build
+> Task :libs:esm-directory-replica:compileJava
+> Task :libs:esm-directory-replica:processResources
+> Task :libs:esm-directory-replica:classes
+> Task :libs:esm-directory-replica:jar
+> Task :libs:esm-directory-replica:assemble
+> Task :libs:esm-directory-replica:compileTestJava NO-SOURCE
+> Task :libs:esm-directory-replica:processTestResources NO-SOURCE
+> Task :libs:esm-directory-replica:testClasses UP-TO-DATE
+> Task :libs:esm-directory-replica:test NO-SOURCE
+> Task :libs:esm-directory-replica:check UP-TO-DATE
+> Task :libs:esm-directory-replica:build
+
+[Incubating] Problems report is available at: file:///workspace/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 2m 27s
+21 actionable tasks: 21 executed
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.9.1/userguide/configuration_cache_enabling.html

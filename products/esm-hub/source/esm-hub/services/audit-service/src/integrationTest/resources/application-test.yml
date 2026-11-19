@@ -1,0 +1,2 @@
+spring.security.oauth2.resourceserver.jwt.public-key-location: classpath:test-jwt/public.pem
+esm.outbox: { poll-ms: 200, initial-delay-ms: 200 }

@@ -1,2 +1,24 @@
 # execution.log: new product run started 2026-11-19T16:55Z (previous run: execution/archive/esmp-first-challenge-20261119T165511Z)
 2026-11-19T17:18Z | T-000.8 | DONE | User: build stopped, esm-hub product files deleted; tracking and input restored to the committed state. Kept: build tool switched to Gradle in instructions (TECHNICAL_RULES, PRODUCT_RULES, SECURITY_RULES) | git status
+2026-11-19T17:22Z | T-001.1 | DONE | inbox sorted: requirements/, data/, reference-material/ | ls
+2026-11-19T17:22Z | T-001.2 | DONE | synthetic data (pack README) | -
+2026-11-19T17:22Z | T-001.3 | DONE | esm-hub scaffolded | ls
+2026-11-19T17:22Z | T-001.4 | DONE | analysis docs adapted | grep clean
+2026-11-19T17:23Z | T-002.1 | DONE | architecture.md | file exists
+2026-11-19T17:23Z | T-002.2 | STARTED | Gradle foundation | R/settings.gradle.kts, gradle/, buildSrc/, scripts/build.sh, libs/*
+2026-11-19T17:25Z | T-002.2 | PROGRESS | esm-common build + web + security packages | R/libs/esm-common
+2026-11-19T17:26Z | T-002.2 | PROGRESS | esm-common events/audit/contracts/config + common SQL (33 classes) | R/libs/esm-common
+2026-11-19T17:27Z | T-002.2 | PROGRESS | esm-test-support (TestJwt, EsmContainers, TEST-ONLY keys), esm-common unit test, esm-directory-replica | R/libs
+2026-11-19T17:28Z | T-002.2 | PROGRESS | spike running: gradle wrapper + build libs -> execution/logs/output/T-002.2-spike.log | -
+2026-11-19T17:33Z | T-002.2 | DONE | Gradle 9.9.1 wrapper + buildSrc conventions + 3 libs build on JDK 27 / Boot 4.1.2; CommonUnitTest 3/3 | scripts/build.sh :libs:*:build BUILD SUCCESSFUL 2m27s (output/T-002.2-spike.log)
+2026-11-19T17:33Z | T-900 | DONE | background agent wrote execution/TOKEN_REDUCTION_REVIEW.md (15 recommendations, top-5) | file exists
+2026-11-19T17:34Z | T-002.3 | DONE | tools/seed (repair_dump.py, legacy-db.sh, export.sh, README), tools/profiling/profile.sql | legacy db up: 150 incidents
+2026-11-19T17:34Z | T-004.1 | STARTED | directory-service | R/services/directory-service/**
+2026-11-19T17:37Z | T-004.1 | PROGRESS | directory-service main code: schema, entities, auth (JWT/JWKS/lockout), users, org, events | R/services/directory-service
+2026-11-19T17:47Z | T-004.1 | DONE | directory-service: auth/JWKS/lockout, users, org, snapshots, audit; demo seed (tools/seed/queries/directory-service.sql) | unit 5/5, IT 8/8 (Testcontainers PG+Kafka), seed applied to scratch DB: 40 users, roles, managers, sequences
+2026-11-19T17:51Z | T-004.x | PROGRESS | all modules registered; build.sh per-builder project cache; docs/development/service-playbook.md; DomainContracts + event-contracts.md (common compiles) | -
+2026-11-19T17:51Z | T-004.2..5 | STARTED | 4 background agents: incident (default model); request+change, asset+knowledge+audit, notification+reporting (sonnet) | services/*
+2026-11-19T17:51Z | T-004.6 | STARTED | gateway, service.Dockerfile, postgres init, docker-compose | R/services/gateway, R/infrastructure, R/docker-compose.yml
+2026-11-19T17:54Z | T-004.6 | PROGRESS | gateway (2/2 unit tests, routes configurable), service.Dockerfile, postgres init, docker-compose.yml (validated), .env.example, gen-jwt-keys.sh, package.sh. Pending: final gateway routes after agent reports; web container after frontend | compose config -q OK
+2026-11-19T17:54Z | T-002.4 | DONE | 9 ADRs; repo hygiene (.gitignore/.gitattributes/.editorconfig); CI workflow (backend, frontend, e2e, Trivy); wait-healthy.sh | files exist
+2026-11-19T17:58Z | T-100 | PAUSED | user ended session (tokens). 4 service builders may be partial; see RESUME.md for the verify-then-relaunch procedure | -

@@ -1,0 +1,21 @@
+# Build output
+build/
+.gradle/
+.gradle-*/
+out/
+*.class
+# Frontend
+node_modules/
+dist/
+coverage/
+test-results/
+playwright-report/
+# Local secrets and environment
+.env
+*.pem
+!libs/esm-test-support/src/main/resources/test-jwt/*.pem
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store

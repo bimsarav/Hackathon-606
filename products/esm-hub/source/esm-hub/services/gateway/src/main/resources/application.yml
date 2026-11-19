@@ -1,0 +1,53 @@
+# Routes: path prefix -> owning service. Service base URLs are overridable per environment (ESM_<SERVICE>_URL).
+server:
+  port: 8080
+spring:
+  application:
+    name: gateway
+  cloud:
+    compatibility-verifier.enabled: false
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: directory
+              uri: ${ESM_DIRECTORY_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/v1/auth/**,/api/v1/users/**,/api/v1/admin/users/**,/api/v1/reference,/api/v1/teams/**,/api/v1/admin/offices/**,/api/v1/admin/departments/**,/api/v1/admin/teams/**,/api/v1/admin/categories/**,/api/v1/admin/services/**
+            - id: incident
+              uri: ${ESM_INCIDENT_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/v1/incidents/**,/api/v1/problems/**,/api/v1/admin/priorities/**,/api/v1/admin/sla-policies/**,/api/v1/admin/calendars/**,/api/v1/admin/assignment-rules/**,/api/v1/admin/escalation-rules/**
+            - id: request
+              uri: ${ESM_REQUEST_URL:http://localhost:8083}
+              predicates:
+                - Path=/api/v1/catalogue/**,/api/v1/requests/**,/api/v1/approvals/**
+            - id: change
+              uri: ${ESM_CHANGE_URL:http://localhost:8084}
+              predicates:
+                - Path=/api/v1/changes/**,/api/v1/changes-calendar/**,/api/v1/change-approvals/**
+            - id: asset
+              uri: ${ESM_ASSET_URL:http://localhost:8085}
+              predicates:
+                - Path=/api/v1/assets/**
+            - id: knowledge
+              uri: ${ESM_KNOWLEDGE_URL:http://localhost:8086}
+              predicates:
+                - Path=/api/v1/kb/**
+            - id: notification
+              uri: ${ESM_NOTIFICATION_URL:http://localhost:8087}
+              predicates:
+                - Path=/api/v1/notifications/**,/api/v1/admin/notifications/**
+            - id: audit
+              uri: ${ESM_AUDIT_URL:http://localhost:8088}
+              predicates:
+                - Path=/api/v1/audit/**
+            - id: reporting
+              uri: ${ESM_REPORTING_URL:http://localhost:8089}
+              predicates:
+                - Path=/api/v1/reports/**
+management:
+  endpoints.web.exposure.include: health,info,prometheus
+  endpoint.health.probes.enabled: true
+logging:
+  structured.format.console: ${ESM_LOG_FORMAT:}

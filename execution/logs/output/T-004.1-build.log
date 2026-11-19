@@ -1,0 +1,66 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.9.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Kotlin does not yet support 27 JDK target, falling back to Kotlin JVM_26 JVM target
+> Task :buildSrc:checkKotlinCompilerVersion
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:generateExternalPluginSpecBuilders UP-TO-DATE
+> Task :buildSrc:extractPrecompiledScriptPluginPlugins UP-TO-DATE
+> Task :buildSrc:compilePluginsBlocks UP-TO-DATE
+> Task :buildSrc:generatePrecompiledScriptPluginAccessors UP-TO-DATE
+> Task :buildSrc:generateScriptPluginAdapters UP-TO-DATE
+
+> Task :buildSrc:compileKotlin UP-TO-DATE
+Kotlin does not yet support 27 JDK target, falling back to Kotlin JVM_26 JVM target
+
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+> Task :libs:esm-common:compileJava UP-TO-DATE
+> Task :libs:esm-common:processResources UP-TO-DATE
+> Task :libs:esm-common:classes UP-TO-DATE
+> Task :libs:esm-common:jar UP-TO-DATE
+> Task :services:directory-service:compileJava UP-TO-DATE
+> Task :services:directory-service:processResources UP-TO-DATE
+> Task :services:directory-service:classes UP-TO-DATE
+> Task :services:directory-service:resolveMainClassName UP-TO-DATE
+> Task :services:directory-service:bootJar UP-TO-DATE
+> Task :services:directory-service:jar UP-TO-DATE
+> Task :services:directory-service:assemble UP-TO-DATE
+> Task :libs:esm-test-support:compileJava UP-TO-DATE
+> Task :libs:esm-test-support:processResources UP-TO-DATE
+> Task :libs:esm-test-support:classes UP-TO-DATE
+> Task :libs:esm-test-support:jar UP-TO-DATE
+> Task :services:directory-service:compileTestJava UP-TO-DATE
+> Task :services:directory-service:processTestResources NO-SOURCE
+> Task :services:directory-service:testClasses UP-TO-DATE
+> Task :services:directory-service:test UP-TO-DATE
+> Task :services:directory-service:compileIntegrationTestJava
+> Task :services:directory-service:processIntegrationTestResources UP-TO-DATE
+> Task :services:directory-service:integrationTestClasses
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by com.sun.jna.Native in an unnamed module (file:/cache/caches/modules-2/files-2.1/net.java.dev.jna/jna/5.18.1/b27ba04287cc4abe769642fe8318d39fc89bf937/jna-5.18.1.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+> Task :services:directory-service:integrationTest
+
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-11-19T17:46:02.392Z  INFO 201 --- [directory-service] [ionShutdownHook] o.a.k.clients.producer.KafkaProducer     : [Producer clientId=directory-service-producer-1] Closing the Kafka producer with timeoutMillis = 30000 ms.
+2026-11-19T17:46:02.395Z  INFO 201 --- [directory-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-19T17:46:02.395Z  INFO 201 --- [directory-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-19T17:46:02.395Z  INFO 201 --- [directory-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-19T17:46:02.395Z  INFO 201 --- [directory-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-19T17:46:02.395Z  INFO 201 --- [directory-service] [ionShutdownHook] o.a.kafka.common.utils.AppInfoParser     : App info kafka.producer for directory-service-producer-1 unregistered
+2026-11-19T17:46:02.405Z  INFO 201 --- [directory-service] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-19T17:46:02.407Z  INFO 201 --- [directory-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-19T17:46:02.409Z  INFO 201 --- [directory-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+> Task :services:directory-service:check
+> Task :services:directory-service:build
+
+BUILD SUCCESSFUL in 52s
+26 actionable tasks: 3 executed, 23 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.9.1/userguide/configuration_cache_enabling.html
