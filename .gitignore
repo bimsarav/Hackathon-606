@@ -1,1 +1,10 @@
 .idea/*
+# Product build output and local secrets (each product repo also has its own .gitignore)
+.env
+products/**/target/
+products/**/node_modules/
+products/**/dist/
+products/**/build/
+products/**/test-results/
+products/**/playwright-report/
+products/**/.env
