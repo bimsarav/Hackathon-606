@@ -7,8 +7,14 @@ Source: master prompt supplied by the user on 2026-11-19 at project START.
 - Phases: 1 Discovery → 2 Solution Design → 3 Planning → 4 Implementation → 5 Quality & Security → 6 Deployment → 7 Final Validation.
 - Document authority, highest first: user instructions > approved business/solution docs > approved project rules > approved architecture decisions > industry best practice.
 - Ask about ambiguities, conflicts, material trade-offs, credentials and risky decisions, grouped into one discussion. Record low-risk reversible decisions in `execution/ASSUMPTIONS.md`.
-- Use the simplest architecture that meets the requirements. Add no microservices, distributed infrastructure, AI/ML or extra technology without a justified need.
+- Use the simplest design that meets the requirements *within the mandated stack*. **Exception (user instruction 2026-11-19):** Spring Boot microservices are always used, with Kafka where it fits (see PRODUCT_RULES.md). Add no other distributed infrastructure, AI/ML or extra technology without a justified need.
 - Never claim a test passed unless it was run. Never mark work complete without verification. Never commit secrets.
+
+## Product delivery (user instruction 2026-11-19, overrides the master prompt where they differ)
+- Full rules: `instructions/PRODUCT_RULES.md`.
+- Every requirement becomes a named product in `products/<product-name>/`. The code base is the git-ready repo `products/<product-name>/source/<product-name>/`, and `products/<product-name>/CONFLUENCE_PAGE.md` is the Confluence-ready page.
+- Stack: latest stable OpenJDK, Spring Boot microservices, Kafka where it fits, React, JUnit 5 + Mockito (+ Testcontainers), Playwright, Docker.
+- At delivery the whole solution sits in the product folder, and builds, tests and deploys without AI.
 
 ## Resumability (mandatory)
 - Full write-ahead checkpoint rules are in `instructions/CHECKPOINT_PROTOCOL.md`. The full original prompt is in `instructions/MASTER_PROMPT.md`.

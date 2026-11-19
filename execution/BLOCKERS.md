@@ -1,7 +1,7 @@
 # Blockers
 | ID | Blocker | Needed from | Status |
 |----|---------|-------------|--------|
-| B-001 | No problem domain, requirements or supporting documents. hack-isa/ was empty. | User: discovery questions Q1–Q6 | OPEN |
+| B-001 | Waiting for the new requirement data in input/. Confirm whether the ESMP pack already in input/inbox/ ("Can drop") is part of it | User | OPEN |
 
 ## Discovery questions for B-001 (asked 2026-11-19, unanswered)
 - Q1 Problem domain: what are we building, and for whom? Share the official hackathon brief if there is one.
