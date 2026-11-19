@@ -28,12 +28,13 @@ products/
 ```
 - The repository must be **ready to push**: no secrets, no build output, no IDE files, no AI tracking files, no absolute paths, no references to the workspace outside it. Its README holds the exact `git init / git remote add / git push` steps.
 - Do not run `git init` inside the workspace: it would create a nested repo in this project's git. The client initialises it, or the user asks for it explicitly.
-- The repository must build, test and run **without AI involvement**: plain Docker, Maven/Gradle wrapper and npm commands, all documented in its README.
+- The repository must build, test and run **without AI involvement**: plain Docker, Gradle wrapper and npm commands, all documented in its README.
 
 ## 3. Technology stack (mandatory)
 | Concern | Technology |
 |---|---|
 | Language/runtime | **OpenJDK, latest stable GA release**. Check the actual latest GA at build start and record the version in DECISIONS.md. If a required framework does not support it yet, use the newest version it supports, and record why |
+| Build | **Gradle** (wrapper, Kotlin DSL, version catalog). User instruction 2026-11-19 |
 | Backend | **Spring Boot microservices** (always microservices, the user's decision). Split by business domain; Spring Cloud Gateway as the single entry point; one database or schema per service (database-per-service) |
 | Messaging | **Apache Kafka** for asynchronous, event-driven communication between services where it fits (domain events, notifications, audit, integration). Synchronous REST only where a request/response is needed |
 | Frontend | **React** (current stable, TypeScript, Vite) |
@@ -43,7 +44,7 @@ products/
 | Other | Use every technology that genuinely serves the requirement: PostgreSQL, Flyway, OpenAPI (springdoc), Spring Security (OAuth2/JWT), Actuator + Micrometer/Prometheus, centralised config, resilience (Resilience4j), nginx, CI. Justify each in an ADR |
 
 ## 4. Build and verification
-- No toolchain on the host is assumed. Build and test inside Docker images (Maven/Gradle + JDK, Node), so the client can reproduce every result.
+- No toolchain on the host is assumed. Build and test inside Docker images (Gradle + JDK, Node), so the client can reproduce every result.
 - "Done" means: every module builds, all JUnit/Mockito/Testcontainers tests pass, Playwright passes against the composed stack, the dependency vulnerability scan is clean or each finding is documented, and `docker compose up` brings up a healthy stack. Record the commands and results in the product's `docs/testing/test-report.md` and in `execution/logs/execution.log`.
 
 ## 5. Working method

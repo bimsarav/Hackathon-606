@@ -1,1 +1,2 @@
 # execution.log: new product run started 2026-11-19T16:55Z (previous run: execution/archive/esmp-first-challenge-20261119T165511Z)
+2026-11-19T17:18Z | T-000.8 | DONE | User: build stopped, esm-hub product files deleted; tracking and input restored to the committed state. Kept: build tool switched to Gradle in instructions (TECHNICAL_RULES, PRODUCT_RULES, SECURITY_RULES) | git status

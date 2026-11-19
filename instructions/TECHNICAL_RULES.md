@@ -1,7 +1,7 @@
 # Technical Rules
 Mandatory stack: see `PRODUCT_RULES.md` §3.
 - Java: latest stable GA OpenJDK (verify the version at build start). Spring Boot (current GA) with Spring Cloud (Gateway, config) where needed.
-- Build: Maven wrapper (`./mvnw`), multi-module parent POM with dependency management via the Spring Boot BOM; exact versions pinned.
+- Build: **Gradle** (user instruction 2026-11-19) with the Gradle wrapper (`./gradlew`), Kotlin DSL (`*.gradle.kts`), multi-project build (`settings.gradle.kts`), a version catalog (`gradle/libs.versions.toml`) and the Spring Boot BOM via `platform(...)`; shared conventions in `buildSrc` convention plugins; exact versions pinned.
 - Persistence: PostgreSQL, one database or schema per service; schema changes only through Flyway migrations (`V<n>__<desc>.sql`), never edited once released.
 - Messaging: Kafka topics named `<domain>.<entity>.<event>` (e.g. `incident.ticket.created`), versioned JSON (or Avro) event schemas, idempotent consumers, a transactional outbox for publish-after-commit, dead-letter topics.
 - APIs: REST, OpenAPI 3 via springdoc, versioned under `/api/v1`, problem+json (RFC 9457) errors.
