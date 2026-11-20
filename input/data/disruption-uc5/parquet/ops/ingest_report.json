@@ -1,0 +1,27 @@
+{
+  "window": {
+    "snapshot": "2026-11-20 00:00:00",
+    "start": "2026-11-19 00:00:00",
+    "end": "2026-12-01 00:00:00"
+  },
+  "counts": {
+    "airports": 142,
+    "aircraft": 110,
+    "booking_classes": 388,
+    "customers": 174723,
+    "pax_segments": 299419,
+    "flights": 4646,
+    "mct": 39
+  },
+  "quality": {
+    "segments_without_flight": 518,
+    "overbooked_flights": 47,
+    "capacity_sources": {
+      "assumed-a320-174": 2390,
+      "inferred-from-max-pax": 426,
+      "inventory-exact": 1830
+    },
+    "flights_without_sta": 2
+  },
+  "built_at": "2026-11-20T22:43:37"
+}
