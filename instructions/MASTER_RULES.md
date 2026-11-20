@@ -28,3 +28,4 @@ START, RESUME, STATUS, REVIEW, PLAN, IMPLEMENT, TEST, FIX, DEPLOY, DOCUMENT, AUD
 
 ## Session report
 At the end of each session, report: Completed, In Progress, Issues, Next Action, Files Updated.
+- Airline domain research (user instruction 2026-11-20, MASTER_PROMPT §15): a standing research role that builds a sourced airline knowledge base in `documentation/knowledge-base/airline/` before solutions are proposed. Summary: `instructions/DOMAIN_RESEARCH_RULES.md`.

@@ -23,3 +23,10 @@
 - [x] T-004.2..5 services (agents; verified by T-005.1) · [x] T-004.6 gateway, Dockerfile, compose (stack healthy) · [x] T-004.7 frontend
 - [x] T-005.1 full build (253 tests green) · [~] T-005.2 package + stack + Playwright E2E (stack + smoke + E2E 6/6 done; package + Trivy pending) · [ ] T-006.1 CI/scripts/runbooks · [ ] T-008 cloud deployment (MASTER_PROMPT §13; BLOCKED B-002; state execution/DEPLOYMENT_STATUS.md): T-008.1 discovery [x] · T-008.2 architecture + ADR · T-008.3a production bootstrap (company + first admin + SLA defaults) · T-008.3 infra/config/secrets + Caddy TLS · T-008.4 deploy · T-008.5 verify (§13.9, Playwright vs cloud URL) · T-008.6 docs/deployment + handover · [ ] T-007.1 (after T-008) delivery, README, CONFLUENCE_PAGE.md, packaging check
 - [x] T-900 (sub-task) token-reduction review delivered by the background agent
+
+## T-300 Airline domain research (user 2026-11-20, MASTER_PROMPT §15) — KB: documentation/knowledge-base/airline/ (= KB/)
+- [x] T-300.0 §15 merged verbatim; DOMAIN_RESEARCH_RULES.md; KB skeleton; D-016
+- [x] T-300.1 Disruption management first pass (5 parallel research agents; each writes its own file)
+      files: [x] KB/topics/disruption-management/01-disruption-prediction.md [x] 02-network-impact-and-recovery.md [x] 03-passenger-impact.md [x] 04-passenger-prioritization-and-rights.md [x] 05-occ-pcu-workflows-and-systems.md
+- [x] T-300.2 Synthesis: 00-OVERVIEW.md (14 §15.8 sections), SOURCES.md (merged registry), GLOSSARY.md, README topic map
+- [ ] T-300.3 Next pass (on user direction): close overview §13 research gaps; validate airline-specific items with the target airline

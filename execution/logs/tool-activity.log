@@ -442,3 +442,406 @@
 2026-11-20T14:53:16Z | 0136a25d | ok   | Write | instructions/AGENT_TECH_STACK.md (4123 chars)
 2026-11-20T14:53:39Z | 0136a25d | ok   | Bash | Insert §9.24 and update cross-references, decisions and log :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606; N=$(date -u +%FT%H:%MZ); S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa…
 2026-11-20T14:53:43Z | 0136a25d | ok   | Bash | Update resume snapshot with the merged rule change :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606; N=$(date -u +%FT%H:%MZ); sed -i "1s/updated [^)]*)/updated $N)/" execution/RESUME.md; p…
+2026-11-20T15:19:25Z | 0136a25d | ok   | Bash | Inspect workspace layout and master prompt structure :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606; ls; ls input; grep -n "^## 1[0-4]\.\|^## 14" instructions/MASTER_PROMPT.md; tail -3 ins…
+2026-11-20T15:19:28Z | 0136a25d | ok   | Bash | Check documentation folder, prompt updates and input subfol… :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606; ls -la documentation "prompt Updates" input/problem-domain input/reference-material inp…
+2026-11-20T15:19:40Z | 0136a25d | ok   | Bash | Read current task, project status and closing master prompt… :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606; cat execution/CURRENT_TASK.md | head -30; cat execution/PROJECT_STATUS.md | head -15; s…
+2026-11-20T15:20:19Z | 0136a25d | ok   | Write | ../../../../../tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad/airline_raw.md (16107 chars)
+2026-11-20T15:20:36Z | 0136a25d | ok   | Bash | Append §15 airline research role to master prompt and TOC :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606; N=$(date -u +%FT%H:%MZ); S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa…
+2026-11-20T15:21:00Z | 0136a25d | ok   | Bash | Write research rules, knowledge base skeleton, decisions an… :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606; N=$(date -u +%FT%H:%MZ); KB=documentation/knowledge-base/airline; mkdir -p $KB/topics/d…
+2026-11-20T15:22:30Z | 0136a25d | ok   | Agent | Research disruption prediction
+2026-11-20T15:22:30Z | 0136a25d | ok   | Agent | Research passenger impact and PSS
+2026-11-20T15:22:30Z | 0136a25d | ok   | Agent | Research prioritization and passenger rights
+2026-11-20T15:22:30Z | 0136a25d | ok   | Agent | Research network impact and recovery
+2026-11-20T15:22:30Z | 0136a25d | ok   | Agent | Research OCC/PCU workflows and systems
+2026-11-20T15:22:33Z | 0136a25d | ok   | Bash | Read research rules and brief :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606; cat instructions/DOMAIN_RESEARCH_RULES.md; sed -n 4173,4600p instructions/MASTER_PROMPT…
+2026-11-20T15:22:33Z | 0136a25d | ok   | ToolSearch | query=select:WebSearch,WebFetch
+2026-11-20T15:22:33Z | 0136a25d | ok   | Bash | Read research rules and brief :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606; cat instructions/DOMAIN_RESEARCH_RULES.md; sed -n 4173,4600p instructions/MASTER_PROMPT…
+2026-11-20T15:22:33Z | 0136a25d | ok   | Bash | Read research rules and brief :: cat instructions/DOMAIN_RESEARCH_RULES.md && sed -n 4173,4600p instructions/MASTER_PROMPT.md && ls -R documentation/knowledge-base | head -50
+2026-11-20T15:22:33Z | 0136a25d | ok   | ToolSearch | query=select:WebSearch,WebFetch
+2026-11-20T15:22:33Z | 0136a25d | ok   | Bash | Read research rules and brief :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606; cat instructions/DOMAIN_RESEARCH_RULES.md; sed -n 4173,4600p instructions/MASTER_PROMPT…
+2026-11-20T15:22:33Z | 0136a25d | ok   | Bash | Read research rules and brief :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606; cat instructions/DOMAIN_RESEARCH_RULES.md; sed -n 4173,4600p instructions/MASTER_PROMPT…
+2026-11-20T15:22:34Z | 0136a25d | ok   | ToolSearch | query=select:WebSearch,WebFetch
+2026-11-20T15:22:34Z | 0136a25d | ok   | ToolSearch | query=select:WebSearch,WebFetch
+2026-11-20T15:22:34Z | 0136a25d | ok   | ToolSearch | query=select:WebSearch,WebFetch
+2026-11-20T15:22:42Z | 0136a25d | ok   | WebSearch | query=Castro Rocha Oliveira "A New Approach for Disruption Management in Airline Operations Control" Springer
+2026-11-20T15:22:42Z | 0136a25d | ok   | WebSearch | query=EUROCONTROL reactionary delay share CODA digest 2024 all-causes delay
+2026-11-20T15:22:43Z | 0136a25d | ok   | WebSearch | query=IATA AHM 730 delay codes AHM 731 sub-codes reactionary 91-96
+2026-11-20T15:22:43Z | 0136a25d | ok   | WebSearch | query=BTS on-time performance definition 15 minutes cause of delay categories late-arriving aircraft
+2026-11-20T15:22:43Z | 0136a25d | ok   | WebSearch | query=DOT investigation Delta CrowdStrike July 2024 outage cancellations crew tracking
+2026-11-20T15:22:43Z | 0136a25d | ok   | WebSearch | query=EUROCONTROL CODA Digest 2025 all-causes delay reactionary delay share
+2026-11-20T15:22:44Z | 0136a25d | ok   | WebSearch | query=DOT Southwest Airlines December 2022 meltdown $140 million penalty consent order
+2026-11-20T15:22:44Z | 0136a25d | ok   | WebSearch | query=Navitaire disruption management reaccommodation low cost carrier
+2026-11-20T15:22:44Z | 0136a25d | ok   | WebSearch | query=IATA AHM 780 MVT movement message AHM 583 LDM DIV diverted aircraft message
+2026-11-20T15:22:44Z | 0136a25d | ok   | WebSearch | query=Clausen Larsen Larsen Rezanova 2010 disruption management in the airline industry concepts models and methods Computers & Operations Research
+2026-11-20T15:22:45Z | 0136a25d | ok   | WebSearch | query=IATA ONE Order disruption servicing order NDC involuntary change
+2026-11-20T15:22:45Z | 0136a25d | ok   | WebSearch | query=FAA Ground Delay Program Ground Stop definition EDCT ATCSCC
+2026-11-20T15:22:45Z | 0136a25d | ok   | WebSearch | query=EUROCONTROL A-CDM milestones 16 milestones TOBT TSAT Airport CDM implementation manual
+2026-11-20T15:22:45Z | 0136a25d | ok   | WebSearch | query=14 CFR 121.533 responsibility for operational control domestic operations pilot in command aircraft dispatcher jointly responsible
+2026-11-20T15:22:45Z | 0136a25d | ok   | WebSearch | query=Sabre Passenger Reaccommodation Recovery IROPS product
+2026-11-20T15:22:46Z | 0136a25d | ok   | WebSearch | query=IATA Minimum Connecting Time SSIM chapter 8 MCT standard
+2026-11-20T15:22:47Z | 0136a25d | ok   | WebSearch | query=Amadeus Altéa Disruption Management reaccommodation passenger recovery
+2026-11-20T15:22:47Z | 0136a25d | ok   | WebSearch | query=IATA Resolution 735d Flight Interruption Manifest involuntary rerouting
+2026-11-20T15:22:51Z | 0136a25d | ok   | WebFetch | url=https://www.bts.gov/topics/airlines-and-airports/airline-time-performance-and-causes-flight-delays
+2026-11-20T15:22:52Z | 0136a25d | ok   | WebFetch | url=https://www.transportation.gov/briefing-room/dot-penalizes-southwest-airlines-140-million-2022-holiday-meltdown
+2026-11-20T15:22:54Z | 0136a25d | ok   | WebFetch | url=https://www.eurocontrol.int/archive_download/all/node/16240
+2026-11-20T15:22:54Z | 0136a25d | ok   | WebFetch | url=https://www.eurocontrol.int/sites/default/files/2024-12/eurocontrol-coda-digest-annual-report-2023.pdf
+2026-11-20T15:22:56Z | 0136a25d | ok   | WebSearch | query=Southwest Airlines December 2022 operational disruption Oliver Wyman SkySolver crew scheduling root cause report
+2026-11-20T15:22:57Z | 0136a25d | ok   | WebSearch | query=airline operations control centre roles crew control maintenance control passenger services hub control study Kohl Larsen Larsen Lindgaard "Air…
+2026-11-20T15:22:57Z | 0136a25d | ok   | WebSearch | query=14 CFR 117.25 rest period 10 hours 8 hours uninterrupted sleep 117.11 flight time limits 117.13 FDP table
+2026-11-20T15:22:58Z | 0136a25d | ok   | WebFetch | url=https://www.iata.org/ahm
+2026-11-20T15:22:58Z | 0136a25d | ok   | WebSearch | query=ICAO Annex 6 flight operations officer / flight dispatcher operational control definition "exercise of authority over the initiation, continuat…
+2026-11-20T15:23:01Z | 0136a25d | ok   | WebSearch | query=EASA Air OPS ORO.GEN.110 operational control AMC "operational control" operator flight dispatcher ORO.GEN.110(c) definition
+2026-11-20T15:23:01Z | 0136a25d | ok   | WebFetch | url=https://www.ansperformance.eu/definition/iata-delay-codes/
+2026-11-20T15:23:02Z | 0136a25d | ok   | Bash | Extract reactionary delay text from PDF :: cd /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad 2>/dev/null || mkdir -p…
+2026-11-20T15:23:02Z | 0136a25d | ok   | WebSearch | query=EU261 revision air passenger rights 2026 Parliament Council second reading status
+2026-11-20T15:23:03Z | 0136a25d | ok   | WebSearch | query=Canada Air Passenger Protection Regulations amendments 2025 compensation burden of proof CTA
+2026-11-20T15:23:03Z | 0136a25d | ok   | WebSearch | query=14 CFR 250.5 denied boarding compensation maximum amount 2025 inflation adjustment
+2026-11-20T15:23:03Z | 0136a25d | ok   | WebSearch | query=DOT airline compensation rulemaking cancellations delays withdrawn 2025
+2026-11-20T15:23:05Z | 0136a25d | ok   | Bash | Extract text from downloaded PDF :: cd /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/; mkdir -p scratchpad/pdf; cp /hom…
+2026-11-20T15:23:05Z | 0136a25d | ok   | WebFetch | url=https://www.iata.org/contentassets/e7a533819be440edbb1e49da96e0f2a8/guidance-document-interline-irops_25june2020.pdf
+2026-11-20T15:23:05Z | 0136a25d | ok   | WebFetch | url=https://amadeus.com/en/resources/case-study/managing-disruption-with-control-credibility-and-care-at-air-canada
+2026-11-20T15:23:05Z | 0136a25d | ok   | WebFetch | url=https://www.iata.org/contentassets/638f0938b3dd451b872a1d8357755421/minimum-connecting-time-user-guide_version-1.1.pdf
+2026-11-20T15:23:07Z | 0136a25d | ok   | Bash | Read more CODA context :: pdftotext /home/heshawa/.claude/projects/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/tool-results/…
+2026-11-20T15:23:09Z | 0136a25d | ok   | WebFetch | url=https://www.kennedyslaw.com/en/thought-leadership/article/2026/reform-of-passenger-rights-legislation-in-europe/
+2026-11-20T15:23:09Z | 0136a25d | ok   | WebFetch | url=https://www.ecfr.gov/current/title-14/chapter-II/subchapter-A/part-250
+2026-11-20T15:23:09Z | 0136a25d | ok   | Bash | Read further lines of CODA report :: cd /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad/pdf; pdftotext -layout …
+2026-11-20T15:23:10Z | 0136a25d | ok   | WebFetch | url=https://amadeus.com/en/portfolio/airlines/passenger-recovery
+2026-11-20T15:23:10Z | 0136a25d | ok   | WebSearch | query=Castro Rocha Oliveira airline operations control centre roles "Aircraft Manager" "Crew Manager" "Passenger" supervisor OCC organisation hub
+2026-11-20T15:23:11Z | 0136a25d | ok   | WebSearch | query=airline "hub control center" OR "integrated operations control" passenger transfer desk misconnect decision hold flight Lufthansa HCC Frankfurt
+2026-11-20T15:23:11Z | 0136a25d | ok   | WebFetch | url=https://www2.imm.dtu.dk/pubdb/pubs/3311-full.html
+2026-11-20T15:23:14Z | 0136a25d | ok   | Bash | Convert downloaded PDFs to text :: cd /home/heshawa/.claude/projects/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/tool-results/ && whi…
+2026-11-20T15:23:16Z | 0136a25d | ok   | WebSearch | query=EUROCONTROL "CODA Digest" annual 2025 punctuality reactionary delay minutes per flight
+2026-11-20T15:23:16Z | 0136a25d | ok   | Bash | Read IATA interline IROPS guidance text :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed 's/ */ /g' $S/irops…
+2026-11-20T15:23:18Z | 0136a25d | ok   | WebFetch | url=https://www.law.cornell.edu/cfr/text/14/part-250
+2026-11-20T15:23:19Z | 0136a25d | ok   | WebSearch | query=Delta CrowdStrike DOT investigation outcome 2025 findings Delta Air Lines July 2024 7000 cancellations
+2026-11-20T15:23:20Z | 0136a25d | ok   | WebSearch | query=IATA Worldwide Airport Slot Guidelines WASG 80/20 use it or lose it historic precedence level 3 coordinated airport
+2026-11-20T15:23:20Z | 0136a25d | ok   | WebFetch | url=https://cms.law/en/gbr/legal-updates/new-european-regulation-on-air-passenger-rights-what-impact-for-the-air-transport-sector
+2026-11-20T15:23:20Z | 0136a25d | ok   | WebSearch | query=EASA ORO.FTL.205 maximum daily FDP 13 hours ORO.FTL.210 60 duty hours 7 days 100 flight hours 28 days ORO.FTL.235 rest 12 hours
+2026-11-20T15:23:21Z | 0136a25d | ok   | Bash | Read rest of IROPS and grep MCT guide :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed 's/ */ /g' $S/irops…
+2026-11-20T15:23:22Z | 0136a25d | ok   | WebSearch | query=eCFR 14 CFR 117.13 flight duty period unaugmented Table B maximum FDP 9 to 14 hours 117.19 extension
+2026-11-20T15:23:25Z | 0136a25d | ok   | WebSearch | query=EUROCONTROL CODA Digest Annual 2024 reactionary delay share of delay minutes 2024
+2026-11-20T15:23:26Z | 0136a25d | ok   | WebFetch | url=https://cdn.lhsystems.com/2025-02/NH_01_NetLine_HubControl Leaflet_2025_v1-1.pdf
+2026-11-20T15:23:27Z | 0136a25d | ok   | WebFetch | url=https://www.eurocontrol.int/publication/eurocontrol-data-snapshot-59-better-first-wave-performance
+2026-11-20T15:23:29Z | 0136a25d | ok   | WebFetch | url=https://www.business.uzh.ch/dam/jcr:d5051dd1-ce0f-4104-9f4b-5c9603ea6c65/davies-et-al-2026-decision-support-for-schedule-recovery-at-lufthansa-gr…
+2026-11-20T15:23:30Z | 0136a25d | ok   | WebSearch | query="2026/2202" regulation air passenger rights Official Journal
+2026-11-20T15:23:31Z | 0136a25d | ok   | WebSearch | query=PNR mandatory elements name itinerary contact ticketing time limit received from AIRIMP five elements
+2026-11-20T15:23:31Z | 0136a25d | ok   | WebSearch | query=IATA EMD Electronic Miscellaneous Document EMD-A EMD-S associated standalone ancillaries
+2026-11-20T15:23:32Z | 0136a25d | ok   | WebSearch | query=married segments logic airline inventory O&D connection journey availability explained
+2026-11-20T15:23:32Z | 0136a25d | ok   | WebFetch | url=https://data.consilium.europa.eu/doc/document/PE-39-2026-INIT/en/pdf
+2026-11-20T15:23:34Z | 0136a25d | ok   | WebFetch | url=https://www.law.cornell.edu/cfr/text/14/appendix-Table_B_to_part_117
+2026-11-20T15:23:34Z | 0136a25d | ok   | WebSearch | query=IATA SSR codes WCHR WCHS WCHC UMNR BLND DEAF DPNA MEDA PETC AVIH definitions airline
+2026-11-20T15:23:34Z | 0136a25d | ok   | WebFetch | url=https://www.law.cornell.edu/cfr/text/14/117.23
+2026-11-20T15:23:36Z | 0136a25d | ok   | WebFetch | url=https://regulatorylibrary.caa.co.uk/965-2012/Content/Document%20Structure/03%20ORO/2%20Regs/05130_ORO.FTL.205_Flight_duty_period_FDP.htm
+2026-11-20T15:23:38Z | 0136a25d | ok   | WebFetch | url=https://www.law.cornell.edu/cfr/text/14/117.19
+2026-11-20T15:23:43Z | 0136a25d | ok   | WebSearch | query=FlightAware Foresight machine learning ETA predictions airlines accuracy
+2026-11-20T15:23:44Z | 0136a25d | ok   | WebSearch | query=Airbus Skywise predictive maintenance airline results reduced AOG unscheduled removals
+2026-11-20T15:23:44Z | 0136a25d | ok   | WebSearch | query=Delta Air Lines predictive maintenance maintenance cancellations reduced APEX
+2026-11-20T15:23:45Z | 0136a25d | ok   | WebSearch | query=EUROCONTROL CTOT slot tolerance -5 +10 minutes ATFM regulation Network Manager
+2026-11-20T15:23:47Z | 0136a25d | ok   | WebSearch | query=United Airlines Delta American self-service rebooking app disruption automatic rebooking announcement
+2026-11-20T15:23:47Z | 0136a25d | ok   | WebFetch | url=https://www.iata.org/contentassets/7b3762815ac44a10b83ccf5560c1b308/best-practices-on-the-application-of-ssr-codes-and-assistance-service.pdf
+2026-11-20T15:23:48Z | 0136a25d | ok   | WebSearch | query=Bratu Barnhart passenger delay metrics flight schedule recovery disrupted passengers Transportation Science
+2026-11-20T15:23:51Z | 0136a25d | ok   | WebSearch | query=14 CFR 121.467 flight attendant duty period limitations rest requirements 14 hours 10 hours rest FAA Reauthorization ***
+2026-11-20T15:23:52Z | 0136a25d | ok   | WebFetch | url=https://regulatorylibrary.caa.co.uk/965-2012/Content/Document%20Structure/03%20ORO/2%20Regs/05130_ORO.FTL.205_Flight_duty_period_FDP.htm
+2026-11-20T15:23:52Z | 0136a25d | ok   | WebFetch | url=https://regulatorylibrary.caa.co.uk/965-2012/Content/Document%20Structure/03%20ORO/2%20Regs/05190_ORO.FTL.235_Rest_periods.htm
+2026-11-20T15:23:52Z | 0136a25d | ok   | WebFetch | url=https://www.law.cornell.edu/cfr/text/14/117.25
+2026-11-20T15:23:52Z | 0136a25d | ok   | WebFetch | url=https://news.delta.com/nothing-artificial-about-intelligence-deltas-industry-first-machine-learning-platform-minimizes
+2026-11-20T15:23:54Z | 0136a25d | ok   | WebFetch | url=https://www.burges-salmon.com/articles/102o4ut/evolution-delivered-what-regulation-eu-2026-2202-means-for-eu261-reform
+2026-11-20T15:23:55Z | 0136a25d | ok   | Bash | Convert EU joint text PDF to text :: cd /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/ 2>/dev/null || mkdir -p /tmp/clau…
+2026-11-20T15:23:56Z | 0136a25d | ok   | WebSearch | query=Delta TechOps APEX predictive maintenance 5,600 maintenance cancellations 2010 55 2018 news.delta.com
+2026-11-20T15:23:56Z | 0136a25d | ok   | WebFetch | url=https://www.aircraft.airbus.com/en/newsroom/news/2024-10-keeping-the-fleet-flying
+2026-11-20T15:23:59Z | 0136a25d | ok   | Bash | Search joint text for thresholds and priority :: cd /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; head -40 pecons.txt; g…
+2026-11-20T15:24:01Z | 0136a25d | ok   | WebFetch | url=https://aviationtoday.com/2020/01/08/delta-develops-ai-tool-address-weather-disruption-improve-flight-operations
+2026-11-20T15:24:03Z | 0136a25d | ok   | Bash | Read relevant joint text passages :: cd /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed -n 1440,1470p peco…
+2026-11-20T15:24:05Z | 0136a25d | ok   | WebFetch | url=https://deltatechops.com/delta-techops-expanding-predictive-maintenance-capabilities-with-new-airbus-partnership/
+2026-11-20T15:24:06Z | 0136a25d | ok   | WebSearch | query=CAE acquired Sabre AirCentre flight and crew management Movement Manager Recovery Manager disruption
+2026-11-20T15:24:06Z | 0136a25d | ok   | WebSearch | query=Jeppesen Crew Tracking Boeing Jeppesen Ops Control "crew recovery" Thoma Bravo 2025 sale
+2026-11-20T15:24:07Z | 0136a25d | ok   | WebSearch | query=IBS Software iFlight Ops disruption recovery optimiser airline operations control
+2026-11-20T15:24:07Z | 0136a25d | ok   | WebSearch | query=Lufthansa Systems NetLine/Ops ++ operations control disruption recovery optimizer what-if
+2026-11-20T15:24:07Z | 0136a25d | ok   | Bash | Read delay compensation and application clauses :: cd /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed -n 1505,1590p peco…
+2026-11-20T15:24:11Z | 0136a25d | ok   | WebFetch | url=https://satellitetoday.com/aviation-tech-today/2020/01/08/delta-develops-ai-tool-address-weather-disruption-improve-flight-operations
+2026-11-20T15:24:18Z | 0136a25d | ok   | WebFetch | url=https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32004R0261
+2026-11-20T15:24:19Z | 0136a25d | ok   | WebSearch | query=airline production machine learning delay prediction operations control "Lufthansa" OR "KLM" OR "Alaska" OR "Southwest" deployed
+2026-11-20T15:24:21Z | 0136a25d | FAIL | WebFetch | url=https://www.airindia.com/in/en/newsroom/articles/inside-air-india-operations-control-centre.html | err=timeout of 60000ms exceeded
+2026-11-20T15:24:22Z | 0136a25d | ok   | WebFetch | url=https://www.law.cornell.edu/cfr/text/14/250.3
+2026-11-20T15:24:22Z | 0136a25d | ok   | WebFetch | url=https://www.business.uzh.ch/dam/jcr:d5051dd1-ce0f-4104-9f4b-5c9603ea6c65/davies-et-al-2026-decision-support-for-schedule-recovery-at-lufthansa-gr…
+2026-11-20T15:24:23Z | 0136a25d | ok   | WebFetch | url=https://cdn.lhsystems.com/2020-11/pb_netline_opssolver_tail.pdf
+2026-11-20T15:24:24Z | 0136a25d | ok   | WebFetch | url=https://amadeus.com/documents/en/blog/pdf/2016/09/airline-disruption-management-whitepaper-2016.pdf
+2026-11-20T15:24:24Z | 0136a25d | ok   | WebFetch | url=https://www.law.cornell.edu/cfr/text/14/250.5
+2026-11-20T15:24:25Z | 0136a25d | ok   | Bash | Extract text from downloaded PDFs :: cd /home/heshawa/.claude/projects/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/tool-results/ && whi…
+2026-11-20T15:24:27Z | 0136a25d | ok   | Bash | Read Lufthansa ODSS paper text :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed -n 1,400p $S/pdf/lh…
+2026-11-20T15:24:31Z | 0136a25d | ok   | WebFetch | url=https://arxiv.org/html/2510.26831v1
+2026-11-20T15:24:31Z | 0136a25d | ok   | Bash | Grep key passages in ODSS paper :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; tr -s ' ' < $S/pdf/lh.t…
+2026-11-20T15:24:31Z | 0136a25d | ok   | WebSearch | query=Google Flights delay prediction 80% confident machine learning announcement
+2026-11-20T15:24:32Z | 0136a25d | ok   | WebSearch | query=United Airlines ConnectionSaver hold connecting flights algorithm predictive
+2026-11-20T15:24:34Z | 0136a25d | ok   | WebSearch | query=Lufthansa Group Google Cloud Operations Decision Support Suite SWISS disruption prediction
+2026-11-20T15:24:35Z | 0136a25d | ok   | Bash | Read intro and adoption passages :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed -n 56,140p $S/pdf/l…
+2026-11-20T15:24:36Z | 0136a25d | ok   | Bash | Convert fetched PDFs to text :: D=/home/heshawa/.claude/projects/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/tool-results; S=/tmp/…
+2026-11-20T15:24:38Z | 0136a25d | ok   | Bash | Read data integration and impact sections :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed -n 225,262p $S/pdf/…
+2026-11-20T15:24:39Z | 0136a25d | ok   | WebFetch | url=https://www.legislation.gov.uk/eur/2004/261/contents
+2026-11-20T15:24:40Z | 0136a25d | ok   | Bash | Read Lufthansa paper start :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; tr -s '\n' < $S/lh.txt …
+2026-11-20T15:24:42Z | 0136a25d | FAIL | WebFetch | url=https://agencyconnect.qantas.com/en/policies/book-and-service/married-flights | err=timeout of 60000ms exceeded
+2026-11-20T15:24:42Z | 0136a25d | ok   | WebFetch | url=https://laws.justice.gc.ca/eng/regulations/SOR-2019-150/FullText.html
+2026-11-20T15:24:44Z | 0136a25d | ok   | WebFetch | url=https://www.business.uzh.ch/dam/jcr:d5051dd1-ce0f-4104-9f4b-5c9603ea6c65/davies-et-al-2026-decision-support-for-schedule-recovery-at-lufthansa-gr…
+2026-11-20T15:24:44Z | 0136a25d | ok   | Bash | Grep key facts in Lufthansa paper :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; tr -s '\n' < $S/lh.txt …
+2026-11-20T15:24:46Z | 0136a25d | ok   | Bash | Extract IATA SSR best practices text :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; pdftotext -layout /home…
+2026-11-20T15:24:47Z | 0136a25d | ok   | WebFetch | url=https://newsroom.lufthansagroup.com/en/more-stability-and-reliability-for-lufthansa-group-customers/
+2026-11-20T15:24:48Z | 0136a25d | ok   | Bash | Read data/integration and adoption parts :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; tr -s '\n' < $S/lh.txt …
+2026-11-20T15:24:49Z | 0136a25d | ok   | Bash | Read SSR appendix codes :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed 's/ */ /g' $S/ssr.t…
+2026-11-20T15:24:49Z | 0136a25d | ok   | WebSearch | query=Amadeus Sabre IBS Software operations control agentic AI disruption 2025 announcement airline OCC copilot
+2026-11-20T15:24:49Z | 0136a25d | ok   | WebSearch | query=United Airlines "Every Flight Has a Story" generative AI delay notifications agents operations 2024
+2026-11-20T15:24:50Z | 0136a25d | ok   | WebSearch | query=Alaska Airlines Flyways Airspace Intelligence system dispatchers route recommendations results
+2026-11-20T15:24:50Z | 0136a25d | ok   | WebSearch | query=American Airlines HEAT Hub Efficiency Analytics Tool weather reshuffle connections Smart Gating
+2026-11-20T15:24:51Z | 0136a25d | ok   | Bash | Extract Lufthansa OPSD paper text and grep :: cd /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad/pdf; cp /home/heshawa/.…
+2026-11-20T15:24:52Z | 0136a25d | ok   | Bash | Read solve time and impact sections :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; tr -s '\n' < $S/lh.txt …
+2026-11-20T15:24:53Z | 0136a25d | ok   | WebFetch | url=https://www.legislation.gov.uk/eur/2004/261/article/7
+2026-11-20T15:24:54Z | 0136a25d | ok   | WebFetch | url=https://www.legislation.gov.uk/eur/2004/261/article/11
+2026-11-20T15:24:55Z | 0136a25d | ok   | WebFetch | url=https://laws.justice.gc.ca/eng/regulations/SOR-2019-150/page-3.html
+2026-11-20T15:24:56Z | 0136a25d | ok   | Bash | Read relevant passages of OPSD paper :: cd /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad/pdf; sed -n 108,160p b.…
+2026-11-20T15:24:56Z | 0136a25d | ok   | Bash | Find solve-time and passenger cost text :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; tr -s '\n' < $S/lh.txt …
+2026-11-20T15:25:00Z | 0136a25d | ok   | WebSearch | query=Navitaire New Skies disruption "irregular operations" rebooking product Amadeus Navitaire 2024 2025
+2026-11-20T15:25:00Z | 0136a25d | ok   | WebSearch | query="Flight Interruption Manifest" IATA resolution FIM billing coupons
+2026-11-20T15:25:00Z | 0136a25d | ok   | WebSearch | query=US DOT automatic refund rule 2024 significant change definition 3 hours domestic 6 hours international cancelled flight
+2026-11-20T15:25:01Z | 0136a25d | ok   | WebSearch | query=SabreMosaic PSS components reservations inventory departure control offer order 2024
+2026-11-20T15:25:02Z | 0136a25d | ok   | WebSearch | query=Boeing completes sale of Jeppesen ForeFlight digital aviation solutions Thoma Bravo 2025
+2026-11-20T15:25:03Z | 0136a25d | ok   | WebSearch | query=CAE completes acquisition Sabre AirCentre airline operations portfolio flight and crew management
+2026-11-20T15:25:03Z | 0136a25d | ok   | WebFetch | url=https://www.transportation.gov/airconsumer/southwest-order-2023-12-11
+2026-11-20T15:25:04Z | 0136a25d | ok   | WebSearch | query=SITA Type B messaging airline Type X migration TTY telegrams ACARS ARINC 620 airline operations
+2026-11-20T15:25:04Z | 0136a25d | ok   | WebSearch | query=Lufthansa Systems NetLine/Ops ++ operations control AI recommendations reinforcement learning
+2026-11-20T15:25:06Z | 0136a25d | ok   | WebFetch | url=https://www.southwest.com/assets/pdfs/corporate-commitments/SW_FinalSummary_ActionPlan_7-2023.pdf
+2026-11-20T15:25:06Z | 0136a25d | ok   | WebSearch | query=Sternberg Soares Carvalho Ogasawara review on flight delay prediction 2017 arXiv
+2026-11-20T15:25:07Z | 0136a25d | ok   | WebSearch | query=graph neural network flight delay prediction airport network spatio-temporal arXiv
+2026-11-20T15:25:07Z | 0136a25d | ok   | WebSearch | query=Rebollo Balakrishnan characterization and prediction of air traffic delays random forest 2 hour horizon accuracy
+2026-11-20T15:25:07Z | 0136a25d | ok   | WebSearch | query=systematic review flight delay prediction machine learning Carvalho 2021 "On the relevance of data science for flight delay research"
+2026-11-20T15:25:07Z | 0136a25d | ok   | WebSearch | query=DOT automatic refund rule 14 CFR 260 significant change 3 hours domestic 6 hours international effective October 28 2024
+2026-11-20T15:25:08Z | 0136a25d | ok   | WebSearch | query=DGCA CAR Section 3 Series M Part IV compensation cancellation denied boarding amounts revision 2024 2025
+2026-11-20T15:25:09Z | 0136a25d | ok   | WebSearch | query=Southwest Senate testimony Watterson February 2023 crew scheduling SkySolver crew phone hold times point-to-point network recovery
+2026-11-20T15:25:09Z | 0136a25d | ok   | WebSearch | query=UAE GCAA air passenger rights regulation delay cancellation compensation; Saudi GACA passenger rights protection regulation 2023
+2026-11-20T15:25:11Z | 0136a25d | ok   | WebSearch | query=ANAC Resolução 400 assistência material 1 hora 2 horas 4 horas reacomodação preterição compensação DES 250 500
+2026-11-20T15:25:13Z | 0136a25d | ok   | WebSearch | query=Barnhart Fearing Vaze 2014 passenger delays cancellations missed connections share of total passenger delay
+2026-11-20T15:25:13Z | 0136a25d | ok   | WebSearch | query=PNRGOV API WCO IATA ICAO guidelines PNR data push governments standard
+2026-11-20T15:25:13Z | 0136a25d | ok   | WebSearch | query=Amadeus completes acquisition Navitaire 2016 Accenture
+2026-11-20T15:25:14Z | 0136a25d | ok   | WebSearch | query=EU Regulation 261/2004 Article 11 persons with reduced mobility unaccompanied children priority Article 14 obligation to inform passengers
+2026-11-20T15:25:14Z | 0136a25d | ok   | WebFetch | url=https://www.iata.org/contentassets/badbfd2d36a74f12b021c9dd899ecbad/type-b-messaging-whitepaper-v2.5.pdf
+2026-11-20T15:25:15Z | 0136a25d | ok   | WebFetch | url=https://www.commerce.senate.gov/services/files/AA8C8107-7E17-43BB-80EA-42D8AA9C4E60
+2026-11-20T15:25:15Z | 0136a25d | ok   | WebSearch | query=FAA ATCSCC Command Center airline operations centers collaborative decision making planning teleconference ground delay program substitutions
+2026-11-20T15:25:18Z | 0136a25d | ok   | WebSearch | query=EUROCONTROL Network Manager CTOT calculated take-off time ATFM slot SAM SRM FUM DPI messages airline operations centre
+2026-11-20T15:25:18Z | 0136a25d | ok   | WebFetch | url=https://lhsystems.com/solutions/ai-other-services/netlineops-aiocc
+2026-11-20T15:25:19Z | 0136a25d | ok   | WebSearch | query=EUROCONTROL Aviation Data Repository for Research flight data access ADRR
+2026-11-20T15:25:19Z | 0136a25d | ok   | WebSearch | query=FAA ASPM Aviation System Performance Metrics definition data airports flights
+2026-11-20T15:25:20Z | 0136a25d | ok   | WebSearch | query=flight delay prediction review 2023 2024 gradient boosting XGBoost LightGBM prediction horizon accuracy deep learning survey
+2026-11-20T15:25:20Z | 0136a25d | ok   | WebSearch | query=flight cancellation prediction machine learning winter storm airline day-ahead model
+2026-11-20T15:25:23Z | 0136a25d | ok   | Bash | Extract IATA Type B whitepaper text :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; pdftotext -layout /home…
+2026-11-20T15:25:24Z | 0136a25d | ok   | WebSearch | query=Southwest Airlines December 2022 point-to-point network reset schedule cut two-thirds flights crew out of position explanation
+2026-11-20T15:25:24Z | 0136a25d | ok   | WebFetch | url=https://sabre.com/?p=20192
+2026-11-20T15:25:25Z | 0136a25d | ok   | WebFetch | url=https://www.gcaa.gov.ae/en/epublication/EPublications/Civil%20Aviation%20Regulations%20(CARs)/CAR%20III%20-%20GENERAL%20REGULATIONS/CAR-PWP%20-%2…
+2026-11-20T15:25:27Z | 0136a25d | ok   | Bash | Read Type B uses and recommendations :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed -n 140,200p $S/pdf/…
+2026-11-20T15:25:28Z | 0136a25d | ok   | WebSearch | query=PNL ADL PTM PSM PFS messages departure control passenger transfer message inbound outbound connections
+2026-11-20T15:25:28Z | 0136a25d | ok   | WebFetch | url=https://www.iata.org/contentassets/6de4dce5f38b45ce82b0db42acd23d1c/ndc-infocus-servicing.pdf
+2026-11-20T15:25:31Z | 0136a25d | ok   | WebFetch | url=https://amadeus.com/en/portfolio/airlines/amadeus-self-re-accommodation
+2026-11-20T15:25:31Z | 0136a25d | ok   | WebSearch | query=Boeing Airplane Health Management real-time airplane data alerts predictive maintenance airlines
+2026-11-20T15:25:32Z | 0136a25d | ok   | WebFetch | url=https://agenciagov.ebc.com.br/noticias/202609/anac-atualiza-regras-sobre-atrasos-e-cancelamentos-e-amplia-deveres-de-informacao-aos-passageiros
+2026-11-20T15:25:33Z | 0136a25d | ok   | WebSearch | query=DOT Southwest Airlines December 2022 holiday meltdown consent order crew scheduling system findings
+2026-11-20T15:25:33Z | 0136a25d | ok   | WebSearch | query=ICAO Annex 3 METAR TAF SIGMET issuance validity TAF 9 hours 24 30 hours
+2026-11-20T15:25:34Z | 0136a25d | ok   | Bash | Extract NDC servicing PDF text :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; pdftotext -layout /home…
+2026-11-20T15:25:35Z | 0136a25d | ok   | WebSearch | query=FAA holdover time guidelines deicing anti-icing fluid winter season document
+2026-11-20T15:25:43Z | 0136a25d | ok   | WebSearch | query=IATA AIDX Aviation Information Data Exchange XML flight information airlines airports ground handlers standard
+2026-11-20T15:25:43Z | 0136a25d | ok   | WebSearch | query=Castro Oliveira airline operations control centre organization "supervisor" "aircraft control" "crew control" "passenger services" "maintenance…
+2026-11-20T15:25:44Z | 0136a25d | ok   | WebSearch | query=14 CFR 259.8 notify passengers flight status changes within 30 minutes delay cancellation diversion
+2026-11-20T15:25:46Z | 0136a25d | ok   | WebSearch | query=airline machine learning predict missed connections transfer passengers hub (Lufthansa OR KLM OR Heathrow OR American) connection risk model
+2026-11-20T15:25:47Z | 0136a25d | ok   | WebFetch | url=https://www.iata.org/en/publications/newsletters/iata-knowledge-hub/on-demand-webinarnew-iata-delay-codes-ahm-732-how-to-improve-performance-anal…
+2026-11-20T15:25:47Z | 0136a25d | ok   | WebSearch | query=OpenSky Network ADS-B data research access historical database Trino coverage limitations
+2026-11-20T15:25:47Z | 0136a25d | ok   | WebSearch | query=IATA AHM 732 "triple A" delay codes process reason stakeholder new delay code structure
+2026-11-20T15:25:47Z | 0136a25d | ok   | WebSearch | query=IATA Recommended Practice 1735 planned schedule change notification passengers schedule change handling PNR status codes TK UN HX
+2026-11-20T15:25:48Z | 0136a25d | ok   | WebSearch | query=IATA ONE Order Modern Airline Retailing 2030 target offers orders status 2025 PSS transition
+2026-11-20T15:25:48Z | 0136a25d | ok   | WebSearch | query=EUROCONTROL Airport CDM DPI message TOBT TSAT EOBT flight update network manager
+2026-11-20T15:25:50Z | 0136a25d | ok   | WebFetch | url=https://core.ac.uk/download/143385463.pdf
+2026-11-20T15:25:53Z | 0136a25d | ok   | WebSearch | query=airline integrated operations centre "customer" desk passenger reaccommodation IROPS team coordination call Delta OCC description "Operations a…
+2026-11-20T15:25:56Z | 0136a25d | ok   | WebFetch | url=https://www.mgmt.ucl.ac.uk/news/bert-de-reyck-uses-big-data-analytics-improve-heathrow-operations
+2026-11-20T15:25:57Z | 0136a25d | ok   | WebSearch | query=EUROCONTROL Airport CDM milestones list "Actual Off-Block Time" "Target Start Up Approval Time" milestone 1 to 16 ATC flight plan activation EI…
+2026-11-20T15:25:59Z | 0136a25d | ok   | WebFetch | url=https://support.travelport.com/webhelp/uAPI/Content/Air/Shared_Air_Topics/PNR_Status_Codes.htm
+2026-11-20T15:26:03Z | 0136a25d | ok   | WebSearch | query=EUROCONTROL Network Manager machine learning predict take-off time or flight plan prediction operational
+2026-11-20T15:26:03Z | 0136a25d | ok   | WebSearch | query=NASA Digital Information Platform machine learning predictions taxi time runway DFW deployed airlines
+2026-11-20T15:26:04Z | 0136a25d | ok   | WebSearch | query=probabilistic flight delay prediction distribution quantile survival analysis arrival delay paper
+2026-11-20T15:26:04Z | 0136a25d | ok   | WebSearch | query=EUROCONTROL en-route ATFM delay 2025 causes capacity staffing weather minutes per flight summer
+2026-11-20T15:26:06Z | 0136a25d | ok   | WebFetch | url=https://pro.delta.com/content/agency/hk/zt/policy-library/schedule-change-and-irregular-operations/schedule-change-and-ticket-revalidation-policy…
+2026-11-20T15:26:08Z | 0136a25d | ok   | WebFetch | url=https://www.iata.org/contentassets/e7a533819be440edbb1e49da96e0f2a8/guidance-document-interline-irops_25june2020.pdf
+2026-11-20T15:26:10Z | 0136a25d | ok   | WebFetch | url=https://repositorio-aberto.up.pt/handle/10216/54256
+2026-11-20T15:26:12Z | 0136a25d | ok   | WebFetch | url=https://www.ucl.ac.uk/management/news/bert-de-reyck-uses-big-data-analytics-improve-heathrow-operations
+2026-11-20T15:26:13Z | 0136a25d | ok   | WebFetch | url=https://westminsterresearch.westminster.ac.uk/download/a120562d0dfbd605a20f2d8de3b40cd6d7eeaaba4578750c2fae0182934f169e/2431243/1-s2.0-S095741742…
+2026-11-20T15:26:16Z | 0136a25d | ok   | WebSearch | query=United ConnectionSaver hold flights connecting passengers algorithm
+2026-11-20T15:26:17Z | 0136a25d | ok   | WebSearch | query=airline overbooking protection seats disruption "protect" passengers revenue management inventory reaccommodation nesting booking classes
+2026-11-20T15:26:17Z | 0136a25d | ok   | WebFetch | url=https://ideas.repec.org/a/eee/jaitra/v95y2021ics0969699721000739.html
+2026-11-20T15:26:17Z | 0136a25d | ok   | WebFetch | url=https://united.mediaroom.com/2023-06-22-Uniteds-New-App-Feature-Helps-Customers-Re-book-and-Receive-Meal-and-Hotel-Vouchers-Automatically
+2026-11-20T15:26:18Z | 0136a25d | FAIL | WebFetch | url=https://www.npr.org/2023/02/08/1155616925/southwest-airlines-coo-prepared-testimony-holiday-travel-chaos | err=timeout of 60000ms exceeded
+2026-11-20T15:26:19Z | 0136a25d | ok   | WebFetch | url=https://arxiv.org/html/2510.26831v1
+2026-11-20T15:26:19Z | 0136a25d | ok   | WebSearch | query=EUROCONTROL data snapshot reactionary delay low-cost carriers vs traditional scheduled punctuality market segment
+2026-11-20T15:26:23Z | 0136a25d | ok   | Bash | Extract IATA interline IROPS guidance :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; pdftotext -layout /home…
+2026-11-20T15:26:26Z | 0136a25d | ok   | Bash | Read passenger handling section :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed -n 140,240p $S/pdf/…
+2026-11-20T15:26:28Z | 0136a25d | ok   | WebFetch | url=https://skybrary.aero/articles/calculated-take-time-ctot
+2026-11-20T15:26:29Z | 0136a25d | ok   | WebFetch | url=https://mdsg.engineering.dartmouth.edu/Wang_Vaze_modeling_probability_distributions_of_delays.pdf
+2026-11-20T15:26:29Z | 0136a25d | ok   | WebSearch | query=Amadeus "Personal Disruption Companion" airline launch
+2026-11-20T15:26:30Z | 0136a25d | ok   | WebSearch | query=Expert Systems with Applications 2024 machine learning ATFM delay individual flights before day of operations Westminster
+2026-11-20T15:26:30Z | 0136a25d | ok   | WebSearch | query=airline PSS market vendors Amadeus Altéa Sabre SabreSonic Navitaire IBS iFly Res Hitit Crane Radixx acquired Sabre 2021
+2026-11-20T15:26:30Z | 0136a25d | ok   | WebSearch | query=EU261 Article 8 re-routing earliest opportunity comparable transport conditions other carriers Interpretative Guidelines 2024
+2026-11-20T15:26:31Z | 0136a25d | ok   | WebFetch | url=https://viewfromthewing.com/a-top-airline-executive-explains-the-southwest-airlines-meltdown/
+2026-11-20T15:26:33Z | 0136a25d | ok   | WebFetch | url=https://www.ksl.com/article/50575686/southwest-explains-its-meltdown-to-congress
+2026-11-20T15:26:34Z | 0136a25d | ok   | Bash | Extract Wang Vaze paper abstract :: cd /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad/pdf; cp /home/heshawa/.…
+2026-11-20T15:26:39Z | 0136a25d | ok   | WebFetch | url=https://www.travelweekly.com/Travel-News/Airline-News/DOT-ends-inquiry-of-CrowdStrike-crash-that-plagued-Delta
+2026-11-20T15:26:41Z | 0136a25d | ok   | WebSearch | query=IBS Software iFlight Korean Air operations control crew go-live press release
+2026-11-20T15:26:41Z | 0136a25d | ok   | WebSearch | query=DOT Southwest Airlines December 2022 meltdown consent order $140 million crew scheduling system SkySolver
+2026-11-20T15:26:41Z | 0136a25d | ok   | WebSearch | query=Amadeus Altéa Departure Control Flight Management disruption management passenger re-accommodation Navitaire acquisition 2016
+2026-11-20T15:26:42Z | 0136a25d | ok   | WebSearch | query=Sabre IROPS reaccommodation automated rebooking passengers product description Sabre Recovery
+2026-11-20T15:26:43Z | 0136a25d | ok   | WebSearch | query=Delta Bastian CrowdStrike "crew tracking" 7,000 flights 1.3 million customers $500 million July 2024 recovery five days
+2026-11-20T15:26:43Z | 0136a25d | ok   | WebSearch | query=Delta CES 2020 machine learning platform Operations and Customer Center "hundreds of millions" data points disruption scenarios
+2026-11-20T15:26:43Z | 0136a25d | ok   | WebSearch | query=Assaia turnaround AI airports predicted off-block time production airports
+2026-11-20T15:26:45Z | 0136a25d | ok   | WebSearch | query=EU Regulation 261/2004 extraordinary circumstances Sturgeon 3 hours delay compensation weather ATC court of justice
+2026-11-20T15:26:47Z | 0136a25d | ok   | WebFetch | url=https://news.delta.com/update-delta-customers-ceo-ed-bastian-july-24.md
+2026-11-20T15:26:50Z | 0136a25d | ok   | WebSearch | query=Delta 8-K August 2024 CrowdStrike outage $380 million revenue impact $170 million expense cancellations
+2026-11-20T15:26:51Z | 0136a25d | ok   | WebSearch | query=Amadeus AirOps AI agent airline operations companion Microsoft 2025 launch airline customer
+2026-11-20T15:26:51Z | 0136a25d | ok   | WebSearch | query=Amadeus completes acquisition of Navitaire from Accenture 2016 low-cost carrier PSS New Skies
+2026-11-20T15:26:51Z | 0136a25d | ok   | WebSearch | query=airline operations control generative AI assistant OCC 2025 2026 "operations control" LLM pilot airline announces (Air India OR Lufthansa OR Em…
+2026-11-20T15:26:52Z | 0136a25d | ok   | WebFetch | url=https://www.legislation.gov.uk/eur/2004/261/article/14/data.htm
+2026-11-20T15:27:03Z | 0136a25d | ok   | WebSearch | query=Petersen Sölveling Clarke Johnson Shebalov "An optimization approach to airline integrated recovery" Transportation Science 2012 results solve …
+2026-11-20T15:27:03Z | 0136a25d | ok   | WebSearch | query=Kohl Larsen Larsen Ross Tiourine 2007 "Airline disruption management—Perspectives, experiences and outcomes" Journal of Air Transport Managemen…
+2026-11-20T15:27:03Z | 0136a25d | ok   | WebFetch | url=https://www.amadeus.com/en/newsroom/press-releases/agentic-ai-airlines-amadeus
+2026-11-20T15:27:03Z | 0136a25d | ok   | WebSearch | query=AhmadBeygi Cohn Guan Belobaba 2008 "Analysis of the potential for delay propagation in passenger airline networks" Journal of Air Transport Man…
+2026-11-20T15:27:03Z | 0136a25d | ok   | WebSearch | query=Hassan Santos Vink 2021 "Airline disruption management: A literature review and practical challenges" Computers & Operations Research findings
+2026-11-20T15:27:07Z | 0136a25d | ok   | WebFetch | url=https://www.bcg.com/publications/2025/ai-first-airline
+2026-11-20T15:27:08Z | 0136a25d | ok   | WebFetch | url=https://runwaygirlnetwork.com/2024/02/united-airlines-explains-every-flight-has-a-story-initiative/
+2026-11-20T15:27:13Z | 0136a25d | ok   | WebFetch | url=https://tech.yahoo.com/ai/articles/airline-exec-raves-ai-good-160007121.html
+2026-11-20T15:27:13Z | 0136a25d | ok   | WebSearch | query="Large-Scale Airline Crew Recovery Using Mixed-Integer Optimization and Supervised Machine Learning" authors journal results
+2026-11-20T15:27:14Z | 0136a25d | ok   | WebFetch | url=https://amadeus.com/documents/en/airlines/white-paper/shaping-the-future-of-airline-disruption-management.pdf
+2026-11-20T15:27:15Z | 0136a25d | ok   | WebSearch | query=reinforcement learning airline disruption recovery aircraft recovery problem paper Transportation Research results compared to MIP
+2026-11-20T15:27:19Z | 0136a25d | ok   | WebFetch | url=https://news.aa.com/news/news-details/2023/Meet-HEAT-Americans-tool-to-manage-through-summer-storms-OPS-OTH-07/default.aspx
+2026-11-20T15:27:20Z | 0136a25d | ok   | Bash | Extract Amadeus whitepapers text :: D=/home/heshawa/.claude/projects/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/tool-results; S=/tmp/…
+2026-11-20T15:27:22Z | 0136a25d | ok   | WebFetch | url=https://news.alaskaair.com/sustainability/how-ai-is-helping-alaska-airlines-plan-better-flight-routes-and-lower-emissions
+2026-11-20T15:27:25Z | 0136a25d | ok   | Bash | Read Amadeus whitepaper excerpts :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; tr -s '\n' < $S/amadeus…
+2026-11-20T15:27:29Z | 0136a25d | ok   | WebFetch | url=https://corporate.airfrance.com/en/ground-air-operations
+2026-11-20T15:27:29Z | 0136a25d | ok   | Bash | Find date and passenger recovery example :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; grep -n -E "20(1|2)[0-9…
+2026-11-20T15:27:34Z | 0136a25d | FAIL | WebFetch | url=https://gaca.gov.sa/-/media/Files/PDF/LawsAndRegulation/Consumer-Protection/Passenger-Rights-Protection-Regulations-EN.pdf | err=Command failed with no output
+2026-11-20T15:27:34Z | 0136a25d | ok   | WebSearch | query=FAA Advisory Circular 120-101 Part 121 Air Carrier Operational Control functions dispatcher flight following
+2026-11-20T15:27:37Z | 0136a25d | ok   | Bash | Extract UAE PWP text and grep key terms :: cd /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; pdftotext -layout /hom…
+2026-11-20T15:27:40Z | 0136a25d | ok   | Bash | Read UAE PWP core provisions :: cd /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed -n 40,50p pwp.txt;…
+2026-11-20T15:27:45Z | 0136a25d | ok   | WebSearch | query=IATA Resolution 735d involuntary rerouting interline reaccommodation flight interruption manifest FIM
+2026-11-20T15:27:46Z | 0136a25d | ok   | WebSearch | query=IATA Standard Schedules Information Manual SSIM ASM SSM messages chapter 4 5 schedule changes
+2026-11-20T15:27:47Z | 0136a25d | ok   | WebSearch | query=IATA AHM 730 delay codes AHM 780 MVT movement message Airport Handling Manual
+2026-11-20T15:27:49Z | 0136a25d | ok   | WebSearch | query=EUROCONTROL Airport CDM milestones TOBT TSAT A-CDM implementation manual DPI messages Network Manager
+2026-11-20T15:27:51Z | 0136a25d | ok   | WebSearch | query=Sabre reaccommodation passenger prioritization rules customer value IROPS "passenger priority"
+2026-11-20T15:27:52Z | 0136a25d | ok   | WebSearch | query=dgca.gov.in CAR Section 3 Series M Part IV "Facilities to be provided to passengers by airlines due to denied boarding, cancellation of flights…
+2026-11-20T15:27:52Z | 0136a25d | ok   | WebSearch | query=ICAO revised limits of liability Montreal Convention 2024 delay 6,303 SDR effective 28 December 2024
+2026-11-20T15:27:54Z | 0136a25d | ok   | WebSearch | query=Amadeus passenger recovery reaccommodation prioritise passengers customer value loyalty tier disruption solution
+2026-11-20T15:27:56Z | 0136a25d | ok   | Bash | Check solver names in LH paper :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; grep -n -i -E "or-tools…
+2026-11-20T15:27:59Z | 0136a25d | ok   | Bash | Read CP-SAT context :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed -n 1955,1975p $S/lh…
+2026-11-20T15:28:05Z | 0136a25d | ok   | WebFetch | url=https://pib.gov.in/PressReleasePage.aspx?PRID=1885978
+2026-11-20T15:28:09Z | 0136a25d | ok   | WebSearch | query=Commission interpretative guidelines Regulation 261/2004 2024 amendment rerouting other carriers "C/2024"
+2026-11-20T15:28:11Z | 0136a25d | ok   | WebSearch | query=United Airlines contract of carriage Rule 25 denied boarding priority "fare class" "check-in" "MileagePlus" involuntary
+2026-11-20T15:28:11Z | 0136a25d | ok   | WebSearch | query=airline passenger recovery fairness priority optimization paper passenger reaccommodation weights loyalty "inconvenience" recovery model
+2026-11-20T15:28:13Z | 0136a25d | ok   | WebSearch | query=Frankfurt airport night flight ban 23:00 05:00 Sydney airport curfew 11pm 6am Curfew Act dispensation
+2026-11-20T15:28:13Z | 0136a25d | ok   | WebSearch | query=FAA Ground Delay Program collaborative decision making slot substitution airline "slot credit substitution" FSM
+2026-11-20T15:28:13Z | 0136a25d | ok   | WebSearch | query=DOT final rule automatic refunds April 2024 significant delay 3 hours domestic 6 hours international cancellation definition
+2026-11-20T15:28:15Z | 0136a25d | ok   | WebSearch | query=airline pilot contract reassignment limits irregular operations pay protection crew scheduling union agreement section IROPS
+2026-11-20T15:28:18Z | 0136a25d | ok   | WebFetch | url=https://www.aa.com/i18n/customer-service/support/conditions-of-carriage.jsp
+2026-11-20T15:28:21Z | 0136a25d | ok   | WebFetch | url=https://www.arxiv.org/abs/2510.26831
+2026-11-20T15:28:28Z | 0136a25d | FAIL | WebFetch | url=https://www.airindia.com/in/en/newsroom/articles/inside-air-india-operations-control-centre.html | err=timeout of 60000ms exceeded
+2026-11-20T15:28:29Z | 0136a25d | ok   | WebSearch | query=CAE Flight and Crew Recovery Manager product disruption airline operations control "Movement Manager" CAE
+2026-11-20T15:28:30Z | 0136a25d | ok   | WebSearch | query=Amadeus passenger reaccommodation disruption management Altea "Passenger Recovery" product airlines automated rebooking
+2026-11-20T15:28:30Z | 0136a25d | ok   | WebSearch | query=American Airlines HEAT Hub Efficiency Analytics Tool United ConnectionSaver disruption tool
+2026-11-20T15:28:30Z | 0136a25d | ok   | WebFetch | url=https://www.geaerospace.com/sites/default/files/networkoperations_optimization.pdf
+2026-11-20T15:28:34Z | 0136a25d | ok   | Bash | Extract GE network ops PDF text :: D=/home/heshawa/.claude/projects/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/tool-results; S=/tmp/…
+2026-11-20T15:28:40Z | 0136a25d | ok   | Bash | Download Castro chapter and FAA AC PDFs :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; mkdir -p $S/dl && cd $S…
+2026-11-20T15:28:44Z | 0136a25d | ok   | Bash | Grep OCC roles in Castro chapter :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; tr -s ' ' < $S/pdf/cast…
+2026-11-20T15:28:45Z | 0136a25d | ok   | WebSearch | query="Towards efficient airline disruption recovery with reinforcement learning" 2023 Transportation Research Part E results
+2026-11-20T15:28:46Z | 0136a25d | ok   | WebSearch | query=Bratu Barnhart 2006 "Flight operations recovery: New approaches considering passenger recovery" Journal of Scheduling
+2026-11-20T15:28:46Z | 0136a25d | ok   | WebSearch | query=Ball et al 2010 NEXTOR "Total Delay Impact Study" $32.9 billion cost of flight delays US 2007
+2026-11-20T15:28:48Z | 0136a25d | ok   | Bash | Read Castro OCC organisation text :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed -n 55,70p $S/pdf/c2…
+2026-11-20T15:28:53Z | 0136a25d | ok   | Bash | Grep FAA AC 120-101 content :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; tr -s ' ' < $S/pdf/ac12…
+2026-11-20T15:28:56Z | 0136a25d | ok   | Bash | Read AC 120-101 functions and limits :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed -n 95,160p $S/pdf/a…
+2026-11-20T15:28:57Z | 0136a25d | ok   | WebSearch | query=EUROCONTROL CTOT slot tolerance -5 +10 minutes ATFM regulation Commission Regulation 255/2010 calculated take-off time
+2026-11-20T15:28:58Z | 0136a25d | ok   | WebSearch | query=Regulation (EC) 261/2004 article 8 re-routing "at the earliest opportunity" article 5 cancellation 14 days notice compensation article 7 extrao…
+2026-11-20T15:29:05Z | 0136a25d | ok   | Bash | Download A-CDM guide and NM ATFCM manual :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; cd $S/dl; curl -sL -A "…
+2026-11-20T15:29:09Z | 0136a25d | ok   | WebFetch | url=https://www.law.cornell.edu/cfr/text/14/121.628
+2026-11-20T15:29:09Z | 0136a25d | ok   | Bash | Read NM ATFCM manual message types :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; tr -s ' ' < $S/pdf/nm.t…
+2026-11-20T15:29:10Z | 0136a25d | ok   | WebFetch | url=https://news.aa.com/news/news-details/2023/Meet-HEAT-Americans-tool-to-manage-through-summer-storms-OPS-OTH-07/default.aspx
+2026-11-20T15:29:12Z | 0136a25d | ok   | Bash | Check KB index and sibling notes :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline; cat README.md | head -60; ls -la topics/disruption…
+2026-11-20T15:29:14Z | 0136a25d | ok   | Bash | Find NM message definitions :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; grep -n -i -E 'slot all…
+2026-11-20T15:29:18Z | 0136a25d | FAIL | WebFetch | url=https://www.united.com/en/us/fly/contract-of-carriage.html | err=timeout of 60000ms exceeded
+2026-11-20T15:29:24Z | 0136a25d | ok   | Bash | Download EUROCONTROL A-CDM documents :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; cd $S/dl; for n in 9815…
+2026-11-20T15:29:29Z | 0136a25d | ok   | Bash | Extract A-CDM milestone list :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; pdftotext -layout $S/dl…
+2026-11-20T15:29:31Z | 0136a25d | ok   | WebSearch | query=contract of carriage "boarding priority" denied boarding "fare class" "frequent flyer" "unaccompanied minors" "check-in time" airline rule text
+2026-11-20T15:29:31Z | 0136a25d | ok   | Bash | Download United CoC and search boarding priority :: cd /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; mkdir -p dl; curl -sL …
+2026-11-20T15:29:33Z | 0136a25d | ok   | Bash | Read milestone 9 and TOBT ownership :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed -n 1825p $S/pdf/acd…
+2026-11-20T15:29:44Z | 0136a25d | ok   | WebFetch | url=https://resource.alaskaair.net/v3/assets/blt2cefe12c88e9dd91/blta6d545d0295aad57/CoC%20English
+2026-11-20T15:29:47Z | 0136a25d | ok   | WebSearch | query=CAT.GEN.MPA.105 responsibilities of the commander EASA "decide on acceptance of the aircraft" operational control "commander shall"
+2026-11-20T15:29:47Z | 0136a25d | ok   | WebFetch | url=https://regulatorylibrary.caa.co.uk/965-2012/Content/Document%20Structure/03%20ORO/3%20AMC/AMC1%20ORO%20GEN%20110%20c%20Operator.htm
+2026-11-20T15:29:48Z | 0136a25d | ok   | WebFetch | url=https://www.delta.com/us/en/legal/contract-of-carriage-igr
+2026-11-20T15:29:48Z | 0136a25d | ok   | WebSearch | query=Regulation (EC) 261/2004 Article 14 obligation to inform passengers of their rights written notice; Article 5 cancellation informed two weeks; …
+2026-11-20T15:29:53Z | 0136a25d | ok   | Bash | Extract Alaska CoC and grep boarding priority :: D=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad/r04; mkdir -p $D; pdftot…
+2026-11-20T15:29:56Z | 0136a25d | ok   | Bash | Read Alaska denied boarding priority text :: D=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad/r04; sed -n 940,985p $D/…
+2026-11-20T15:29:59Z | 0136a25d | ok   | WebFetch | url=https://regulatorylibrary.caa.co.uk/965-2012/Content/Regs/05440_CATGENMPA105_Responsibilities_of_the_commander.htm
+2026-11-20T15:30:01Z | 0136a25d | ok   | WebSearch | query=EASA GM1 ORO.GEN.110(c) "does not imply a requirement for licensed flight dispatchers or a full flight watch system"
+2026-11-20T15:30:09Z | 0136a25d | ok   | WebSearch | query=DOT airline customer service dashboard commitments rebook on partner airline no additional cost cancellation controllable
+2026-11-20T15:30:10Z | 0136a25d | ok   | WebSearch | query="Every Flight Has a Story" United 2025 generative AI fully automated storytellers Jason Birnbaum messages
+2026-11-20T15:30:11Z | 0136a25d | ok   | WebSearch | query=GDPR Article 22 automated decision-making CJEU SCHUFA C-634/21 profiling scoring "decision" 2023
+2026-11-20T15:30:11Z | 0136a25d | ok   | WebFetch | url=https://www.easa.europa.eu/en/easy-access-rules/4e4220/ERULES-1963177438-11982
+2026-11-20T15:30:12Z | 0136a25d | ok   | WebSearch | query=IATA Resolution 735d involuntary rerouting interline passengers disruption endorsement
+2026-11-20T15:30:12Z | 0136a25d | ok   | WebSearch | query=Saudi GACA passenger rights protection regulations compensation delay 3 hours SAR 750 cancellation 150% denied boarding 200% priority elderly d…
+2026-11-20T15:30:24Z | 0136a25d | ok   | WebFetch | url=https://livefromalounge.com/wp-content/uploads/2023/12/D3M-M4-1.pdf
+2026-11-20T15:30:24Z | 0136a25d | ok   | WebFetch | url=https://www.law.cornell.edu/cfr/text/14/259.4
+2026-11-20T15:30:25Z | 0136a25d | ok   | WebSearch | query=CJEU Folkerts C-11/11 connecting flight delay final destination; Sturgeon C-402/07; Airhelp v SAS C-28/20 strike own staff; Wallentin-Hermann C…
+2026-11-20T15:30:28Z | 0136a25d | ok   | WebFetch | url=https://www.cio.com/article/3969476/united-airlines-ai-strategy-the-airline-that-makes-decisions-fastest-wins.html
+2026-11-20T15:30:29Z | 0136a25d | FAIL | Bash | Fetch Air India OCC article via curl :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; cd $S/dl; curl -sL -m 4… | err=Exit code 1 ls: cannot access 'ai.html': No such file or directory Traceback (most recent call last): File "<string>", …
+2026-11-20T15:30:29Z | 0136a25d | ok   | Bash | Extract DGCA CAR copy text :: D=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad/r04; pdftotext -layout /…
+2026-11-20T15:30:33Z | 0136a25d | ok   | Bash | Read DGCA denied boarding and delay text :: D=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad/r04; sed -n 165,200p $D/…
+2026-11-20T15:30:38Z | 0136a25d | ok   | Write | documentation/knowledge-base/airline/topics/disruption-management/03-passenger-impact.md (53443 chars)
+2026-11-20T15:30:40Z | 0136a25d | ok   | Bash | Count words in output file :: wc -w /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline/topics/disruption-management/03-passenger-impact…
+2026-11-20T15:30:41Z | 0136a25d | ok   | WebSearch | query=ACARS Aircraft Communications Addressing and Reporting System ARINC 618 620 OOOI times out off on in airline operations
+2026-11-20T15:30:41Z | 0136a25d | ok   | WebSearch | query=AIMS Airline Information Management Systems crew management operations control software airlines customers aims.aero
+2026-11-20T15:30:44Z | 0136a25d | ok   | WebSearch | query=EASA Air Ops "flight watch" "flight monitoring" definitions Annex I Regulation 965/2012 operational control
+2026-11-20T15:30:47Z | 0136a25d | ok   | WebSearch | query=DOT final rule December 2024 wheelchair air travelers with disabilities 14 CFR 382 mishandled wheelchair strict liability effective date
+2026-11-20T15:30:48Z | 0136a25d | ok   | WebFetch | url=https://amadeus.com/en/portfolio/airlines/passenger-recovery
+2026-11-20T15:30:49Z | 0136a25d | ok   | SubagentHandback | {"message": "I wrote the passenger impact note: /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline/topics…
+2026-11-20T15:30:49Z | 0136a25d | ok   | WebFetch | url=https://amadeus.com/en/blog/articles/how-amadeus-helps-air-canada-rebook-disrupted-passengers-in-just-10-minutes
+2026-11-20T15:30:51Z | 0136a25d | ok   | Bash | Download EASA amendment document :: S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; cd $S/dl; curl -sL -m 6…
+2026-11-20T15:30:52Z | 0136a25d | ok   | Write | documentation/knowledge-base/airline/topics/disruption-management/01-disruption-prediction.md (53995 chars)
+2026-11-20T15:30:53Z | 0136a25d | ok   | Bash | Verify passenger impact note and record progress :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606; N=$(date -u +%FT%H:%MZ); f=documentation/knowledge-base/airline/topics/disruption-manag…
+2026-11-20T15:30:55Z | 0136a25d | ok   | Bash | Read EASA draft operational control text :: S=/tmp/claude-1000/-hom e; S=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchp…
+2026-11-20T15:30:56Z | 0136a25d | ok   | Bash | Fix typo and count words :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline/topics/disruption-management; sed -i 's/Delta propa…
+2026-11-20T15:31:00Z | 0136a25d | ok   | WebSearch | query=DOT investigation Delta CrowdStrike July 2024 outage passengers rebooking unaccompanied minors findings
+2026-11-20T15:31:01Z | 0136a25d | ok   | WebSearch | query=DOT Southwest Airlines consent order December 2023 $140 million holiday meltdown penalty
+2026-11-20T15:31:03Z | 0136a25d | ok   | WebSearch | query=passenger reaccommodation priority fairness airline disruption "equity" optimization paper Transportation Research customer value prioritization
+2026-11-20T15:31:03Z | 0136a25d | ok   | WebSearch | query=Regulation (EC) 1107/2006 rights of disabled persons reduced mobility air travel 48 hours notification airport managing body assistance article…
+2026-11-20T15:31:06Z | 0136a25d | ok   | SubagentHandback | {"message": "I wrote the note, documentation/knowledge-base/airline/topics/disruption-management/01-disruption-prediction.md. It has all 10 sections …
+2026-11-20T15:31:08Z | 0136a25d | ok   | WebSearch | query=IATA NDC ONE Order "OrderChangeNotif" involuntary schedule change disruption notification seller airline
+2026-11-20T15:31:09Z | 0136a25d | ok   | Bash | Verify prediction note and record progress :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606; N=$(date -u +%FT%H:%MZ); f=documentation/knowledge-base/airline/topics/disruption-manag…
+2026-11-20T15:31:20Z | 0136a25d | ok   | WebFetch | url=https://goias.gov.br/procon/wp-content/uploads/sites/19/2017/03/resolucao-400-anac.pdf
+2026-11-20T15:31:24Z | 0136a25d | ok   | Bash | Extract ANAC Res 400 text :: D=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad/r04; pdftotext -layout /…
+2026-11-20T15:31:28Z | 0136a25d | ok   | Bash | Read ANAC Res 400 Arts 21-28 :: D=/tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad/r04; sed -n 283,384p $D/…
+2026-11-20T15:31:35Z | 0136a25d | ok   | Bash | Check topic folder and KB index :: ls /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline/topics/disruption-management/; head -40 /home/hesha…
+2026-11-20T15:31:37Z | 0136a25d | FAIL | WebFetch | url=https://otc-cta.gc.ca/eng/transition-book-chair-2026/air-passenger-protection | err=read ECONNRESET
+2026-11-20T15:31:42Z | 0136a25d | ok   | WebSearch | query=UK261 reform 2026 Department for Transport aviation consumer passenger compensation domestic flights changes CAA enforcement powers
+2026-11-20T15:31:50Z | 0136a25d | ok   | WebSearch | query=Canada Gazette Part II 2026 Regulations Amending the Air Passenger Protection Regulations final published coming into force
+2026-11-20T15:32:03Z | 0136a25d | ok   | WebFetch | url=https://laws.justice.gc.ca/eng/regulations/SOR-2019-150/page-2.html
+2026-11-20T15:32:09Z | 0136a25d | ok   | Bash | Read more joint text passages :: cd /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed -n 575,600p pecons…
+2026-11-20T15:32:13Z | 0136a25d | ok   | Bash | Check extraordinary circumstances annex nature :: cd /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/0136a25d-db73-400b-b812-43032f398716/scratchpad; sed -n 1588,1600p peco…
+2026-11-20T15:32:38Z | 0136a25d | ok   | Bash | Check sibling topic files and index :: ls /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline/topics/disruption-management/ 2>/dev/null; head -40…
+2026-11-20T15:33:21Z | 0136a25d | ok   | Write | documentation/knowledge-base/airline/topics/disruption-management/02-network-impact-and-recovery.md (55296 chars)
+2026-11-20T15:33:25Z | 0136a25d | ok   | Bash | Remove unused source row; count words :: F=/home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline/topics/disruption-management/02-network-impact-and-r…
+2026-11-20T15:33:33Z | 0136a25d | ok   | SubagentHandback | {"message": "I wrote the network impact and recovery note at `/home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/…
+2026-11-20T15:33:37Z | 0136a25d | ok   | Bash | Verify network note and record progress :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606; N=$(date -u +%FT%H:%MZ); f=documentation/knowledge-base/airline/topics/disruption-manag…
+2026-11-20T15:35:02Z | 0136a25d | ok   | Write | documentation/knowledge-base/airline/topics/disruption-management/05-occ-pcu-workflows-and-systems.md (52175 chars)
+2026-11-20T15:35:10Z | 0136a25d | ok   | Bash | Fix Mermaid labels and count words :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline/topics/disruption-management/ && python3 - <<'EOF' …
+2026-11-20T15:35:19Z | 0136a25d | ok   | SubagentHandback | {"message": "I wrote `/home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline/topics/disruption-management/05-…
+2026-11-20T15:35:22Z | 0136a25d | ok   | Bash | Verify OCC note and record progress :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606; N=$(date -u +%FT%H:%MZ); f=documentation/knowledge-base/airline/topics/disruption-manag…
+2026-11-20T15:36:03Z | 0136a25d | ok   | Write | documentation/knowledge-base/airline/topics/disruption-management/04-passenger-prioritization-and-rights.md (52443 chars)
+2026-11-20T15:36:08Z | 0136a25d | ok   | Bash | Count words in output file :: wc -w /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline/topics/disruption-management/04-passenger-priori…
+2026-11-20T15:36:15Z | 0136a25d | ok   | SubagentHandback | {"message": "I wrote documentation/knowledge-base/airline/topics/disruption-management/04-passenger-prioritization-and-rights.md (about 7,500 words w…
+2026-11-20T15:36:22Z | 0136a25d | ok   | Bash | Mark research done and list note structures :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline/topics/disruption-management; N=$(date -u +%FT%H:%M…
+2026-11-20T15:36:26Z | 0136a25d | ok   | Bash | Read key findings of notes 01 to 03 :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline/topics/disruption-management; sed -n 1,34p 01-*.md;…
+2026-11-20T15:36:26Z | 0136a25d | ok   | Bash | Read key findings of notes 04 and 05 :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline/topics/disruption-management; sed -n 1,31p 04-*.md;…
+2026-11-20T15:36:31Z | 0136a25d | ok   | Bash | Inspect source and terminology table formats :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline/topics/disruption-management; for f in 0*.md; do ec…
+2026-11-20T15:36:47Z | 0136a25d | ok   | Bash | Generate merged source registry and glossary from notes :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline; python3 - <<'EOF' import re,pathlib,collections T=…
+2026-11-20T15:36:53Z | 0136a25d | ok   | Bash | Read open questions from all notes and check CrowdStrike co… :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline/topics/disruption-management; for f in 0*.md; do ec…
+2026-11-20T15:37:00Z | 0136a25d | ok   | Bash | Find stale cross-references and read stakeholder table :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline/topics/disruption-management; grep -n "^> Related\|…
+2026-11-20T15:38:21Z | 0136a25d | ok   | Write | documentation/knowledge-base/airline/topics/disruption-management/00-OVERVIEW.md (20639 chars)
+2026-11-20T15:38:27Z | 0136a25d | ok   | Bash | Spot-check cited source IDs in the overview :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606/documentation/knowledge-base/airline; grep -E "^\| (S-N0[89]|S-N2[89]|S-N12|S-N18|S-N33|…
+2026-11-20T15:38:40Z | 0136a25d | ok   | Bash | Fix note cross-links, update README and tracking files :: cd /home/heshawa/AI-projects-personal/hack-isa/Hackathon-606; N=$(date -u +%FT%H:%MZ); python3 - "$N" <<'EOF' import pathlib,sys,re N=sys.argv[1] T=p…

@@ -60,3 +60,12 @@
 2026-11-20T11:49Z | T-100 | COMPLETED (user decision) | user: 'Do not perform these. Mark this as complete' -> D-013; outstanding items recorded as not performed; not deployed | PROJECT_STATUS, CURRENT_TASK, DEPLOYMENT_STATUS, BLOCKERS, RESUME
 2026-11-20T11:54Z | T-203 | DONE | user requirement 'Enterprise server operations, maintenance & restart resilience' merged verbatim as MASTER_PROMPT §14 (+TOC, Phase 6, §5, §12); DEPLOYMENT_RULES, MASTER_RULES, CLAUDE.md, DEPLOYMENT_STATUS template; D-014. esm-hub closed (D-013): not applied | grep refs
 2026-11-20T14:53Z | T-204 | DONE | user requirement 'Technology stack & engineering standards (product vs AI agent stack)' merged verbatim as MASTER_PROMPT §9.24 (+TOC, header, §3 tree, §9.0, §9.16.6); TECH_STACK_STANDARDS, MASTER_RULES, CLAUDE.md; new instructions/AGENT_TECH_STACK.md; D-015 | grep refs
+2026-11-20T15:20Z | T-300.0 | DONE | §15 airline research role merged verbatim; DOMAIN_RESEARCH_RULES.md; KB skeleton; D-016 | MASTER_PROMPT, CLAUDE.md, MASTER_RULES
+2026-11-20T15:20Z | T-300.1 | STARTED | disruption-management research via 5 parallel agents | KB/topics/disruption-management/01..05
+2026-11-20T15:30Z | T-300.1 | PROGRESS | 03-passenger-impact.md written (57 sources, S-X) | documentation/knowledge-base/airline/topics/disruption-management/03-passenger-impact.md
+2026-11-20T15:31Z | T-300.1 | PROGRESS | 01-disruption-prediction.md written (56 sources, S-P) | documentation/knowledge-base/airline/topics/disruption-management/01-disruption-prediction.md
+2026-11-20T15:33Z | T-300.1 | PROGRESS | 02-network-impact-and-recovery.md written (54 sources, S-N; ~half 'via search') | documentation/knowledge-base/airline/topics/disruption-management/02-network-impact-and-recovery.md
+2026-11-20T15:35Z | T-300.1 | PROGRESS | 05-occ-pcu-workflows-and-systems.md written (41 sources, S-O) | documentation/knowledge-base/airline/topics/disruption-management/05-occ-pcu-workflows-and-systems.md
+2026-11-20T15:36Z | T-300.1 | DONE | all 5 notes written (04: 53 sources, S-R) | KB/topics/disruption-management/01..05
+2026-11-20T15:36Z | T-300.2 | STARTED | synthesis: SOURCES.md, GLOSSARY.md, 00-OVERVIEW.md, README | KB
+2026-11-20T15:38Z | T-300.2 | DONE | 00-OVERVIEW.md (14 §15.8 sections), SOURCES.md (261 rows, 20 shared URLs), GLOSSARY.md (98 terms), README, note cross-links | KB
