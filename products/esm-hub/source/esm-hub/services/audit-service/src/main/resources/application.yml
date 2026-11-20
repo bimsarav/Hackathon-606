@@ -25,3 +25,8 @@ logging:
 ---
 spring.config.activate.on-profile: demo
 spring.flyway.locations: classpath:db/common,classpath:db/migration,classpath:db/seed
+
+---
+# Boot ignores public-key-location when a jwk-set-uri is present, so the URI is set outside the test profile only.
+spring.config.activate.on-profile: "!test"
+spring.security.oauth2.resourceserver.jwt.jwk-set-uri: ${ESM_JWKS_URI:http://localhost:8081/.well-known/jwks.json}

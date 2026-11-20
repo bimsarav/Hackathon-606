@@ -152,7 +152,17 @@ services:
       ESM_NOTIFICATION_URL: http://notification-service:8087
       ESM_AUDIT_URL: http://audit-service:8088
       ESM_REPORTING_URL: http://reporting-service:8089
-    ports: ["${ESM_HTTP_PORT:-8080}:8080"]   # replaced by the web (nginx) container once the frontend is added
+
+  web:
+    build: { context: frontend, dockerfile: Dockerfile }
+    image: esm-hub/web:latest
+    depends_on: { gateway: { condition: service_started } }
+    ports: ["${ESM_HTTP_PORT:-8080}:8080"]   # the only published entry point (UI + /api)
+    read_only: true
+    tmpfs: [/tmp, /var/cache/nginx]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    restart: unless-stopped
 
 volumes:
   pgdata:

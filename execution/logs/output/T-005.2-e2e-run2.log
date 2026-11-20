@@ -1,0 +1,130 @@
+npm notice
+npm notice New major version of npm available! 10.9.0 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+
+Running 6 tests using 1 worker
+
+  ✓  1 [chromium] › audit.spec.ts:4:1 › an auditor views the audit log (1.4s)
+  ✓  2 [chromium] › incident-lifecycle.spec.ts:4:1 › employee raises an incident, agent assigns it, technician resolves it, employee sees it resolved (9.3s)
+  ✘  3 [chromium] › knowledge.spec.ts:4:1 › KB search and read (10.5s)
+  ✓  4 [chromium] › rbac.spec.ts:4:1 › an employee cannot see the admin navigation (843ms)
+  ✘  5 [chromium] › rbac.spec.ts:18:1 › an admin sees the admin navigation (10.4s)
+  ✘  6 [chromium] › request-approval.spec.ts:4:1 › a catalogue request is submitted and the manager approves it (12.6s)
+
+
+  1) [chromium] › knowledge.spec.ts:4:1 › KB search and read ───────────────────────────────────────
+
+    Error: [31mTimed out 10000ms waiting for [39m[2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m()[22m
+
+    Locator: getByRole('navigation', { name: 'Main' })
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+    [2m  - expect.toBeVisible with timeout 10000ms[22m
+    [2m  - waiting for getByRole('navigation', { name: 'Main' })[22m
+
+
+       at helpers.ts:32
+
+      30 |   await page.getByLabel('Password').fill(PASSWORD);
+      31 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 32 |   await expect(page.getByRole('navigation', { name: 'Main' })).toBeVisible();
+         |                                                                ^
+      33 | }
+      34 |
+      35 | /** Log in over the API and return the user's team ids (to pick the right team in the assignment form). */
+        at signIn (/work/tests/helpers.ts:32:64)
+        at /work/tests/knowledge.spec.ts:5:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/knowledge-KB-search-and-read-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/knowledge-KB-search-and-read-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/knowledge-KB-search-and-read-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › rbac.spec.ts:18:1 › an admin sees the admin navigation ───────────────────────────
+
+    Error: [31mTimed out 10000ms waiting for [39m[2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m()[22m
+
+    Locator: getByRole('navigation', { name: 'Main' })
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+    [2m  - expect.toBeVisible with timeout 10000ms[22m
+    [2m  - waiting for getByRole('navigation', { name: 'Main' })[22m
+
+
+       at helpers.ts:32
+
+      30 |   await page.getByLabel('Password').fill(PASSWORD);
+      31 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 32 |   await expect(page.getByRole('navigation', { name: 'Main' })).toBeVisible();
+         |                                                                ^
+      33 | }
+      34 |
+      35 | /** Log in over the API and return the user's team ids (to pick the right team in the assignment form). */
+        at signIn (/work/tests/helpers.ts:32:64)
+        at /work/tests/rbac.spec.ts:19:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/rbac-an-admin-sees-the-admin-navigation-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/rbac-an-admin-sees-the-admin-navigation-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/rbac-an-admin-sees-the-admin-navigation-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › request-approval.spec.ts:4:1 › a catalogue request is submitted and the manager approves it 
+
+    Error: [31mTimed out 10000ms waiting for [39m[2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m()[22m
+
+    Locator: getByRole('navigation', { name: 'Main' })
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+    [2m  - expect.toBeVisible with timeout 10000ms[22m
+    [2m  - waiting for getByRole('navigation', { name: 'Main' })[22m
+
+
+       at helpers.ts:32
+
+      30 |   await page.getByLabel('Password').fill(PASSWORD);
+      31 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 32 |   await expect(page.getByRole('navigation', { name: 'Main' })).toBeVisible();
+         |                                                                ^
+      33 | }
+      34 |
+      35 | /** Log in over the API and return the user's team ids (to pick the right team in the assignment form). */
+        at signIn (/work/tests/helpers.ts:32:64)
+        at /work/tests/request-approval.spec.ts:17:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/request-approval-a-catalog-8722d-and-the-manager-approves-it-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/request-approval-a-catalog-8722d-and-the-manager-approves-it-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/request-approval-a-catalog-8722d-and-the-manager-approves-it-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium] › knowledge.spec.ts:4:1 › KB search and read ────────────────────────────────────────
+    [chromium] › rbac.spec.ts:18:1 › an admin sees the admin navigation ────────────────────────────
+    [chromium] › request-approval.spec.ts:4:1 › a catalogue request is submitted and the manager approves it 
+  3 passed (47.5s)
+EXIT 1

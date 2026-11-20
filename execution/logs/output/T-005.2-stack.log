@@ -1,0 +1,2341 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.9.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Kotlin does not yet support 27 JDK target, falling back to Kotlin JVM_26 JVM target
+> Task :buildSrc:checkKotlinCompilerVersion
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:generateExternalPluginSpecBuilders UP-TO-DATE
+> Task :buildSrc:extractPrecompiledScriptPluginPlugins UP-TO-DATE
+> Task :buildSrc:generateScriptPluginAdapters UP-TO-DATE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:compilePluginsBlocks
+> Task :buildSrc:generatePrecompiledScriptPluginAccessors UP-TO-DATE
+
+> Task :buildSrc:compileKotlin
+Kotlin does not yet support 27 JDK target, falling back to Kotlin JVM_26 JVM target
+w: ⚠️ Inconsistent JVM Target Compatibility Between Java and Kotlin Tasks
+Inconsistent JVM-target compatibility detected for tasks 'compileJava' (27) and 'compileKotlin' (26).
+Solution: Consider using JVM Toolchain: https://kotl.in/gradle/jvm/toolchain
+Learn more about JVM-target validation: https://kotl.in/gradle/jvm/target-validation
+
+
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+> Task :libs:esm-common:compileJava
+> Task :libs:esm-common:processResources UP-TO-DATE
+> Task :libs:esm-common:classes
+> Task :libs:esm-common:jar
+> Task :libs:esm-directory-replica:compileJava UP-TO-DATE
+> Task :libs:esm-directory-replica:processResources
+> Task :libs:esm-directory-replica:classes
+> Task :libs:esm-directory-replica:jar
+> Task :services:asset-service:compileJava
+> Task :services:asset-service:processResources
+> Task :services:asset-service:classes
+> Task :services:asset-service:resolveMainClassName
+> Task :services:asset-service:bootJar
+> Task :services:audit-service:compileJava
+> Task :services:audit-service:processResources
+> Task :services:audit-service:classes
+> Task :services:audit-service:resolveMainClassName
+> Task :services:audit-service:bootJar
+> Task :services:change-service:compileJava
+> Task :services:change-service:processResources
+> Task :services:change-service:classes
+> Task :services:change-service:resolveMainClassName
+> Task :services:change-service:bootJar
+> Task :services:directory-service:compileJava
+> Task :services:directory-service:processResources
+> Task :services:directory-service:classes
+> Task :services:directory-service:resolveMainClassName
+> Task :services:directory-service:bootJar
+> Task :services:gateway:compileJava
+> Task :services:gateway:processResources
+> Task :services:gateway:classes
+> Task :services:gateway:resolveMainClassName
+> Task :services:gateway:bootJar
+> Task :services:incident-service:compileJava
+> Task :services:incident-service:processResources
+> Task :services:incident-service:classes
+> Task :services:incident-service:resolveMainClassName
+> Task :services:incident-service:bootJar
+> Task :services:knowledge-service:compileJava
+> Task :services:knowledge-service:processResources
+> Task :services:knowledge-service:classes
+> Task :services:knowledge-service:resolveMainClassName
+> Task :services:knowledge-service:bootJar
+> Task :services:notification-service:compileJava
+> Task :services:notification-service:processResources
+> Task :services:notification-service:classes
+> Task :services:notification-service:resolveMainClassName
+> Task :services:notification-service:bootJar
+> Task :services:reporting-service:compileJava
+> Task :services:reporting-service:processResources
+> Task :services:reporting-service:classes
+> Task :services:reporting-service:resolveMainClassName
+> Task :services:reporting-service:bootJar
+> Task :services:request-service:compileJava
+> Task :services:request-service:processResources
+> Task :services:request-service:classes
+> Task :services:request-service:resolveMainClassName
+> Task :services:request-service:bootJar
+
+[Incubating] Problems report is available at: file:///workspace/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 40s
+56 actionable tasks: 47 executed, 9 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.9.1/userguide/configuration_cache_enabling.html
+#0 building with "default" instance using docker driver
+
+#1 [request-service internal] load build definition from service.Dockerfile
+#1 transferring dockerfile: 953B done
+#1 DONE 0.0s
+
+#2 [notification-service internal] load build definition from service.Dockerfile
+#2 transferring dockerfile: 953B done
+#2 DONE 0.0s
+
+#3 [incident-service internal] load build definition from service.Dockerfile
+#3 transferring dockerfile: 953B done
+#3 DONE 0.0s
+
+#4 [directory-service internal] load build definition from service.Dockerfile
+#4 transferring dockerfile: 953B done
+#4 DONE 0.0s
+
+#5 [knowledge-service internal] load build definition from service.Dockerfile
+#5 transferring dockerfile: 953B done
+#5 DONE 0.0s
+
+#6 [change-service internal] load build definition from service.Dockerfile
+#6 transferring dockerfile: 953B done
+#6 DONE 0.0s
+
+#7 [audit-service internal] load build definition from service.Dockerfile
+#7 transferring dockerfile: 953B done
+#7 DONE 0.0s
+
+#8 [asset-service internal] load build definition from service.Dockerfile
+#8 transferring dockerfile: 953B done
+#8 DONE 0.0s
+
+#9 [reporting-service internal] load build definition from service.Dockerfile
+#9 transferring dockerfile: 953B done
+#9 DONE 0.0s
+
+#10 [request-service internal] load .dockerignore
+#10 transferring context: 2B done
+#10 DONE 0.0s
+
+#11 [notification-service internal] load .dockerignore
+#11 transferring context: 2B done
+#11 DONE 0.0s
+
+#12 [directory-service internal] load .dockerignore
+#12 transferring context: 2B done
+#12 DONE 0.0s
+
+#13 [knowledge-service internal] load .dockerignore
+#13 transferring context: 2B done
+#13 DONE 0.0s
+
+#14 [incident-service internal] load .dockerignore
+#14 transferring context: 2B done
+#14 DONE 0.0s
+
+#15 [reporting-service internal] load .dockerignore
+#15 transferring context: 2B done
+#15 DONE 0.0s
+
+#16 [change-service internal] load .dockerignore
+#16 transferring context: 2B done
+#16 DONE 0.0s
+
+#17 [asset-service internal] load .dockerignore
+#17 transferring context: 2B done
+#17 DONE 0.0s
+
+#18 [audit-service internal] load .dockerignore
+#18 transferring context: 2B done
+#18 DONE 0.0s
+
+#19 [reporting-service internal] load metadata for docker.io/library/eclipse-temurin:27-jre
+#19 DONE 2.2s
+
+#20 [request-service 1/4] FROM docker.io/library/eclipse-temurin:27-jre@sha256:acfb350b50e707addf3dcbb47f7052d1882d1e5f1670ce838a9c7838d82d4fe5
+#20 resolve docker.io/library/eclipse-temurin:27-jre@sha256:acfb350b50e707addf3dcbb47f7052d1882d1e5f1670ce838a9c7838d82d4fe5 0.0s done
+#20 sha256:acfb350b50e707addf3dcbb47f7052d1882d1e5f1670ce838a9c7838d82d4fe5 5.91kB / 5.91kB done
+#20 sha256:a048e7977953b0f5ba45b759f53d2c835261dea9b71e9f7a87a42106752d8176 9.04kB / 9.04kB done
+#20 sha256:2719c23ca6855fed092edd3f47fbea2e6870bfd00fa4e10b2077126d551bca28 2.13kB / 2.13kB done
+#20 sha256:5c65180f9e9d7837d53b93240dbf4b0b2dc6787336f944c824d30c437f869e11 0B / 12.15MB 0.1s
+#20 sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 0B / 63.51MB 0.1s
+#20 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 0B / 32B 0.1s
+#20 sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 4.19MB / 63.51MB 0.4s
+#20 sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 8.39MB / 63.51MB 0.6s
+#20 ...
+
+#21 [asset-service internal] load build context
+#21 transferring context: 91.95MB 0.7s done
+#21 DONE 0.8s
+
+#22 [knowledge-service internal] load build context
+#22 transferring context: 91.95MB 0.8s done
+#22 DONE 0.8s
+
+#23 [directory-service internal] load build context
+#23 transferring context: 91.98MB 0.7s done
+#23 DONE 0.8s
+
+#24 [notification-service internal] load build context
+#24 transferring context: 92.88MB 0.8s done
+#24 DONE 0.8s
+
+#20 [request-service 1/4] FROM docker.io/library/eclipse-temurin:27-jre@sha256:acfb350b50e707addf3dcbb47f7052d1882d1e5f1670ce838a9c7838d82d4fe5
+#20 ...
+
+#25 [reporting-service internal] load build context
+#25 transferring context: 91.93MB 0.8s done
+#25 DONE 0.8s
+
+#26 [audit-service internal] load build context
+#26 transferring context: 91.92MB 0.8s done
+#26 DONE 0.8s
+
+#27 [change-service internal] load build context
+#27 transferring context: 91.96MB 0.8s done
+#27 DONE 0.8s
+
+#28 [request-service internal] load build context
+#28 transferring context: 91.97MB 0.8s done
+#28 DONE 0.8s
+
+#29 [incident-service internal] load build context
+#29 transferring context: 92.09MB 0.8s done
+#29 DONE 0.8s
+
+#20 [request-service 1/4] FROM docker.io/library/eclipse-temurin:27-jre@sha256:acfb350b50e707addf3dcbb47f7052d1882d1e5f1670ce838a9c7838d82d4fe5
+#20 sha256:5c65180f9e9d7837d53b93240dbf4b0b2dc6787336f944c824d30c437f869e11 1.05MB / 12.15MB 0.9s
+#20 sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 12.58MB / 63.51MB 0.9s
+#20 sha256:5c65180f9e9d7837d53b93240dbf4b0b2dc6787336f944c824d30c437f869e11 2.10MB / 12.15MB 1.0s
+#20 sha256:5c65180f9e9d7837d53b93240dbf4b0b2dc6787336f944c824d30c437f869e11 3.15MB / 12.15MB 1.2s
+#20 sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 16.78MB / 63.51MB 1.3s
+#20 sha256:5c65180f9e9d7837d53b93240dbf4b0b2dc6787336f944c824d30c437f869e11 4.19MB / 12.15MB 1.5s
+#20 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 32B / 32B 1.4s done
+#20 sha256:5c65180f9e9d7837d53b93240dbf4b0b2dc6787336f944c824d30c437f869e11 5.24MB / 12.15MB 1.6s
+#20 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 32B / 32B 1.4s done
+#20 sha256:015cb327ee215c81fc43e3a1ad049fe69c3e2290ab7cf4a5c376cd677af9bf5f 0B / 2.46kB 1.6s
+#20 sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 20.97MB / 63.51MB 1.7s
+#20 sha256:015cb327ee215c81fc43e3a1ad049fe69c3e2290ab7cf4a5c376cd677af9bf5f 2.46kB / 2.46kB 1.7s done
+#20 sha256:5c65180f9e9d7837d53b93240dbf4b0b2dc6787336f944c824d30c437f869e11 7.34MB / 12.15MB 1.9s
+#20 sha256:5c65180f9e9d7837d53b93240dbf4b0b2dc6787336f944c824d30c437f869e11 9.44MB / 12.15MB 2.2s
+#20 sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 26.21MB / 63.51MB 2.2s
+#20 sha256:5c65180f9e9d7837d53b93240dbf4b0b2dc6787336f944c824d30c437f869e11 10.49MB / 12.15MB 2.4s
+#20 sha256:5c65180f9e9d7837d53b93240dbf4b0b2dc6787336f944c824d30c437f869e11 12.15MB / 12.15MB 2.6s done
+#20 sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 30.41MB / 63.51MB 2.6s
+#20 sha256:5c65180f9e9d7837d53b93240dbf4b0b2dc6787336f944c824d30c437f869e11 12.15MB / 12.15MB 2.6s done
+#20 extracting sha256:5c65180f9e9d7837d53b93240dbf4b0b2dc6787336f944c824d30c437f869e11
+#20 sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 35.65MB / 63.51MB 3.0s
+#20 extracting sha256:5c65180f9e9d7837d53b93240dbf4b0b2dc6787336f944c824d30c437f869e11 0.5s done
+#20 sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 40.89MB / 63.51MB 3.3s
+#20 sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 46.14MB / 63.51MB 3.5s
+#20 sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 51.38MB / 63.51MB 3.8s
+#20 sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 58.72MB / 63.51MB 4.2s
+#20 sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 63.51MB / 63.51MB 4.5s
+#20 sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 63.51MB / 63.51MB 4.5s done
+#20 extracting sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce
+#20 extracting sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 1.8s done
+#20 extracting sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 done
+#20 extracting sha256:015cb327ee215c81fc43e3a1ad049fe69c3e2290ab7cf4a5c376cd677af9bf5f done
+#20 DONE 6.5s
+
+#30 [change-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#30 0.742 Get:1 http://security.ubuntu.com/ubuntu resolute-security InRelease [137 kB]
+#30 0.814 Get:2 http://archive.ubuntu.com/ubuntu resolute InRelease [136 kB]
+#30 1.358 Get:3 http://archive.ubuntu.com/ubuntu resolute-updates InRelease [137 kB]
+#30 1.388 Get:4 http://security.ubuntu.com/ubuntu resolute-security/main amd64 Packages [885 kB]
+#30 1.653 Get:5 http://archive.ubuntu.com/ubuntu resolute-backports InRelease [137 kB]
+#30 1.920 Get:6 http://archive.ubuntu.com/ubuntu resolute/main amd64 Packages [1,874 kB]
+#30 1.977 Get:7 http://security.ubuntu.com/ubuntu resolute-security/restricted amd64 Packages [723 kB]
+#30 2.052 Get:8 http://security.ubuntu.com/ubuntu resolute-security/universe amd64 Packages [278 kB]
+#30 2.120 Get:9 http://security.ubuntu.com/ubuntu resolute-security/multiverse amd64 Packages [24.6 kB]
+#30 3.015 Get:10 http://archive.ubuntu.com/ubuntu resolute/universe amd64 Packages [20.1 MB]
+#30 ...
+
+#31 [notification-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#31 0.868 Get:1 http://archive.ubuntu.com/ubuntu resolute InRelease [136 kB]
+#31 0.936 Get:2 http://security.ubuntu.com/ubuntu resolute-security InRelease [137 kB]
+#31 1.400 Get:3 http://archive.ubuntu.com/ubuntu resolute-updates InRelease [137 kB]
+#31 1.690 Get:4 http://archive.ubuntu.com/ubuntu resolute-backports InRelease [137 kB]
+#31 1.874 Get:5 http://security.ubuntu.com/ubuntu resolute-security/restricted amd64 Packages [723 kB]
+#31 1.952 Get:6 http://archive.ubuntu.com/ubuntu resolute/main amd64 Packages [1,874 kB]
+#31 3.091 Get:7 http://security.ubuntu.com/ubuntu resolute-security/multiverse amd64 Packages [24.6 kB]
+#31 3.270 Get:8 http://archive.ubuntu.com/ubuntu resolute/multiverse amd64 Packages [352 kB]
+#31 3.300 Get:9 http://security.ubuntu.com/ubuntu resolute-security/main amd64 Packages [885 kB]
+#31 3.314 Get:10 http://archive.ubuntu.com/ubuntu resolute/restricted amd64 Packages [189 kB]
+#31 3.688 Get:11 http://archive.ubuntu.com/ubuntu resolute/universe amd64 Packages [20.1 MB]
+#31 4.152 Get:12 http://security.ubuntu.com/ubuntu resolute-security/universe amd64 Packages [278 kB]
+#31 ...
+
+#32 [reporting-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#32 0.756 Get:1 http://security.ubuntu.com/ubuntu resolute-security InRelease [137 kB]
+#32 0.830 Get:2 http://archive.ubuntu.com/ubuntu resolute InRelease [136 kB]
+#32 1.382 Get:3 http://archive.ubuntu.com/ubuntu resolute-updates InRelease [137 kB]
+#32 1.398 Get:4 http://security.ubuntu.com/ubuntu resolute-security/multiverse amd64 Packages [24.6 kB]
+#32 1.566 Get:5 http://security.ubuntu.com/ubuntu resolute-security/main amd64 Packages [885 kB]
+#32 1.691 Get:6 http://archive.ubuntu.com/ubuntu resolute-backports InRelease [137 kB]
+#32 1.961 Get:7 http://archive.ubuntu.com/ubuntu resolute/universe amd64 Packages [20.1 MB]
+#32 1.993 Get:8 http://security.ubuntu.com/ubuntu resolute-security/restricted amd64 Packages [723 kB]
+#32 2.101 Get:9 http://security.ubuntu.com/ubuntu resolute-security/universe amd64 Packages [278 kB]
+#32 ...
+
+#33 [request-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#33 0.862 Get:1 http://archive.ubuntu.com/ubuntu resolute InRelease [136 kB]
+#33 1.004 Get:2 http://security.ubuntu.com/ubuntu resolute-security InRelease [137 kB]
+#33 1.433 Get:3 http://archive.ubuntu.com/ubuntu resolute-updates InRelease [137 kB]
+#33 1.738 Get:4 http://archive.ubuntu.com/ubuntu resolute-backports InRelease [137 kB]
+#33 2.016 Get:5 http://archive.ubuntu.com/ubuntu resolute/multiverse amd64 Packages [352 kB]
+#33 2.156 Get:6 http://security.ubuntu.com/ubuntu resolute-security/restricted amd64 Packages [723 kB]
+#33 2.264 Get:7 http://archive.ubuntu.com/ubuntu resolute/main amd64 Packages [1,874 kB]
+#33 3.736 Get:8 http://archive.ubuntu.com/ubuntu resolute/restricted amd64 Packages [189 kB]
+#33 3.919 Get:9 http://archive.ubuntu.com/ubuntu resolute/universe amd64 Packages [20.1 MB]
+#33 ...
+
+#34 [incident-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#34 0.761 Get:1 http://security.ubuntu.com/ubuntu resolute-security InRelease [137 kB]
+#34 1.410 Get:2 http://security.ubuntu.com/ubuntu resolute-security/multiverse amd64 Packages [24.6 kB]
+#34 1.576 Get:3 http://security.ubuntu.com/ubuntu resolute-security/universe amd64 Packages [278 kB]
+#34 1.786 Get:4 http://security.ubuntu.com/ubuntu resolute-security/main amd64 Packages [885 kB]
+#34 1.912 Get:5 http://archive.ubuntu.com/ubuntu resolute InRelease [136 kB]
+#34 2.046 Get:6 http://security.ubuntu.com/ubuntu resolute-security/restricted amd64 Packages [723 kB]
+#34 2.457 Get:7 http://archive.ubuntu.com/ubuntu resolute-updates InRelease [137 kB]
+#34 2.974 Get:8 http://archive.ubuntu.com/ubuntu resolute-backports InRelease [137 kB]
+#34 3.743 Get:9 http://archive.ubuntu.com/ubuntu resolute/main amd64 Packages [1,874 kB]
+#34 9.657 Get:10 http://archive.ubuntu.com/ubuntu resolute/multiverse amd64 Packages [352 kB]
+#34 ...
+
+#35 [asset-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#35 0.894 Get:1 http://archive.ubuntu.com/ubuntu resolute InRelease [136 kB]
+#35 1.471 Get:2 http://archive.ubuntu.com/ubuntu resolute-updates InRelease [137 kB]
+#35 1.784 Get:3 http://archive.ubuntu.com/ubuntu resolute-backports InRelease [137 kB]
+#35 1.838 Get:4 http://security.ubuntu.com/ubuntu resolute-security InRelease [137 kB]
+#35 2.067 Get:5 http://archive.ubuntu.com/ubuntu resolute/main amd64 Packages [1,874 kB]
+#35 2.427 Get:6 http://security.ubuntu.com/ubuntu resolute-security/universe amd64 Packages [278 kB]
+#35 3.941 Get:7 http://archive.ubuntu.com/ubuntu resolute/restricted amd64 Packages [189 kB]
+#35 3.942 Get:8 http://archive.ubuntu.com/ubuntu resolute/universe amd64 Packages [20.1 MB]
+#35 3.947 Get:9 http://security.ubuntu.com/ubuntu resolute-security/main amd64 Packages [885 kB]
+#35 4.713 Get:10 http://security.ubuntu.com/ubuntu resolute-security/multiverse amd64 Packages [24.6 kB]
+#35 4.729 Get:11 http://security.ubuntu.com/ubuntu resolute-security/restricted amd64 Packages [723 kB]
+#35 ...
+
+#36 [audit-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#36 0.981 Get:1 http://security.ubuntu.com/ubuntu resolute-security InRelease [137 kB]
+#36 1.911 Get:2 http://archive.ubuntu.com/ubuntu resolute InRelease [136 kB]
+#36 2.121 Get:3 http://security.ubuntu.com/ubuntu resolute-security/multiverse amd64 Packages [24.6 kB]
+#36 2.407 Get:4 http://security.ubuntu.com/ubuntu resolute-security/universe amd64 Packages [278 kB]
+#36 2.621 Get:5 http://archive.ubuntu.com/ubuntu resolute-updates InRelease [137 kB]
+#36 2.975 Get:6 http://archive.ubuntu.com/ubuntu resolute-backports InRelease [137 kB]
+#36 3.758 Get:7 http://security.ubuntu.com/ubuntu resolute-security/main amd64 Packages [885 kB]
+#36 4.055 Get:8 http://archive.ubuntu.com/ubuntu resolute/main amd64 Packages [1,874 kB]
+#36 5.137 Get:9 http://archive.ubuntu.com/ubuntu resolute/restricted amd64 Packages [189 kB]
+#36 5.138 Get:10 http://archive.ubuntu.com/ubuntu resolute/universe amd64 Packages [20.1 MB]
+#36 6.774 Get:11 http://security.ubuntu.com/ubuntu resolute-security/restricted amd64 Packages [723 kB]
+#36 10.47 Get:12 http://archive.ubuntu.com/ubuntu resolute/multiverse amd64 Packages [352 kB]
+#36 10.65 Get:13 http://archive.ubuntu.com/ubuntu resolute-updates/multiverse amd64 Packages [26.1 kB]
+#36 10.70 Get:14 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 Packages [1,111 kB]
+#36 ...
+
+#37 [directory-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#37 0.736 Get:1 http://security.ubuntu.com/ubuntu resolute-security InRelease [137 kB]
+#37 0.815 Get:2 http://archive.ubuntu.com/ubuntu resolute InRelease [136 kB]
+#37 1.362 Get:3 http://archive.ubuntu.com/ubuntu resolute-updates InRelease [137 kB]
+#37 1.368 Get:4 http://security.ubuntu.com/ubuntu resolute-security/main amd64 Packages [885 kB]
+#37 1.660 Get:5 http://archive.ubuntu.com/ubuntu resolute-backports InRelease [137 kB]
+#37 1.929 Get:6 http://archive.ubuntu.com/ubuntu resolute/universe amd64 Packages [20.1 MB]
+#37 1.951 Get:7 http://security.ubuntu.com/ubuntu resolute-security/multiverse amd64 Packages [24.6 kB]
+#37 1.953 Get:8 http://security.ubuntu.com/ubuntu resolute-security/universe amd64 Packages [278 kB]
+#37 1.980 Get:9 http://security.ubuntu.com/ubuntu resolute-security/restricted amd64 Packages [723 kB]
+#37 ...
+
+#38 [knowledge-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#38 0.709 Get:1 http://security.ubuntu.com/ubuntu resolute-security InRelease [137 kB]
+#38 0.829 Get:2 http://archive.ubuntu.com/ubuntu resolute InRelease [136 kB]
+#38 1.227 Get:3 http://security.ubuntu.com/ubuntu resolute-security/restricted amd64 Packages [723 kB]
+#38 1.368 Get:4 http://archive.ubuntu.com/ubuntu resolute-updates InRelease [137 kB]
+#38 1.662 Get:5 http://archive.ubuntu.com/ubuntu resolute-backports InRelease [137 kB]
+#38 1.690 Get:6 http://security.ubuntu.com/ubuntu resolute-security/main amd64 Packages [885 kB]
+#38 1.808 Get:7 http://security.ubuntu.com/ubuntu resolute-security/universe amd64 Packages [278 kB]
+#38 1.839 Get:8 http://security.ubuntu.com/ubuntu resolute-security/multiverse amd64 Packages [24.6 kB]
+#38 1.928 Get:9 http://archive.ubuntu.com/ubuntu resolute/universe amd64 Packages [20.1 MB]
+#38 ...
+
+#36 [audit-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#36 10.93 Get:15 http://archive.ubuntu.com/ubuntu resolute-updates/universe amd64 Packages [497 kB]
+#36 11.06 Get:16 http://archive.ubuntu.com/ubuntu resolute-updates/restricted amd64 Packages [773 kB]
+#36 11.15 Get:17 http://archive.ubuntu.com/ubuntu resolute-backports/universe amd64 Packages [3,308 B]
+#36 11.18 Fetched 27.4 MB in 11s (2,560 kB/s)
+#36 11.18 Reading package lists...
+#36 11.69 Reading package lists...
+#36 12.36 Building dependency tree...
+#36 12.52 Reading state information...
+#36 12.55 Solving dependencies...
+#36 12.71 The following additional packages will be installed:
+#36 12.71   libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#36 12.71   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#36 12.71   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#36 12.71   libsasl2-modules-db libssh2-1t64 libunistring5
+#36 12.71 Suggested packages:
+#36 12.71   gnutls-bin krb5-doc krb5-user
+#36 12.71 Recommended packages:
+#36 12.71   bash-completion krb5-locales publicsuffix libsasl2-modules
+#36 12.76 The following NEW packages will be installed:
+#36 12.76   curl libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#36 12.76   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#36 12.76   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#36 12.76   libsasl2-modules-db libssh2-1t64 libunistring5
+#36 13.14 0 upgraded, 20 newly installed, 0 to remove and 5 not upgraded.
+#36 13.14 Need to get 4,072 kB of archives.
+#36 13.14 After this operation, 11.1 MB of additional disk space will be used.
+#36 13.14 Get:1 http://archive.ubuntu.com/ubuntu resolute/main amd64 libnettle8t64 amd64 3.10.2-1 [185 kB]
+#36 13.72 Get:2 http://archive.ubuntu.com/ubuntu resolute/main amd64 libhogweed6t64 amd64 3.10.2-1 [201 kB]
+#36 13.88 Get:3 http://archive.ubuntu.com/ubuntu resolute/main amd64 libunistring5 amd64 1.3-2build1 [610 kB]
+#36 14.18 Get:4 http://archive.ubuntu.com/ubuntu resolute/main amd64 libidn2-0 amd64 2.3.8-4build1 [67.6 kB]
+#36 14.20 Get:5 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgnutls30t64 amd64 3.8.12-2ubuntu1.1 [1,029 kB]
+#36 14.37 Get:6 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5support0 amd64 1.22.1-2ubuntu4.1 [33.5 kB]
+#36 14.38 Get:7 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libk5crypto3 amd64 1.22.1-2ubuntu4.1 [82.0 kB]
+#36 14.39 Get:8 http://archive.ubuntu.com/ubuntu resolute/main amd64 libkeyutils1 amd64 1.6.3-6ubuntu3 [10.6 kB]
+#36 14.39 Get:9 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5-3 amd64 1.22.1-2ubuntu4.1 [361 kB]
+#36 14.44 Get:10 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgssapi-krb5-2 amd64 1.22.1-2ubuntu4.1 [147 kB]
+#36 14.45 Get:11 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libnghttp2-14 amd64 1.68.0-2ubuntu0.2 [71.0 kB]
+#36 14.46 Get:12 http://archive.ubuntu.com/ubuntu resolute/main amd64 libpsl5t64 amd64 0.21.2-1.1build2 [59.5 kB]
+#36 14.46 Get:13 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-modules-db amd64 2.1.28+dfsg1-9ubuntu3 [21.1 kB]
+#36 14.53 Get:14 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-2 amd64 2.1.28+dfsg1-9ubuntu3 [54.0 kB]
+#36 14.71 Get:15 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap-common all 2.6.10+dfsg-1ubuntu5 [36.0 kB]
+#36 14.71 Get:16 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap2 amd64 2.6.10+dfsg-1ubuntu5 [204 kB]
+#36 14.72 Get:17 http://archive.ubuntu.com/ubuntu resolute/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-3 [59.0 kB]
+#36 14.73 Get:18 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libssh2-1t64 amd64 1.11.1-1ubuntu0.26.04.4 [138 kB]
+#36 14.73 Get:19 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libcurl4t64 amd64 8.18.0-1ubuntu2.8 [430 kB]
+#36 14.75 Get:20 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 curl amd64 8.18.0-1ubuntu2.8 [273 kB]
+#36 15.07 debconf: unable to initialize frontend: Dialog
+#36 15.07 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#36 15.07 debconf: falling back to frontend: Readline
+#36 15.07 debconf: unable to initialize frontend: Readline
+#36 15.07 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 20.)
+#36 15.07 debconf: falling back to frontend: Teletype
+#36 15.09 debconf: unable to initialize frontend: Teletype
+#36 15.09 debconf: (This frontend requires a controlling tty.)
+#36 15.09 debconf: falling back to frontend: Noninteractive
+#36 17.05 Fetched 4,072 kB in 2s (2,051 kB/s)
+#36 17.09 Selecting previously unselected package libnettle8t64:amd64.
+#36 17.09 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 9798 files and directories currently installed.)
+#36 17.11 Preparing to unpack .../00-libnettle8t64_3.10.2-1_amd64.deb ...
+#36 17.12 Unpacking libnettle8t64:amd64 (3.10.2-1) ...
+#36 17.16 Selecting previously unselected package libhogweed6t64:amd64.
+#36 17.17 Preparing to unpack .../01-libhogweed6t64_3.10.2-1_amd64.deb ...
+#36 17.17 Unpacking libhogweed6t64:amd64 (3.10.2-1) ...
+#36 17.21 Selecting previously unselected package libunistring5:amd64.
+#36 17.21 Preparing to unpack .../02-libunistring5_1.3-2build1_amd64.deb ...
+#36 17.22 Unpacking libunistring5:amd64 (1.3-2build1) ...
+#36 17.28 Selecting previously unselected package libidn2-0:amd64.
+#36 17.29 Preparing to unpack .../03-libidn2-0_2.3.8-4build1_amd64.deb ...
+#36 17.29 Unpacking libidn2-0:amd64 (2.3.8-4build1) ...
+#36 17.33 Selecting previously unselected package libgnutls30t64:amd64.
+#36 17.33 Preparing to unpack .../04-libgnutls30t64_3.8.12-2ubuntu1.1_amd64.deb ...
+#36 17.33 Unpacking libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#36 17.41 Selecting previously unselected package libkrb5support0:amd64.
+#36 17.41 Preparing to unpack .../05-libkrb5support0_1.22.1-2ubuntu4.1_amd64.deb ...
+#36 17.42 Unpacking libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#36 17.45 Selecting previously unselected package libk5crypto3:amd64.
+#36 17.46 Preparing to unpack .../06-libk5crypto3_1.22.1-2ubuntu4.1_amd64.deb ...
+#36 17.46 Unpacking libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#36 17.50 Selecting previously unselected package libkeyutils1:amd64.
+#36 17.50 Preparing to unpack .../07-libkeyutils1_1.6.3-6ubuntu3_amd64.deb ...
+#36 17.50 Unpacking libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#36 17.54 Selecting previously unselected package libkrb5-3:amd64.
+#36 17.54 Preparing to unpack .../08-libkrb5-3_1.22.1-2ubuntu4.1_amd64.deb ...
+#36 17.55 Unpacking libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#36 17.60 Selecting previously unselected package libgssapi-krb5-2:amd64.
+#36 17.61 Preparing to unpack .../09-libgssapi-krb5-2_1.22.1-2ubuntu4.1_amd64.deb ...
+#36 17.61 Unpacking libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#36 17.66 Selecting previously unselected package libnghttp2-14:amd64.
+#36 17.66 Preparing to unpack .../10-libnghttp2-14_1.68.0-2ubuntu0.2_amd64.deb ...
+#36 17.66 Unpacking libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#36 17.71 Selecting previously unselected package libpsl5t64:amd64.
+#36 17.71 Preparing to unpack .../11-libpsl5t64_0.21.2-1.1build2_amd64.deb ...
+#36 17.72 Unpacking libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#36 17.75 Selecting previously unselected package libsasl2-modules-db:amd64.
+#36 17.76 Preparing to unpack .../12-libsasl2-modules-db_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#36 17.76 Unpacking libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#36 17.80 Selecting previously unselected package libsasl2-2:amd64.
+#36 17.81 Preparing to unpack .../13-libsasl2-2_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#36 17.81 Unpacking libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#36 17.85 Selecting previously unselected package libldap-common.
+#36 17.85 Preparing to unpack .../14-libldap-common_2.6.10+dfsg-1ubuntu5_all.deb ...
+#36 17.85 Unpacking libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#36 17.90 Selecting previously unselected package libldap2:amd64.
+#36 17.90 Preparing to unpack .../15-libldap2_2.6.10+dfsg-1ubuntu5_amd64.deb ...
+#36 17.90 Unpacking libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#36 17.95 Selecting previously unselected package librtmp1:amd64.
+#36 17.95 Preparing to unpack .../16-librtmp1_2.4+20151223.gitfa8646d.1-3_amd64.deb ...
+#36 17.95 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#36 18.00 Selecting previously unselected package libssh2-1t64:amd64.
+#36 18.00 Preparing to unpack .../17-libssh2-1t64_1.11.1-1ubuntu0.26.04.4_amd64.deb ...
+#36 18.00 Unpacking libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#36 18.05 Selecting previously unselected package libcurl4t64:amd64.
+#36 18.06 Preparing to unpack .../18-libcurl4t64_8.18.0-1ubuntu2.8_amd64.deb ...
+#36 18.06 Unpacking libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#36 18.12 Selecting previously unselected package curl.
+#36 18.12 Preparing to unpack .../19-curl_8.18.0-1ubuntu2.8_amd64.deb ...
+#36 18.13 Unpacking curl (8.18.0-1ubuntu2.8) ...
+#36 18.20 Setting up libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#36 18.20 Setting up libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#36 18.21 Setting up libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#36 18.21 Setting up libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#36 18.22 Setting up libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#36 18.23 Setting up libnettle8t64:amd64 (3.10.2-1) ...
+#36 18.23 Setting up libunistring5:amd64 (1.3-2build1) ...
+#36 18.24 Setting up libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#36 18.24 Setting up libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#36 18.25 Setting up libhogweed6t64:amd64 (3.10.2-1) ...
+#36 18.25 Setting up libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#36 18.26 Setting up libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#36 18.26 Setting up libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#36 18.27 Setting up libidn2-0:amd64 (2.3.8-4build1) ...
+#36 18.27 Setting up libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#36 18.28 Setting up libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#36 18.29 Setting up libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#36 18.29 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#36 18.30 Setting up libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#36 18.30 Setting up curl (8.18.0-1ubuntu2.8) ...
+#36 18.31 Processing triggers for libc-bin (2.43-2ubuntu2.4) ...
+#36 ...
+
+#33 [request-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#33 10.50 Get:10 http://security.ubuntu.com/ubuntu resolute-security/multiverse amd64 Packages [24.6 kB]
+#33 11.45 Get:11 http://security.ubuntu.com/ubuntu resolute-security/main amd64 Packages [885 kB]
+#33 12.25 Get:12 http://security.ubuntu.com/ubuntu resolute-security/universe amd64 Packages [278 kB]
+#33 15.66 Get:13 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 Packages [1,111 kB]
+#33 16.19 Get:14 http://archive.ubuntu.com/ubuntu resolute-updates/restricted amd64 Packages [773 kB]
+#33 16.54 Get:15 http://archive.ubuntu.com/ubuntu resolute-updates/multiverse amd64 Packages [26.1 kB]
+#33 16.55 Get:16 http://archive.ubuntu.com/ubuntu resolute-updates/universe amd64 Packages [497 kB]
+#33 16.78 Get:17 http://archive.ubuntu.com/ubuntu resolute-backports/universe amd64 Packages [3,308 B]
+#33 18.51 Fetched 27.4 MB in 18s (1,523 kB/s)
+#33 18.51 Reading package lists...
+#33 ...
+
+#30 [change-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#30 11.61 Get:11 http://archive.ubuntu.com/ubuntu resolute/multiverse amd64 Packages [352 kB]
+#30 11.75 Get:12 http://archive.ubuntu.com/ubuntu resolute/restricted amd64 Packages [189 kB]
+#30 11.82 Get:13 http://archive.ubuntu.com/ubuntu resolute-updates/restricted amd64 Packages [773 kB]
+#30 12.12 Get:14 http://archive.ubuntu.com/ubuntu resolute-updates/multiverse amd64 Packages [26.1 kB]
+#30 12.13 Get:15 http://archive.ubuntu.com/ubuntu resolute-updates/universe amd64 Packages [497 kB]
+#30 12.32 Get:16 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 Packages [1,111 kB]
+#30 12.74 Get:17 http://archive.ubuntu.com/ubuntu resolute-backports/universe amd64 Packages [3,308 B]
+#30 12.80 Fetched 27.4 MB in 12s (2,220 kB/s)
+#30 12.80 Reading package lists...
+#30 13.71 Reading package lists...
+#30 14.95 Building dependency tree...
+#30 15.28 Reading state information...
+#30 15.35 Solving dependencies...
+#30 15.65 The following additional packages will be installed:
+#30 15.65   libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#30 15.65   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#30 15.65   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#30 15.65   libsasl2-modules-db libssh2-1t64 libunistring5
+#30 15.66 Suggested packages:
+#30 15.66   gnutls-bin krb5-doc krb5-user
+#30 15.66 Recommended packages:
+#30 15.66   bash-completion krb5-locales publicsuffix libsasl2-modules
+#30 15.75 The following NEW packages will be installed:
+#30 15.75   curl libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#30 15.75   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#30 15.75   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#30 15.75   libsasl2-modules-db libssh2-1t64 libunistring5
+#30 16.17 0 upgraded, 20 newly installed, 0 to remove and 5 not upgraded.
+#30 16.17 Need to get 4,072 kB of archives.
+#30 16.17 After this operation, 11.1 MB of additional disk space will be used.
+#30 16.17 Get:1 http://archive.ubuntu.com/ubuntu resolute/main amd64 libnettle8t64 amd64 3.10.2-1 [185 kB]
+#30 16.76 Get:2 http://archive.ubuntu.com/ubuntu resolute/main amd64 libhogweed6t64 amd64 3.10.2-1 [201 kB]
+#30 16.92 Get:3 http://archive.ubuntu.com/ubuntu resolute/main amd64 libunistring5 amd64 1.3-2build1 [610 kB]
+#30 17.20 Get:4 http://archive.ubuntu.com/ubuntu resolute/main amd64 libidn2-0 amd64 2.3.8-4build1 [67.6 kB]
+#30 17.23 Get:5 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgnutls30t64 amd64 3.8.12-2ubuntu1.1 [1,029 kB]
+#30 17.41 Get:6 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5support0 amd64 1.22.1-2ubuntu4.1 [33.5 kB]
+#30 17.41 Get:7 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libk5crypto3 amd64 1.22.1-2ubuntu4.1 [82.0 kB]
+#30 17.42 Get:8 http://archive.ubuntu.com/ubuntu resolute/main amd64 libkeyutils1 amd64 1.6.3-6ubuntu3 [10.6 kB]
+#30 17.43 Get:9 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5-3 amd64 1.22.1-2ubuntu4.1 [361 kB]
+#30 17.47 Get:10 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgssapi-krb5-2 amd64 1.22.1-2ubuntu4.1 [147 kB]
+#30 17.49 Get:11 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libnghttp2-14 amd64 1.68.0-2ubuntu0.2 [71.0 kB]
+#30 17.49 Get:12 http://archive.ubuntu.com/ubuntu resolute/main amd64 libpsl5t64 amd64 0.21.2-1.1build2 [59.5 kB]
+#30 17.50 Get:13 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-modules-db amd64 2.1.28+dfsg1-9ubuntu3 [21.1 kB]
+#30 17.56 Get:14 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-2 amd64 2.1.28+dfsg1-9ubuntu3 [54.0 kB]
+#30 17.74 Get:15 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap-common all 2.6.10+dfsg-1ubuntu5 [36.0 kB]
+#30 17.75 Get:16 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap2 amd64 2.6.10+dfsg-1ubuntu5 [204 kB]
+#30 17.76 Get:17 http://archive.ubuntu.com/ubuntu resolute/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-3 [59.0 kB]
+#30 17.77 Get:18 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libssh2-1t64 amd64 1.11.1-1ubuntu0.26.04.4 [138 kB]
+#30 17.77 Get:19 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libcurl4t64 amd64 8.18.0-1ubuntu2.8 [430 kB]
+#30 17.79 Get:20 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 curl amd64 8.18.0-1ubuntu2.8 [273 kB]
+#30 18.24 debconf: unable to initialize frontend: Dialog
+#30 18.24 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#30 18.24 debconf: falling back to frontend: Readline
+#30 18.24 debconf: unable to initialize frontend: Readline
+#30 18.24 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 20.)
+#30 18.24 debconf: falling back to frontend: Teletype
+#30 18.27 debconf: unable to initialize frontend: Teletype
+#30 18.27 debconf: (This frontend requires a controlling tty.)
+#30 18.27 debconf: falling back to frontend: Noninteractive
+#30 ...
+
+#34 [incident-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#34 10.77 Get:11 http://archive.ubuntu.com/ubuntu resolute/restricted amd64 Packages [189 kB]
+#34 11.16 Get:12 http://archive.ubuntu.com/ubuntu resolute/universe amd64 Packages [20.1 MB]
+#34 ...
+
+#38 [knowledge-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#38 11.63 Get:10 http://archive.ubuntu.com/ubuntu resolute/main amd64 Packages [1,874 kB]
+#38 12.40 Get:11 http://archive.ubuntu.com/ubuntu resolute/restricted amd64 Packages [189 kB]
+#38 12.48 Get:12 http://archive.ubuntu.com/ubuntu resolute/multiverse amd64 Packages [352 kB]
+#38 12.62 Get:13 http://archive.ubuntu.com/ubuntu resolute-updates/universe amd64 Packages [497 kB]
+#38 12.80 Get:14 http://archive.ubuntu.com/ubuntu resolute-updates/restricted amd64 Packages [773 kB]
+#38 13.03 Get:15 http://archive.ubuntu.com/ubuntu resolute-updates/multiverse amd64 Packages [26.1 kB]
+#38 13.04 Get:16 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 Packages [1,111 kB]
+#38 13.31 Get:17 http://archive.ubuntu.com/ubuntu resolute-backports/universe amd64 Packages [3,308 B]
+#38 13.38 Fetched 27.4 MB in 13s (2,124 kB/s)
+#38 13.38 Reading package lists...
+#38 14.52 Reading package lists...
+#38 16.11 Building dependency tree...
+#38 16.43 Reading state information...
+#38 16.53 Solving dependencies...
+#38 16.91 The following additional packages will be installed:
+#38 16.91   libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#38 16.91   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#38 16.91   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#38 16.91   libsasl2-modules-db libssh2-1t64 libunistring5
+#38 16.91 Suggested packages:
+#38 16.91   gnutls-bin krb5-doc krb5-user
+#38 16.91 Recommended packages:
+#38 16.91   bash-completion krb5-locales publicsuffix libsasl2-modules
+#38 17.01 The following NEW packages will be installed:
+#38 17.01   curl libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#38 17.01   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#38 17.01   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#38 17.01   libsasl2-modules-db libssh2-1t64 libunistring5
+#38 17.42 0 upgraded, 20 newly installed, 0 to remove and 5 not upgraded.
+#38 17.42 Need to get 4,072 kB of archives.
+#38 17.42 After this operation, 11.1 MB of additional disk space will be used.
+#38 17.42 Get:1 http://archive.ubuntu.com/ubuntu resolute/main amd64 libnettle8t64 amd64 3.10.2-1 [185 kB]
+#38 18.00 Get:2 http://archive.ubuntu.com/ubuntu resolute/main amd64 libhogweed6t64 amd64 3.10.2-1 [201 kB]
+#38 18.16 Get:3 http://archive.ubuntu.com/ubuntu resolute/main amd64 libunistring5 amd64 1.3-2build1 [610 kB]
+#38 18.47 Get:4 http://archive.ubuntu.com/ubuntu resolute/main amd64 libidn2-0 amd64 2.3.8-4build1 [67.6 kB]
+#38 18.47 Get:5 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgnutls30t64 amd64 3.8.12-2ubuntu1.1 [1,029 kB]
+#38 18.68 Get:6 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5support0 amd64 1.22.1-2ubuntu4.1 [33.5 kB]
+#38 18.75 Get:7 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libk5crypto3 amd64 1.22.1-2ubuntu4.1 [82.0 kB]
+#38 18.83 Get:8 http://archive.ubuntu.com/ubuntu resolute/main amd64 libkeyutils1 amd64 1.6.3-6ubuntu3 [10.6 kB]
+#38 18.89 Get:9 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5-3 amd64 1.22.1-2ubuntu4.1 [361 kB]
+#38 18.93 Get:10 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgssapi-krb5-2 amd64 1.22.1-2ubuntu4.1 [147 kB]
+#38 18.97 Get:11 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libnghttp2-14 amd64 1.68.0-2ubuntu0.2 [71.0 kB]
+#38 18.98 Get:12 http://archive.ubuntu.com/ubuntu resolute/main amd64 libpsl5t64 amd64 0.21.2-1.1build2 [59.5 kB]
+#38 18.98 Get:13 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-modules-db amd64 2.1.28+dfsg1-9ubuntu3 [21.1 kB]
+#38 18.99 Get:14 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-2 amd64 2.1.28+dfsg1-9ubuntu3 [54.0 kB]
+#38 19.00 Get:15 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap-common all 2.6.10+dfsg-1ubuntu5 [36.0 kB]
+#38 19.18 Get:16 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap2 amd64 2.6.10+dfsg-1ubuntu5 [204 kB]
+#38 19.20 Get:17 http://archive.ubuntu.com/ubuntu resolute/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-3 [59.0 kB]
+#38 19.22 Get:18 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libssh2-1t64 amd64 1.11.1-1ubuntu0.26.04.4 [138 kB]
+#38 19.24 Get:19 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libcurl4t64 amd64 8.18.0-1ubuntu2.8 [430 kB]
+#38 19.27 Get:20 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 curl amd64 8.18.0-1ubuntu2.8 [273 kB]
+#38 20.99 debconf: unable to initialize frontend: Dialog
+#38 20.99 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#38 20.99 debconf: falling back to frontend: Readline
+#38 20.99 debconf: unable to initialize frontend: Readline
+#38 20.99 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 20.)
+#38 20.99 debconf: falling back to frontend: Teletype
+#38 21.02 debconf: unable to initialize frontend: Teletype
+#38 21.02 debconf: (This frontend requires a controlling tty.)
+#38 21.02 debconf: falling back to frontend: Noninteractive
+#38 ...
+
+#30 [change-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#30 21.47 Fetched 4,072 kB in 2s (2,025 kB/s)
+#30 21.79 Selecting previously unselected package libnettle8t64:amd64.
+#30 21.79 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 9798 files and directories currently installed.)
+#30 21.80 Preparing to unpack .../00-libnettle8t64_3.10.2-1_amd64.deb ...
+#30 ...
+
+#37 [directory-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#37 11.79 Get:10 http://archive.ubuntu.com/ubuntu resolute/restricted amd64 Packages [189 kB]
+#37 11.86 Get:11 http://archive.ubuntu.com/ubuntu resolute/multiverse amd64 Packages [352 kB]
+#37 12.02 Get:12 http://archive.ubuntu.com/ubuntu resolute/main amd64 Packages [1,874 kB]
+#37 12.83 Get:13 http://archive.ubuntu.com/ubuntu resolute-updates/universe amd64 Packages [497 kB]
+#37 13.54 Get:14 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 Packages [1,111 kB]
+#37 14.02 Get:15 http://archive.ubuntu.com/ubuntu resolute-updates/restricted amd64 Packages [773 kB]
+#37 14.34 Get:16 http://archive.ubuntu.com/ubuntu resolute-updates/multiverse amd64 Packages [26.1 kB]
+#37 14.35 Get:17 http://archive.ubuntu.com/ubuntu resolute-backports/universe amd64 Packages [3,308 B]
+#37 14.44 Fetched 27.4 MB in 14s (1,958 kB/s)
+#37 14.44 Reading package lists...
+#37 15.97 Reading package lists...
+#37 18.43 Building dependency tree...
+#37 18.93 Reading state information...
+#37 19.08 Solving dependencies...
+#37 19.66 The following additional packages will be installed:
+#37 19.66   libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#37 19.66   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#37 19.66   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#37 19.66   libsasl2-modules-db libssh2-1t64 libunistring5
+#37 19.66 Suggested packages:
+#37 19.66   gnutls-bin krb5-doc krb5-user
+#37 19.66 Recommended packages:
+#37 19.66   bash-completion krb5-locales publicsuffix libsasl2-modules
+#37 19.81 The following NEW packages will be installed:
+#37 19.81   curl libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#37 19.81   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#37 19.81   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#37 19.81   libsasl2-modules-db libssh2-1t64 libunistring5
+#37 20.24 0 upgraded, 20 newly installed, 0 to remove and 5 not upgraded.
+#37 20.24 Need to get 4,072 kB of archives.
+#37 20.24 After this operation, 11.1 MB of additional disk space will be used.
+#37 20.24 Get:1 http://archive.ubuntu.com/ubuntu resolute/main amd64 libnettle8t64 amd64 3.10.2-1 [185 kB]
+#37 21.07 Get:2 http://archive.ubuntu.com/ubuntu resolute/main amd64 libhogweed6t64 amd64 3.10.2-1 [201 kB]
+#37 21.23 Get:3 http://archive.ubuntu.com/ubuntu resolute/main amd64 libunistring5 amd64 1.3-2build1 [610 kB]
+#37 21.54 Get:4 http://archive.ubuntu.com/ubuntu resolute/main amd64 libidn2-0 amd64 2.3.8-4build1 [67.6 kB]
+#37 21.58 Get:5 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgnutls30t64 amd64 3.8.12-2ubuntu1.1 [1,029 kB]
+#37 21.77 Get:6 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5support0 amd64 1.22.1-2ubuntu4.1 [33.5 kB]
+#37 21.77 Get:7 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libk5crypto3 amd64 1.22.1-2ubuntu4.1 [82.0 kB]
+#37 21.78 Get:8 http://archive.ubuntu.com/ubuntu resolute/main amd64 libkeyutils1 amd64 1.6.3-6ubuntu3 [10.6 kB]
+#37 21.79 Get:9 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5-3 amd64 1.22.1-2ubuntu4.1 [361 kB]
+#37 21.81 Get:10 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgssapi-krb5-2 amd64 1.22.1-2ubuntu4.1 [147 kB]
+#37 21.82 Get:11 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libnghttp2-14 amd64 1.68.0-2ubuntu0.2 [71.0 kB]
+#37 21.84 Get:12 http://archive.ubuntu.com/ubuntu resolute/main amd64 libpsl5t64 amd64 0.21.2-1.1build2 [59.5 kB]
+#37 21.85 Get:13 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-modules-db amd64 2.1.28+dfsg1-9ubuntu3 [21.1 kB]
+#37 21.88 Get:14 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-2 amd64 2.1.28+dfsg1-9ubuntu3 [54.0 kB]
+#37 ...
+
+#30 [change-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#30 21.93 Unpacking libnettle8t64:amd64 (3.10.2-1) ...
+#30 ...
+
+#36 [audit-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#36 DONE 22.0s
+
+#39 [audit-service 3/4] WORKDIR /app
+#39 DONE 0.1s
+
+#30 [change-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#30 22.04 Selecting previously unselected package libhogweed6t64:amd64.
+#30 22.04 Preparing to unpack .../01-libhogweed6t64_3.10.2-1_amd64.deb ...
+#30 22.04 Unpacking libhogweed6t64:amd64 (3.10.2-1) ...
+#30 22.10 Selecting previously unselected package libunistring5:amd64.
+#30 22.11 Preparing to unpack .../02-libunistring5_1.3-2build1_amd64.deb ...
+#30 22.11 Unpacking libunistring5:amd64 (1.3-2build1) ...
+#30 ...
+
+#40 [audit-service 4/4] COPY --chown=root:root services/audit-service/build/libs/app.jar /app/app.jar
+#40 DONE 0.3s
+
+#30 [change-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#30 22.40 Selecting previously unselected package libidn2-0:amd64.
+#30 22.41 Preparing to unpack .../03-libidn2-0_2.3.8-4build1_amd64.deb ...
+#30 22.41 Unpacking libidn2-0:amd64 (2.3.8-4build1) ...
+#30 22.47 Selecting previously unselected package libgnutls30t64:amd64.
+#30 22.47 Preparing to unpack .../04-libgnutls30t64_3.8.12-2ubuntu1.1_amd64.deb ...
+#30 22.47 Unpacking libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#30 22.58 Selecting previously unselected package libkrb5support0:amd64.
+#30 22.58 Preparing to unpack .../05-libkrb5support0_1.22.1-2ubuntu4.1_amd64.deb ...
+#30 22.59 Unpacking libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#30 22.64 Selecting previously unselected package libk5crypto3:amd64.
+#30 22.64 Preparing to unpack .../06-libk5crypto3_1.22.1-2ubuntu4.1_amd64.deb ...
+#30 22.65 Unpacking libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#30 22.71 Selecting previously unselected package libkeyutils1:amd64.
+#30 22.71 Preparing to unpack .../07-libkeyutils1_1.6.3-6ubuntu3_amd64.deb ...
+#30 22.71 Unpacking libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#30 22.76 Selecting previously unselected package libkrb5-3:amd64.
+#30 22.77 Preparing to unpack .../08-libkrb5-3_1.22.1-2ubuntu4.1_amd64.deb ...
+#30 22.77 Unpacking libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#30 22.86 Selecting previously unselected package libgssapi-krb5-2:amd64.
+#30 22.87 Preparing to unpack .../09-libgssapi-krb5-2_1.22.1-2ubuntu4.1_amd64.deb ...
+#30 22.87 Unpacking libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#30 22.94 Selecting previously unselected package libnghttp2-14:amd64.
+#30 22.95 Preparing to unpack .../10-libnghttp2-14_1.68.0-2ubuntu0.2_amd64.deb ...
+#30 22.95 Unpacking libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#30 23.02 Selecting previously unselected package libpsl5t64:amd64.
+#30 23.02 Preparing to unpack .../11-libpsl5t64_0.21.2-1.1build2_amd64.deb ...
+#30 23.03 Unpacking libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#30 23.08 Selecting previously unselected package libsasl2-modules-db:amd64.
+#30 ...
+
+#31 [notification-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#31 13.03 Get:13 http://archive.ubuntu.com/ubuntu resolute-updates/multiverse amd64 Packages [26.1 kB]
+#31 13.04 Get:14 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 Packages [1,111 kB]
+#31 13.43 Get:15 http://archive.ubuntu.com/ubuntu resolute-updates/restricted amd64 Packages [773 kB]
+#31 13.69 Get:16 http://archive.ubuntu.com/ubuntu resolute-updates/universe amd64 Packages [497 kB]
+#31 13.87 Get:17 http://archive.ubuntu.com/ubuntu resolute-backports/universe amd64 Packages [3,308 B]
+#31 14.17 Fetched 27.4 MB in 14s (2,008 kB/s)
+#31 14.17 Reading package lists...
+#31 15.57 Reading package lists...
+#31 17.94 Building dependency tree...
+#31 18.40 Reading state information...
+#31 18.55 Solving dependencies...
+#31 19.14 The following additional packages will be installed:
+#31 19.14   libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#31 19.14   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#31 19.14   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#31 19.14   libsasl2-modules-db libssh2-1t64 libunistring5
+#31 19.15 Suggested packages:
+#31 19.15   gnutls-bin krb5-doc krb5-user
+#31 19.15 Recommended packages:
+#31 19.15   bash-completion krb5-locales publicsuffix libsasl2-modules
+#31 19.29 The following NEW packages will be installed:
+#31 19.29   curl libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#31 19.29   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#31 19.30   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#31 19.30   libsasl2-modules-db libssh2-1t64 libunistring5
+#31 19.75 0 upgraded, 20 newly installed, 0 to remove and 5 not upgraded.
+#31 19.75 Need to get 4,072 kB of archives.
+#31 19.75 After this operation, 11.1 MB of additional disk space will be used.
+#31 19.75 Get:1 http://archive.ubuntu.com/ubuntu resolute/main amd64 libnettle8t64 amd64 3.10.2-1 [185 kB]
+#31 21.08 Get:2 http://archive.ubuntu.com/ubuntu resolute/main amd64 libhogweed6t64 amd64 3.10.2-1 [201 kB]
+#31 21.26 Get:3 http://archive.ubuntu.com/ubuntu resolute/main amd64 libunistring5 amd64 1.3-2build1 [610 kB]
+#31 21.58 Get:4 http://archive.ubuntu.com/ubuntu resolute/main amd64 libidn2-0 amd64 2.3.8-4build1 [67.6 kB]
+#31 21.65 Get:5 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgnutls30t64 amd64 3.8.12-2ubuntu1.1 [1,029 kB]
+#31 21.81 Get:6 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5support0 amd64 1.22.1-2ubuntu4.1 [33.5 kB]
+#31 21.84 Get:7 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libk5crypto3 amd64 1.22.1-2ubuntu4.1 [82.0 kB]
+#31 21.85 Get:8 http://archive.ubuntu.com/ubuntu resolute/main amd64 libkeyutils1 amd64 1.6.3-6ubuntu3 [10.6 kB]
+#31 21.87 Get:9 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5-3 amd64 1.22.1-2ubuntu4.1 [361 kB]
+#31 21.92 Get:10 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgssapi-krb5-2 amd64 1.22.1-2ubuntu4.1 [147 kB]
+#31 21.92 Get:11 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libnghttp2-14 amd64 1.68.0-2ubuntu0.2 [71.0 kB]
+#31 21.95 Get:12 http://archive.ubuntu.com/ubuntu resolute/main amd64 libpsl5t64 amd64 0.21.2-1.1build2 [59.5 kB]
+#31 21.96 Get:13 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-modules-db amd64 2.1.28+dfsg1-9ubuntu3 [21.1 kB]
+#31 21.96 Get:14 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-2 amd64 2.1.28+dfsg1-9ubuntu3 [54.0 kB]
+#31 22.13 Get:15 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap-common all 2.6.10+dfsg-1ubuntu5 [36.0 kB]
+#31 22.14 Get:16 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap2 amd64 2.6.10+dfsg-1ubuntu5 [204 kB]
+#31 22.15 Get:17 http://archive.ubuntu.com/ubuntu resolute/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-3 [59.0 kB]
+#31 22.15 Get:18 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libssh2-1t64 amd64 1.11.1-1ubuntu0.26.04.4 [138 kB]
+#31 22.17 Get:19 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libcurl4t64 amd64 8.18.0-1ubuntu2.8 [430 kB]
+#31 22.30 Get:20 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 curl amd64 8.18.0-1ubuntu2.8 [273 kB]
+#31 22.77 debconf: unable to initialize frontend: Dialog
+#31 22.77 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#31 22.77 debconf: falling back to frontend: Readline
+#31 22.77 debconf: unable to initialize frontend: Readline
+#31 22.77 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 20.)
+#31 22.77 debconf: falling back to frontend: Teletype
+#31 22.80 debconf: unable to initialize frontend: Teletype
+#31 22.80 debconf: (This frontend requires a controlling tty.)
+#31 22.80 debconf: falling back to frontend: Noninteractive
+#31 ...
+
+#32 [reporting-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#32 13.03 Get:10 http://archive.ubuntu.com/ubuntu resolute/restricted amd64 Packages [189 kB]
+#32 13.08 Get:11 http://archive.ubuntu.com/ubuntu resolute/main amd64 Packages [1,874 kB]
+#32 13.52 Get:12 http://archive.ubuntu.com/ubuntu resolute/multiverse amd64 Packages [352 kB]
+#32 13.58 Get:13 http://archive.ubuntu.com/ubuntu resolute-updates/universe amd64 Packages [497 kB]
+#32 13.68 Get:14 http://archive.ubuntu.com/ubuntu resolute-updates/restricted amd64 Packages [773 kB]
+#32 13.80 Get:15 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 Packages [1,111 kB]
+#32 13.96 Get:16 http://archive.ubuntu.com/ubuntu resolute-updates/multiverse amd64 Packages [26.1 kB]
+#32 13.96 Get:17 http://archive.ubuntu.com/ubuntu resolute-backports/universe amd64 Packages [3,308 B]
+#32 14.36 Fetched 27.4 MB in 14s (1,974 kB/s)
+#32 14.36 Reading package lists...
+#32 16.17 Reading package lists...
+#32 18.66 Building dependency tree...
+#32 19.18 Reading state information...
+#32 19.35 Solving dependencies...
+#32 20.01 The following additional packages will be installed:
+#32 20.01   libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#32 20.01   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#32 20.01   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#32 20.02   libsasl2-modules-db libssh2-1t64 libunistring5
+#32 20.02 Suggested packages:
+#32 20.02   gnutls-bin krb5-doc krb5-user
+#32 20.02 Recommended packages:
+#32 20.02   bash-completion krb5-locales publicsuffix libsasl2-modules
+#32 20.18 The following NEW packages will be installed:
+#32 20.18   curl libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#32 20.18   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#32 20.18   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#32 20.18   libsasl2-modules-db libssh2-1t64 libunistring5
+#32 20.63 0 upgraded, 20 newly installed, 0 to remove and 5 not upgraded.
+#32 20.63 Need to get 4,072 kB of archives.
+#32 20.63 After this operation, 11.1 MB of additional disk space will be used.
+#32 20.63 Get:1 http://archive.ubuntu.com/ubuntu resolute/main amd64 libnettle8t64 amd64 3.10.2-1 [185 kB]
+#32 21.25 Get:2 http://archive.ubuntu.com/ubuntu resolute/main amd64 libhogweed6t64 amd64 3.10.2-1 [201 kB]
+#32 21.43 Get:3 http://archive.ubuntu.com/ubuntu resolute/main amd64 libunistring5 amd64 1.3-2build1 [610 kB]
+#32 21.71 Get:4 http://archive.ubuntu.com/ubuntu resolute/main amd64 libidn2-0 amd64 2.3.8-4build1 [67.6 kB]
+#32 21.75 Get:5 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgnutls30t64 amd64 3.8.12-2ubuntu1.1 [1,029 kB]
+#32 21.96 Get:6 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5support0 amd64 1.22.1-2ubuntu4.1 [33.5 kB]
+#32 21.96 Get:7 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libk5crypto3 amd64 1.22.1-2ubuntu4.1 [82.0 kB]
+#32 21.96 Get:8 http://archive.ubuntu.com/ubuntu resolute/main amd64 libkeyutils1 amd64 1.6.3-6ubuntu3 [10.6 kB]
+#32 21.96 Get:9 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5-3 amd64 1.22.1-2ubuntu4.1 [361 kB]
+#32 21.98 Get:10 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgssapi-krb5-2 amd64 1.22.1-2ubuntu4.1 [147 kB]
+#32 22.01 Get:11 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libnghttp2-14 amd64 1.68.0-2ubuntu0.2 [71.0 kB]
+#32 22.03 Get:12 http://archive.ubuntu.com/ubuntu resolute/main amd64 libpsl5t64 amd64 0.21.2-1.1build2 [59.5 kB]
+#32 22.03 Get:13 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-modules-db amd64 2.1.28+dfsg1-9ubuntu3 [21.1 kB]
+#32 22.06 Get:14 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-2 amd64 2.1.28+dfsg1-9ubuntu3 [54.0 kB]
+#32 22.24 Get:15 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap-common all 2.6.10+dfsg-1ubuntu5 [36.0 kB]
+#32 22.30 Get:16 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap2 amd64 2.6.10+dfsg-1ubuntu5 [204 kB]
+#32 22.33 Get:17 http://archive.ubuntu.com/ubuntu resolute/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-3 [59.0 kB]
+#32 22.34 Get:18 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libssh2-1t64 amd64 1.11.1-1ubuntu0.26.04.4 [138 kB]
+#32 22.35 Get:19 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libcurl4t64 amd64 8.18.0-1ubuntu2.8 [430 kB]
+#32 22.36 Get:20 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 curl amd64 8.18.0-1ubuntu2.8 [273 kB]
+#32 22.82 debconf: unable to initialize frontend: Dialog
+#32 22.82 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#32 22.82 debconf: falling back to frontend: Readline
+#32 22.82 debconf: unable to initialize frontend: Readline
+#32 22.82 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 20.)
+#32 22.82 debconf: falling back to frontend: Teletype
+#32 22.85 debconf: unable to initialize frontend: Teletype
+#32 22.85 debconf: (This frontend requires a controlling tty.)
+#32 22.85 debconf: falling back to frontend: Noninteractive
+#32 ...
+
+#30 [change-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#30 23.08 Preparing to unpack .../12-libsasl2-modules-db_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#30 23.09 Unpacking libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#30 23.16 Selecting previously unselected package libsasl2-2:amd64.
+#30 23.17 Preparing to unpack .../13-libsasl2-2_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#30 23.17 Unpacking libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#30 23.23 Selecting previously unselected package libldap-common.
+#30 23.23 Preparing to unpack .../14-libldap-common_2.6.10+dfsg-1ubuntu5_all.deb ...
+#30 23.24 Unpacking libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#30 23.30 Selecting previously unselected package libldap2:amd64.
+#30 23.30 Preparing to unpack .../15-libldap2_2.6.10+dfsg-1ubuntu5_amd64.deb ...
+#30 23.30 Unpacking libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#30 23.39 Selecting previously unselected package librtmp1:amd64.
+#30 23.40 Preparing to unpack .../16-librtmp1_2.4+20151223.gitfa8646d.1-3_amd64.deb ...
+#30 23.40 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#30 23.46 Selecting previously unselected package libssh2-1t64:amd64.
+#30 23.46 Preparing to unpack .../17-libssh2-1t64_1.11.1-1ubuntu0.26.04.4_amd64.deb ...
+#30 23.46 Unpacking libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#30 23.52 Selecting previously unselected package libcurl4t64:amd64.
+#30 23.53 Preparing to unpack .../18-libcurl4t64_8.18.0-1ubuntu2.8_amd64.deb ...
+#30 23.53 Unpacking libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#30 23.59 Selecting previously unselected package curl.
+#30 23.60 Preparing to unpack .../19-curl_8.18.0-1ubuntu2.8_amd64.deb ...
+#30 23.60 Unpacking curl (8.18.0-1ubuntu2.8) ...
+#30 23.67 Setting up libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#30 23.68 Setting up libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#30 23.68 Setting up libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#30 23.69 Setting up libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#30 23.70 Setting up libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#30 23.70 Setting up libnettle8t64:amd64 (3.10.2-1) ...
+#30 23.71 Setting up libunistring5:amd64 (1.3-2build1) ...
+#30 23.71 Setting up libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#30 23.72 Setting up libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#30 23.73 Setting up libhogweed6t64:amd64 (3.10.2-1) ...
+#30 23.73 Setting up libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#30 23.74 Setting up libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#30 23.74 Setting up libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#30 23.75 Setting up libidn2-0:amd64 (2.3.8-4build1) ...
+#30 23.75 Setting up libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#30 23.76 Setting up libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#30 23.77 Setting up libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#30 23.77 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#30 23.78 Setting up libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#30 23.78 Setting up curl (8.18.0-1ubuntu2.8) ...
+#30 23.79 Processing triggers for libc-bin (2.43-2ubuntu2.4) ...
+#30 DONE 23.9s
+
+#41 [audit-service] exporting to image
+#41 exporting layers 1.5s done
+#41 writing image sha256:936a010cb7614a929f2e841f394a51bd753b39ada5abfbc3f939a7cdac05f0be done
+#41 naming to docker.io/esm-hub/audit-service:latest done
+#41 DONE 1.5s
+
+#42 [change-service 3/4] WORKDIR /app
+#42 DONE 0.0s
+
+#38 [knowledge-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#38 23.62 Fetched 4,072 kB in 2s (1,792 kB/s)
+#38 23.67 Selecting previously unselected package libnettle8t64:amd64.
+#38 23.67 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 9798 files and directories currently installed.)
+#38 23.68 Preparing to unpack .../00-libnettle8t64_3.10.2-1_amd64.deb ...
+#38 23.69 Unpacking libnettle8t64:amd64 (3.10.2-1) ...
+#38 23.74 Selecting previously unselected package libhogweed6t64:amd64.
+#38 23.74 Preparing to unpack .../01-libhogweed6t64_3.10.2-1_amd64.deb ...
+#38 23.74 Unpacking libhogweed6t64:amd64 (3.10.2-1) ...
+#38 23.78 Selecting previously unselected package libunistring5:amd64.
+#38 23.79 Preparing to unpack .../02-libunistring5_1.3-2build1_amd64.deb ...
+#38 23.79 Unpacking libunistring5:amd64 (1.3-2build1) ...
+#38 23.87 Selecting previously unselected package libidn2-0:amd64.
+#38 23.88 Preparing to unpack .../03-libidn2-0_2.3.8-4build1_amd64.deb ...
+#38 23.88 Unpacking libidn2-0:amd64 (2.3.8-4build1) ...
+#38 23.93 Selecting previously unselected package libgnutls30t64:amd64.
+#38 23.93 Preparing to unpack .../04-libgnutls30t64_3.8.12-2ubuntu1.1_amd64.deb ...
+#38 23.93 Unpacking libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#38 24.05 Selecting previously unselected package libkrb5support0:amd64.
+#38 24.06 Preparing to unpack .../05-libkrb5support0_1.22.1-2ubuntu4.1_amd64.deb ...
+#38 24.06 Unpacking libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#38 ...
+
+#35 [asset-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#35 13.95 Get:12 http://archive.ubuntu.com/ubuntu resolute/multiverse amd64 Packages [352 kB]
+#35 14.02 Get:13 http://archive.ubuntu.com/ubuntu resolute-updates/multiverse amd64 Packages [26.1 kB]
+#35 14.03 Get:14 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 Packages [1,111 kB]
+#35 14.25 Get:15 http://archive.ubuntu.com/ubuntu resolute-updates/universe amd64 Packages [497 kB]
+#35 14.34 Get:16 http://archive.ubuntu.com/ubuntu resolute-updates/restricted amd64 Packages [773 kB]
+#35 14.47 Get:17 http://archive.ubuntu.com/ubuntu resolute-backports/universe amd64 Packages [3,308 B]
+#35 15.42 Fetched 27.4 MB in 15s (1,840 kB/s)
+#35 15.42 Reading package lists...
+#35 17.60 Reading package lists...
+#35 20.75 Building dependency tree...
+#35 21.14 Reading state information...
+#35 21.27 Solving dependencies...
+#35 21.71 The following additional packages will be installed:
+#35 21.71   libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#35 21.71   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#35 21.72   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#35 21.72   libsasl2-modules-db libssh2-1t64 libunistring5
+#35 21.72 Suggested packages:
+#35 21.72   gnutls-bin krb5-doc krb5-user
+#35 21.72 Recommended packages:
+#35 21.72   bash-completion krb5-locales publicsuffix libsasl2-modules
+#35 21.85 The following NEW packages will be installed:
+#35 21.85   curl libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#35 21.85   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#35 21.85   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#35 21.85   libsasl2-modules-db libssh2-1t64 libunistring5
+#35 22.30 0 upgraded, 20 newly installed, 0 to remove and 5 not upgraded.
+#35 22.30 Need to get 4,072 kB of archives.
+#35 22.30 After this operation, 11.1 MB of additional disk space will be used.
+#35 22.30 Get:1 http://archive.ubuntu.com/ubuntu resolute/main amd64 libnettle8t64 amd64 3.10.2-1 [185 kB]
+#35 22.87 Get:2 http://archive.ubuntu.com/ubuntu resolute/main amd64 libhogweed6t64 amd64 3.10.2-1 [201 kB]
+#35 23.03 Get:3 http://archive.ubuntu.com/ubuntu resolute/main amd64 libunistring5 amd64 1.3-2build1 [610 kB]
+#35 23.32 Get:4 http://archive.ubuntu.com/ubuntu resolute/main amd64 libidn2-0 amd64 2.3.8-4build1 [67.6 kB]
+#35 23.34 Get:5 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgnutls30t64 amd64 3.8.12-2ubuntu1.1 [1,029 kB]
+#35 23.51 Get:6 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5support0 amd64 1.22.1-2ubuntu4.1 [33.5 kB]
+#35 23.52 Get:7 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libk5crypto3 amd64 1.22.1-2ubuntu4.1 [82.0 kB]
+#35 23.53 Get:8 http://archive.ubuntu.com/ubuntu resolute/main amd64 libkeyutils1 amd64 1.6.3-6ubuntu3 [10.6 kB]
+#35 23.54 Get:9 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5-3 amd64 1.22.1-2ubuntu4.1 [361 kB]
+#35 23.58 Get:10 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgssapi-krb5-2 amd64 1.22.1-2ubuntu4.1 [147 kB]
+#35 23.59 Get:11 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libnghttp2-14 amd64 1.68.0-2ubuntu0.2 [71.0 kB]
+#35 23.60 Get:12 http://archive.ubuntu.com/ubuntu resolute/main amd64 libpsl5t64 amd64 0.21.2-1.1build2 [59.5 kB]
+#35 23.61 Get:13 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-modules-db amd64 2.1.28+dfsg1-9ubuntu3 [21.1 kB]
+#35 23.67 Get:14 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-2 amd64 2.1.28+dfsg1-9ubuntu3 [54.0 kB]
+#35 23.84 Get:15 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap-common all 2.6.10+dfsg-1ubuntu5 [36.0 kB]
+#35 23.85 Get:16 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap2 amd64 2.6.10+dfsg-1ubuntu5 [204 kB]
+#35 23.86 Get:17 http://archive.ubuntu.com/ubuntu resolute/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-3 [59.0 kB]
+#35 23.88 Get:18 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libssh2-1t64 amd64 1.11.1-1ubuntu0.26.04.4 [138 kB]
+#35 23.89 Get:19 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libcurl4t64 amd64 8.18.0-1ubuntu2.8 [430 kB]
+#35 23.91 Get:20 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 curl amd64 8.18.0-1ubuntu2.8 [273 kB]
+#35 ...
+
+#43 [change-service 4/4] COPY --chown=root:root services/change-service/build/libs/app.jar /app/app.jar
+#43 DONE 0.4s
+
+#34 [incident-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#34 23.97 Get:13 http://archive.ubuntu.com/ubuntu resolute-updates/restricted amd64 Packages [773 kB]
+#34 24.19 Get:14 http://archive.ubuntu.com/ubuntu resolute-updates/multiverse amd64 Packages [26.1 kB]
+#34 24.19 Get:15 http://archive.ubuntu.com/ubuntu resolute-updates/universe amd64 Packages [497 kB]
+#34 24.28 Get:16 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 Packages [1,111 kB]
+#34 24.48 Get:17 http://archive.ubuntu.com/ubuntu resolute-backports/universe amd64 Packages [3,308 B]
+#34 ...
+
+#38 [knowledge-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#38 24.33 Selecting previously unselected package libk5crypto3:amd64.
+#38 24.33 Preparing to unpack .../06-libk5crypto3_1.22.1-2ubuntu4.1_amd64.deb ...
+#38 24.33 Unpacking libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#38 24.42 Selecting previously unselected package libkeyutils1:amd64.
+#38 24.42 Preparing to unpack .../07-libkeyutils1_1.6.3-6ubuntu3_amd64.deb ...
+#38 24.43 Unpacking libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#38 24.50 Selecting previously unselected package libkrb5-3:amd64.
+#38 24.50 Preparing to unpack .../08-libkrb5-3_1.22.1-2ubuntu4.1_amd64.deb ...
+#38 24.50 Unpacking libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#38 24.60 Selecting previously unselected package libgssapi-krb5-2:amd64.
+#38 24.61 Preparing to unpack .../09-libgssapi-krb5-2_1.22.1-2ubuntu4.1_amd64.deb ...
+#38 24.61 Unpacking libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#38 24.67 Selecting previously unselected package libnghttp2-14:amd64.
+#38 24.68 Preparing to unpack .../10-libnghttp2-14_1.68.0-2ubuntu0.2_amd64.deb ...
+#38 24.68 Unpacking libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#38 24.77 Selecting previously unselected package libpsl5t64:amd64.
+#38 24.77 Preparing to unpack .../11-libpsl5t64_0.21.2-1.1build2_amd64.deb ...
+#38 24.77 Unpacking libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#38 24.84 Selecting previously unselected package libsasl2-modules-db:amd64.
+#38 24.84 Preparing to unpack .../12-libsasl2-modules-db_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#38 24.85 Unpacking libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#38 24.92 Selecting previously unselected package libsasl2-2:amd64.
+#38 24.92 Preparing to unpack .../13-libsasl2-2_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#38 24.92 Unpacking libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#38 25.01 Selecting previously unselected package libldap-common.
+#38 25.01 Preparing to unpack .../14-libldap-common_2.6.10+dfsg-1ubuntu5_all.deb ...
+#38 25.02 Unpacking libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#38 25.09 Selecting previously unselected package libldap2:amd64.
+#38 25.09 Preparing to unpack .../15-libldap2_2.6.10+dfsg-1ubuntu5_amd64.deb ...
+#38 25.09 Unpacking libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#38 25.19 Selecting previously unselected package librtmp1:amd64.
+#38 25.19 Preparing to unpack .../16-librtmp1_2.4+20151223.gitfa8646d.1-3_amd64.deb ...
+#38 25.20 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#38 25.26 Selecting previously unselected package libssh2-1t64:amd64.
+#38 25.27 Preparing to unpack .../17-libssh2-1t64_1.11.1-1ubuntu0.26.04.4_amd64.deb ...
+#38 25.29 Unpacking libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#38 25.36 Selecting previously unselected package libcurl4t64:amd64.
+#38 25.36 Preparing to unpack .../18-libcurl4t64_8.18.0-1ubuntu2.8_amd64.deb ...
+#38 25.36 Unpacking libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#38 25.46 Selecting previously unselected package curl.
+#38 25.46 Preparing to unpack .../19-curl_8.18.0-1ubuntu2.8_amd64.deb ...
+#38 25.46 Unpacking curl (8.18.0-1ubuntu2.8) ...
+#38 25.67 Setting up libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#38 25.68 Setting up libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#38 25.69 Setting up libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#38 25.70 Setting up libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#38 25.70 Setting up libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#38 25.71 Setting up libnettle8t64:amd64 (3.10.2-1) ...
+#38 25.72 Setting up libunistring5:amd64 (1.3-2build1) ...
+#38 25.72 Setting up libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#38 25.73 Setting up libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#38 25.74 Setting up libhogweed6t64:amd64 (3.10.2-1) ...
+#38 25.74 Setting up libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#38 25.75 Setting up libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#38 25.75 Setting up libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#38 25.77 Setting up libidn2-0:amd64 (2.3.8-4build1) ...
+#38 25.77 Setting up libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#38 25.78 Setting up libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#38 25.79 Setting up libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#38 25.79 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#38 25.80 Setting up libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#38 25.81 Setting up curl (8.18.0-1ubuntu2.8) ...
+#38 25.81 Processing triggers for libc-bin (2.43-2ubuntu2.4) ...
+#38 DONE 26.0s
+
+#44 [knowledge-service 3/4] WORKDIR /app
+#44 DONE 0.0s
+
+#41 [change-service] exporting to image
+#41 exporting layers 1.7s done
+#41 writing image sha256:904bc5117dbb7db959ce80a1b0675c5912808152346fb583df6a47076128e0ae done
+#41 naming to docker.io/esm-hub/change-service:latest done
+#41 DONE 3.3s
+
+#31 [notification-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#31 26.07 Fetched 4,072 kB in 3s (1,364 kB/s)
+#31 26.12 Selecting previously unselected package libnettle8t64:amd64.
+#31 26.12 (Reading database ... #31 ...
+
+#45 [knowledge-service 4/4] COPY --chown=root:root services/knowledge-service/build/libs/app.jar /app/app.jar
+#45 DONE 0.2s
+
+#31 [notification-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#31 26.12 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 9798 files and directories currently installed.)
+#31 26.13 Preparing to unpack .../00-libnettle8t64_3.10.2-1_amd64.deb ...
+#31 26.18 Unpacking libnettle8t64:amd64 (3.10.2-1) ...
+#31 26.23 Selecting previously unselected package libhogweed6t64:amd64.
+#31 26.24 Preparing to unpack .../01-libhogweed6t64_3.10.2-1_amd64.deb ...
+#31 26.24 Unpacking libhogweed6t64:amd64 (3.10.2-1) ...
+#31 26.29 Selecting previously unselected package libunistring5:amd64.
+#31 26.30 Preparing to unpack .../02-libunistring5_1.3-2build1_amd64.deb ...
+#31 26.30 Unpacking libunistring5:amd64 (1.3-2build1) ...
+#31 26.38 Selecting previously unselected package libidn2-0:amd64.
+#31 26.39 Preparing to unpack .../03-libidn2-0_2.3.8-4build1_amd64.deb ...
+#31 26.39 Unpacking libidn2-0:amd64 (2.3.8-4build1) ...
+#31 26.45 Selecting previously unselected package libgnutls30t64:amd64.
+#31 26.45 Preparing to unpack .../04-libgnutls30t64_3.8.12-2ubuntu1.1_amd64.deb ...
+#31 26.45 Unpacking libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#31 26.54 Selecting previously unselected package libkrb5support0:amd64.
+#31 26.54 Preparing to unpack .../05-libkrb5support0_1.22.1-2ubuntu4.1_amd64.deb ...
+#31 26.55 Unpacking libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#31 26.60 Selecting previously unselected package libk5crypto3:amd64.
+#31 26.61 Preparing to unpack .../06-libk5crypto3_1.22.1-2ubuntu4.1_amd64.deb ...
+#31 26.61 Unpacking libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#31 26.67 Selecting previously unselected package libkeyutils1:amd64.
+#31 26.67 Preparing to unpack .../07-libkeyutils1_1.6.3-6ubuntu3_amd64.deb ...
+#31 26.67 Unpacking libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#31 26.70 Selecting previously unselected package libkrb5-3:amd64.
+#31 26.71 Preparing to unpack .../08-libkrb5-3_1.22.1-2ubuntu4.1_amd64.deb ...
+#31 26.71 Unpacking libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#31 26.77 Selecting previously unselected package libgssapi-krb5-2:amd64.
+#31 26.77 Preparing to unpack .../09-libgssapi-krb5-2_1.22.1-2ubuntu4.1_amd64.deb ...
+#31 26.77 Unpacking libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#31 26.81 Selecting previously unselected package libnghttp2-14:amd64.
+#31 26.82 Preparing to unpack .../10-libnghttp2-14_1.68.0-2ubuntu0.2_amd64.deb ...
+#31 26.82 Unpacking libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#31 26.88 Selecting previously unselected package libpsl5t64:amd64.
+#31 26.88 Preparing to unpack .../11-libpsl5t64_0.21.2-1.1build2_amd64.deb ...
+#31 26.88 Unpacking libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#31 26.92 Selecting previously unselected package libsasl2-modules-db:amd64.
+#31 26.92 Preparing to unpack .../12-libsasl2-modules-db_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#31 26.92 Unpacking libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#31 26.96 Selecting previously unselected package libsasl2-2:amd64.
+#31 26.96 Preparing to unpack .../13-libsasl2-2_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#31 26.96 Unpacking libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#31 27.00 Selecting previously unselected package libldap-common.
+#31 27.00 Preparing to unpack .../14-libldap-common_2.6.10+dfsg-1ubuntu5_all.deb ...
+#31 27.01 Unpacking libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#31 27.05 Selecting previously unselected package libldap2:amd64.
+#31 27.06 Preparing to unpack .../15-libldap2_2.6.10+dfsg-1ubuntu5_amd64.deb ...
+#31 27.06 Unpacking libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#31 27.10 Selecting previously unselected package librtmp1:amd64.
+#31 27.11 Preparing to unpack .../16-librtmp1_2.4+20151223.gitfa8646d.1-3_amd64.deb ...
+#31 27.11 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#31 27.15 Selecting previously unselected package libssh2-1t64:amd64.
+#31 27.15 Preparing to unpack .../17-libssh2-1t64_1.11.1-1ubuntu0.26.04.4_amd64.deb ...
+#31 27.15 Unpacking libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#31 27.19 Selecting previously unselected package libcurl4t64:amd64.
+#31 27.19 Preparing to unpack .../18-libcurl4t64_8.18.0-1ubuntu2.8_amd64.deb ...
+#31 27.19 Unpacking libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#31 27.24 Selecting previously unselected package curl.
+#31 27.25 Preparing to unpack .../19-curl_8.18.0-1ubuntu2.8_amd64.deb ...
+#31 27.25 Unpacking curl (8.18.0-1ubuntu2.8) ...
+#31 27.31 Setting up libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#31 27.31 Setting up libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#31 27.32 Setting up libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#31 27.33 Setting up libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#31 27.33 Setting up libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#31 27.34 Setting up libnettle8t64:amd64 (3.10.2-1) ...
+#31 27.34 Setting up libunistring5:amd64 (1.3-2build1) ...
+#31 27.35 Setting up libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#31 27.35 Setting up libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#31 27.36 Setting up libhogweed6t64:amd64 (3.10.2-1) ...
+#31 27.37 Setting up libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#31 27.37 Setting up libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#31 27.38 Setting up libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#31 27.38 Setting up libidn2-0:amd64 (2.3.8-4build1) ...
+#31 27.39 Setting up libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#31 27.40 Setting up libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#31 27.41 Setting up libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#31 27.41 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#31 27.42 Setting up libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#31 27.42 Setting up curl (8.18.0-1ubuntu2.8) ...
+#31 27.43 Processing triggers for libc-bin (2.43-2ubuntu2.4) ...
+#31 DONE 27.6s
+
+#41 [knowledge-service] exporting to image
+#41 exporting layers 1.4s done
+#41 writing image sha256:5bdb781cf190962211b0574213d23b8ce756880084f0413c0eff9025ea8e9cbb done
+#41 naming to docker.io/esm-hub/knowledge-service:latest done
+#41 DONE 4.7s
+
+#32 [reporting-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#32 26.08 Fetched 4,072 kB in 2s (1,912 kB/s)
+#32 26.18 Selecting previously unselected package libnettle8t64:amd64.
+#32 26.18 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 9798 files and directories currently installed.)
+#32 26.20 Preparing to unpack .../00-libnettle8t64_3.10.2-1_amd64.deb ...
+#32 26.21 Unpacking libnettle8t64:amd64 (3.10.2-1) ...
+#32 26.27 Selecting previously unselected package libhogweed6t64:amd64.
+#32 26.27 Preparing to unpack .../01-libhogweed6t64_3.10.2-1_amd64.deb ...
+#32 26.27 Unpacking libhogweed6t64:amd64 (3.10.2-1) ...
+#32 26.32 Selecting previously unselected package libunistring5:amd64.
+#32 26.32 Preparing to unpack .../02-libunistring5_1.3-2build1_amd64.deb ...
+#32 26.33 Unpacking libunistring5:amd64 (1.3-2build1) ...
+#32 26.42 Selecting previously unselected package libidn2-0:amd64.
+#32 26.42 Preparing to unpack .../03-libidn2-0_2.3.8-4build1_amd64.deb ...
+#32 26.42 Unpacking libidn2-0:amd64 (2.3.8-4build1) ...
+#32 26.48 Selecting previously unselected package libgnutls30t64:amd64.
+#32 26.48 Preparing to unpack .../04-libgnutls30t64_3.8.12-2ubuntu1.1_amd64.deb ...
+#32 26.48 Unpacking libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#32 26.57 Selecting previously unselected package libkrb5support0:amd64.
+#32 26.58 Preparing to unpack .../05-libkrb5support0_1.22.1-2ubuntu4.1_amd64.deb ...
+#32 26.58 Unpacking libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#32 26.64 Selecting previously unselected package libk5crypto3:amd64.
+#32 26.64 Preparing to unpack .../06-libk5crypto3_1.22.1-2ubuntu4.1_amd64.deb ...
+#32 26.64 Unpacking libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#32 26.69 Selecting previously unselected package libkeyutils1:amd64.
+#32 26.69 Preparing to unpack .../07-libkeyutils1_1.6.3-6ubuntu3_amd64.deb ...
+#32 26.70 Unpacking libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#32 26.74 Selecting previously unselected package libkrb5-3:amd64.
+#32 26.75 Preparing to unpack .../08-libkrb5-3_1.22.1-2ubuntu4.1_amd64.deb ...
+#32 26.75 Unpacking libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#32 26.81 Selecting previously unselected package libgssapi-krb5-2:amd64.
+#32 26.82 Preparing to unpack .../09-libgssapi-krb5-2_1.22.1-2ubuntu4.1_amd64.deb ...
+#32 26.82 Unpacking libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#32 26.88 Selecting previously unselected package libnghttp2-14:amd64.
+#32 26.88 Preparing to unpack .../10-libnghttp2-14_1.68.0-2ubuntu0.2_amd64.deb ...
+#32 26.88 Unpacking libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#32 26.92 Selecting previously unselected package libpsl5t64:amd64.
+#32 26.93 Preparing to unpack .../11-libpsl5t64_0.21.2-1.1build2_amd64.deb ...
+#32 26.93 Unpacking libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#32 26.96 Selecting previously unselected package libsasl2-modules-db:amd64.
+#32 26.96 Preparing to unpack .../12-libsasl2-modules-db_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#32 26.97 Unpacking libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#32 27.00 Selecting previously unselected package libsasl2-2:amd64.
+#32 27.00 Preparing to unpack .../13-libsasl2-2_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#32 27.00 Unpacking libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#32 27.05 Selecting previously unselected package libldap-common.
+#32 27.05 Preparing to unpack .../14-libldap-common_2.6.10+dfsg-1ubuntu5_all.deb ...
+#32 27.05 Unpacking libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#32 27.09 Selecting previously unselected package libldap2:amd64.
+#32 27.10 Preparing to unpack .../15-libldap2_2.6.10+dfsg-1ubuntu5_amd64.deb ...
+#32 27.10 Unpacking libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#32 27.14 Selecting previously unselected package librtmp1:amd64.
+#32 27.15 Preparing to unpack .../16-librtmp1_2.4+20151223.gitfa8646d.1-3_amd64.deb ...
+#32 27.15 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#32 27.19 Selecting previously unselected package libssh2-1t64:amd64.
+#32 27.19 Preparing to unpack .../17-libssh2-1t64_1.11.1-1ubuntu0.26.04.4_amd64.deb ...
+#32 27.19 Unpacking libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#32 27.23 Selecting previously unselected package libcurl4t64:amd64.
+#32 27.23 Preparing to unpack .../18-libcurl4t64_8.18.0-1ubuntu2.8_amd64.deb ...
+#32 27.24 Unpacking libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#32 27.28 Selecting previously unselected package curl.
+#32 27.29 Preparing to unpack .../19-curl_8.18.0-1ubuntu2.8_amd64.deb ...
+#32 27.29 Unpacking curl (8.18.0-1ubuntu2.8) ...
+#32 27.35 Setting up libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#32 27.36 Setting up libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#32 27.36 Setting up libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#32 27.37 Setting up libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#32 27.38 Setting up libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#32 27.38 Setting up libnettle8t64:amd64 (3.10.2-1) ...
+#32 27.39 Setting up libunistring5:amd64 (1.3-2build1) ...
+#32 27.39 Setting up libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#32 27.40 Setting up libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#32 27.40 Setting up libhogweed6t64:amd64 (3.10.2-1) ...
+#32 27.41 Setting up libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#32 27.42 Setting up libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#32 27.42 Setting up libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#32 27.43 Setting up libidn2-0:amd64 (2.3.8-4build1) ...
+#32 27.43 Setting up libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#32 27.44 Setting up libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#32 27.45 Setting up libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#32 27.45 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#32 27.46 Setting up libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#32 27.46 Setting up curl (8.18.0-1ubuntu2.8) ...
+#32 27.47 Processing triggers for libc-bin (2.43-2ubuntu2.4) ...
+#32 DONE 27.6s
+
+#46 [notification-service 3/4] WORKDIR /app
+#46 DONE 0.0s
+
+#37 [directory-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#37 22.06 Get:15 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap-common all 2.6.10+dfsg-1ubuntu5 [36.0 kB]
+#37 22.07 Get:16 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap2 amd64 2.6.10+dfsg-1ubuntu5 [204 kB]
+#37 22.08 Get:17 http://archive.ubuntu.com/ubuntu resolute/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-3 [59.0 kB]
+#37 22.09 Get:18 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libssh2-1t64 amd64 1.11.1-1ubuntu0.26.04.4 [138 kB]
+#37 22.10 Get:19 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libcurl4t64 amd64 8.18.0-1ubuntu2.8 [430 kB]
+#37 22.13 Get:20 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 curl amd64 8.18.0-1ubuntu2.8 [273 kB]
+#37 22.61 debconf: unable to initialize frontend: Dialog
+#37 22.61 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#37 22.61 debconf: falling back to frontend: Readline
+#37 22.61 debconf: unable to initialize frontend: Readline
+#37 22.61 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 20.)
+#37 22.61 debconf: falling back to frontend: Teletype
+#37 22.64 debconf: unable to initialize frontend: Teletype
+#37 22.64 debconf: (This frontend requires a controlling tty.)
+#37 22.64 debconf: falling back to frontend: Noninteractive
+#37 26.19 Fetched 4,072 kB in 2s (1,784 kB/s)
+#37 26.23 Selecting previously unselected package libnettle8t64:amd64.
+#37 26.23 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 9798 files and directories currently installed.)
+#37 26.25 Preparing to unpack .../00-libnettle8t64_3.10.2-1_amd64.deb ...
+#37 26.27 Unpacking libnettle8t64:amd64 (3.10.2-1) ...
+#37 26.32 Selecting previously unselected package libhogweed6t64:amd64.
+#37 26.33 Preparing to unpack .../01-libhogweed6t64_3.10.2-1_amd64.deb ...
+#37 26.33 Unpacking libhogweed6t64:amd64 (3.10.2-1) ...
+#37 26.39 Selecting previously unselected package libunistring5:amd64.
+#37 26.39 Preparing to unpack .../02-libunistring5_1.3-2build1_amd64.deb ...
+#37 26.39 Unpacking libunistring5:amd64 (1.3-2build1) ...
+#37 26.48 Selecting previously unselected package libidn2-0:amd64.
+#37 26.48 Preparing to unpack .../03-libidn2-0_2.3.8-4build1_amd64.deb ...
+#37 26.49 Unpacking libidn2-0:amd64 (2.3.8-4build1) ...
+#37 26.54 Selecting previously unselected package libgnutls30t64:amd64.
+#37 26.55 Preparing to unpack .../04-libgnutls30t64_3.8.12-2ubuntu1.1_amd64.deb ...
+#37 26.55 Unpacking libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#37 26.64 Selecting previously unselected package libkrb5support0:amd64.
+#37 26.64 Preparing to unpack .../05-libkrb5support0_1.22.1-2ubuntu4.1_amd64.deb ...
+#37 26.64 Unpacking libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#37 26.69 Selecting previously unselected package libk5crypto3:amd64.
+#37 26.70 Preparing to unpack .../06-libk5crypto3_1.22.1-2ubuntu4.1_amd64.deb ...
+#37 26.70 Unpacking libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#37 26.74 Selecting previously unselected package libkeyutils1:amd64.
+#37 26.75 Preparing to unpack .../07-libkeyutils1_1.6.3-6ubuntu3_amd64.deb ...
+#37 26.75 Unpacking libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#37 26.78 Selecting previously unselected package libkrb5-3:amd64.
+#37 26.78 Preparing to unpack .../08-libkrb5-3_1.22.1-2ubuntu4.1_amd64.deb ...
+#37 26.78 Unpacking libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#37 26.85 Selecting previously unselected package libgssapi-krb5-2:amd64.
+#37 26.85 Preparing to unpack .../09-libgssapi-krb5-2_1.22.1-2ubuntu4.1_amd64.deb ...
+#37 26.86 Unpacking libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#37 26.91 Selecting previously unselected package libnghttp2-14:amd64.
+#37 26.91 Preparing to unpack .../10-libnghttp2-14_1.68.0-2ubuntu0.2_amd64.deb ...
+#37 26.91 Unpacking libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#37 26.95 Selecting previously unselected package libpsl5t64:amd64.
+#37 26.95 Preparing to unpack .../11-libpsl5t64_0.21.2-1.1build2_amd64.deb ...
+#37 26.95 Unpacking libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#37 26.99 Selecting previously unselected package libsasl2-modules-db:amd64.
+#37 26.99 Preparing to unpack .../12-libsasl2-modules-db_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#37 26.99 Unpacking libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#37 27.02 Selecting previously unselected package libsasl2-2:amd64.
+#37 27.03 Preparing to unpack .../13-libsasl2-2_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#37 27.03 Unpacking libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#37 27.07 Selecting previously unselected package libldap-common.
+#37 27.08 Preparing to unpack .../14-libldap-common_2.6.10+dfsg-1ubuntu5_all.deb ...
+#37 27.08 Unpacking libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#37 27.11 Selecting previously unselected package libldap2:amd64.
+#37 27.12 Preparing to unpack .../15-libldap2_2.6.10+dfsg-1ubuntu5_amd64.deb ...
+#37 27.12 Unpacking libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#37 27.16 Selecting previously unselected package librtmp1:amd64.
+#37 27.16 Preparing to unpack .../16-librtmp1_2.4+20151223.gitfa8646d.1-3_amd64.deb ...
+#37 27.16 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#37 27.20 Selecting previously unselected package libssh2-1t64:amd64.
+#37 27.20 Preparing to unpack .../17-libssh2-1t64_1.11.1-1ubuntu0.26.04.4_amd64.deb ...
+#37 27.21 Unpacking libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#37 27.25 Selecting previously unselected package libcurl4t64:amd64.
+#37 27.25 Preparing to unpack .../18-libcurl4t64_8.18.0-1ubuntu2.8_amd64.deb ...
+#37 27.25 Unpacking libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#37 27.30 Selecting previously unselected package curl.
+#37 27.30 Preparing to unpack .../19-curl_8.18.0-1ubuntu2.8_amd64.deb ...
+#37 27.31 Unpacking curl (8.18.0-1ubuntu2.8) ...
+#37 27.36 Setting up libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#37 27.36 Setting up libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#37 27.37 Setting up libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#37 27.38 Setting up libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#37 27.38 Setting up libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#37 27.39 Setting up libnettle8t64:amd64 (3.10.2-1) ...
+#37 27.40 Setting up libunistring5:amd64 (1.3-2build1) ...
+#37 27.40 Setting up libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#37 27.41 Setting up libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#37 27.42 Setting up libhogweed6t64:amd64 (3.10.2-1) ...
+#37 27.42 Setting up libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#37 27.43 Setting up libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#37 27.43 Setting up libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#37 27.44 Setting up libidn2-0:amd64 (2.3.8-4build1) ...
+#37 27.44 Setting up libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#37 27.45 Setting up libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#37 27.46 Setting up libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#37 27.46 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#37 27.47 Setting up libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#37 27.47 Setting up curl (8.18.0-1ubuntu2.8) ...
+#37 27.48 Processing triggers for libc-bin (2.43-2ubuntu2.4) ...
+#37 DONE 27.6s
+
+#47 [reporting-service 3/4] WORKDIR /app
+#47 DONE 0.0s
+
+#48 [directory-service 3/4] WORKDIR /app
+#48 DONE 0.0s
+
+#34 [incident-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#34 27.66 Fetched 27.4 MB in 27s (1,009 kB/s)
+#34 27.66 Reading package lists...
+#34 ...
+
+#49 [reporting-service 4/4] COPY --chown=root:root services/reporting-service/build/libs/app.jar /app/app.jar
+#49 DONE 0.6s
+
+#50 [directory-service 4/4] COPY --chown=root:root services/directory-service/build/libs/app.jar /app/app.jar
+#50 DONE 0.6s
+
+#51 [notification-service 4/4] COPY --chown=root:root services/notification-service/build/libs/app.jar /app/app.jar
+#51 DONE 0.7s
+
+#41 [notification-service] exporting to image
+#41 ...
+
+#35 [asset-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#35 24.43 debconf: unable to initialize frontend: Dialog
+#35 24.43 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#35 24.43 debconf: falling back to frontend: Readline
+#35 24.43 debconf: unable to initialize frontend: Readline
+#35 24.43 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 20.)
+#35 24.43 debconf: falling back to frontend: Teletype
+#35 24.47 debconf: unable to initialize frontend: Teletype
+#35 24.47 debconf: (This frontend requires a controlling tty.)
+#35 24.47 debconf: falling back to frontend: Noninteractive
+#35 27.30 Fetched 4,072 kB in 2s (2,033 kB/s)
+#35 27.34 Selecting previously unselected package libnettle8t64:amd64.
+#35 27.34 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 9798 files and directories currently installed.)
+#35 27.35 Preparing to unpack .../00-libnettle8t64_3.10.2-1_amd64.deb ...
+#35 27.36 Unpacking libnettle8t64:amd64 (3.10.2-1) ...
+#35 27.41 Selecting previously unselected package libhogweed6t64:amd64.
+#35 27.41 Preparing to unpack .../01-libhogweed6t64_3.10.2-1_amd64.deb ...
+#35 27.41 Unpacking libhogweed6t64:amd64 (3.10.2-1) ...
+#35 27.45 Selecting previously unselected package libunistring5:amd64.
+#35 27.46 Preparing to unpack .../02-libunistring5_1.3-2build1_amd64.deb ...
+#35 27.46 Unpacking libunistring5:amd64 (1.3-2build1) ...
+#35 27.53 Selecting previously unselected package libidn2-0:amd64.
+#35 27.53 Preparing to unpack .../03-libidn2-0_2.3.8-4build1_amd64.deb ...
+#35 27.53 Unpacking libidn2-0:amd64 (2.3.8-4build1) ...
+#35 27.59 Selecting previously unselected package libgnutls30t64:amd64.
+#35 27.59 Preparing to unpack .../04-libgnutls30t64_3.8.12-2ubuntu1.1_amd64.deb ...
+#35 27.59 Unpacking libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#35 27.67 Selecting previously unselected package libkrb5support0:amd64.
+#35 27.68 Preparing to unpack .../05-libkrb5support0_1.22.1-2ubuntu4.1_amd64.deb ...
+#35 27.68 Unpacking libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#35 27.71 Selecting previously unselected package libk5crypto3:amd64.
+#35 27.71 Preparing to unpack .../06-libk5crypto3_1.22.1-2ubuntu4.1_amd64.deb ...
+#35 27.72 Unpacking libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#35 28.23 Selecting previously unselected package libkeyutils1:amd64.
+#35 28.24 Preparing to unpack .../07-libkeyutils1_1.6.3-6ubuntu3_amd64.deb ...
+#35 28.24 Unpacking libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#35 28.31 Selecting previously unselected package libkrb5-3:amd64.
+#35 28.31 Preparing to unpack .../08-libkrb5-3_1.22.1-2ubuntu4.1_amd64.deb ...
+#35 28.31 Unpacking libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#35 28.38 Selecting previously unselected package libgssapi-krb5-2:amd64.
+#35 28.38 Preparing to unpack .../09-libgssapi-krb5-2_1.22.1-2ubuntu4.1_amd64.deb ...
+#35 28.39 Unpacking libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#35 28.45 Selecting previously unselected package libnghttp2-14:amd64.
+#35 28.45 Preparing to unpack .../10-libnghttp2-14_1.68.0-2ubuntu0.2_amd64.deb ...
+#35 28.45 Unpacking libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#35 28.50 Selecting previously unselected package libpsl5t64:amd64.
+#35 28.50 Preparing to unpack .../11-libpsl5t64_0.21.2-1.1build2_amd64.deb ...
+#35 28.50 Unpacking libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#35 28.54 Selecting previously unselected package libsasl2-modules-db:amd64.
+#35 28.54 Preparing to unpack .../12-libsasl2-modules-db_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#35 28.54 Unpacking libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#35 28.59 Selecting previously unselected package libsasl2-2:amd64.
+#35 28.60 Preparing to unpack .../13-libsasl2-2_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#35 28.60 Unpacking libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#35 28.66 Selecting previously unselected package libldap-common.
+#35 28.66 Preparing to unpack .../14-libldap-common_2.6.10+dfsg-1ubuntu5_all.deb ...
+#35 28.66 Unpacking libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#35 28.70 Selecting previously unselected package libldap2:amd64.
+#35 28.70 Preparing to unpack .../15-libldap2_2.6.10+dfsg-1ubuntu5_amd64.deb ...
+#35 28.71 Unpacking libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#35 28.77 Selecting previously unselected package librtmp1:amd64.
+#35 28.77 Preparing to unpack .../16-librtmp1_2.4+20151223.gitfa8646d.1-3_amd64.deb ...
+#35 28.77 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#35 28.81 Selecting previously unselected package libssh2-1t64:amd64.
+#35 28.81 Preparing to unpack .../17-libssh2-1t64_1.11.1-1ubuntu0.26.04.4_amd64.deb ...
+#35 28.81 Unpacking libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#35 28.87 Selecting previously unselected package libcurl4t64:amd64.
+#35 28.87 Preparing to unpack .../18-libcurl4t64_8.18.0-1ubuntu2.8_amd64.deb ...
+#35 28.88 Unpacking libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#35 28.92 Selecting previously unselected package curl.
+#35 28.93 Preparing to unpack .../19-curl_8.18.0-1ubuntu2.8_amd64.deb ...
+#35 28.93 Unpacking curl (8.18.0-1ubuntu2.8) ...
+#35 28.98 Setting up libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#35 29.00 Setting up libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#35 29.01 Setting up libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#35 29.01 Setting up libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#35 29.03 Setting up libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#35 29.04 Setting up libnettle8t64:amd64 (3.10.2-1) ...
+#35 29.04 Setting up libunistring5:amd64 (1.3-2build1) ...
+#35 29.05 Setting up libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#35 29.06 Setting up libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#35 29.06 Setting up libhogweed6t64:amd64 (3.10.2-1) ...
+#35 29.07 Setting up libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#35 29.07 Setting up libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#35 29.09 Setting up libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#35 29.09 Setting up libidn2-0:amd64 (2.3.8-4build1) ...
+#35 29.10 Setting up libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#35 29.10 Setting up libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#35 29.12 Setting up libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#35 29.12 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#35 29.12 Setting up libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#35 29.13 Setting up curl (8.18.0-1ubuntu2.8) ...
+#35 29.15 Processing triggers for libc-bin (2.43-2ubuntu2.4) ...
+#35 DONE 29.3s
+
+#41 [reporting-service] exporting to image
+#41 exporting layers 1.1s done
+#41 writing image sha256:08d6a678312454e372cc93cd67072f4f05481a06df7385ebf47a441994431362 done
+#41 naming to docker.io/esm-hub/reporting-service:latest done
+#41 writing image sha256:9f7de8870f2d673b8844d01d80760ed877d54a07ed4f50a6c5596657ee712f75
+#41 writing image sha256:9f7de8870f2d673b8844d01d80760ed877d54a07ed4f50a6c5596657ee712f75 0.0s done
+#41 naming to docker.io/esm-hub/directory-service:latest done
+#41 writing image sha256:69b50c617a625d6117ac0c5adca49ad8da2785b2ab0f98657ff753ac33e77c28 0.0s done
+#41 naming to docker.io/esm-hub/notification-service:latest done
+#41 DONE 5.8s
+
+#52 [asset-service 3/4] WORKDIR /app
+#52 DONE 0.1s
+
+#53 [asset-service 4/4] COPY --chown=root:root services/asset-service/build/libs/app.jar /app/app.jar
+#53 DONE 0.3s
+
+#54 [gateway internal] load build definition from service.Dockerfile
+#54 transferring dockerfile: 40B done
+#54 DONE 0.1s
+
+#55 [gateway internal] load .dockerignore
+#55 transferring context: 2B done
+#55 DONE 0.1s
+
+#41 [asset-service] exporting to image
+#41 ...
+
+#20 [gateway 1/4] FROM docker.io/library/eclipse-temurin:27-jre@sha256:acfb350b50e707addf3dcbb47f7052d1882d1e5f1670ce838a9c7838d82d4fe5
+#20 resolve docker.io/library/eclipse-temurin:27-jre@sha256:acfb350b50e707addf3dcbb47f7052d1882d1e5f1670ce838a9c7838d82d4fe5 0.0s done
+#20 sha256:acfb350b50e707addf3dcbb47f7052d1882d1e5f1670ce838a9c7838d82d4fe5 5.91kB / 5.91kB done
+#20 sha256:a048e7977953b0f5ba45b759f53d2c835261dea9b71e9f7a87a42106752d8176 9.04kB / 9.04kB done
+#20 sha256:2719c23ca6855fed092edd3f47fbea2e6870bfd00fa4e10b2077126d551bca28 2.13kB / 2.13kB done
+#20 sha256:5c65180f9e9d7837d53b93240dbf4b0b2dc6787336f944c824d30c437f869e11 12.15MB / 12.15MB 2.6s done
+#20 sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 63.51MB / 63.51MB 4.5s done
+#20 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 32B / 32B 1.4s done
+#20 sha256:015cb327ee215c81fc43e3a1ad049fe69c3e2290ab7cf4a5c376cd677af9bf5f 2.46kB / 2.46kB 1.7s done
+#20 extracting sha256:5c65180f9e9d7837d53b93240dbf4b0b2dc6787336f944c824d30c437f869e11 0.5s done
+#20 extracting sha256:9dad8196f0ffdad81cea98ebe3d52c8201ec9cfbbf746471de05d78fde2a52ce 1.8s done
+#20 extracting sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 done
+#20 extracting sha256:015cb327ee215c81fc43e3a1ad049fe69c3e2290ab7cf4a5c376cd677af9bf5f done
+#20 DONE 6.6s
+
+#19 [gateway internal] load metadata for docker.io/library/eclipse-temurin:27-jre
+#19 DONE 2.9s
+
+#56 [gateway internal] load build context
+#56 ...
+
+#41 [asset-service] exporting to image
+#41 exporting layers 1.2s done
+#41 writing image sha256:acaf63ae4ac0fc3b4681ba352bb20639f3a10573e19fffab8214e99ec0ed96dc done
+#41 naming to docker.io/esm-hub/asset-service:latest done
+#41 DONE 7.0s
+
+#56 [gateway internal] load build context
+#56 transferring context: 37.62MB 0.5s done
+#56 DONE 0.6s
+
+#33 [request-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#33 18.51 Reading package lists...
+#33 21.70 Reading package lists...
+#33 24.73 Building dependency tree...
+#33 25.19 Reading state information...
+#33 25.31 Solving dependencies...
+#33 25.79 The following additional packages will be installed:
+#33 25.79   libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#33 25.79   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#33 25.79   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#33 25.79   libsasl2-modules-db libssh2-1t64 libunistring5
+#33 25.79 Suggested packages:
+#33 25.79   gnutls-bin krb5-doc krb5-user
+#33 25.79 Recommended packages:
+#33 25.79   bash-completion krb5-locales publicsuffix libsasl2-modules
+#33 25.91 The following NEW packages will be installed:
+#33 25.91   curl libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#33 25.91   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#33 25.91   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#33 25.91   libsasl2-modules-db libssh2-1t64 libunistring5
+#33 26.36 0 upgraded, 20 newly installed, 0 to remove and 5 not upgraded.
+#33 26.36 Need to get 4,072 kB of archives.
+#33 26.36 After this operation, 11.1 MB of additional disk space will be used.
+#33 26.36 Get:1 http://archive.ubuntu.com/ubuntu resolute/main amd64 libnettle8t64 amd64 3.10.2-1 [185 kB]
+#33 26.95 Get:2 http://archive.ubuntu.com/ubuntu resolute/main amd64 libhogweed6t64 amd64 3.10.2-1 [201 kB]
+#33 27.11 Get:3 http://archive.ubuntu.com/ubuntu resolute/main amd64 libunistring5 amd64 1.3-2build1 [610 kB]
+#33 27.40 Get:4 http://archive.ubuntu.com/ubuntu resolute/main amd64 libidn2-0 amd64 2.3.8-4build1 [67.6 kB]
+#33 27.42 Get:5 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgnutls30t64 amd64 3.8.12-2ubuntu1.1 [1,029 kB]
+#33 27.59 Get:6 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5support0 amd64 1.22.1-2ubuntu4.1 [33.5 kB]
+#33 27.60 Get:7 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libk5crypto3 amd64 1.22.1-2ubuntu4.1 [82.0 kB]
+#33 27.62 Get:8 http://archive.ubuntu.com/ubuntu resolute/main amd64 libkeyutils1 amd64 1.6.3-6ubuntu3 [10.6 kB]
+#33 27.63 Get:9 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5-3 amd64 1.22.1-2ubuntu4.1 [361 kB]
+#33 27.66 Get:10 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgssapi-krb5-2 amd64 1.22.1-2ubuntu4.1 [147 kB]
+#33 27.68 Get:11 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libnghttp2-14 amd64 1.68.0-2ubuntu0.2 [71.0 kB]
+#33 27.69 Get:12 http://archive.ubuntu.com/ubuntu resolute/main amd64 libpsl5t64 amd64 0.21.2-1.1build2 [59.5 kB]
+#33 27.70 Get:13 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-modules-db amd64 2.1.28+dfsg1-9ubuntu3 [21.1 kB]
+#33 27.74 Get:14 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-2 amd64 2.1.28+dfsg1-9ubuntu3 [54.0 kB]
+#33 27.92 Get:15 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap-common all 2.6.10+dfsg-1ubuntu5 [36.0 kB]
+#33 28.01 Get:16 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap2 amd64 2.6.10+dfsg-1ubuntu5 [204 kB]
+#33 28.14 Get:17 http://archive.ubuntu.com/ubuntu resolute/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-3 [59.0 kB]
+#33 28.14 Get:18 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libssh2-1t64 amd64 1.11.1-1ubuntu0.26.04.4 [138 kB]
+#33 28.14 Get:19 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libcurl4t64 amd64 8.18.0-1ubuntu2.8 [430 kB]
+#33 28.15 Get:20 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 curl amd64 8.18.0-1ubuntu2.8 [273 kB]
+#33 28.51 debconf: unable to initialize frontend: Dialog
+#33 28.51 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#33 28.51 debconf: falling back to frontend: Readline
+#33 28.51 debconf: unable to initialize frontend: Readline
+#33 28.51 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 20.)
+#33 28.51 debconf: falling back to frontend: Teletype
+#33 28.53 debconf: unable to initialize frontend: Teletype
+#33 28.53 debconf: (This frontend requires a controlling tty.)
+#33 28.53 debconf: falling back to frontend: Noninteractive
+#33 30.45 Fetched 4,072 kB in 2s (1,855 kB/s)
+#33 30.50 Selecting previously unselected package libnettle8t64:amd64.
+#33 30.50 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 9798 files and directories currently installed.)
+#33 30.51 Preparing to unpack .../00-libnettle8t64_3.10.2-1_amd64.deb ...
+#33 30.52 Unpacking libnettle8t64:amd64 (3.10.2-1) ...
+#33 30.58 Selecting previously unselected package libhogweed6t64:amd64.
+#33 30.58 Preparing to unpack .../01-libhogweed6t64_3.10.2-1_amd64.deb ...
+#33 30.58 Unpacking libhogweed6t64:amd64 (3.10.2-1) ...
+#33 30.63 Selecting previously unselected package libunistring5:amd64.
+#33 30.63 Preparing to unpack .../02-libunistring5_1.3-2build1_amd64.deb ...
+#33 30.63 Unpacking libunistring5:amd64 (1.3-2build1) ...
+#33 30.71 Selecting previously unselected package libidn2-0:amd64.
+#33 30.71 Preparing to unpack .../03-libidn2-0_2.3.8-4build1_amd64.deb ...
+#33 30.71 Unpacking libidn2-0:amd64 (2.3.8-4build1) ...
+#33 30.77 Selecting previously unselected package libgnutls30t64:amd64.
+#33 30.77 Preparing to unpack .../04-libgnutls30t64_3.8.12-2ubuntu1.1_amd64.deb ...
+#33 30.77 Unpacking libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#33 30.85 Selecting previously unselected package libkrb5support0:amd64.
+#33 30.85 Preparing to unpack .../05-libkrb5support0_1.22.1-2ubuntu4.1_amd64.deb ...
+#33 30.85 Unpacking libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#33 30.90 Selecting previously unselected package libk5crypto3:amd64.
+#33 30.91 Preparing to unpack .../06-libk5crypto3_1.22.1-2ubuntu4.1_amd64.deb ...
+#33 30.91 Unpacking libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#33 30.96 Selecting previously unselected package libkeyutils1:amd64.
+#33 30.96 Preparing to unpack .../07-libkeyutils1_1.6.3-6ubuntu3_amd64.deb ...
+#33 30.96 Unpacking libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#33 31.00 Selecting previously unselected package libkrb5-3:amd64.
+#33 31.00 Preparing to unpack .../08-libkrb5-3_1.22.1-2ubuntu4.1_amd64.deb ...
+#33 31.00 Unpacking libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#33 31.06 Selecting previously unselected package libgssapi-krb5-2:amd64.
+#33 31.06 Preparing to unpack .../09-libgssapi-krb5-2_1.22.1-2ubuntu4.1_amd64.deb ...
+#33 31.06 Unpacking libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#33 31.11 Selecting previously unselected package libnghttp2-14:amd64.
+#33 31.11 Preparing to unpack .../10-libnghttp2-14_1.68.0-2ubuntu0.2_amd64.deb ...
+#33 31.11 Unpacking libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#33 31.16 Selecting previously unselected package libpsl5t64:amd64.
+#33 31.16 Preparing to unpack .../11-libpsl5t64_0.21.2-1.1build2_amd64.deb ...
+#33 31.17 Unpacking libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#33 31.20 Selecting previously unselected package libsasl2-modules-db:amd64.
+#33 31.20 Preparing to unpack .../12-libsasl2-modules-db_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#33 31.20 Unpacking libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#33 31.24 Selecting previously unselected package libsasl2-2:amd64.
+#33 31.24 Preparing to unpack .../13-libsasl2-2_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#33 31.24 Unpacking libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#33 31.29 Selecting previously unselected package libldap-common.
+#33 31.29 Preparing to unpack .../14-libldap-common_2.6.10+dfsg-1ubuntu5_all.deb ...
+#33 31.29 Unpacking libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#33 31.33 Selecting previously unselected package libldap2:amd64.
+#33 31.33 Preparing to unpack .../15-libldap2_2.6.10+dfsg-1ubuntu5_amd64.deb ...
+#33 31.34 Unpacking libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#33 31.38 Selecting previously unselected package librtmp1:amd64.
+#33 31.38 Preparing to unpack .../16-librtmp1_2.4+20151223.gitfa8646d.1-3_amd64.deb ...
+#33 31.39 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#33 31.43 Selecting previously unselected package libssh2-1t64:amd64.
+#33 31.43 Preparing to unpack .../17-libssh2-1t64_1.11.1-1ubuntu0.26.04.4_amd64.deb ...
+#33 31.44 Unpacking libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#33 31.48 Selecting previously unselected package libcurl4t64:amd64.
+#33 31.48 Preparing to unpack .../18-libcurl4t64_8.18.0-1ubuntu2.8_amd64.deb ...
+#33 31.48 Unpacking libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#33 31.53 Selecting previously unselected package curl.
+#33 31.54 Preparing to unpack .../19-curl_8.18.0-1ubuntu2.8_amd64.deb ...
+#33 31.54 Unpacking curl (8.18.0-1ubuntu2.8) ...
+#33 31.59 Setting up libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#33 31.60 Setting up libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#33 31.60 Setting up libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#33 31.61 Setting up libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#33 31.61 Setting up libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#33 31.61 Setting up libnettle8t64:amd64 (3.10.2-1) ...
+#33 31.62 Setting up libunistring5:amd64 (1.3-2build1) ...
+#33 31.62 Setting up libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#33 31.62 Setting up libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#33 31.63 Setting up libhogweed6t64:amd64 (3.10.2-1) ...
+#33 31.63 Setting up libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#33 31.63 Setting up libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#33 31.64 Setting up libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#33 31.64 Setting up libidn2-0:amd64 (2.3.8-4build1) ...
+#33 31.64 Setting up libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#33 31.65 Setting up libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#33 31.65 Setting up libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#33 31.66 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#33 31.66 Setting up libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#33 31.66 Setting up curl (8.18.0-1ubuntu2.8) ...
+#33 31.67 Processing triggers for libc-bin (2.43-2ubuntu2.4) ...
+#33 DONE 31.8s
+
+#57 [gateway 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#57 0.779 Get:1 http://archive.ubuntu.com/ubuntu resolute InRelease [136 kB]
+#57 0.833 Get:2 http://security.ubuntu.com/ubuntu resolute-security InRelease [137 kB]
+#57 1.321 Get:3 http://archive.ubuntu.com/ubuntu resolute-updates InRelease [137 kB]
+#57 ...
+
+#58 [request-service 3/4] WORKDIR /app
+#58 DONE 0.0s
+
+#59 [request-service 4/4] COPY --chown=root:root services/request-service/build/libs/app.jar /app/app.jar
+#59 DONE 0.1s
+
+#57 [gateway 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#57 1.630 Get:4 http://archive.ubuntu.com/ubuntu resolute-backports InRelease [137 kB]
+#57 1.711 Get:5 http://security.ubuntu.com/ubuntu resolute-security/universe amd64 Packages [278 kB]
+#57 1.899 Get:6 http://archive.ubuntu.com/ubuntu resolute/main amd64 Packages [1,874 kB]
+#57 2.222 Get:7 http://security.ubuntu.com/ubuntu resolute-security/main amd64 Packages [885 kB]
+#57 ...
+
+#41 [request-service] exporting to image
+#41 exporting layers 0.9s done
+#41 writing image sha256:f7bfe00cba1388b1233f28f670e223ca71da22265d85e14b191e9eff747e43ee done
+#41 naming to docker.io/esm-hub/request-service:latest done
+#41 DONE 7.9s
+
+#57 [gateway 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#57 2.493 Get:8 http://archive.ubuntu.com/ubuntu resolute/universe amd64 Packages [20.1 MB]
+#57 2.599 Get:9 http://security.ubuntu.com/ubuntu resolute-security/restricted amd64 Packages [723 kB]
+#57 2.723 Get:10 http://security.ubuntu.com/ubuntu resolute-security/multiverse amd64 Packages [24.6 kB]
+#57 3.611 Get:11 http://archive.ubuntu.com/ubuntu resolute/restricted amd64 Packages [189 kB]
+#57 3.613 Get:12 http://archive.ubuntu.com/ubuntu resolute/multiverse amd64 Packages [352 kB]
+#57 3.783 Get:13 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 Packages [1,111 kB]
+#57 3.955 Get:14 http://archive.ubuntu.com/ubuntu resolute-updates/restricted amd64 Packages [773 kB]
+#57 3.982 Get:15 http://archive.ubuntu.com/ubuntu resolute-updates/multiverse amd64 Packages [26.1 kB]
+#57 3.982 Get:16 http://archive.ubuntu.com/ubuntu resolute-updates/universe amd64 Packages [497 kB]
+#57 4.113 Get:17 http://archive.ubuntu.com/ubuntu resolute-backports/universe amd64 Packages [3,308 B]
+#57 4.807 Fetched 27.4 MB in 4s (6,164 kB/s)
+#57 4.807 Reading package lists...
+#57 5.791 Reading package lists...
+#57 ...
+
+#34 [incident-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#34 27.66 Reading package lists...
+#34 29.59 Reading package lists...
+#34 31.52 Building dependency tree...
+#34 31.84 Reading state information...
+#34 31.92 Solving dependencies...
+#34 32.26 The following additional packages will be installed:
+#34 32.26   libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#34 32.26   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#34 32.26   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#34 32.26   libsasl2-modules-db libssh2-1t64 libunistring5
+#34 32.26 Suggested packages:
+#34 32.26   gnutls-bin krb5-doc krb5-user
+#34 32.26 Recommended packages:
+#34 32.26   bash-completion krb5-locales publicsuffix libsasl2-modules
+#34 32.33 The following NEW packages will be installed:
+#34 32.33   curl libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#34 32.33   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#34 32.33   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#34 32.33   libsasl2-modules-db libssh2-1t64 libunistring5
+#34 32.73 0 upgraded, 20 newly installed, 0 to remove and 5 not upgraded.
+#34 32.73 Need to get 4,072 kB of archives.
+#34 32.73 After this operation, 11.1 MB of additional disk space will be used.
+#34 32.73 Get:1 http://archive.ubuntu.com/ubuntu resolute/main amd64 libnettle8t64 amd64 3.10.2-1 [185 kB]
+#34 33.31 Get:2 http://archive.ubuntu.com/ubuntu resolute/main amd64 libhogweed6t64 amd64 3.10.2-1 [201 kB]
+#34 33.60 Get:3 http://archive.ubuntu.com/ubuntu resolute/main amd64 libunistring5 amd64 1.3-2build1 [610 kB]
+#34 33.94 Get:4 http://archive.ubuntu.com/ubuntu resolute/main amd64 libidn2-0 amd64 2.3.8-4build1 [67.6 kB]
+#34 33.94 Get:5 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgnutls30t64 amd64 3.8.12-2ubuntu1.1 [1,029 kB]
+#34 34.22 Get:6 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5support0 amd64 1.22.1-2ubuntu4.1 [33.5 kB]
+#34 34.22 Get:7 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libk5crypto3 amd64 1.22.1-2ubuntu4.1 [82.0 kB]
+#34 34.22 Get:8 http://archive.ubuntu.com/ubuntu resolute/main amd64 libkeyutils1 amd64 1.6.3-6ubuntu3 [10.6 kB]
+#34 34.22 Get:9 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5-3 amd64 1.22.1-2ubuntu4.1 [361 kB]
+#34 34.31 Get:10 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgssapi-krb5-2 amd64 1.22.1-2ubuntu4.1 [147 kB]
+#34 34.34 Get:11 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libnghttp2-14 amd64 1.68.0-2ubuntu0.2 [71.0 kB]
+#34 34.36 Get:12 http://archive.ubuntu.com/ubuntu resolute/main amd64 libpsl5t64 amd64 0.21.2-1.1build2 [59.5 kB]
+#34 34.37 Get:13 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-modules-db amd64 2.1.28+dfsg1-9ubuntu3 [21.1 kB]
+#34 34.37 Get:14 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-2 amd64 2.1.28+dfsg1-9ubuntu3 [54.0 kB]
+#34 34.46 Get:15 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap-common all 2.6.10+dfsg-1ubuntu5 [36.0 kB]
+#34 34.47 Get:16 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap2 amd64 2.6.10+dfsg-1ubuntu5 [204 kB]
+#34 34.50 Get:17 http://archive.ubuntu.com/ubuntu resolute/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-3 [59.0 kB]
+#34 34.51 Get:18 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libssh2-1t64 amd64 1.11.1-1ubuntu0.26.04.4 [138 kB]
+#34 34.64 Get:19 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libcurl4t64 amd64 8.18.0-1ubuntu2.8 [430 kB]
+#34 34.68 Get:20 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 curl amd64 8.18.0-1ubuntu2.8 [273 kB]
+#34 34.86 debconf: unable to initialize frontend: Dialog
+#34 34.86 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#34 34.86 debconf: falling back to frontend: Readline
+#34 34.86 debconf: unable to initialize frontend: Readline
+#34 34.86 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 20.)
+#34 34.86 debconf: falling back to frontend: Teletype
+#34 34.87 debconf: unable to initialize frontend: Teletype
+#34 34.87 debconf: (This frontend requires a controlling tty.)
+#34 34.87 debconf: falling back to frontend: Noninteractive
+#34 35.90 Fetched 4,072 kB in 2s (1,743 kB/s)
+#34 35.93 Selecting previously unselected package libnettle8t64:amd64.
+#34 35.93 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 9798 files and directories currently installed.)
+#34 35.93 Preparing to unpack .../00-libnettle8t64_3.10.2-1_amd64.deb ...
+#34 35.94 Unpacking libnettle8t64:amd64 (3.10.2-1) ...
+#34 35.96 Selecting previously unselected package libhogweed6t64:amd64.
+#34 35.96 Preparing to unpack .../01-libhogweed6t64_3.10.2-1_amd64.deb ...
+#34 35.96 Unpacking libhogweed6t64:amd64 (3.10.2-1) ...
+#34 35.98 Selecting previously unselected package libunistring5:amd64.
+#34 35.98 Preparing to unpack .../02-libunistring5_1.3-2build1_amd64.deb ...
+#34 35.99 Unpacking libunistring5:amd64 (1.3-2build1) ...
+#34 36.02 Selecting previously unselected package libidn2-0:amd64.
+#34 36.02 Preparing to unpack .../03-libidn2-0_2.3.8-4build1_amd64.deb ...
+#34 36.02 Unpacking libidn2-0:amd64 (2.3.8-4build1) ...
+#34 36.04 Selecting previously unselected package libgnutls30t64:amd64.
+#34 36.04 Preparing to unpack .../04-libgnutls30t64_3.8.12-2ubuntu1.1_amd64.deb ...
+#34 36.05 Unpacking libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#34 36.08 Selecting previously unselected package libkrb5support0:amd64.
+#34 36.08 Preparing to unpack .../05-libkrb5support0_1.22.1-2ubuntu4.1_amd64.deb ...
+#34 36.08 Unpacking libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#34 36.10 Selecting previously unselected package libk5crypto3:amd64.
+#34 36.10 Preparing to unpack .../06-libk5crypto3_1.22.1-2ubuntu4.1_amd64.deb ...
+#34 36.10 Unpacking libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#34 36.12 Selecting previously unselected package libkeyutils1:amd64.
+#34 36.12 Preparing to unpack .../07-libkeyutils1_1.6.3-6ubuntu3_amd64.deb ...
+#34 36.12 Unpacking libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#34 36.14 Selecting previously unselected package libkrb5-3:amd64.
+#34 36.14 Preparing to unpack .../08-libkrb5-3_1.22.1-2ubuntu4.1_amd64.deb ...
+#34 36.14 Unpacking libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#34 36.17 Selecting previously unselected package libgssapi-krb5-2:amd64.
+#34 36.18 Preparing to unpack .../09-libgssapi-krb5-2_1.22.1-2ubuntu4.1_amd64.deb ...
+#34 36.18 Unpacking libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#34 36.20 Selecting previously unselected package libnghttp2-14:amd64.
+#34 36.20 Preparing to unpack .../10-libnghttp2-14_1.68.0-2ubuntu0.2_amd64.deb ...
+#34 36.20 Unpacking libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#34 36.22 Selecting previously unselected package libpsl5t64:amd64.
+#34 36.22 Preparing to unpack .../11-libpsl5t64_0.21.2-1.1build2_amd64.deb ...
+#34 36.22 Unpacking libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#34 36.24 Selecting previously unselected package libsasl2-modules-db:amd64.
+#34 36.24 Preparing to unpack .../12-libsasl2-modules-db_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#34 36.24 Unpacking libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#34 36.26 Selecting previously unselected package libsasl2-2:amd64.
+#34 36.26 Preparing to unpack .../13-libsasl2-2_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#34 36.26 Unpacking libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#34 36.27 Selecting previously unselected package libldap-common.
+#34 36.27 Preparing to unpack .../14-libldap-common_2.6.10+dfsg-1ubuntu5_all.deb ...
+#34 36.28 Unpacking libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#34 36.29 Selecting previously unselected package libldap2:amd64.
+#34 36.29 Preparing to unpack .../15-libldap2_2.6.10+dfsg-1ubuntu5_amd64.deb ...
+#34 36.30 Unpacking libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#34 36.32 Selecting previously unselected package librtmp1:amd64.
+#34 36.32 Preparing to unpack .../16-librtmp1_2.4+20151223.gitfa8646d.1-3_amd64.deb ...
+#34 36.32 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#34 36.33 Selecting previously unselected package libssh2-1t64:amd64.
+#34 36.34 Preparing to unpack .../17-libssh2-1t64_1.11.1-1ubuntu0.26.04.4_amd64.deb ...
+#34 36.34 Unpacking libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#34 36.35 Selecting previously unselected package libcurl4t64:amd64.
+#34 36.36 Preparing to unpack .../18-libcurl4t64_8.18.0-1ubuntu2.8_amd64.deb ...
+#34 36.36 Unpacking libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#34 36.38 Selecting previously unselected package curl.
+#34 36.38 Preparing to unpack .../19-curl_8.18.0-1ubuntu2.8_amd64.deb ...
+#34 36.38 Unpacking curl (8.18.0-1ubuntu2.8) ...
+#34 36.42 Setting up libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#34 36.42 Setting up libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#34 36.42 Setting up libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#34 36.43 Setting up libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#34 36.43 Setting up libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#34 36.43 Setting up libnettle8t64:amd64 (3.10.2-1) ...
+#34 36.43 Setting up libunistring5:amd64 (1.3-2build1) ...
+#34 36.43 Setting up libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#34 36.44 Setting up libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#34 36.44 Setting up libhogweed6t64:amd64 (3.10.2-1) ...
+#34 36.44 Setting up libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#34 36.44 Setting up libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#34 36.45 Setting up libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#34 36.45 Setting up libidn2-0:amd64 (2.3.8-4build1) ...
+#34 36.45 Setting up libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#34 36.46 Setting up libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#34 36.46 Setting up libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#34 36.46 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#34 36.46 Setting up libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#34 36.47 Setting up curl (8.18.0-1ubuntu2.8) ...
+#34 36.47 Processing triggers for libc-bin (2.43-2ubuntu2.4) ...
+#34 DONE 36.5s
+
+#60 [incident-service 3/4] WORKDIR /app
+#60 DONE 0.0s
+
+#61 [incident-service 4/4] COPY --chown=root:root services/incident-service/build/libs/app.jar /app/app.jar
+#61 DONE 0.1s
+
+#41 [incident-service] exporting to image
+#41 exporting layers 0.5s done
+#41 writing image sha256:f032b9f3d899ffda8fd279e1f0d7e546e4938485245681d0318d9b99c4744860 done
+#41 naming to docker.io/esm-hub/incident-service:latest done
+#41 DONE 8.4s
+
+#57 [gateway 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#57 5.791 Reading package lists...
+#57 6.829 Building dependency tree...
+#57 7.013 Reading state information...
+#57 7.062 Solving dependencies...
+#57 7.250 The following additional packages will be installed:
+#57 7.250   libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#57 7.250   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#57 7.251   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#57 7.251   libsasl2-modules-db libssh2-1t64 libunistring5
+#57 7.252 Suggested packages:
+#57 7.252   gnutls-bin krb5-doc krb5-user
+#57 7.252 Recommended packages:
+#57 7.252   bash-completion krb5-locales publicsuffix libsasl2-modules
+#57 7.295 The following NEW packages will be installed:
+#57 7.295   curl libcurl4t64 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0
+#57 7.295   libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-common libldap2
+#57 7.295   libnettle8t64 libnghttp2-14 libpsl5t64 librtmp1 libsasl2-2
+#57 7.296   libsasl2-modules-db libssh2-1t64 libunistring5
+#57 7.737 0 upgraded, 20 newly installed, 0 to remove and 5 not upgraded.
+#57 7.737 Need to get 4,072 kB of archives.
+#57 7.737 After this operation, 11.1 MB of additional disk space will be used.
+#57 7.737 Get:1 http://archive.ubuntu.com/ubuntu resolute/main amd64 libnettle8t64 amd64 3.10.2-1 [185 kB]
+#57 8.367 Get:2 http://archive.ubuntu.com/ubuntu resolute/main amd64 libhogweed6t64 amd64 3.10.2-1 [201 kB]
+#57 8.510 Get:3 http://archive.ubuntu.com/ubuntu resolute/main amd64 libunistring5 amd64 1.3-2build1 [610 kB]
+#57 9.006 Get:4 http://archive.ubuntu.com/ubuntu resolute/main amd64 libidn2-0 amd64 2.3.8-4build1 [67.6 kB]
+#57 9.007 Get:5 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgnutls30t64 amd64 3.8.12-2ubuntu1.1 [1,029 kB]
+#57 9.232 Get:6 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5support0 amd64 1.22.1-2ubuntu4.1 [33.5 kB]
+#57 9.233 Get:7 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libk5crypto3 amd64 1.22.1-2ubuntu4.1 [82.0 kB]
+#57 9.237 Get:8 http://archive.ubuntu.com/ubuntu resolute/main amd64 libkeyutils1 amd64 1.6.3-6ubuntu3 [10.6 kB]
+#57 9.245 Get:9 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libkrb5-3 amd64 1.22.1-2ubuntu4.1 [361 kB]
+#57 9.283 Get:10 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libgssapi-krb5-2 amd64 1.22.1-2ubuntu4.1 [147 kB]
+#57 9.416 Get:11 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libnghttp2-14 amd64 1.68.0-2ubuntu0.2 [71.0 kB]
+#57 9.417 Get:12 http://archive.ubuntu.com/ubuntu resolute/main amd64 libpsl5t64 amd64 0.21.2-1.1build2 [59.5 kB]
+#57 9.417 Get:13 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-modules-db amd64 2.1.28+dfsg1-9ubuntu3 [21.1 kB]
+#57 9.417 Get:14 http://archive.ubuntu.com/ubuntu resolute/main amd64 libsasl2-2 amd64 2.1.28+dfsg1-9ubuntu3 [54.0 kB]
+#57 9.626 Get:15 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap-common all 2.6.10+dfsg-1ubuntu5 [36.0 kB]
+#57 9.627 Get:16 http://archive.ubuntu.com/ubuntu resolute/main amd64 libldap2 amd64 2.6.10+dfsg-1ubuntu5 [204 kB]
+#57 9.629 Get:17 http://archive.ubuntu.com/ubuntu resolute/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-3 [59.0 kB]
+#57 9.630 Get:18 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libssh2-1t64 amd64 1.11.1-1ubuntu0.26.04.4 [138 kB]
+#57 9.631 Get:19 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 libcurl4t64 amd64 8.18.0-1ubuntu2.8 [430 kB]
+#57 9.825 Get:20 http://archive.ubuntu.com/ubuntu resolute-updates/main amd64 curl amd64 8.18.0-1ubuntu2.8 [273 kB]
+#57 9.929 debconf: unable to initialize frontend: Dialog
+#57 9.929 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#57 9.929 debconf: falling back to frontend: Readline
+#57 9.929 debconf: unable to initialize frontend: Readline
+#57 9.929 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 20.)
+#57 9.929 debconf: falling back to frontend: Teletype
+#57 9.935 debconf: unable to initialize frontend: Teletype
+#57 9.935 debconf: (This frontend requires a controlling tty.)
+#57 9.935 debconf: falling back to frontend: Noninteractive
+#57 10.47 Fetched 4,072 kB in 3s (1,618 kB/s)
+#57 10.49 Selecting previously unselected package libnettle8t64:amd64.
+#57 10.49 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 9798 files and directories currently installed.)
+#57 10.49 Preparing to unpack .../00-libnettle8t64_3.10.2-1_amd64.deb ...
+#57 10.49 Unpacking libnettle8t64:amd64 (3.10.2-1) ...
+#57 10.51 Selecting previously unselected package libhogweed6t64:amd64.
+#57 10.51 Preparing to unpack .../01-libhogweed6t64_3.10.2-1_amd64.deb ...
+#57 10.51 Unpacking libhogweed6t64:amd64 (3.10.2-1) ...
+#57 10.53 Selecting previously unselected package libunistring5:amd64.
+#57 10.53 Preparing to unpack .../02-libunistring5_1.3-2build1_amd64.deb ...
+#57 10.53 Unpacking libunistring5:amd64 (1.3-2build1) ...
+#57 10.56 Selecting previously unselected package libidn2-0:amd64.
+#57 10.56 Preparing to unpack .../03-libidn2-0_2.3.8-4build1_amd64.deb ...
+#57 10.56 Unpacking libidn2-0:amd64 (2.3.8-4build1) ...
+#57 10.57 Selecting previously unselected package libgnutls30t64:amd64.
+#57 10.57 Preparing to unpack .../04-libgnutls30t64_3.8.12-2ubuntu1.1_amd64.deb ...
+#57 10.58 Unpacking libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#57 10.60 Selecting previously unselected package libkrb5support0:amd64.
+#57 10.60 Preparing to unpack .../05-libkrb5support0_1.22.1-2ubuntu4.1_amd64.deb ...
+#57 10.60 Unpacking libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#57 10.62 Selecting previously unselected package libk5crypto3:amd64.
+#57 10.62 Preparing to unpack .../06-libk5crypto3_1.22.1-2ubuntu4.1_amd64.deb ...
+#57 10.62 Unpacking libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#57 10.63 Selecting previously unselected package libkeyutils1:amd64.
+#57 10.63 Preparing to unpack .../07-libkeyutils1_1.6.3-6ubuntu3_amd64.deb ...
+#57 10.64 Unpacking libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#57 10.65 Selecting previously unselected package libkrb5-3:amd64.
+#57 10.65 Preparing to unpack .../08-libkrb5-3_1.22.1-2ubuntu4.1_amd64.deb ...
+#57 10.65 Unpacking libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#57 10.67 Selecting previously unselected package libgssapi-krb5-2:amd64.
+#57 10.67 Preparing to unpack .../09-libgssapi-krb5-2_1.22.1-2ubuntu4.1_amd64.deb ...
+#57 10.67 Unpacking libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#57 10.69 Selecting previously unselected package libnghttp2-14:amd64.
+#57 10.69 Preparing to unpack .../10-libnghttp2-14_1.68.0-2ubuntu0.2_amd64.deb ...
+#57 10.69 Unpacking libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#57 10.70 Selecting previously unselected package libpsl5t64:amd64.
+#57 10.70 Preparing to unpack .../11-libpsl5t64_0.21.2-1.1build2_amd64.deb ...
+#57 10.70 Unpacking libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#57 10.71 Selecting previously unselected package libsasl2-modules-db:amd64.
+#57 10.72 Preparing to unpack .../12-libsasl2-modules-db_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#57 10.72 Unpacking libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#57 10.73 Selecting previously unselected package libsasl2-2:amd64.
+#57 10.73 Preparing to unpack .../13-libsasl2-2_2.1.28+dfsg1-9ubuntu3_amd64.deb ...
+#57 10.73 Unpacking libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#57 10.74 Selecting previously unselected package libldap-common.
+#57 10.74 Preparing to unpack .../14-libldap-common_2.6.10+dfsg-1ubuntu5_all.deb ...
+#57 10.74 Unpacking libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#57 10.76 Selecting previously unselected package libldap2:amd64.
+#57 10.76 Preparing to unpack .../15-libldap2_2.6.10+dfsg-1ubuntu5_amd64.deb ...
+#57 10.76 Unpacking libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#57 10.77 Selecting previously unselected package librtmp1:amd64.
+#57 10.78 Preparing to unpack .../16-librtmp1_2.4+20151223.gitfa8646d.1-3_amd64.deb ...
+#57 10.78 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#57 10.79 Selecting previously unselected package libssh2-1t64:amd64.
+#57 10.79 Preparing to unpack .../17-libssh2-1t64_1.11.1-1ubuntu0.26.04.4_amd64.deb ...
+#57 10.79 Unpacking libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#57 10.81 Selecting previously unselected package libcurl4t64:amd64.
+#57 10.81 Preparing to unpack .../18-libcurl4t64_8.18.0-1ubuntu2.8_amd64.deb ...
+#57 10.81 Unpacking libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#57 10.82 Selecting previously unselected package curl.
+#57 10.83 Preparing to unpack .../19-curl_8.18.0-1ubuntu2.8_amd64.deb ...
+#57 10.83 Unpacking curl (8.18.0-1ubuntu2.8) ...
+#57 10.85 Setting up libkeyutils1:amd64 (1.6.3-6ubuntu3) ...
+#57 10.86 Setting up libnghttp2-14:amd64 (1.68.0-2ubuntu0.2) ...
+#57 10.87 Setting up libldap-common (2.6.10+dfsg-1ubuntu5) ...
+#57 10.87 Setting up libkrb5support0:amd64 (1.22.1-2ubuntu4.1) ...
+#57 10.87 Setting up libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#57 10.87 Setting up libnettle8t64:amd64 (3.10.2-1) ...
+#57 10.88 Setting up libunistring5:amd64 (1.3-2build1) ...
+#57 10.88 Setting up libk5crypto3:amd64 (1.22.1-2ubuntu4.1) ...
+#57 10.88 Setting up libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3) ...
+#57 10.88 Setting up libhogweed6t64:amd64 (3.10.2-1) ...
+#57 10.89 Setting up libkrb5-3:amd64 (1.22.1-2ubuntu4.1) ...
+#57 10.89 Setting up libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.4) ...
+#57 10.89 Setting up libldap2:amd64 (2.6.10+dfsg-1ubuntu5) ...
+#57 10.89 Setting up libidn2-0:amd64 (2.3.8-4build1) ...
+#57 10.90 Setting up libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1) ...
+#57 10.90 Setting up libgnutls30t64:amd64 (3.8.12-2ubuntu1.1) ...
+#57 10.90 Setting up libpsl5t64:amd64 (0.21.2-1.1build2) ...
+#57 10.90 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3) ...
+#57 10.91 Setting up libcurl4t64:amd64 (8.18.0-1ubuntu2.8) ...
+#57 10.91 Setting up curl (8.18.0-1ubuntu2.8) ...
+#57 10.91 Processing triggers for libc-bin (2.43-2ubuntu2.4) ...
+#57 DONE 11.0s
+
+#62 [gateway 3/4] WORKDIR /app
+#62 DONE 0.0s
+
+#63 [gateway 4/4] COPY --chown=root:root services/gateway/build/libs/app.jar /app/app.jar
+#63 DONE 0.0s
+
+#41 [gateway] exporting to image
+#41 exporting layers 0.1s done
+#41 writing image sha256:0b370349d8e41f8bc02cdd288bf488d5ef3de92fbf1029644c6be674faa853f6 done
+#41 naming to docker.io/esm-hub/gateway:latest done
+#41 DONE 8.5s
+
+#64 [web internal] load build definition from Dockerfile
+#64 transferring dockerfile: 436B done
+#64 DONE 0.0s
+
+#65 [web internal] load .dockerignore
+#65 transferring context: 64B done
+#65 DONE 0.0s
+
+#66 [web] resolve image config for docker.io/docker/dockerfile:1
+#66 DONE 2.1s
+
+#67 [web] docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#67 resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e done
+#67 sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 9.08kB / 9.08kB done
+#67 sha256:7b32114e84ca21aeb2d6f871a0b62b3a0762193f75d9afd048ee4cbe889f3148 1.13kB / 1.13kB done
+#67 sha256:528c92d70d7e39dbb3dd1c6681f6750c565c7e45b70527cda47c1a61495c1b6a 1.41kB / 1.41kB done
+#67 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 0B / 14.28MB 0.1s
+#67 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 6.29MB / 14.28MB 0.4s
+#67 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 7.34MB / 14.28MB 0.5s
+#67 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 9.44MB / 14.28MB 0.6s
+#67 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 11.53MB / 14.28MB 0.7s
+#67 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 12.58MB / 14.28MB 0.8s
+#67 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 14.28MB / 14.28MB 0.9s done
+#67 extracting sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62
+#67 extracting sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 0.2s done
+#67 DONE 1.2s
+
+#68 [web internal] load build definition from Dockerfile
+#68 DONE 0.0s
+
+#69 [web internal] load metadata for docker.io/library/node:24-alpine
+#69 DONE 0.0s
+
+#70 [web internal] load metadata for docker.io/nginxinc/nginx-unprivileged:1.27-alpine
+#70 DONE 2.1s
+
+#71 [web internal] load .dockerignore
+#71 DONE 0.0s
+
+#72 [web internal] load build context
+#72 transferring context: 362.42kB done
+#72 DONE 0.0s
+
+#73 [web stage-1 1/3] FROM docker.io/nginxinc/nginx-unprivileged:1.27-alpine@sha256:65e3e85dbaed8ba248841d9d58a899b6197106c23cb0ff1a132b7bfe0547e4c0
+#73 resolve docker.io/nginxinc/nginx-unprivileged:1.27-alpine@sha256:65e3e85dbaed8ba248841d9d58a899b6197106c23cb0ff1a132b7bfe0547e4c0 done
+#73 ...
+
+#74 [web build 1/6] FROM docker.io/library/node:24-alpine
+#74 DONE 0.0s
+
+#75 [web build 2/6] WORKDIR /app
+#75 DONE 0.0s
+
+#76 [web build 3/6] COPY package.json package-lock.json ./
+#76 DONE 0.0s
+
+#73 [web stage-1 1/3] FROM docker.io/nginxinc/nginx-unprivileged:1.27-alpine@sha256:65e3e85dbaed8ba248841d9d58a899b6197106c23cb0ff1a132b7bfe0547e4c0
+#73 sha256:65e3e85dbaed8ba248841d9d58a899b6197106c23cb0ff1a132b7bfe0547e4c0 6.79kB / 6.79kB done
+#73 sha256:576fe098e8467d48ff489eb63f411a74b9e3769957a5c26462c4468a731c3e3d 0B / 1.79MB 0.1s
+#73 sha256:513bae533eb237e219e2d3412e0dbb9cd94c25b2b84530b5131fda9512c0e773 0B / 627B 0.1s
+#73 sha256:28d91bdce70ad09025ea901458fdd149259d8e05982ade79d4ef2c0d9470eb48 2.61kB / 2.61kB done
+#73 sha256:47ce8258a10e28ce4b4498588c25ef77ae328f4c56cbe3e8d5dcf4f6d8019997 13.38kB / 13.38kB done
+#73 sha256:945f5aaec3d7649d815440e6030ec4e4f562488ee50fa779a69f920cab3c5871 0B / 2.80kB 0.1s
+#73 sha256:576fe098e8467d48ff489eb63f411a74b9e3769957a5c26462c4468a731c3e3d 1.79MB / 1.79MB 0.4s done
+#73 extracting sha256:576fe098e8467d48ff489eb63f411a74b9e3769957a5c26462c4468a731c3e3d
+#73 sha256:048c29a613179205d158f722a495c6b3bbd77439864c075ea5db2d42331d1dcc 0B / 956B 0.4s
+#73 sha256:513bae533eb237e219e2d3412e0dbb9cd94c25b2b84530b5131fda9512c0e773 627B / 627B 0.5s done
+#73 extracting sha256:576fe098e8467d48ff489eb63f411a74b9e3769957a5c26462c4468a731c3e3d 0.1s done
+#73 sha256:8f7ead5f2dc0fb85f6d6b3c81284ccd4b80b783030d202a18ba5ccc5ee98f451 0B / 403B 0.5s
+#73 extracting sha256:945f5aaec3d7649d815440e6030ec4e4f562488ee50fa779a69f920cab3c5871
+#73 sha256:945f5aaec3d7649d815440e6030ec4e4f562488ee50fa779a69f920cab3c5871 2.80kB / 2.80kB 0.7s done
+#73 extracting sha256:945f5aaec3d7649d815440e6030ec4e4f562488ee50fa779a69f920cab3c5871 done
+#73 sha256:b16687ec2b7bf8ddce81f21d836d6f9821f1b864f3e8e7fad1734d8295cb4a12 0B / 1.20kB 0.7s
+#73 extracting sha256:513bae533eb237e219e2d3412e0dbb9cd94c25b2b84530b5131fda9512c0e773 done
+#73 extracting sha256:048c29a613179205d158f722a495c6b3bbd77439864c075ea5db2d42331d1dcc done
+#73 extracting sha256:8f7ead5f2dc0fb85f6d6b3c81284ccd4b80b783030d202a18ba5ccc5ee98f451
+#73 sha256:048c29a613179205d158f722a495c6b3bbd77439864c075ea5db2d42331d1dcc 956B / 956B 0.7s done
+#73 sha256:8f7ead5f2dc0fb85f6d6b3c81284ccd4b80b783030d202a18ba5ccc5ee98f451 403B / 403B 0.7s done
+#73 extracting sha256:8f7ead5f2dc0fb85f6d6b3c81284ccd4b80b783030d202a18ba5ccc5ee98f451 done
+#73 sha256:400c1de759f415b6b2a0ba96bcef3e516f26171d5930757dcddc3d6971bf3e81 0B / 15.52MB 0.9s
+#73 sha256:f79056b7935ee1a11822640a4e32333a6fccfc86efddab21fd6d7300edf2d054 0B / 1.40kB 0.9s
+#73 extracting sha256:b16687ec2b7bf8ddce81f21d836d6f9821f1b864f3e8e7fad1734d8295cb4a12
+#73 sha256:b16687ec2b7bf8ddce81f21d836d6f9821f1b864f3e8e7fad1734d8295cb4a12 1.20kB / 1.20kB 0.9s done
+#73 sha256:400c1de759f415b6b2a0ba96bcef3e516f26171d5930757dcddc3d6971bf3e81 1.05MB / 15.52MB 1.0s
+#73 extracting sha256:b16687ec2b7bf8ddce81f21d836d6f9821f1b864f3e8e7fad1734d8295cb4a12 done
+#73 sha256:400c1de759f415b6b2a0ba96bcef3e516f26171d5930757dcddc3d6971bf3e81 2.10MB / 15.52MB 1.2s
+#73 sha256:f79056b7935ee1a11822640a4e32333a6fccfc86efddab21fd6d7300edf2d054 1.40kB / 1.40kB 1.1s done
+#73 extracting sha256:f79056b7935ee1a11822640a4e32333a6fccfc86efddab21fd6d7300edf2d054 done
+#73 sha256:400c1de759f415b6b2a0ba96bcef3e516f26171d5930757dcddc3d6971bf3e81 3.15MB / 15.52MB 1.3s
+#73 sha256:400c1de759f415b6b2a0ba96bcef3e516f26171d5930757dcddc3d6971bf3e81 4.19MB / 15.52MB 1.5s
+#73 sha256:400c1de759f415b6b2a0ba96bcef3e516f26171d5930757dcddc3d6971bf3e81 5.24MB / 15.52MB 1.7s
+#73 sha256:400c1de759f415b6b2a0ba96bcef3e516f26171d5930757dcddc3d6971bf3e81 6.29MB / 15.52MB 1.9s
+#73 sha256:400c1de759f415b6b2a0ba96bcef3e516f26171d5930757dcddc3d6971bf3e81 7.34MB / 15.52MB 2.0s
+#73 sha256:400c1de759f415b6b2a0ba96bcef3e516f26171d5930757dcddc3d6971bf3e81 9.44MB / 15.52MB 2.2s
+#73 sha256:400c1de759f415b6b2a0ba96bcef3e516f26171d5930757dcddc3d6971bf3e81 11.53MB / 15.52MB 2.3s
+#73 sha256:400c1de759f415b6b2a0ba96bcef3e516f26171d5930757dcddc3d6971bf3e81 13.63MB / 15.52MB 2.4s
+#73 sha256:400c1de759f415b6b2a0ba96bcef3e516f26171d5930757dcddc3d6971bf3e81 15.52MB / 15.52MB 2.5s done
+#73 extracting sha256:400c1de759f415b6b2a0ba96bcef3e516f26171d5930757dcddc3d6971bf3e81
+#73 extracting sha256:400c1de759f415b6b2a0ba96bcef3e516f26171d5930757dcddc3d6971bf3e81 0.4s done
+#73 DONE 3.0s
+
+#77 [web stage-1 2/3] COPY nginx.conf /etc/nginx/conf.d/default.conf
+#77 DONE 0.1s
+
+#78 [web build 4/6] RUN npm ci
+#78 1.377 npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+#78 2.564 npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+#78 4.265 
+#78 4.265 added 292 packages, and audited 293 packages in 4s
+#78 4.265 
+#78 4.265 72 packages are looking for funding
+#78 4.265   run `npm fund` for details
+#78 4.283 
+#78 4.283 6 vulnerabilities (3 moderate, 1 high, 2 critical)
+#78 4.283 
+#78 4.283 To address all issues (including breaking changes), run:
+#78 4.283   npm audit fix --force
+#78 4.283 
+#78 4.283 Run `npm audit` for details.
+#78 4.284 npm warn install-scripts 3 packages have install scripts not yet covered by allowScripts:
+#78 4.284 npm warn install-scripts   esbuild@0.25.12 (postinstall: node install.js)
+#78 4.284 npm warn install-scripts   esbuild@0.21.5 (postinstall: node install.js)
+#78 4.284 npm warn install-scripts   esbuild@0.21.5 (postinstall: node install.js)
+#78 4.284 npm warn install-scripts
+#78 4.284 npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+#78 4.285 npm notice
+#78 4.285 npm notice New major version of npm available! 11.19.1 -> 12.2.3
+#78 4.285 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+#78 4.285 npm notice To update run: npm install -g npm@12.2.3
+#78 4.285 npm notice
+#78 DONE 4.4s
+
+#79 [web build 5/6] COPY . .
+#79 DONE 0.0s
+
+#80 [web build 6/6] RUN npm run build
+#80 0.347 
+#80 0.347 > esm-hub-frontend@1.0.0 build
+#80 0.347 > tsc --noEmit && vite build
+#80 0.347 
+#80 4.298 vite v6.4.6 building for production...
+#80 4.414 transforming...
+#80 6.219 ✓ 110 modules transformed.
+#80 6.582 rendering chunks...
+#80 6.597 computing gzip size...
+#80 6.625 dist/index.html                   0.51 kB │ gzip:   0.31 kB
+#80 6.625 dist/assets/index-DBd9LcYq.css    8.50 kB │ gzip:   2.45 kB
+#80 6.625 dist/assets/index-ChXrxBTI.js   398.31 kB │ gzip: 118.30 kB
+#80 6.626 ✓ built in 2.28s
+#80 DONE 6.7s
+
+#81 [web stage-1 3/3] COPY --from=build /app/dist /usr/share/nginx/html
+#81 DONE 0.0s
+
+#41 [web] exporting to image
+#41 exporting layers 0.0s done
+#41 writing image sha256:d8c14506237363e05aa543e13f6f59912c52346bb41b4d9ca510f04ec052e50c done
+#41 naming to docker.io/esm-hub/web:latest done
+#41 DONE 8.5s
+ mailpit Pulling 
+ 2d35ebdb57d9 Pulling fs layer 
+ b143aff5074c Pulling fs layer 
+ e38fa431e774 Pulling fs layer 
+ 2d35ebdb57d9 Downloading [>                                                  ]  45.56kB/3.802MB
+ b143aff5074c Downloading [>                                                  ]  101.9kB/10.16MB
+ e38fa431e774 Downloading [====>                                              ]  16.38kB/173.3kB
+ 2d35ebdb57d9 Downloading [===================>                               ]  1.512MB/3.802MB
+ b143aff5074c Downloading [==>                                                ]  539.6kB/10.16MB
+ e38fa431e774 Downloading [==================================================>]  173.3kB/173.3kB
+ e38fa431e774 Verifying Checksum 
+ e38fa431e774 Download complete 
+ 2d35ebdb57d9 Verifying Checksum 
+ 2d35ebdb57d9 Download complete 
+ 2d35ebdb57d9 Extracting [>                                                  ]  65.54kB/3.802MB
+ b143aff5074c Downloading [=====>                                             ]  1.195MB/10.16MB
+ 2d35ebdb57d9 Extracting [=================================================> ]  3.801MB/3.802MB
+ 2d35ebdb57d9 Extracting [==================================================>]  3.802MB/3.802MB
+ 2d35ebdb57d9 Pull complete 
+ b143aff5074c Downloading [===========>                                       ]  2.376MB/10.16MB
+ b143aff5074c Downloading [======================>                            ]   4.67MB/10.16MB
+ b143aff5074c Downloading [=======================================>           ]  7.996MB/10.16MB
+ b143aff5074c Verifying Checksum 
+ b143aff5074c Download complete 
+ b143aff5074c Extracting [>                                                  ]  131.1kB/10.16MB
+ b143aff5074c Extracting [=======================>                           ]  4.719MB/10.16MB
+ b143aff5074c Extracting [===========================================>       ]  8.913MB/10.16MB
+ b143aff5074c Extracting [==================================================>]  10.16MB/10.16MB
+ b143aff5074c Pull complete 
+ e38fa431e774 Extracting [=========>                                         ]  32.77kB/173.3kB
+ e38fa431e774 Extracting [==================================================>]  173.3kB/173.3kB
+ e38fa431e774 Extracting [==================================================>]  173.3kB/173.3kB
+ e38fa431e774 Pull complete 
+ mailpit Pulled 
+ Network esm-hub_default  Creating
+ Network esm-hub_default  Created
+ Volume "esm-hub_kafkadata"  Creating
+ Volume "esm-hub_kafkadata"  Created
+ Volume "esm-hub_pgdata"  Creating
+ Volume "esm-hub_pgdata"  Created
+ Container esm-hub-mailpit-1  Creating
+ Container esm-hub-postgres-1  Creating
+ Container esm-hub-kafka-1  Creating
+ Container esm-hub-mailpit-1  Created
+ Container esm-hub-postgres-1  Created
+ Container esm-hub-kafka-1  Created
+ Container esm-hub-change-service-1  Creating
+ Container esm-hub-asset-service-1  Creating
+ Container esm-hub-request-service-1  Creating
+ Container esm-hub-knowledge-service-1  Creating
+ Container esm-hub-audit-service-1  Creating
+ Container esm-hub-notification-service-1  Creating
+ Container esm-hub-directory-service-1  Creating
+ Container esm-hub-incident-service-1  Creating
+ Container esm-hub-reporting-service-1  Creating
+ Container esm-hub-directory-service-1  Created
+ Container esm-hub-gateway-1  Creating
+ Container esm-hub-change-service-1  Created
+ Container esm-hub-asset-service-1  Created
+ Container esm-hub-reporting-service-1  Created
+ Container esm-hub-audit-service-1  Created
+ Container esm-hub-request-service-1  Created
+ Container esm-hub-notification-service-1  Created
+ Container esm-hub-knowledge-service-1  Created
+ Container esm-hub-incident-service-1  Created
+ Container esm-hub-gateway-1  Created
+ Container esm-hub-web-1  Creating
+ Container esm-hub-web-1  Created
+ Container esm-hub-mailpit-1  Starting
+ Container esm-hub-postgres-1  Starting
+ Container esm-hub-kafka-1  Starting
+ Container esm-hub-mailpit-1  Started
+ Container esm-hub-postgres-1  Started
+ Container esm-hub-kafka-1  Started
+ Container esm-hub-postgres-1  Waiting
+ Container esm-hub-kafka-1  Waiting
+ Container esm-hub-postgres-1  Waiting
+ Container esm-hub-kafka-1  Waiting
+ Container esm-hub-kafka-1  Waiting
+ Container esm-hub-postgres-1  Waiting
+ Container esm-hub-kafka-1  Waiting
+ Container esm-hub-postgres-1  Waiting
+ Container esm-hub-postgres-1  Waiting
+ Container esm-hub-kafka-1  Waiting
+ Container esm-hub-postgres-1  Waiting
+ Container esm-hub-postgres-1  Waiting
+ Container esm-hub-kafka-1  Waiting
+ Container esm-hub-postgres-1  Waiting
+ Container esm-hub-kafka-1  Waiting
+ Container esm-hub-kafka-1  Waiting
+ Container esm-hub-postgres-1  Waiting
+ Container esm-hub-kafka-1  Waiting
+ Container esm-hub-postgres-1  Healthy
+ Container esm-hub-postgres-1  Healthy
+ Container esm-hub-postgres-1  Healthy
+ Container esm-hub-postgres-1  Healthy
+ Container esm-hub-postgres-1  Healthy
+ Container esm-hub-postgres-1  Healthy
+ Container esm-hub-postgres-1  Healthy
+ Container esm-hub-postgres-1  Healthy
+ Container esm-hub-postgres-1  Healthy
+ Container esm-hub-kafka-1  Healthy
+ Container esm-hub-request-service-1  Starting
+ Container esm-hub-kafka-1  Healthy
+ Container esm-hub-directory-service-1  Starting
+ Container esm-hub-kafka-1  Healthy
+ Container esm-hub-incident-service-1  Starting
+ Container esm-hub-kafka-1  Healthy
+ Container esm-hub-asset-service-1  Starting
+ Container esm-hub-kafka-1  Healthy
+ Container esm-hub-audit-service-1  Starting
+ Container esm-hub-kafka-1  Healthy
+ Container esm-hub-notification-service-1  Starting
+ Container esm-hub-kafka-1  Healthy
+ Container esm-hub-knowledge-service-1  Starting
+ Container esm-hub-kafka-1  Healthy
+ Container esm-hub-change-service-1  Starting
+ Container esm-hub-kafka-1  Healthy
+ Container esm-hub-reporting-service-1  Starting
+ Container esm-hub-request-service-1  Started
+ Container esm-hub-directory-service-1  Started
+ Container esm-hub-gateway-1  Starting
+ Container esm-hub-asset-service-1  Started
+ Container esm-hub-notification-service-1  Started
+ Container esm-hub-incident-service-1  Started
+ Container esm-hub-knowledge-service-1  Started
+ Container esm-hub-audit-service-1  Started
+ Container esm-hub-reporting-service-1  Started
+ Container esm-hub-change-service-1  Started
+ Container esm-hub-gateway-1  Started
+ Container esm-hub-web-1  Starting
+ Container esm-hub-web-1  Started
+not healthy in time:
+asset-service starting
+audit-service starting
+knowledge-service starting
+notification-service starting
+reporting-service starting

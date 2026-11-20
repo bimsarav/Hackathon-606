@@ -64,7 +64,7 @@ class AssetServiceIT {
     }
 
     JsonNode create(String token, String tag, String extra, int status) throws Exception {
-        return call(post("/api/v1/assets").header("Authorization", token).contentType(MediaType.APPLICATION_JSON)
+        return call(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/v1/assets").header("Authorization", token).contentType(MediaType.APPLICATION_JSON)
                 .content("{\"assetTag\":\"" + tag + "\",\"assetType\":\"Laptop\"" + extra + "}"), status);
     }
 
@@ -161,7 +161,7 @@ class AssetServiceIT {
         create(manager, "FLT-OLD", ",\"officeId\":1,\"warrantyEnd\":\"" + today.minusDays(5) + "\"", 201);
         create(manager, "FLT-SOON", ",\"warrantyEnd\":\"" + today.plusDays(10) + "\"", 201);
         create(manager, "FLT-LATER", ",\"officeId\":1,\"warrantyEnd\":\"" + today.plusDays(400) + "\"", 201);
-        long phone = call(post("/api/v1/assets").header("Authorization", manager).contentType(MediaType.APPLICATION_JSON)
+        long phone = call(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/v1/assets").header("Authorization", manager).contentType(MediaType.APPLICATION_JSON)
                 .content("{\"assetTag\":\"FLT-PHONE\",\"assetType\":\"Phone\",\"model\":\"Pixelz\"}"), 201).get("assetId").asLong();
         post(manager, "/api/v1/assets/" + phone + "/assign", "{\"userId\":14}", 200);
 

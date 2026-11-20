@@ -1,0 +1,18 @@
+auth/me                    200 {'userId': 5, 'companyId': 1, 'name': 'Sara Khan', 'email': 'sara.khan
+users                      200 total= 40
+reference                  200 {'offices': [{'officeId': 1, 'name': 'Abu Dhabi HQ', 'city': 'Abu Dhab
+incidents                  200 total= 150
+requests                   200 total= 45
+catalogue                  200 [{'itemId': 5, 'serviceId': 5, 'serviceName': 'Access Management', 'na
+approvals                  200 []
+changes                    200 total= 20
+change-approvals           200 []
+assets                     200 total= 60
+kb/articles                200 total= 8
+notifications              200 total= 0
+notifications/unread-count 200 {'unread': 0}
+audit                      403 {'detail': 'Your role does not allow this action.', 'instance': '/api/
+reports/summary            200 {'since': '2025-11-21', 'until': '2026-11-21', 'created': 150, 'resolv
+reports/sla-compliance     200 [{'priority': 'P1', 'incidents': 15, 'responded': 15, 'responseMetPct'
+reports/incident-volume?by=month 200 [{'key': '2026-01', 'count': 9, 'breached': 6}, {'key': '2026-02', 'co
+audit (admin) 200 {"items":[{"auditId":42,"service":"legacy","actorUserId":19,"entityType":"ASSET","entityId":"16","action":"STATUS_CHANGE

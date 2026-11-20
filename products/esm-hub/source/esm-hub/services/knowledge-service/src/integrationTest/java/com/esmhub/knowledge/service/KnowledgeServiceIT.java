@@ -76,15 +76,15 @@ class KnowledgeServiceIT {
         return post(token, "/api/v1/kb/articles", "{\"title\":\"" + title + "\",\"body\":\"" + body + "\"}", 201).get("articleId").asLong();
     }
 
-    void status(String token, long id, String to, int expected) throws Exception {
+    void setStatus(String token, long id, String to, int expected) throws Exception {
         post(token, "/api/v1/kb/articles/" + id + "/status", "{\"status\":\"" + to + "\"}", expected);
     }
 
     /** Creates an article and publishes it with a second pair of eyes. */
     long published(String title, String body) throws Exception {
         long id = create(tech12, title, body);
-        status(tech12, id, "UNDER_REVIEW", 200);
-        status(editor10, id, "PUBLISHED", 200);
+        setStatus(tech12, id, "UNDER_REVIEW", 200);
+        setStatus(editor10, id, "PUBLISHED", 200);
         return id;
     }
 
@@ -102,21 +102,21 @@ class KnowledgeServiceIT {
         long id = create(tech12, "Reset the VPN client", "Open the client and press reset to restore the tunnel.");
         get(employee13, "/api/v1/kb/articles/" + id, 404);
         get(tech12, "/api/v1/kb/articles/" + id, 200);
-        status(employee13, id, "UNDER_REVIEW", 404);
-        status(tech12, id, "PUBLISHED", 422);
-        status(tech12, id, "UNDER_REVIEW", 200);
+        setStatus(employee13, id, "UNDER_REVIEW", 404);
+        setStatus(tech12, id, "PUBLISHED", 422);
+        setStatus(tech12, id, "UNDER_REVIEW", 200);
         // editors (active ones) are notified, not the author, not inactive editors
         assertThat(recipients(id, "article.review_requested")).containsExactlyInAnyOrder(10L, 11L);
-        status(tech12, id, "PUBLISHED", 403);
-        status(employee13, id, "PUBLISHED", 404);
+        setStatus(tech12, id, "PUBLISHED", 403);
+        setStatus(employee13, id, "PUBLISHED", 404);
         JsonNode pub = post(editor10, "/api/v1/kb/articles/" + id + "/status", "{\"status\":\"PUBLISHED\"}", 200);
         assertThat(pub.get("status").asString()).isEqualTo("PUBLISHED");
         assertThat(pub.get("publishedAt").isNull()).isFalse();
         assertThat(recipients(id, "article.published")).containsExactly(12L);
-        status(tech12, id, "RETIRED", 403);
-        status(editor11, id, "RETIRED", 200);
-        status(editor11, id, "UNDER_REVIEW", 422);
-        status(editor11, id, "DRAFT", 200);
+        setStatus(tech12, id, "RETIRED", 403);
+        setStatus(editor11, id, "RETIRED", 200);
+        setStatus(editor11, id, "UNDER_REVIEW", 422);
+        setStatus(editor11, id, "DRAFT", 200);
         assertThat(jdbc.queryForList("SELECT event_type FROM outbox_events WHERE topic='audit.events' AND message_key=? ORDER BY id",
                 String.class, String.valueOf(id))).containsExactly("audit.create", "audit.status_change", "audit.status_change",
                 "audit.status_change", "audit.status_change");
@@ -125,10 +125,10 @@ class KnowledgeServiceIT {
     @Test
     void editorWhoIsAuthorCannotPublishOwnArticle() throws Exception {
         long id = create(editor10, "Editor article", "An article written by an editor and nobody else.");
-        status(editor10, id, "UNDER_REVIEW", 200);
+        setStatus(editor10, id, "UNDER_REVIEW", 200);
         assertThat(recipients(id, "article.review_requested")).containsExactly(11L);
-        status(editor10, id, "PUBLISHED", 403);
-        status(editor11, id, "PUBLISHED", 200);
+        setStatus(editor10, id, "PUBLISHED", 403);
+        setStatus(editor11, id, "PUBLISHED", 200);
     }
 
     @Test
@@ -136,10 +136,10 @@ class KnowledgeServiceIT {
         long id = create(tech12, "Draft to edit", "Initial body text for the draft article.");
         patch(employee13, "/api/v1/kb/articles/" + id, "{\"title\":\"Hack\"}", 404);
         assertThat(patch(tech12, "/api/v1/kb/articles/" + id, "{\"title\":\"Edited title\"}", 200).get("title").asString()).isEqualTo("Edited title");
-        status(tech12, id, "UNDER_REVIEW", 200);
+        setStatus(tech12, id, "UNDER_REVIEW", 200);
         patch(tech12, "/api/v1/kb/articles/" + id, "{\"title\":\"Too late\"}", 403);
         patch(editor11, "/api/v1/kb/articles/" + id, "{\"title\":\"Editor fixed\"}", 200);
-        status(editor11, id, "PUBLISHED", 200);
+        setStatus(editor11, id, "PUBLISHED", 200);
         patch(editor11, "/api/v1/kb/articles/" + id, "{\"title\":\"Nope\"}", 422);
         patch(tech12, "/api/v1/kb/articles/" + id, "{\"title\":\"Nope\"}", 403);
     }
@@ -167,10 +167,10 @@ class KnowledgeServiceIT {
         assertThat(r.get("items").get(0).get("body").isNull()).isTrue();
         assertThat(r.get("items").get(0).get("snippet").asString()).contains("wireguard");
 
-        List<Long> excl = get(employee13, "/api/v1/kb/articles?q=wireguard%20-printer", 200).get("items").valueStream()
+        List<Long> excl = get(employee13, "/api/v1/kb/articles?q=wireguard -printer", 200).get("items").valueStream()
                 .map(n -> n.get("articleId").asLong()).toList();
         assertThat(excl).containsExactlyInAnyOrder(strong, weak);
-        List<Long> phrase = get(employee13, "/api/v1/kb/articles?q=%22printer%20queue%22", 200).get("items").valueStream()
+        List<Long> phrase = get(employee13, "/api/v1/kb/articles?q=\"printer queue\"", 200).get("items").valueStream()
                 .map(n -> n.get("articleId").asLong()).toList();
         assertThat(phrase).containsExactly(other);
         assertThat(get(employee13, "/api/v1/kb/articles?q=wireguard&size=1&page=2", 200).get("items")).hasSize(1);
@@ -181,7 +181,7 @@ class KnowledgeServiceIT {
     void employeesSeeOnlyPublishedPlusOwnDrafts() throws Exception {
         long draft = create(tech12, "Zebrafish draft", "A zebrafish draft that is not yet reviewed by anyone.");
         long review = create(tech12, "Zebrafish in review", "A zebrafish article that is waiting for review.");
-        status(tech12, review, "UNDER_REVIEW", 200);
+        setStatus(tech12, review, "UNDER_REVIEW", 200);
         long pub = published("Zebrafish published", "A zebrafish article that everybody can read now.");
         Set<Long> employee = ids(get(employee13, "/api/v1/kb/articles?q=zebrafish", 200));
         assertThat(employee).containsExactly(pub);
@@ -204,8 +204,8 @@ class KnowledgeServiceIT {
     void readingCountsViewsOnlyWhenPublished() throws Exception {
         long id = create(tech12, "View counting", "Body of the view counting article.");
         assertThat(get(tech12, "/api/v1/kb/articles/" + id, 200).get("viewCount").asInt()).isZero();
-        status(tech12, id, "UNDER_REVIEW", 200);
-        status(editor10, id, "PUBLISHED", 200);
+        setStatus(tech12, id, "UNDER_REVIEW", 200);
+        setStatus(editor10, id, "PUBLISHED", 200);
         assertThat(get(employee13, "/api/v1/kb/articles/" + id, 200).get("viewCount").asInt()).isEqualTo(1);
         assertThat(get(employee14, "/api/v1/kb/articles/" + id, 200).get("viewCount").asInt()).isEqualTo(2);
     }
@@ -236,10 +236,10 @@ class KnowledgeServiceIT {
         long id = published("Tenant article", "Only company one may read this tenant article.");
         get(other30, "/api/v1/kb/articles/" + id, 404);
         post(other30, "/api/v1/kb/articles/" + id + "/feedback", "{\"helpful\":true}", 404);
-        status(other30, id, "RETIRED", 404);
+        setStatus(other30, id, "RETIRED", 404);
         assertThat(get(other30, "/api/v1/kb/articles?q=tenant", 200).get("total").asInt()).isZero();
-        long theirs = post(other30, "/api/v1/kb/articles", "{\"title\":\"Other tenant\",\"body\":\"Written in the other company.\"}", 403).isNull() ? 0 : 0;
-        assertThat(theirs).isZero();
+        long theirs = post(other30, "/api/v1/kb/articles", "{\"title\":\"Other tenant\",\"body\":\"Written in the other company.\"}", 201).get("articleId").asLong();
+        get(editor10, "/api/v1/kb/articles/" + theirs, 404);
     }
 
     @Test

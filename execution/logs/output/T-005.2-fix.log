@@ -1,0 +1,268 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.9.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Kotlin does not yet support 27 JDK target, falling back to Kotlin JVM_26 JVM target
+> Task :buildSrc:checkKotlinCompilerVersion
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:generateExternalPluginSpecBuilders UP-TO-DATE
+> Task :buildSrc:extractPrecompiledScriptPluginPlugins UP-TO-DATE
+> Task :buildSrc:compilePluginsBlocks UP-TO-DATE
+> Task :buildSrc:generatePrecompiledScriptPluginAccessors UP-TO-DATE
+> Task :buildSrc:generateScriptPluginAdapters UP-TO-DATE
+
+> Task :buildSrc:compileKotlin UP-TO-DATE
+Kotlin does not yet support 27 JDK target, falling back to Kotlin JVM_26 JVM target
+
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+> Task :libs:esm-common:compileJava UP-TO-DATE
+> Task :libs:esm-common:processResources UP-TO-DATE
+> Task :libs:esm-common:classes UP-TO-DATE
+> Task :libs:esm-common:jar UP-TO-DATE
+> Task :libs:esm-directory-replica:compileJava UP-TO-DATE
+> Task :libs:esm-directory-replica:processResources UP-TO-DATE
+> Task :libs:esm-directory-replica:classes UP-TO-DATE
+> Task :libs:esm-directory-replica:jar UP-TO-DATE
+> Task :services:asset-service:compileJava UP-TO-DATE
+> Task :services:asset-service:processResources
+> Task :services:asset-service:classes
+> Task :services:asset-service:resolveMainClassName
+> Task :services:asset-service:bootJar
+> Task :services:audit-service:compileJava UP-TO-DATE
+> Task :services:audit-service:processResources
+> Task :services:audit-service:classes
+> Task :services:audit-service:resolveMainClassName
+> Task :services:audit-service:bootJar
+> Task :services:knowledge-service:compileJava UP-TO-DATE
+> Task :services:knowledge-service:processResources
+> Task :services:knowledge-service:classes
+> Task :services:knowledge-service:resolveMainClassName
+> Task :services:knowledge-service:bootJar
+> Task :services:notification-service:compileJava UP-TO-DATE
+> Task :services:notification-service:processResources
+> Task :services:notification-service:classes
+> Task :services:notification-service:resolveMainClassName
+> Task :services:notification-service:bootJar
+> Task :services:reporting-service:compileJava UP-TO-DATE
+> Task :services:reporting-service:processResources
+> Task :services:reporting-service:classes
+> Task :services:reporting-service:resolveMainClassName
+> Task :services:reporting-service:bootJar
+
+BUILD SUCCESSFUL in 1m 41s
+36 actionable tasks: 16 executed, 20 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.9.1/userguide/configuration_cache_enabling.html
+#0 building with "default" instance using docker driver
+
+#1 [reporting-service internal] load build definition from service.Dockerfile
+#1 transferring dockerfile: 40B 0.0s done
+#1 DONE 0.0s
+
+#2 [knowledge-service internal] load build definition from service.Dockerfile
+#2 transferring dockerfile: 40B 0.0s done
+#2 DONE 0.1s
+
+#3 [notification-service internal] load build definition from service.Dockerfile
+#3 transferring dockerfile: 40B done
+#3 DONE 0.0s
+
+#4 [asset-service internal] load build definition from service.Dockerfile
+#4 transferring dockerfile: 40B done
+#4 DONE 0.0s
+
+#5 [reporting-service internal] load .dockerignore
+#5 transferring context: 2B done
+#5 DONE 0.0s
+
+#6 [audit-service internal] load build definition from service.Dockerfile
+#6 transferring dockerfile: 40B 0.0s done
+#6 DONE 0.1s
+
+#7 [knowledge-service internal] load .dockerignore
+#7 transferring context: 2B 0.0s done
+#7 DONE 0.1s
+
+#8 [asset-service internal] load .dockerignore
+#8 transferring context: 2B 0.0s done
+#8 DONE 0.1s
+
+#9 [notification-service internal] load .dockerignore
+#9 transferring context: 2B 0.0s done
+#9 DONE 0.1s
+
+#10 [audit-service internal] load .dockerignore
+#10 transferring context: 2B 0.0s done
+#10 DONE 0.1s
+
+#11 [notification-service internal] load metadata for docker.io/library/eclipse-temurin:27-jre
+#11 DONE 1.6s
+
+#12 [audit-service internal] load build context
+#12 DONE 0.0s
+
+#13 [knowledge-service internal] load build context
+#13 DONE 0.0s
+
+#14 [audit-service 1/4] FROM docker.io/library/eclipse-temurin:27-jre@sha256:acfb350b50e707addf3dcbb47f7052d1882d1e5f1670ce838a9c7838d82d4fe5
+#14 DONE 0.0s
+
+#15 [reporting-service internal] load build context
+#15 DONE 0.0s
+
+#16 [notification-service internal] load build context
+#16 transferring context: 33.04MB 3.4s
+#16 ...
+
+#15 [reporting-service internal] load build context
+#15 ...
+
+#16 [notification-service internal] load build context
+#16 transferring context: 81.55MB 8.4s
+#16 ...
+
+#17 [asset-service internal] load build context
+#17 transferring context: 91.95MB 8.6s done
+#17 DONE 8.6s
+
+#18 [asset-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#18 CACHED
+
+#19 [asset-service 3/4] WORKDIR /app
+#19 CACHED
+
+#16 [notification-service internal] load build context
+#16 ...
+
+#12 [audit-service internal] load build context
+#12 transferring context: 91.92MB 8.6s done
+#12 DONE 8.7s
+
+#20 [audit-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#20 CACHED
+
+#21 [audit-service 3/4] WORKDIR /app
+#21 CACHED
+
+#16 [notification-service internal] load build context
+#16 ...
+
+#15 [reporting-service internal] load build context
+#15 transferring context: 91.93MB 9.0s done
+#15 DONE 9.0s
+
+#22 [reporting-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#22 CACHED
+
+#23 [reporting-service 3/4] WORKDIR /app
+#23 CACHED
+
+#16 [notification-service internal] load build context
+#16 transferring context: 92.88MB 9.3s done
+#16 DONE 9.3s
+
+#24 [notification-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#24 CACHED
+
+#25 [notification-service 3/4] WORKDIR /app
+#25 CACHED
+
+#26 [notification-service 4/4] COPY --chown=root:root services/notification-service/build/libs/app.jar /app/app.jar
+#26 ...
+
+#27 [audit-service 4/4] COPY --chown=root:root services/audit-service/build/libs/app.jar /app/app.jar
+#27 DONE 0.9s
+
+#28 [asset-service 4/4] COPY --chown=root:root services/asset-service/build/libs/app.jar /app/app.jar
+#28 DONE 1.0s
+
+#29 [asset-service] exporting to image
+#29 exporting layers
+#29 ...
+
+#30 [reporting-service 4/4] COPY --chown=root:root services/reporting-service/build/libs/app.jar /app/app.jar
+#30 DONE 0.6s
+
+#29 [reporting-service] exporting to image
+#29 ...
+
+#13 [knowledge-service internal] load build context
+#13 transferring context: 91.95MB 10.0s done
+#13 DONE 10.1s
+
+#26 [notification-service 4/4] COPY --chown=root:root services/notification-service/build/libs/app.jar /app/app.jar
+#26 DONE 0.9s
+
+#31 [knowledge-service 2/4] RUN groupadd --system esm && useradd --system --gid esm --home-dir /app --shell /usr/sbin/nologin esm  && apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+#31 CACHED
+
+#32 [knowledge-service 3/4] WORKDIR /app
+#32 CACHED
+
+#29 [notification-service] exporting to image
+#29 ...
+
+#33 [knowledge-service 4/4] COPY --chown=root:root services/knowledge-service/build/libs/app.jar /app/app.jar
+#33 DONE 1.0s
+
+#29 [knowledge-service] exporting to image
+#29 exporting layers 4.2s done
+#29 writing image sha256:f9ebd3de4bcd3b1cebc9c2aa15c600b9e0d40c2cdf0b951947893b6b30add9c6 0.0s done
+#29 naming to docker.io/esm-hub/asset-service:latest done
+#29 exporting layers 4.4s done
+#29 writing image sha256:26926a3eab5da40e1c85afb24349027f856035221c0d1a1ca6e4ae0089667262 0.0s done
+#29 naming to docker.io/esm-hub/audit-service:latest done
+#29 writing image sha256:7b748dcb615a74a8f0ca962d2ffafe498fd0aa97c56e42620aa9a89587b583ef 0.0s done
+#29 naming to docker.io/esm-hub/reporting-service:latest done
+#29 exporting layers 4.5s done
+#29 writing image sha256:fe1c013c49cddb67ef33e046405477c35c821c7fa53e220c21b29b3e4e2c8487 done
+#29 naming to docker.io/esm-hub/notification-service:latest done
+#29 exporting layers 4.3s done
+#29 writing image sha256:485cc2a70302026e09c9ae0d79c35f7e2605e12473d894a5e7507eb653318363 0.0s done
+#29 naming to docker.io/esm-hub/knowledge-service:latest
+#29 naming to docker.io/esm-hub/knowledge-service:latest done
+#29 DONE 6.0s
+ Container esm-hub-postgres-1  Running
+ Container esm-hub-kafka-1  Running
+ Container esm-hub-audit-service-1  Recreate
+ Container esm-hub-asset-service-1  Recreate
+ Container esm-hub-reporting-service-1  Recreate
+ Container esm-hub-knowledge-service-1  Recreate
+ Container esm-hub-notification-service-1  Recreate
+ Container esm-hub-audit-service-1  Recreated
+ Container esm-hub-asset-service-1  Recreated
+ Container esm-hub-reporting-service-1  Recreated
+ Container esm-hub-knowledge-service-1  Recreated
+ Container esm-hub-notification-service-1  Recreated
+ Container esm-hub-kafka-1  Waiting
+ Container esm-hub-postgres-1  Waiting
+ Container esm-hub-postgres-1  Waiting
+ Container esm-hub-kafka-1  Waiting
+ Container esm-hub-kafka-1  Waiting
+ Container esm-hub-postgres-1  Waiting
+ Container esm-hub-kafka-1  Waiting
+ Container esm-hub-postgres-1  Waiting
+ Container esm-hub-postgres-1  Waiting
+ Container esm-hub-kafka-1  Waiting
+ Container esm-hub-postgres-1  Healthy
+ Container esm-hub-kafka-1  Healthy
+ Container esm-hub-postgres-1  Healthy
+ Container esm-hub-notification-service-1  Starting
+ Container esm-hub-postgres-1  Healthy
+ Container esm-hub-kafka-1  Healthy
+ Container esm-hub-asset-service-1  Starting
+ Container esm-hub-postgres-1  Healthy
+ Container esm-hub-postgres-1  Healthy
+ Container esm-hub-kafka-1  Healthy
+ Container esm-hub-reporting-service-1  Starting
+ Container esm-hub-kafka-1  Healthy
+ Container esm-hub-knowledge-service-1  Starting
+ Container esm-hub-kafka-1  Healthy
+ Container esm-hub-audit-service-1  Starting
+ Container esm-hub-notification-service-1  Started
+ Container esm-hub-reporting-service-1  Started
+ Container esm-hub-audit-service-1  Started
+ Container esm-hub-asset-service-1  Started
+ Container esm-hub-knowledge-service-1  Started

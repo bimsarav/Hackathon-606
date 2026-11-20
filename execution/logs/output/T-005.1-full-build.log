@@ -1,0 +1,855 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.9.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Kotlin does not yet support 27 JDK target, falling back to Kotlin JVM_26 JVM target
+> Task :buildSrc:checkKotlinCompilerVersion
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:generateExternalPluginSpecBuilders
+> Task :buildSrc:extractPrecompiledScriptPluginPlugins
+> Task :buildSrc:generateScriptPluginAdapters
+> Task :buildSrc:pluginDescriptors
+> Task :buildSrc:processResources
+> Task :buildSrc:compilePluginsBlocks
+> Task :buildSrc:generatePrecompiledScriptPluginAccessors
+
+> Task :buildSrc:compileKotlin
+Kotlin does not yet support 27 JDK target, falling back to Kotlin JVM_26 JVM target
+w: ⚠️ Inconsistent JVM Target Compatibility Between Java and Kotlin Tasks
+Inconsistent JVM-target compatibility detected for tasks 'compileJava' (27) and 'compileKotlin' (26).
+Solution: Consider using JVM Toolchain: https://kotl.in/gradle/jvm/toolchain
+Learn more about JVM-target validation: https://kotl.in/gradle/jvm/target-validation
+
+
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:classes
+> Task :buildSrc:jar
+> Task :libs:esm-common:clean
+> Task :libs:esm-directory-replica:clean
+> Task :libs:esm-test-support:clean
+> Task :services:asset-service:clean
+> Task :services:audit-service:clean
+> Task :services:change-service:clean
+> Task :services:directory-service:clean
+> Task :services:gateway:clean
+> Task :services:incident-service:clean
+> Task :services:knowledge-service:clean
+> Task :services:notification-service:clean
+> Task :services:reporting-service:clean
+> Task :services:request-service:clean
+> Task :libs:esm-common:compileJava
+> Task :libs:esm-common:processResources
+> Task :libs:esm-common:classes
+> Task :libs:esm-common:jar
+> Task :libs:esm-common:assemble
+> Task :libs:esm-common:compileTestJava
+> Task :libs:esm-common:processTestResources NO-SOURCE
+> Task :libs:esm-common:testClasses
+> Task :libs:esm-common:test
+> Task :libs:esm-common:check
+> Task :libs:esm-common:build
+> Task :libs:esm-directory-replica:compileJava
+> Task :libs:esm-directory-replica:processResources
+> Task :libs:esm-directory-replica:classes
+> Task :libs:esm-directory-replica:jar
+> Task :libs:esm-directory-replica:assemble
+> Task :libs:esm-directory-replica:compileTestJava NO-SOURCE
+> Task :libs:esm-directory-replica:processTestResources NO-SOURCE
+> Task :libs:esm-directory-replica:testClasses UP-TO-DATE
+> Task :libs:esm-directory-replica:test NO-SOURCE
+> Task :libs:esm-directory-replica:check UP-TO-DATE
+> Task :libs:esm-directory-replica:build
+> Task :libs:esm-test-support:compileJava
+> Task :libs:esm-test-support:processResources
+> Task :libs:esm-test-support:classes
+> Task :libs:esm-test-support:jar
+> Task :libs:esm-test-support:assemble
+> Task :libs:esm-test-support:compileTestJava NO-SOURCE
+> Task :libs:esm-test-support:processTestResources NO-SOURCE
+> Task :libs:esm-test-support:testClasses UP-TO-DATE
+> Task :libs:esm-test-support:test NO-SOURCE
+> Task :libs:esm-test-support:check UP-TO-DATE
+> Task :libs:esm-test-support:build
+> Task :services:asset-service:compileJava
+> Task :services:asset-service:processResources
+> Task :services:asset-service:classes
+> Task :services:asset-service:resolveMainClassName
+> Task :services:asset-service:bootJar
+> Task :services:asset-service:jar
+> Task :services:asset-service:assemble
+> Task :services:asset-service:compileTestJava
+> Task :services:asset-service:processTestResources NO-SOURCE
+> Task :services:asset-service:testClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :services:asset-service:test
+> Task :services:asset-service:compileIntegrationTestJava
+> Task :services:asset-service:processIntegrationTestResources
+> Task :services:asset-service:integrationTestClasses
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by com.sun.jna.Native in an unnamed module (file:/cache/caches/modules-2/files-2.1/net.java.dev.jna/jna/5.18.1/b27ba04287cc4abe769642fe8318d39fc89bf937/jna-5.18.1.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+> Task :services:asset-service:integrationTest
+
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-11-20T06:07:34.464Z  INFO 598 --- [asset-service] [ntainer#2-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-asset-service.directory-1, groupId=asset-service.directory] Revoke previously assigned partitions [directory.services-0]
+2026-11-20T06:07:34.464Z  INFO 598 --- [asset-service] [ntainer#0-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-asset-service.directory-3, groupId=asset-service.directory] Revoke previously assigned partitions [directory.users-0]
+2026-11-20T06:07:34.464Z  INFO 598 --- [asset-service] [ntainer#1-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-asset-service.directory-4, groupId=asset-service.directory] Revoke previously assigned partitions [directory.teams-0]
+2026-11-20T06:07:34.464Z  INFO 598 --- [asset-service] [ntainer#3-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-asset-service.directory-2, groupId=asset-service.directory] Revoke previously assigned partitions [directory.offices-0]
+2026-11-20T06:07:34.465Z  INFO 598 --- [asset-service] [ntainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : asset-service.directory: partitions revoked: [directory.services-0]
+2026-11-20T06:07:34.465Z  INFO 598 --- [asset-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : asset-service.directory: partitions revoked: [directory.users-0]
+2026-11-20T06:07:34.465Z  INFO 598 --- [asset-service] [ntainer#3-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : asset-service.directory: partitions revoked: [directory.offices-0]
+2026-11-20T06:07:34.465Z  INFO 598 --- [asset-service] [ntainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : asset-service.directory: partitions revoked: [directory.teams-0]
+2026-11-20T06:07:34.466Z  INFO 598 --- [asset-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-1, groupId=asset-service.directory] Member consumer-asset-service.directory-1-046ab14d-fbea-4c87-9015-6592ca9ec0b6 sending LeaveGroup request to coordinator localhost:32854 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:07:34.466Z  INFO 598 --- [asset-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-4, groupId=asset-service.directory] Member consumer-asset-service.directory-4-be7ed4f7-c0d7-4933-ba6c-da3800c5cbe0 sending LeaveGroup request to coordinator localhost:32854 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:07:34.466Z  INFO 598 --- [asset-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-3, groupId=asset-service.directory] Member consumer-asset-service.directory-3-911d4974-724c-4dbe-9ab5-acbecea698a0 sending LeaveGroup request to coordinator localhost:32854 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:07:34.466Z  INFO 598 --- [asset-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-2, groupId=asset-service.directory] Member consumer-asset-service.directory-2-1f311057-bb27-46c5-910c-95e11737f38b sending LeaveGroup request to coordinator localhost:32854 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:07:34.467Z  INFO 598 --- [asset-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-1, groupId=asset-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:07:34.467Z  INFO 598 --- [asset-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-3, groupId=asset-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:07:34.467Z  INFO 598 --- [asset-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-1, groupId=asset-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:07:34.467Z  INFO 598 --- [asset-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-3, groupId=asset-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:07:34.467Z  INFO 598 --- [asset-service] [ntainer#2-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-asset-service.directory-1, groupId=asset-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:07:34.467Z  INFO 598 --- [asset-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-4, groupId=asset-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:07:34.467Z  INFO 598 --- [asset-service] [ntainer#0-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-asset-service.directory-3, groupId=asset-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:07:34.467Z  INFO 598 --- [asset-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-4, groupId=asset-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:07:34.467Z  INFO 598 --- [asset-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-2, groupId=asset-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:07:34.467Z  INFO 598 --- [asset-service] [ntainer#1-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-asset-service.directory-4, groupId=asset-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:07:34.467Z  INFO 598 --- [asset-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-2, groupId=asset-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:07:34.467Z  INFO 598 --- [asset-service] [ntainer#3-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-asset-service.directory-2, groupId=asset-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:07:34.467Z  INFO 598 --- [asset-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-3, groupId=asset-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:07:34.467Z  INFO 598 --- [asset-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-1, groupId=asset-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:07:34.468Z  INFO 598 --- [asset-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-1, groupId=asset-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:07:34.468Z  INFO 598 --- [asset-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-3, groupId=asset-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:07:34.468Z  INFO 598 --- [asset-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-2, groupId=asset-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:07:34.468Z  INFO 598 --- [asset-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-2, groupId=asset-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:07:34.469Z  INFO 598 --- [asset-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-4, groupId=asset-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:07:34.469Z  INFO 598 --- [asset-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-asset-service.directory-4, groupId=asset-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:07:34.930Z  INFO 598 --- [asset-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:07:34.931Z  INFO 598 --- [asset-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:07:34.931Z  INFO 598 --- [asset-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:07:34.931Z  INFO 598 --- [asset-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:07:34.931Z  INFO 598 --- [asset-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:07:34.931Z  INFO 598 --- [asset-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:07:34.931Z  INFO 598 --- [asset-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:07:34.932Z  INFO 598 --- [asset-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:07:34.932Z  INFO 598 --- [asset-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:07:34.932Z  INFO 598 --- [asset-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:07:34.932Z  INFO 598 --- [asset-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:07:34.932Z  INFO 598 --- [asset-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:07:34.932Z  INFO 598 --- [asset-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:07:34.933Z  INFO 598 --- [asset-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:07:34.934Z  INFO 598 --- [asset-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:07:34.934Z  INFO 598 --- [asset-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:07:34.956Z  INFO 598 --- [asset-service] [ntainer#3-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-asset-service.directory-2 unregistered
+2026-11-20T06:07:34.958Z  INFO 598 --- [asset-service] [ntainer#3-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : asset-service.directory: Consumer stopped
+2026-11-20T06:07:34.958Z  INFO 598 --- [asset-service] [ntainer#2-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-asset-service.directory-1 unregistered
+2026-11-20T06:07:34.959Z  INFO 598 --- [asset-service] [ntainer#1-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-asset-service.directory-4 unregistered
+2026-11-20T06:07:34.960Z  INFO 598 --- [asset-service] [ntainer#0-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-asset-service.directory-3 unregistered
+2026-11-20T06:07:34.960Z  INFO 598 --- [asset-service] [ntainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : asset-service.directory: Consumer stopped
+2026-11-20T06:07:34.962Z  INFO 598 --- [asset-service] [ntainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : asset-service.directory: Consumer stopped
+2026-11-20T06:07:34.963Z  INFO 598 --- [asset-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : asset-service.directory: Consumer stopped
+2026-11-20T06:07:34.964Z  INFO 598 --- [asset-service] [ionShutdownHook] o.a.k.clients.producer.KafkaProducer     : [Producer clientId=asset-service-producer-1] Closing the Kafka producer with timeoutMillis = 30000 ms.
+2026-11-20T06:07:34.970Z  INFO 598 --- [asset-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:07:34.970Z  INFO 598 --- [asset-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:07:34.970Z  INFO 598 --- [asset-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:07:34.970Z  INFO 598 --- [asset-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:07:34.972Z  INFO 598 --- [asset-service] [ionShutdownHook] o.a.kafka.common.utils.AppInfoParser     : App info kafka.producer for asset-service-producer-1 unregistered
+2026-11-20T06:07:34.999Z  INFO 598 --- [asset-service] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-20T06:07:35.008Z  INFO 598 --- [asset-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-20T06:07:35.016Z  INFO 598 --- [asset-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+> Task :services:asset-service:check
+> Task :services:asset-service:build
+> Task :services:audit-service:compileJava
+> Task :services:audit-service:processResources
+> Task :services:audit-service:classes
+> Task :services:audit-service:resolveMainClassName
+> Task :services:audit-service:bootJar
+> Task :services:audit-service:jar
+> Task :services:audit-service:assemble
+> Task :services:audit-service:compileTestJava
+> Task :services:audit-service:processTestResources NO-SOURCE
+> Task :services:audit-service:testClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :services:audit-service:test
+> Task :services:audit-service:compileIntegrationTestJava
+> Task :services:audit-service:processIntegrationTestResources
+> Task :services:audit-service:integrationTestClasses
+> Task :services:audit-service:integrationTest
+
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-11-20T06:08:40.343Z  INFO 936 --- [audit-service] [ntainer#0-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-audit-service.records-1, groupId=audit-service.records] Revoke previously assigned partitions [audit.events-0, audit.events-1, audit.events-2]
+2026-11-20T06:08:40.344Z  INFO 936 --- [audit-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : audit-service.records: partitions revoked: [audit.events-0, audit.events-1, audit.events-2]
+2026-11-20T06:08:40.347Z  INFO 936 --- [audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service.records-1, groupId=audit-service.records] Member consumer-audit-service.records-1-5ea74975-e27b-479d-8b3b-7a629542625a sending LeaveGroup request to coordinator localhost:32857 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:08:40.349Z  INFO 936 --- [audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service.records-1, groupId=audit-service.records] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:08:40.350Z  INFO 936 --- [audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service.records-1, groupId=audit-service.records] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:08:40.350Z  INFO 936 --- [audit-service] [ntainer#0-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-audit-service.records-1, groupId=audit-service.records] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:08:40.355Z  INFO 936 --- [audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service.records-1, groupId=audit-service.records] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:08:40.356Z  INFO 936 --- [audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service.records-1, groupId=audit-service.records] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:08:40.567Z  INFO 936 --- [audit-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:08:40.567Z  INFO 936 --- [audit-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:08:40.567Z  INFO 936 --- [audit-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:08:40.567Z  INFO 936 --- [audit-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:08:40.573Z  INFO 936 --- [audit-service] [ntainer#0-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-audit-service.records-1 unregistered
+2026-11-20T06:08:40.575Z  INFO 936 --- [audit-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : audit-service.records: Consumer stopped
+2026-11-20T06:08:40.577Z  INFO 936 --- [audit-service] [ionShutdownHook] o.a.k.clients.producer.KafkaProducer     : [Producer clientId=audit-service-producer-1] Closing the Kafka producer with timeoutMillis = 30000 ms.
+2026-11-20T06:08:40.583Z  INFO 936 --- [audit-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:08:40.583Z  INFO 936 --- [audit-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:08:40.584Z  INFO 936 --- [audit-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:08:40.584Z  INFO 936 --- [audit-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:08:40.585Z  INFO 936 --- [audit-service] [ionShutdownHook] o.a.kafka.common.utils.AppInfoParser     : App info kafka.producer for audit-service-producer-1 unregistered
+2026-11-20T06:08:40.599Z  INFO 936 --- [audit-service] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-20T06:08:40.603Z  INFO 936 --- [audit-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-20T06:08:40.606Z  INFO 936 --- [audit-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+> Task :services:audit-service:check
+> Task :services:audit-service:build
+> Task :services:change-service:compileJava
+> Task :services:change-service:processResources
+> Task :services:change-service:classes
+> Task :services:change-service:resolveMainClassName
+> Task :services:change-service:bootJar
+> Task :services:change-service:jar
+> Task :services:change-service:assemble
+> Task :services:change-service:compileTestJava
+> Task :services:change-service:processTestResources NO-SOURCE
+> Task :services:change-service:testClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :services:change-service:test
+> Task :services:change-service:compileIntegrationTestJava
+> Task :services:change-service:processIntegrationTestResources
+> Task :services:change-service:integrationTestClasses
+> Task :services:change-service:integrationTest
+
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-11-20T06:09:52.330Z  INFO 1240 --- [change-service] [ntainer#1-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-change-service.directory-4, groupId=change-service.directory] Revoke previously assigned partitions [directory.teams-0]
+2026-11-20T06:09:52.330Z  INFO 1240 --- [change-service] [ntainer#2-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-change-service.directory-1, groupId=change-service.directory] Revoke previously assigned partitions [directory.services-0]
+2026-11-20T06:09:52.331Z  INFO 1240 --- [change-service] [ntainer#0-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-change-service.directory-3, groupId=change-service.directory] Revoke previously assigned partitions [directory.users-0]
+2026-11-20T06:09:52.330Z  INFO 1240 --- [change-service] [ntainer#3-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-change-service.directory-2, groupId=change-service.directory] Revoke previously assigned partitions [directory.offices-0]
+2026-11-20T06:09:52.331Z  INFO 1240 --- [change-service] [ntainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : change-service.directory: partitions revoked: [directory.teams-0]
+2026-11-20T06:09:52.332Z  INFO 1240 --- [change-service] [ntainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : change-service.directory: partitions revoked: [directory.services-0]
+2026-11-20T06:09:52.332Z  INFO 1240 --- [change-service] [ntainer#3-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : change-service.directory: partitions revoked: [directory.offices-0]
+2026-11-20T06:09:52.332Z  INFO 1240 --- [change-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : change-service.directory: partitions revoked: [directory.users-0]
+2026-11-20T06:09:52.334Z  INFO 1240 --- [change-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-4, groupId=change-service.directory] Member consumer-change-service.directory-4-882b96cc-6a04-4e3c-920c-9d014eb0cffc sending LeaveGroup request to coordinator localhost:32860 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:09:52.334Z  INFO 1240 --- [change-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-1, groupId=change-service.directory] Member consumer-change-service.directory-1-8bf12ba9-c59e-4d90-8212-048bc30b334b sending LeaveGroup request to coordinator localhost:32860 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:09:52.334Z  INFO 1240 --- [change-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-2, groupId=change-service.directory] Member consumer-change-service.directory-2-a1fd1940-018d-487c-a49a-dcbc9dd33b74 sending LeaveGroup request to coordinator localhost:32860 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:09:52.334Z  INFO 1240 --- [change-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-3, groupId=change-service.directory] Member consumer-change-service.directory-3-4580c64b-75cc-4623-9d4a-689af7e41a6a sending LeaveGroup request to coordinator localhost:32860 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:09:52.335Z  INFO 1240 --- [change-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-4, groupId=change-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:09:52.335Z  INFO 1240 --- [change-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-2, groupId=change-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:09:52.335Z  INFO 1240 --- [change-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-2, groupId=change-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:09:52.336Z  INFO 1240 --- [change-service] [ntainer#3-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-change-service.directory-2, groupId=change-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:09:52.335Z  INFO 1240 --- [change-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-1, groupId=change-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:09:52.336Z  INFO 1240 --- [change-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-3, groupId=change-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:09:52.335Z  INFO 1240 --- [change-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-4, groupId=change-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:09:52.336Z  INFO 1240 --- [change-service] [ntainer#1-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-change-service.directory-4, groupId=change-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:09:52.336Z  INFO 1240 --- [change-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-3, groupId=change-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:09:52.336Z  INFO 1240 --- [change-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-1, groupId=change-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:09:52.337Z  INFO 1240 --- [change-service] [ntainer#2-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-change-service.directory-1, groupId=change-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:09:52.337Z  INFO 1240 --- [change-service] [ntainer#0-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-change-service.directory-3, groupId=change-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:09:52.337Z  INFO 1240 --- [change-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-2, groupId=change-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:09:52.337Z  INFO 1240 --- [change-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-4, groupId=change-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:09:52.337Z  INFO 1240 --- [change-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-2, groupId=change-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:09:52.337Z  INFO 1240 --- [change-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-4, groupId=change-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:09:52.337Z  INFO 1240 --- [change-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-1, groupId=change-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:09:52.338Z  INFO 1240 --- [change-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-1, groupId=change-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:09:52.338Z  INFO 1240 --- [change-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-3, groupId=change-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:09:52.338Z  INFO 1240 --- [change-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-change-service.directory-3, groupId=change-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:09:52.565Z  INFO 1240 --- [change-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:09:52.565Z  INFO 1240 --- [change-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:09:52.565Z  INFO 1240 --- [change-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:09:52.564Z  INFO 1240 --- [change-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:09:52.565Z  INFO 1240 --- [change-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:09:52.565Z  INFO 1240 --- [change-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:09:52.565Z  INFO 1240 --- [change-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:09:52.565Z  INFO 1240 --- [change-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:09:52.565Z  INFO 1240 --- [change-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:09:52.565Z  INFO 1240 --- [change-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:09:52.566Z  INFO 1240 --- [change-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:09:52.566Z  INFO 1240 --- [change-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:09:52.566Z  INFO 1240 --- [change-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:09:52.566Z  INFO 1240 --- [change-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:09:52.566Z  INFO 1240 --- [change-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:09:52.566Z  INFO 1240 --- [change-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:09:52.584Z  INFO 1240 --- [change-service] [ntainer#0-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-change-service.directory-3 unregistered
+2026-11-20T06:09:52.587Z  INFO 1240 --- [change-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : change-service.directory: Consumer stopped
+2026-11-20T06:09:52.588Z  INFO 1240 --- [change-service] [ntainer#2-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-change-service.directory-1 unregistered
+2026-11-20T06:09:52.589Z  INFO 1240 --- [change-service] [ntainer#3-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-change-service.directory-2 unregistered
+2026-11-20T06:09:52.589Z  INFO 1240 --- [change-service] [ntainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : change-service.directory: Consumer stopped
+2026-11-20T06:09:52.589Z  INFO 1240 --- [change-service] [ntainer#1-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-change-service.directory-4 unregistered
+2026-11-20T06:09:52.591Z  INFO 1240 --- [change-service] [ntainer#3-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : change-service.directory: Consumer stopped
+2026-11-20T06:09:52.594Z  INFO 1240 --- [change-service] [ntainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : change-service.directory: Consumer stopped
+2026-11-20T06:09:52.594Z  INFO 1240 --- [change-service] [ionShutdownHook] o.a.k.clients.producer.KafkaProducer     : [Producer clientId=change-service-producer-1] Closing the Kafka producer with timeoutMillis = 30000 ms.
+2026-11-20T06:09:52.603Z  INFO 1240 --- [change-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:09:52.603Z  INFO 1240 --- [change-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:09:52.603Z  INFO 1240 --- [change-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:09:52.603Z  INFO 1240 --- [change-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:09:52.605Z  INFO 1240 --- [change-service] [ionShutdownHook] o.a.kafka.common.utils.AppInfoParser     : App info kafka.producer for change-service-producer-1 unregistered
+2026-11-20T06:09:52.635Z  INFO 1240 --- [change-service] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-20T06:09:52.643Z  INFO 1240 --- [change-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-20T06:09:52.651Z  INFO 1240 --- [change-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+> Task :services:change-service:check
+> Task :services:change-service:build
+> Task :services:directory-service:compileJava
+> Task :services:directory-service:processResources
+> Task :services:directory-service:classes
+> Task :services:directory-service:resolveMainClassName
+> Task :services:directory-service:bootJar
+> Task :services:directory-service:jar
+> Task :services:directory-service:assemble
+> Task :services:directory-service:compileTestJava
+> Task :services:directory-service:processTestResources NO-SOURCE
+> Task :services:directory-service:testClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :services:directory-service:test
+> Task :services:directory-service:compileIntegrationTestJava
+> Task :services:directory-service:processIntegrationTestResources
+> Task :services:directory-service:integrationTestClasses
+> Task :services:directory-service:integrationTest
+
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-11-20T06:11:31.381Z  INFO 1546 --- [directory-service] [ionShutdownHook] o.a.k.clients.producer.KafkaProducer     : [Producer clientId=directory-service-producer-1] Closing the Kafka producer with timeoutMillis = 30000 ms.
+2026-11-20T06:11:31.392Z  INFO 1546 --- [directory-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:11:31.392Z  INFO 1546 --- [directory-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:11:31.392Z  INFO 1546 --- [directory-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:11:31.392Z  INFO 1546 --- [directory-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:11:31.393Z  INFO 1546 --- [directory-service] [ionShutdownHook] o.a.kafka.common.utils.AppInfoParser     : App info kafka.producer for directory-service-producer-1 unregistered
+2026-11-20T06:11:31.422Z  INFO 1546 --- [directory-service] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-20T06:11:31.434Z  INFO 1546 --- [directory-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-20T06:11:31.440Z  INFO 1546 --- [directory-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+> Task :services:directory-service:check
+> Task :services:directory-service:build
+> Task :services:gateway:compileJava
+> Task :services:gateway:processResources
+> Task :services:gateway:classes
+> Task :services:gateway:resolveMainClassName
+> Task :services:gateway:bootJar
+> Task :services:gateway:jar
+> Task :services:gateway:assemble
+> Task :services:gateway:compileTestJava
+> Task :services:gateway:processTestResources NO-SOURCE
+> Task :services:gateway:testClasses
+> Task :services:gateway:test
+> Task :services:gateway:check
+> Task :services:gateway:build
+> Task :services:incident-service:compileJava
+> Task :services:incident-service:processResources
+> Task :services:incident-service:classes
+> Task :services:incident-service:resolveMainClassName
+> Task :services:incident-service:bootJar
+> Task :services:incident-service:jar
+> Task :services:incident-service:assemble
+> Task :services:incident-service:compileTestJava
+> Task :services:incident-service:processTestResources NO-SOURCE
+> Task :services:incident-service:testClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :services:incident-service:test
+> Task :services:incident-service:compileIntegrationTestJava
+> Task :services:incident-service:processIntegrationTestResources
+> Task :services:incident-service:integrationTestClasses
+> Task :services:incident-service:integrationTest
+
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-11-20T06:13:57.043Z  INFO 1935 --- [incident-service] [ntainer#2-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-incident-service.directory-1, groupId=incident-service.directory] Revoke previously assigned partitions [directory.services-0]
+2026-11-20T06:13:57.043Z  INFO 1935 --- [incident-service] [ntainer#3-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-incident-service.directory-2, groupId=incident-service.directory] Revoke previously assigned partitions [directory.offices-0]
+2026-11-20T06:13:57.043Z  INFO 1935 --- [incident-service] [ntainer#1-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-incident-service.directory-4, groupId=incident-service.directory] Revoke previously assigned partitions [directory.teams-0]
+2026-11-20T06:13:57.043Z  INFO 1935 --- [incident-service] [ntainer#0-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-incident-service.directory-3, groupId=incident-service.directory] Revoke previously assigned partitions [directory.users-0]
+2026-11-20T06:13:57.044Z  INFO 1935 --- [incident-service] [ntainer#3-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : incident-service.directory: partitions revoked: [directory.offices-0]
+2026-11-20T06:13:57.044Z  INFO 1935 --- [incident-service] [ntainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : incident-service.directory: partitions revoked: [directory.teams-0]
+2026-11-20T06:13:57.044Z  INFO 1935 --- [incident-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : incident-service.directory: partitions revoked: [directory.users-0]
+2026-11-20T06:13:57.044Z  INFO 1935 --- [incident-service] [ntainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : incident-service.directory: partitions revoked: [directory.services-0]
+2026-11-20T06:13:57.046Z  INFO 1935 --- [incident-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-2, groupId=incident-service.directory] Member consumer-incident-service.directory-2-7c001585-efc8-49bb-86be-bc8a8b071a72 sending LeaveGroup request to coordinator localhost:32866 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:13:57.046Z  INFO 1935 --- [incident-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-1, groupId=incident-service.directory] Member consumer-incident-service.directory-1-6b6b6ba1-83d6-42a6-b474-2bc79590d4a0 sending LeaveGroup request to coordinator localhost:32866 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:13:57.046Z  INFO 1935 --- [incident-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-4, groupId=incident-service.directory] Member consumer-incident-service.directory-4-f85a07ad-b633-43f8-88da-59301403d4c2 sending LeaveGroup request to coordinator localhost:32866 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:13:57.046Z  INFO 1935 --- [incident-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-3, groupId=incident-service.directory] Member consumer-incident-service.directory-3-5a386f49-4e53-4991-a5d0-ebcb68877621 sending LeaveGroup request to coordinator localhost:32866 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:13:57.046Z  INFO 1935 --- [incident-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-2, groupId=incident-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:13:57.046Z  INFO 1935 --- [incident-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-4, groupId=incident-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:13:57.046Z  INFO 1935 --- [incident-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-1, groupId=incident-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:13:57.046Z  INFO 1935 --- [incident-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-2, groupId=incident-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:13:57.046Z  INFO 1935 --- [incident-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-4, groupId=incident-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:13:57.047Z  INFO 1935 --- [incident-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-1, groupId=incident-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:13:57.047Z  INFO 1935 --- [incident-service] [ntainer#1-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-incident-service.directory-4, groupId=incident-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:13:57.047Z  INFO 1935 --- [incident-service] [ntainer#3-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-incident-service.directory-2, groupId=incident-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:13:57.047Z  INFO 1935 --- [incident-service] [ntainer#2-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-incident-service.directory-1, groupId=incident-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:13:57.047Z  INFO 1935 --- [incident-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-3, groupId=incident-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:13:57.047Z  INFO 1935 --- [incident-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-3, groupId=incident-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:13:57.047Z  INFO 1935 --- [incident-service] [ntainer#0-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-incident-service.directory-3, groupId=incident-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:13:57.047Z  INFO 1935 --- [incident-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-1, groupId=incident-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:13:57.047Z  INFO 1935 --- [incident-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-1, groupId=incident-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:13:57.047Z  INFO 1935 --- [incident-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-4, groupId=incident-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:13:57.047Z  INFO 1935 --- [incident-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-4, groupId=incident-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:13:57.048Z  INFO 1935 --- [incident-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-2, groupId=incident-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:13:57.048Z  INFO 1935 --- [incident-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-2, groupId=incident-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:13:57.048Z  INFO 1935 --- [incident-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-3, groupId=incident-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:13:57.048Z  INFO 1935 --- [incident-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-incident-service.directory-3, groupId=incident-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:13:57.222Z  INFO 1935 --- [incident-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:13:57.223Z  INFO 1935 --- [incident-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:13:57.223Z  INFO 1935 --- [incident-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:13:57.223Z  INFO 1935 --- [incident-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:13:57.229Z  INFO 1935 --- [incident-service] [ntainer#1-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-incident-service.directory-4 unregistered
+2026-11-20T06:13:57.230Z  INFO 1935 --- [incident-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:13:57.231Z  INFO 1935 --- [incident-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:13:57.231Z  INFO 1935 --- [incident-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:13:57.231Z  INFO 1935 --- [incident-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:13:57.231Z  INFO 1935 --- [incident-service] [ntainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : incident-service.directory: Consumer stopped
+2026-11-20T06:13:57.232Z  INFO 1935 --- [incident-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:13:57.232Z  INFO 1935 --- [incident-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:13:57.232Z  INFO 1935 --- [incident-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:13:57.232Z  INFO 1935 --- [incident-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:13:57.232Z  INFO 1935 --- [incident-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:13:57.232Z  INFO 1935 --- [incident-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:13:57.232Z  INFO 1935 --- [incident-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:13:57.232Z  INFO 1935 --- [incident-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:13:57.246Z  INFO 1935 --- [incident-service] [ntainer#3-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-incident-service.directory-2 unregistered
+2026-11-20T06:13:57.248Z  INFO 1935 --- [incident-service] [ntainer#3-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : incident-service.directory: Consumer stopped
+2026-11-20T06:13:57.249Z  INFO 1935 --- [incident-service] [ntainer#0-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-incident-service.directory-3 unregistered
+2026-11-20T06:13:57.250Z  INFO 1935 --- [incident-service] [ntainer#2-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-incident-service.directory-1 unregistered
+2026-11-20T06:13:57.252Z  INFO 1935 --- [incident-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : incident-service.directory: Consumer stopped
+2026-11-20T06:13:57.255Z  INFO 1935 --- [incident-service] [ntainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : incident-service.directory: Consumer stopped
+2026-11-20T06:13:57.255Z  INFO 1935 --- [incident-service] [ionShutdownHook] o.a.k.clients.producer.KafkaProducer     : [Producer clientId=incident-service-producer-1] Closing the Kafka producer with timeoutMillis = 30000 ms.
+2026-11-20T06:13:57.263Z  INFO 1935 --- [incident-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:13:57.263Z  INFO 1935 --- [incident-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:13:57.264Z  INFO 1935 --- [incident-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:13:57.264Z  INFO 1935 --- [incident-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:13:57.265Z  INFO 1935 --- [incident-service] [ionShutdownHook] o.a.kafka.common.utils.AppInfoParser     : App info kafka.producer for incident-service-producer-1 unregistered
+2026-11-20T06:13:57.301Z  INFO 1935 --- [incident-service] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-20T06:13:57.308Z  INFO 1935 --- [incident-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-20T06:13:57.312Z  INFO 1935 --- [incident-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+> Task :services:incident-service:check
+> Task :services:incident-service:build
+> Task :services:knowledge-service:compileJava
+> Task :services:knowledge-service:processResources
+> Task :services:knowledge-service:classes
+> Task :services:knowledge-service:resolveMainClassName
+> Task :services:knowledge-service:bootJar
+> Task :services:knowledge-service:jar
+> Task :services:knowledge-service:assemble
+> Task :services:knowledge-service:compileTestJava
+> Task :services:knowledge-service:processTestResources NO-SOURCE
+> Task :services:knowledge-service:testClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :services:knowledge-service:test
+> Task :services:knowledge-service:compileIntegrationTestJava
+> Task :services:knowledge-service:processIntegrationTestResources
+> Task :services:knowledge-service:integrationTestClasses
+> Task :services:knowledge-service:integrationTest
+
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-11-20T06:15:40.611Z  INFO 2291 --- [knowledge-service] [ntainer#1-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-knowledge-service.directory-4, groupId=knowledge-service.directory] Revoke previously assigned partitions [directory.teams-0]
+2026-11-20T06:15:40.611Z  INFO 2291 --- [knowledge-service] [ntainer#3-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-knowledge-service.directory-2, groupId=knowledge-service.directory] Revoke previously assigned partitions [directory.offices-0]
+2026-11-20T06:15:40.611Z  INFO 2291 --- [knowledge-service] [ntainer#0-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-knowledge-service.directory-3, groupId=knowledge-service.directory] Revoke previously assigned partitions [directory.users-0]
+2026-11-20T06:15:40.611Z  INFO 2291 --- [knowledge-service] [ntainer#2-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-knowledge-service.directory-1, groupId=knowledge-service.directory] Revoke previously assigned partitions [directory.services-0]
+2026-11-20T06:15:40.613Z  INFO 2291 --- [knowledge-service] [ntainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : knowledge-service.directory: partitions revoked: [directory.teams-0]
+2026-11-20T06:15:40.613Z  INFO 2291 --- [knowledge-service] [ntainer#3-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : knowledge-service.directory: partitions revoked: [directory.offices-0]
+2026-11-20T06:15:40.613Z  INFO 2291 --- [knowledge-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : knowledge-service.directory: partitions revoked: [directory.users-0]
+2026-11-20T06:15:40.613Z  INFO 2291 --- [knowledge-service] [ntainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : knowledge-service.directory: partitions revoked: [directory.services-0]
+2026-11-20T06:15:40.615Z  INFO 2291 --- [knowledge-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-4, groupId=knowledge-service.directory] Member consumer-knowledge-service.directory-4-97aac4f2-f1f4-45da-bad2-e074cb6839b5 sending LeaveGroup request to coordinator localhost:32869 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:15:40.615Z  INFO 2291 --- [knowledge-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-3, groupId=knowledge-service.directory] Member consumer-knowledge-service.directory-3-a9c111c6-7093-4dad-900e-41baf502e385 sending LeaveGroup request to coordinator localhost:32869 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:15:40.615Z  INFO 2291 --- [knowledge-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-1, groupId=knowledge-service.directory] Member consumer-knowledge-service.directory-1-6bae3be0-5e54-4c2a-b29a-a7ce202fba8d sending LeaveGroup request to coordinator localhost:32869 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:15:40.615Z  INFO 2291 --- [knowledge-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-2, groupId=knowledge-service.directory] Member consumer-knowledge-service.directory-2-c7568067-bf9e-4e8d-ac0c-675185b413bb sending LeaveGroup request to coordinator localhost:32869 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:15:40.616Z  INFO 2291 --- [knowledge-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-4, groupId=knowledge-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:15:40.616Z  INFO 2291 --- [knowledge-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-3, groupId=knowledge-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:15:40.616Z  INFO 2291 --- [knowledge-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-4, groupId=knowledge-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:15:40.616Z  INFO 2291 --- [knowledge-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-3, groupId=knowledge-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:15:40.616Z  INFO 2291 --- [knowledge-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-1, groupId=knowledge-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:15:40.616Z  INFO 2291 --- [knowledge-service] [ntainer#0-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-knowledge-service.directory-3, groupId=knowledge-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:15:40.616Z  INFO 2291 --- [knowledge-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-1, groupId=knowledge-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:15:40.617Z  INFO 2291 --- [knowledge-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-2, groupId=knowledge-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:15:40.617Z  INFO 2291 --- [knowledge-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-2, groupId=knowledge-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:15:40.617Z  INFO 2291 --- [knowledge-service] [ntainer#3-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-knowledge-service.directory-2, groupId=knowledge-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:15:40.616Z  INFO 2291 --- [knowledge-service] [ntainer#1-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-knowledge-service.directory-4, groupId=knowledge-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:15:40.617Z  INFO 2291 --- [knowledge-service] [ntainer#2-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-knowledge-service.directory-1, groupId=knowledge-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:15:40.618Z  INFO 2291 --- [knowledge-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-3, groupId=knowledge-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:15:40.618Z  INFO 2291 --- [knowledge-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-2, groupId=knowledge-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:15:40.619Z  INFO 2291 --- [knowledge-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-2, groupId=knowledge-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:15:40.619Z  INFO 2291 --- [knowledge-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-1, groupId=knowledge-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:15:40.619Z  INFO 2291 --- [knowledge-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-1, groupId=knowledge-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:15:40.619Z  INFO 2291 --- [knowledge-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-4, groupId=knowledge-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:15:40.619Z  INFO 2291 --- [knowledge-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-3, groupId=knowledge-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:15:40.620Z  INFO 2291 --- [knowledge-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-knowledge-service.directory-4, groupId=knowledge-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:15:40.773Z  INFO 2291 --- [knowledge-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:15:40.773Z  INFO 2291 --- [knowledge-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:15:40.773Z  INFO 2291 --- [knowledge-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:15:40.774Z  INFO 2291 --- [knowledge-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:15:40.783Z  INFO 2291 --- [knowledge-service] [ntainer#0-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-knowledge-service.directory-3 unregistered
+2026-11-20T06:15:40.785Z  INFO 2291 --- [knowledge-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : knowledge-service.directory: Consumer stopped
+2026-11-20T06:15:40.794Z  INFO 2291 --- [knowledge-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:15:40.794Z  INFO 2291 --- [knowledge-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:15:40.794Z  INFO 2291 --- [knowledge-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:15:40.794Z  INFO 2291 --- [knowledge-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:15:40.794Z  INFO 2291 --- [knowledge-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:15:40.794Z  INFO 2291 --- [knowledge-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:15:40.794Z  INFO 2291 --- [knowledge-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:15:40.795Z  INFO 2291 --- [knowledge-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:15:40.795Z  INFO 2291 --- [knowledge-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:15:40.795Z  INFO 2291 --- [knowledge-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:15:40.795Z  INFO 2291 --- [knowledge-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:15:40.795Z  INFO 2291 --- [knowledge-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:15:40.812Z  INFO 2291 --- [knowledge-service] [ntainer#1-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-knowledge-service.directory-4 unregistered
+2026-11-20T06:15:40.814Z  INFO 2291 --- [knowledge-service] [ntainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : knowledge-service.directory: Consumer stopped
+2026-11-20T06:15:40.817Z  INFO 2291 --- [knowledge-service] [ntainer#2-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-knowledge-service.directory-1 unregistered
+2026-11-20T06:15:40.818Z  INFO 2291 --- [knowledge-service] [ntainer#3-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-knowledge-service.directory-2 unregistered
+2026-11-20T06:15:40.819Z  INFO 2291 --- [knowledge-service] [ntainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : knowledge-service.directory: Consumer stopped
+2026-11-20T06:15:40.822Z  INFO 2291 --- [knowledge-service] [ntainer#3-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : knowledge-service.directory: Consumer stopped
+2026-11-20T06:15:40.824Z  INFO 2291 --- [knowledge-service] [ionShutdownHook] o.a.k.clients.producer.KafkaProducer     : [Producer clientId=knowledge-service-producer-1] Closing the Kafka producer with timeoutMillis = 30000 ms.
+2026-11-20T06:15:40.835Z  INFO 2291 --- [knowledge-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:15:40.836Z  INFO 2291 --- [knowledge-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:15:40.836Z  INFO 2291 --- [knowledge-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:15:40.836Z  INFO 2291 --- [knowledge-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:15:40.838Z  INFO 2291 --- [knowledge-service] [ionShutdownHook] o.a.kafka.common.utils.AppInfoParser     : App info kafka.producer for knowledge-service-producer-1 unregistered
+2026-11-20T06:15:40.865Z  INFO 2291 --- [knowledge-service] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-20T06:15:40.872Z  INFO 2291 --- [knowledge-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-20T06:15:40.878Z  INFO 2291 --- [knowledge-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+> Task :services:knowledge-service:check
+> Task :services:knowledge-service:build
+> Task :services:notification-service:compileJava
+> Task :services:notification-service:processResources
+> Task :services:notification-service:classes
+> Task :services:notification-service:resolveMainClassName
+> Task :services:notification-service:bootJar
+> Task :services:notification-service:jar
+> Task :services:notification-service:assemble
+> Task :services:notification-service:compileTestJava
+> Task :services:notification-service:processTestResources NO-SOURCE
+> Task :services:notification-service:testClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :services:notification-service:test
+> Task :services:notification-service:compileIntegrationTestJava
+> Task :services:notification-service:processIntegrationTestResources
+> Task :services:notification-service:integrationTestClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :services:notification-service:integrationTest
+
+2026-11-20T06:16:28.077Z  INFO 2606 --- [notification-service] [ntainer#2-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-notification-service.directory-1, groupId=notification-service.directory] Revoke previously assigned partitions [directory.teams-0]
+2026-11-20T06:16:28.077Z  INFO 2606 --- [notification-service] [ntainer#1-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-notification-service.directory-5, groupId=notification-service.directory] Revoke previously assigned partitions [directory.users-0]
+2026-11-20T06:16:28.077Z  INFO 2606 --- [notification-service] [ntainer#4-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-notification-service.directory-3, groupId=notification-service.directory] Revoke previously assigned partitions [directory.offices-0]
+2026-11-20T06:16:28.077Z  INFO 2606 --- [notification-service] [ntainer#0-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-notification-service.events-4, groupId=notification-service.events] Revoke previously assigned partitions [asset.events-0, asset.events-1, asset.events-2, change.events-0, change.events-1, change.events-2, incident.events-0, incident.events-1, incident.events-2, knowledge.events-0, knowledge.events-1, knowledge.events-2, request.events-0, request.events-1, request.events-2]
+2026-11-20T06:16:28.077Z  INFO 2606 --- [notification-service] [ntainer#3-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-notification-service.directory-2, groupId=notification-service.directory] Revoke previously assigned partitions [directory.services-0]
+2026-11-20T06:16:28.077Z  INFO 2606 --- [notification-service] [ntainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : notification-service.directory: partitions revoked: [directory.teams-0]
+2026-11-20T06:16:28.077Z  INFO 2606 --- [notification-service] [ntainer#3-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : notification-service.directory: partitions revoked: [directory.services-0]
+2026-11-20T06:16:28.077Z  INFO 2606 --- [notification-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : notification-service.events: partitions revoked: [asset.events-0, asset.events-1, asset.events-2, change.events-0, change.events-1, change.events-2, incident.events-0, incident.events-1, incident.events-2, knowledge.events-0, knowledge.events-1, knowledge.events-2, request.events-0, request.events-1, request.events-2]
+2026-11-20T06:16:28.077Z  INFO 2606 --- [notification-service] [ntainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : notification-service.directory: partitions revoked: [directory.users-0]
+2026-11-20T06:16:28.078Z  INFO 2606 --- [notification-service] [ntainer#4-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : notification-service.directory: partitions revoked: [directory.offices-0]
+2026-11-20T06:16:28.079Z  INFO 2606 --- [notification-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-5, groupId=notification-service.directory] Member consumer-notification-service.directory-5-fbbeec96-2886-4e1e-9818-34ed2905be43 sending LeaveGroup request to coordinator localhost:32872 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:16:28.079Z  INFO 2606 --- [notification-service] [ntainer#4-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-3, groupId=notification-service.directory] Member consumer-notification-service.directory-3-ef612c2d-9159-4bb7-b5fb-c3ed5ce51fff sending LeaveGroup request to coordinator localhost:32872 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:16:28.079Z  INFO 2606 --- [notification-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-2, groupId=notification-service.directory] Member consumer-notification-service.directory-2-bd7579a5-dd06-466b-a035-b2e8dbb7dac0 sending LeaveGroup request to coordinator localhost:32872 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:16:28.079Z  INFO 2606 --- [notification-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-1, groupId=notification-service.directory] Member consumer-notification-service.directory-1-6bc23f35-0ba7-4f16-b8db-bf7d260798b6 sending LeaveGroup request to coordinator localhost:32872 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:16:28.080Z  INFO 2606 --- [notification-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.events-4, groupId=notification-service.events] Member consumer-notification-service.events-4-d9a6c2e3-af5b-4bb8-a7ce-7223278ae547 sending LeaveGroup request to coordinator localhost:32872 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:16:28.082Z  INFO 2606 --- [notification-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-1, groupId=notification-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.082Z  INFO 2606 --- [notification-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-1, groupId=notification-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.082Z  INFO 2606 --- [notification-service] [ntainer#2-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-notification-service.directory-1, groupId=notification-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:16:28.083Z  INFO 2606 --- [notification-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-2, groupId=notification-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.082Z  INFO 2606 --- [notification-service] [ntainer#4-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-3, groupId=notification-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.083Z  INFO 2606 --- [notification-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-5, groupId=notification-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.083Z  INFO 2606 --- [notification-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-2, groupId=notification-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.083Z  INFO 2606 --- [notification-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-5, groupId=notification-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.083Z  INFO 2606 --- [notification-service] [ntainer#1-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-notification-service.directory-5, groupId=notification-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:16:28.084Z  INFO 2606 --- [notification-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.events-4, groupId=notification-service.events] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.083Z  INFO 2606 --- [notification-service] [ntainer#3-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-notification-service.directory-2, groupId=notification-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:16:28.085Z  INFO 2606 --- [notification-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.events-4, groupId=notification-service.events] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.085Z  INFO 2606 --- [notification-service] [ntainer#0-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-notification-service.events-4, groupId=notification-service.events] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:16:28.085Z  INFO 2606 --- [notification-service] [ntainer#4-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-3, groupId=notification-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.085Z  INFO 2606 --- [notification-service] [ntainer#4-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-notification-service.directory-3, groupId=notification-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:16:28.089Z  INFO 2606 --- [notification-service] [ntainer#4-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-3, groupId=notification-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.089Z  INFO 2606 --- [notification-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-2, groupId=notification-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.089Z  INFO 2606 --- [notification-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-1, groupId=notification-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.089Z  INFO 2606 --- [notification-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.events-4, groupId=notification-service.events] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.089Z  INFO 2606 --- [notification-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-1, groupId=notification-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.089Z  INFO 2606 --- [notification-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.events-4, groupId=notification-service.events] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.089Z  INFO 2606 --- [notification-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-5, groupId=notification-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.089Z  INFO 2606 --- [notification-service] [ntainer#4-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-3, groupId=notification-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.089Z  INFO 2606 --- [notification-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-2, groupId=notification-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.089Z  INFO 2606 --- [notification-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-notification-service.directory-5, groupId=notification-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:16:28.122Z  INFO 2606 --- [notification-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:16:28.123Z  INFO 2606 --- [notification-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:16:28.123Z  INFO 2606 --- [notification-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:16:28.124Z  INFO 2606 --- [notification-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:16:28.131Z  INFO 2606 --- [notification-service] [ntainer#0-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-notification-service.events-4 unregistered
+2026-11-20T06:16:28.132Z  INFO 2606 --- [notification-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : notification-service.events: Consumer stopped
+2026-11-20T06:16:28.189Z  INFO 2606 --- [notification-service] [ntainer#4-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:16:28.189Z  INFO 2606 --- [notification-service] [ntainer#4-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:16:28.190Z  INFO 2606 --- [notification-service] [ntainer#4-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:16:28.190Z  INFO 2606 --- [notification-service] [ntainer#4-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:16:28.193Z  INFO 2606 --- [notification-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:16:28.193Z  INFO 2606 --- [notification-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:16:28.194Z  INFO 2606 --- [notification-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:16:28.194Z  INFO 2606 --- [notification-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:16:28.195Z  INFO 2606 --- [notification-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:16:28.195Z  INFO 2606 --- [notification-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:16:28.195Z  INFO 2606 --- [notification-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:16:28.196Z  INFO 2606 --- [notification-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:16:28.196Z  INFO 2606 --- [notification-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:16:28.196Z  INFO 2606 --- [notification-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:16:28.197Z  INFO 2606 --- [notification-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:16:28.197Z  INFO 2606 --- [notification-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:16:28.204Z  INFO 2606 --- [notification-service] [ntainer#4-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-notification-service.directory-3 unregistered
+2026-11-20T06:16:28.205Z  INFO 2606 --- [notification-service] [ntainer#4-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : notification-service.directory: Consumer stopped
+2026-11-20T06:16:28.209Z  INFO 2606 --- [notification-service] [ntainer#2-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-notification-service.directory-1 unregistered
+2026-11-20T06:16:28.209Z  INFO 2606 --- [notification-service] [ntainer#3-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-notification-service.directory-2 unregistered
+2026-11-20T06:16:28.210Z  INFO 2606 --- [notification-service] [ntainer#1-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-notification-service.directory-5 unregistered
+2026-11-20T06:16:28.211Z  INFO 2606 --- [notification-service] [ntainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : notification-service.directory: Consumer stopped
+2026-11-20T06:16:28.211Z  INFO 2606 --- [notification-service] [ntainer#3-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : notification-service.directory: Consumer stopped
+2026-11-20T06:16:28.213Z  INFO 2606 --- [notification-service] [ntainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : notification-service.directory: Consumer stopped
+2026-11-20T06:16:28.213Z  INFO 2606 --- [notification-service] [ionShutdownHook] o.a.k.clients.producer.KafkaProducer     : [Producer clientId=notification-service-producer-1] Closing the Kafka producer with timeoutMillis = 30000 ms.
+2026-11-20T06:16:28.220Z  INFO 2606 --- [notification-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:16:28.220Z  INFO 2606 --- [notification-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:16:28.220Z  INFO 2606 --- [notification-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:16:28.220Z  INFO 2606 --- [notification-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:16:28.221Z  INFO 2606 --- [notification-service] [ionShutdownHook] o.a.kafka.common.utils.AppInfoParser     : App info kafka.producer for notification-service-producer-1 unregistered
+2026-11-20T06:16:28.233Z  INFO 2606 --- [notification-service] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-20T06:16:28.237Z  INFO 2606 --- [notification-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-20T06:16:28.240Z  INFO 2606 --- [notification-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+> Task :services:notification-service:check
+> Task :services:notification-service:build
+> Task :services:reporting-service:compileJava
+> Task :services:reporting-service:processResources
+> Task :services:reporting-service:classes
+> Task :services:reporting-service:resolveMainClassName
+> Task :services:reporting-service:bootJar
+> Task :services:reporting-service:jar
+> Task :services:reporting-service:assemble
+> Task :services:reporting-service:compileTestJava
+> Task :services:reporting-service:processTestResources NO-SOURCE
+> Task :services:reporting-service:testClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :services:reporting-service:test
+> Task :services:reporting-service:compileIntegrationTestJava
+> Task :services:reporting-service:processIntegrationTestResources
+> Task :services:reporting-service:integrationTestClasses
+> Task :services:reporting-service:integrationTest
+
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-11-20T06:17:09.976Z  INFO 2894 --- [reporting-service] [ntainer#5-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-reporting-service.directory-7, groupId=reporting-service.directory] Revoke previously assigned partitions [directory.users-0]
+2026-11-20T06:17:09.976Z  INFO 2894 --- [reporting-service] [ntainer#8-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-reporting-service.directory-3, groupId=reporting-service.directory] Revoke previously assigned partitions [directory.offices-0]
+2026-11-20T06:17:09.977Z  INFO 2894 --- [reporting-service] [ntainer#3-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-reporting-service.projections-5, groupId=reporting-service.projections] Revoke previously assigned partitions [change.changes-0, change.changes-1, change.changes-2]
+2026-11-20T06:17:09.976Z  INFO 2894 --- [reporting-service] [ntainer#4-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-reporting-service.projections-6, groupId=reporting-service.projections] Revoke previously assigned partitions [asset.assets-0, asset.assets-1, asset.assets-2]
+2026-11-20T06:17:09.976Z  INFO 2894 --- [reporting-service] [ntainer#1-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-reporting-service.projections-9, groupId=reporting-service.projections] Revoke previously assigned partitions [incident.problems-0, incident.problems-1, incident.problems-2]
+2026-11-20T06:17:09.976Z  INFO 2894 --- [reporting-service] [ntainer#6-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-reporting-service.directory-1, groupId=reporting-service.directory] Revoke previously assigned partitions [directory.teams-0]
+2026-11-20T06:17:09.976Z  INFO 2894 --- [reporting-service] [ntainer#0-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-reporting-service.projections-8, groupId=reporting-service.projections] Revoke previously assigned partitions [incident.incidents-0, incident.incidents-1, incident.incidents-2]
+2026-11-20T06:17:09.977Z  INFO 2894 --- [reporting-service] [ntainer#7-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-reporting-service.directory-2, groupId=reporting-service.directory] Revoke previously assigned partitions [directory.services-0]
+2026-11-20T06:17:09.976Z  INFO 2894 --- [reporting-service] [ntainer#2-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-reporting-service.projections-4, groupId=reporting-service.projections] Revoke previously assigned partitions [request.requests-0, request.requests-1, request.requests-2]
+2026-11-20T06:17:09.978Z  INFO 2894 --- [reporting-service] [ntainer#7-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.directory: partitions revoked: [directory.services-0]
+2026-11-20T06:17:09.978Z  INFO 2894 --- [reporting-service] [ntainer#8-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.directory: partitions revoked: [directory.offices-0]
+2026-11-20T06:17:09.978Z  INFO 2894 --- [reporting-service] [ntainer#6-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.directory: partitions revoked: [directory.teams-0]
+2026-11-20T06:17:09.978Z  INFO 2894 --- [reporting-service] [ntainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.projections: partitions revoked: [incident.problems-0, incident.problems-1, incident.problems-2]
+2026-11-20T06:17:09.978Z  INFO 2894 --- [reporting-service] [ntainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.projections: partitions revoked: [request.requests-0, request.requests-1, request.requests-2]
+2026-11-20T06:17:09.978Z  INFO 2894 --- [reporting-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.projections: partitions revoked: [incident.incidents-0, incident.incidents-1, incident.incidents-2]
+2026-11-20T06:17:09.978Z  INFO 2894 --- [reporting-service] [ntainer#4-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.projections: partitions revoked: [asset.assets-0, asset.assets-1, asset.assets-2]
+2026-11-20T06:17:09.978Z  INFO 2894 --- [reporting-service] [ntainer#3-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.projections: partitions revoked: [change.changes-0, change.changes-1, change.changes-2]
+2026-11-20T06:17:09.979Z  INFO 2894 --- [reporting-service] [ntainer#5-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.directory: partitions revoked: [directory.users-0]
+2026-11-20T06:17:09.981Z  INFO 2894 --- [reporting-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-5, groupId=reporting-service.projections] Member consumer-reporting-service.projections-5-dd40c71e-b350-4ef8-acd0-90a6a604e8ca sending LeaveGroup request to coordinator localhost:32875 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:17:09.981Z  INFO 2894 --- [reporting-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-8, groupId=reporting-service.projections] Member consumer-reporting-service.projections-8-8122d1b4-7fdf-4091-840a-3cd9aa2ba237 sending LeaveGroup request to coordinator localhost:32875 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:17:09.981Z  INFO 2894 --- [reporting-service] [ntainer#8-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-3, groupId=reporting-service.directory] Member consumer-reporting-service.directory-3-b8a5058a-a653-4f94-9032-41702896474b sending LeaveGroup request to coordinator localhost:32875 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:17:09.982Z  INFO 2894 --- [reporting-service] [ntainer#7-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-2, groupId=reporting-service.directory] Member consumer-reporting-service.directory-2-a1d4e68a-5456-4411-a8a5-b7e672ff9772 sending LeaveGroup request to coordinator localhost:32875 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:17:09.981Z  INFO 2894 --- [reporting-service] [ntainer#4-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-6, groupId=reporting-service.projections] Member consumer-reporting-service.projections-6-3f57afe1-4db7-43d1-9d9f-3c764fedce83 sending LeaveGroup request to coordinator localhost:32875 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:17:09.981Z  INFO 2894 --- [reporting-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-9, groupId=reporting-service.projections] Member consumer-reporting-service.projections-9-6a1429da-6b58-4ade-81b3-1b3744ee7dfb sending LeaveGroup request to coordinator localhost:32875 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:17:09.982Z  INFO 2894 --- [reporting-service] [ntainer#5-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-7, groupId=reporting-service.directory] Member consumer-reporting-service.directory-7-d2c4634f-7cc3-462d-863b-751d92de1a06 sending LeaveGroup request to coordinator localhost:32875 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:17:09.981Z  INFO 2894 --- [reporting-service] [ntainer#6-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-1, groupId=reporting-service.directory] Member consumer-reporting-service.directory-1-53adc5d6-86b3-4221-bd3d-2c2ad5127b25 sending LeaveGroup request to coordinator localhost:32875 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:17:09.981Z  INFO 2894 --- [reporting-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-4, groupId=reporting-service.projections] Member consumer-reporting-service.projections-4-a5050dc8-7005-43e2-80e8-197e488edb41 sending LeaveGroup request to coordinator localhost:32875 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:17:09.984Z  INFO 2894 --- [reporting-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-5, groupId=reporting-service.projections] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.984Z  INFO 2894 --- [reporting-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-8, groupId=reporting-service.projections] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.984Z  INFO 2894 --- [reporting-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-9, groupId=reporting-service.projections] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.984Z  INFO 2894 --- [reporting-service] [ntainer#7-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-2, groupId=reporting-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.984Z  INFO 2894 --- [reporting-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-9, groupId=reporting-service.projections] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.984Z  INFO 2894 --- [reporting-service] [ntainer#7-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-2, groupId=reporting-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.984Z  INFO 2894 --- [reporting-service] [ntainer#6-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-1, groupId=reporting-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.984Z  INFO 2894 --- [reporting-service] [ntainer#8-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-3, groupId=reporting-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.985Z  INFO 2894 --- [reporting-service] [ntainer#6-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-1, groupId=reporting-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.985Z  INFO 2894 --- [reporting-service] [ntainer#6-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-reporting-service.directory-1, groupId=reporting-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:17:09.984Z  INFO 2894 --- [reporting-service] [ntainer#5-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-7, groupId=reporting-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.984Z  INFO 2894 --- [reporting-service] [ntainer#4-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-6, groupId=reporting-service.projections] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.984Z  INFO 2894 --- [reporting-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-5, groupId=reporting-service.projections] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.985Z  INFO 2894 --- [reporting-service] [ntainer#4-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-6, groupId=reporting-service.projections] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.985Z  INFO 2894 --- [reporting-service] [ntainer#5-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-7, groupId=reporting-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.985Z  INFO 2894 --- [reporting-service] [ntainer#4-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-reporting-service.projections-6, groupId=reporting-service.projections] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:17:09.985Z  INFO 2894 --- [reporting-service] [ntainer#5-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-reporting-service.directory-7, groupId=reporting-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:17:09.984Z  INFO 2894 --- [reporting-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-4, groupId=reporting-service.projections] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.984Z  INFO 2894 --- [reporting-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-8, groupId=reporting-service.projections] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.985Z  INFO 2894 --- [reporting-service] [ntainer#0-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-reporting-service.projections-8, groupId=reporting-service.projections] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:17:09.985Z  INFO 2894 --- [reporting-service] [ntainer#1-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-reporting-service.projections-9, groupId=reporting-service.projections] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:17:09.985Z  INFO 2894 --- [reporting-service] [ntainer#8-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-3, groupId=reporting-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.985Z  INFO 2894 --- [reporting-service] [ntainer#7-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-reporting-service.directory-2, groupId=reporting-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:17:09.989Z  INFO 2894 --- [reporting-service] [ntainer#8-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-reporting-service.directory-3, groupId=reporting-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:17:09.985Z  INFO 2894 --- [reporting-service] [ntainer#3-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-reporting-service.projections-5, groupId=reporting-service.projections] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:17:09.985Z  INFO 2894 --- [reporting-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-4, groupId=reporting-service.projections] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.990Z  INFO 2894 --- [reporting-service] [ntainer#2-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-reporting-service.projections-4, groupId=reporting-service.projections] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:17:09.991Z  INFO 2894 --- [reporting-service] [ntainer#7-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-2, groupId=reporting-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.991Z  INFO 2894 --- [reporting-service] [ntainer#5-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-7, groupId=reporting-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.991Z  INFO 2894 --- [reporting-service] [ntainer#6-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-1, groupId=reporting-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.991Z  INFO 2894 --- [reporting-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-5, groupId=reporting-service.projections] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.991Z  INFO 2894 --- [reporting-service] [ntainer#5-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-7, groupId=reporting-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.991Z  INFO 2894 --- [reporting-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-4, groupId=reporting-service.projections] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.991Z  INFO 2894 --- [reporting-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-9, groupId=reporting-service.projections] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.991Z  INFO 2894 --- [reporting-service] [ntainer#8-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-3, groupId=reporting-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.992Z  INFO 2894 --- [reporting-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-4, groupId=reporting-service.projections] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.991Z  INFO 2894 --- [reporting-service] [ntainer#4-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-6, groupId=reporting-service.projections] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.991Z  INFO 2894 --- [reporting-service] [ntainer#7-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-2, groupId=reporting-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.992Z  INFO 2894 --- [reporting-service] [ntainer#8-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-3, groupId=reporting-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.991Z  INFO 2894 --- [reporting-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-8, groupId=reporting-service.projections] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.992Z  INFO 2894 --- [reporting-service] [ntainer#4-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-6, groupId=reporting-service.projections] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.992Z  INFO 2894 --- [reporting-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-8, groupId=reporting-service.projections] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.992Z  INFO 2894 --- [reporting-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-5, groupId=reporting-service.projections] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.992Z  INFO 2894 --- [reporting-service] [ntainer#6-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.directory-1, groupId=reporting-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:09.992Z  INFO 2894 --- [reporting-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-reporting-service.projections-9, groupId=reporting-service.projections] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:10.195Z  INFO 2894 --- [reporting-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:17:10.195Z  INFO 2894 --- [reporting-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:17:10.195Z  INFO 2894 --- [reporting-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:17:10.196Z  INFO 2894 --- [reporting-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:17:10.196Z  INFO 2894 --- [reporting-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:17:10.196Z  INFO 2894 --- [reporting-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:17:10.196Z  INFO 2894 --- [reporting-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:17:10.196Z  INFO 2894 --- [reporting-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:17:10.205Z  INFO 2894 --- [reporting-service] [ntainer#1-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-reporting-service.projections-9 unregistered
+2026-11-20T06:17:10.206Z  INFO 2894 --- [reporting-service] [ntainer#0-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-reporting-service.projections-8 unregistered
+2026-11-20T06:17:10.207Z  INFO 2894 --- [reporting-service] [ntainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.projections: Consumer stopped
+2026-11-20T06:17:10.207Z  INFO 2894 --- [reporting-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.projections: Consumer stopped
+2026-11-20T06:17:10.243Z  INFO 2894 --- [reporting-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:17:10.243Z  INFO 2894 --- [reporting-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:17:10.243Z  INFO 2894 --- [reporting-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:17:10.243Z  INFO 2894 --- [reporting-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:17:10.243Z  INFO 2894 --- [reporting-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:17:10.244Z  INFO 2894 --- [reporting-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:17:10.244Z  INFO 2894 --- [reporting-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:17:10.244Z  INFO 2894 --- [reporting-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:17:10.251Z  INFO 2894 --- [reporting-service] [ntainer#2-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-reporting-service.projections-4 unregistered
+2026-11-20T06:17:10.252Z  INFO 2894 --- [reporting-service] [ntainer#3-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-reporting-service.projections-5 unregistered
+2026-11-20T06:17:10.252Z  INFO 2894 --- [reporting-service] [ntainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.projections: Consumer stopped
+2026-11-20T06:17:10.254Z  INFO 2894 --- [reporting-service] [ntainer#3-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.projections: Consumer stopped
+2026-11-20T06:17:10.260Z  INFO 2894 --- [reporting-service] [ntainer#8-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:17:10.261Z  INFO 2894 --- [reporting-service] [ntainer#7-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:17:10.261Z  INFO 2894 --- [reporting-service] [ntainer#8-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:17:10.261Z  INFO 2894 --- [reporting-service] [ntainer#7-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:17:10.261Z  INFO 2894 --- [reporting-service] [ntainer#8-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:17:10.261Z  INFO 2894 --- [reporting-service] [ntainer#5-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:17:10.261Z  INFO 2894 --- [reporting-service] [ntainer#8-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:17:10.261Z  INFO 2894 --- [reporting-service] [ntainer#5-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:17:10.262Z  INFO 2894 --- [reporting-service] [ntainer#4-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:17:10.262Z  INFO 2894 --- [reporting-service] [ntainer#6-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:17:10.262Z  INFO 2894 --- [reporting-service] [ntainer#6-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:17:10.262Z  INFO 2894 --- [reporting-service] [ntainer#4-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:17:10.262Z  INFO 2894 --- [reporting-service] [ntainer#6-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:17:10.262Z  INFO 2894 --- [reporting-service] [ntainer#7-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:17:10.262Z  INFO 2894 --- [reporting-service] [ntainer#5-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:17:10.263Z  INFO 2894 --- [reporting-service] [ntainer#6-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:17:10.263Z  INFO 2894 --- [reporting-service] [ntainer#4-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:17:10.263Z  INFO 2894 --- [reporting-service] [ntainer#5-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:17:10.263Z  INFO 2894 --- [reporting-service] [ntainer#7-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:17:10.263Z  INFO 2894 --- [reporting-service] [ntainer#4-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:17:10.286Z  INFO 2894 --- [reporting-service] [ntainer#8-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-reporting-service.directory-3 unregistered
+2026-11-20T06:17:10.289Z  INFO 2894 --- [reporting-service] [ntainer#8-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.directory: Consumer stopped
+2026-11-20T06:17:10.292Z  INFO 2894 --- [reporting-service] [ntainer#4-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-reporting-service.projections-6 unregistered
+2026-11-20T06:17:10.294Z  INFO 2894 --- [reporting-service] [ntainer#7-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-reporting-service.directory-2 unregistered
+2026-11-20T06:17:10.294Z  INFO 2894 --- [reporting-service] [ntainer#4-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.projections: Consumer stopped
+2026-11-20T06:17:10.295Z  INFO 2894 --- [reporting-service] [ntainer#7-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.directory: Consumer stopped
+2026-11-20T06:17:10.295Z  INFO 2894 --- [reporting-service] [ntainer#6-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-reporting-service.directory-1 unregistered
+2026-11-20T06:17:10.296Z  INFO 2894 --- [reporting-service] [ntainer#5-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-reporting-service.directory-7 unregistered
+2026-11-20T06:17:10.296Z  INFO 2894 --- [reporting-service] [ntainer#6-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.directory: Consumer stopped
+2026-11-20T06:17:10.298Z  INFO 2894 --- [reporting-service] [ntainer#5-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : reporting-service.directory: Consumer stopped
+2026-11-20T06:17:10.299Z  INFO 2894 --- [reporting-service] [ionShutdownHook] o.a.k.clients.producer.KafkaProducer     : [Producer clientId=reporting-service-producer-1] Closing the Kafka producer with timeoutMillis = 30000 ms.
+2026-11-20T06:17:10.315Z  INFO 2894 --- [reporting-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:17:10.315Z  INFO 2894 --- [reporting-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:17:10.315Z  INFO 2894 --- [reporting-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:17:10.315Z  INFO 2894 --- [reporting-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:17:10.317Z  INFO 2894 --- [reporting-service] [ionShutdownHook] o.a.kafka.common.utils.AppInfoParser     : App info kafka.producer for reporting-service-producer-1 unregistered
+2026-11-20T06:17:10.337Z  INFO 2894 --- [reporting-service] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-20T06:17:10.346Z  INFO 2894 --- [reporting-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-20T06:17:10.355Z  INFO 2894 --- [reporting-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+> Task :services:reporting-service:check
+> Task :services:reporting-service:build
+> Task :services:request-service:compileJava
+> Task :services:request-service:processResources
+> Task :services:request-service:classes
+> Task :services:request-service:resolveMainClassName
+> Task :services:request-service:bootJar
+> Task :services:request-service:jar
+> Task :services:request-service:assemble
+> Task :services:request-service:compileTestJava
+> Task :services:request-service:processTestResources NO-SOURCE
+> Task :services:request-service:testClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :services:request-service:test
+> Task :services:request-service:compileIntegrationTestJava
+> Task :services:request-service:processIntegrationTestResources
+> Task :services:request-service:integrationTestClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :services:request-service:integrationTest
+
+2026-11-20T06:17:59.769Z  INFO 3197 --- [request-service] [ntainer#2-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-request-service.directory-1, groupId=request-service.directory] Revoke previously assigned partitions [directory.services-0]
+2026-11-20T06:17:59.770Z  INFO 3197 --- [request-service] [ntainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : request-service.directory: partitions revoked: [directory.services-0]
+2026-11-20T06:17:59.769Z  INFO 3197 --- [request-service] [ntainer#0-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-request-service.directory-3, groupId=request-service.directory] Revoke previously assigned partitions [directory.users-0]
+2026-11-20T06:17:59.769Z  INFO 3197 --- [request-service] [ntainer#1-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-request-service.directory-4, groupId=request-service.directory] Revoke previously assigned partitions [directory.teams-0]
+2026-11-20T06:17:59.769Z  INFO 3197 --- [request-service] [ntainer#3-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-request-service.directory-2, groupId=request-service.directory] Revoke previously assigned partitions [directory.offices-0]
+2026-11-20T06:17:59.770Z  INFO 3197 --- [request-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : request-service.directory: partitions revoked: [directory.users-0]
+2026-11-20T06:17:59.770Z  INFO 3197 --- [request-service] [ntainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : request-service.directory: partitions revoked: [directory.teams-0]
+2026-11-20T06:17:59.770Z  INFO 3197 --- [request-service] [ntainer#3-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : request-service.directory: partitions revoked: [directory.offices-0]
+2026-11-20T06:17:59.771Z  INFO 3197 --- [request-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-1, groupId=request-service.directory] Member consumer-request-service.directory-1-9642c540-4f58-49ca-bfac-e873ba44a124 sending LeaveGroup request to coordinator localhost:32878 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:17:59.771Z  INFO 3197 --- [request-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-4, groupId=request-service.directory] Member consumer-request-service.directory-4-395a697b-64c7-483e-8026-516b70db6485 sending LeaveGroup request to coordinator localhost:32878 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:17:59.771Z  INFO 3197 --- [request-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-2, groupId=request-service.directory] Member consumer-request-service.directory-2-3b857a73-ea44-4c88-bb15-cb3de31155b4 sending LeaveGroup request to coordinator localhost:32878 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:17:59.771Z  INFO 3197 --- [request-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-1, groupId=request-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:59.771Z  INFO 3197 --- [request-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-2, groupId=request-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:59.771Z  INFO 3197 --- [request-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-4, groupId=request-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:59.771Z  INFO 3197 --- [request-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-1, groupId=request-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:59.772Z  INFO 3197 --- [request-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-2, groupId=request-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:59.772Z  INFO 3197 --- [request-service] [ntainer#2-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-request-service.directory-1, groupId=request-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:17:59.772Z  INFO 3197 --- [request-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-4, groupId=request-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:59.772Z  INFO 3197 --- [request-service] [ntainer#3-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-request-service.directory-2, groupId=request-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:17:59.772Z  INFO 3197 --- [request-service] [ntainer#1-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-request-service.directory-4, groupId=request-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:17:59.771Z  INFO 3197 --- [request-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-3, groupId=request-service.directory] Member consumer-request-service.directory-3-ce9f0a3f-e94a-40d2-9f67-88faed77a034 sending LeaveGroup request to coordinator localhost:32878 (id: 2147483646 rack: null isFenced: false) due to the consumer unsubscribed from all topics
+2026-11-20T06:17:59.772Z  INFO 3197 --- [request-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-1, groupId=request-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:59.772Z  INFO 3197 --- [request-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-2, groupId=request-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:59.772Z  INFO 3197 --- [request-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-4, groupId=request-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:59.772Z  INFO 3197 --- [request-service] [ntainer#2-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-1, groupId=request-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:59.772Z  INFO 3197 --- [request-service] [ntainer#3-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-2, groupId=request-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:59.772Z  INFO 3197 --- [request-service] [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-4, groupId=request-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:59.773Z  INFO 3197 --- [request-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-3, groupId=request-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:59.773Z  INFO 3197 --- [request-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-3, groupId=request-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:59.773Z  INFO 3197 --- [request-service] [ntainer#0-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-request-service.directory-3, groupId=request-service.directory] Unsubscribed all topics or patterns and assigned partitions
+2026-11-20T06:17:59.774Z  INFO 3197 --- [request-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-3, groupId=request-service.directory] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-11-20T06:17:59.774Z  INFO 3197 --- [request-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-request-service.directory-3, groupId=request-service.directory] Request joining group due to: consumer pro-actively leaving the group
+2026-11-20T06:17:59.942Z  INFO 3197 --- [request-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:17:59.942Z  INFO 3197 --- [request-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:17:59.942Z  INFO 3197 --- [request-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:17:59.942Z  INFO 3197 --- [request-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:17:59.942Z  INFO 3197 --- [request-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:17:59.942Z  INFO 3197 --- [request-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:17:59.942Z  INFO 3197 --- [request-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:17:59.942Z  INFO 3197 --- [request-service] [ntainer#2-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:17:59.942Z  INFO 3197 --- [request-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:17:59.942Z  INFO 3197 --- [request-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:17:59.942Z  INFO 3197 --- [request-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:17:59.942Z  INFO 3197 --- [request-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:17:59.942Z  INFO 3197 --- [request-service] [ntainer#1-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:17:59.942Z  INFO 3197 --- [request-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:17:59.942Z  INFO 3197 --- [request-service] [ntainer#3-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:17:59.942Z  INFO 3197 --- [request-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:17:59.950Z  INFO 3197 --- [request-service] [ntainer#3-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-request-service.directory-2 unregistered
+2026-11-20T06:17:59.950Z  INFO 3197 --- [request-service] [ntainer#2-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-request-service.directory-1 unregistered
+2026-11-20T06:17:59.951Z  INFO 3197 --- [request-service] [ntainer#1-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-request-service.directory-4 unregistered
+2026-11-20T06:17:59.951Z  INFO 3197 --- [request-service] [ntainer#0-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-request-service.directory-3 unregistered
+2026-11-20T06:17:59.951Z  INFO 3197 --- [request-service] [ntainer#2-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : request-service.directory: Consumer stopped
+2026-11-20T06:17:59.951Z  INFO 3197 --- [request-service] [ntainer#3-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : request-service.directory: Consumer stopped
+2026-11-20T06:17:59.952Z  INFO 3197 --- [request-service] [ntainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : request-service.directory: Consumer stopped
+2026-11-20T06:17:59.952Z  INFO 3197 --- [request-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : request-service.directory: Consumer stopped
+2026-11-20T06:17:59.953Z  INFO 3197 --- [request-service] [ionShutdownHook] o.a.k.clients.producer.KafkaProducer     : [Producer clientId=request-service-producer-1] Closing the Kafka producer with timeoutMillis = 30000 ms.
+2026-11-20T06:17:59.955Z  INFO 3197 --- [request-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-11-20T06:17:59.955Z  INFO 3197 --- [request-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-11-20T06:17:59.955Z  INFO 3197 --- [request-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-11-20T06:17:59.955Z  INFO 3197 --- [request-service] [ionShutdownHook] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-11-20T06:17:59.956Z  INFO 3197 --- [request-service] [ionShutdownHook] o.a.kafka.common.utils.AppInfoParser     : App info kafka.producer for request-service-producer-1 unregistered
+2026-11-20T06:17:59.965Z  INFO 3197 --- [request-service] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-20T06:17:59.969Z  INFO 3197 --- [request-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-20T06:17:59.970Z  INFO 3197 --- [request-service] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+> Task :services:request-service:check
+> Task :services:request-service:build
+
+[Incubating] Problems report is available at: file:///workspace/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 13m 47s
+131 actionable tasks: 131 executed
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.9.1/userguide/configuration_cache_enabling.html

@@ -1,0 +1,453 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.9.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Kotlin does not yet support 27 JDK target, falling back to Kotlin JVM_26 JVM target
+> Task :buildSrc:checkKotlinCompilerVersion
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:generateExternalPluginSpecBuilders UP-TO-DATE
+> Task :buildSrc:extractPrecompiledScriptPluginPlugins UP-TO-DATE
+> Task :buildSrc:generateScriptPluginAdapters UP-TO-DATE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:compilePluginsBlocks
+> Task :buildSrc:generatePrecompiledScriptPluginAccessors UP-TO-DATE
+
+> Task :buildSrc:compileKotlin
+Kotlin does not yet support 27 JDK target, falling back to Kotlin JVM_26 JVM target
+w: ⚠️ Inconsistent JVM Target Compatibility Between Java and Kotlin Tasks
+Inconsistent JVM-target compatibility detected for tasks 'compileJava' (27) and 'compileKotlin' (26).
+Solution: Consider using JVM Toolchain: https://kotl.in/gradle/jvm/toolchain
+Learn more about JVM-target validation: https://kotl.in/gradle/jvm/target-validation
+
+
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+> Task :libs:esm-common:compileJava UP-TO-DATE
+> Task :libs:esm-common:processResources UP-TO-DATE
+> Task :libs:esm-common:classes UP-TO-DATE
+> Task :libs:esm-common:jar UP-TO-DATE
+> Task :libs:esm-directory-replica:compileJava
+> Task :libs:esm-directory-replica:processResources
+> Task :libs:esm-directory-replica:classes
+> Task :libs:esm-directory-replica:jar
+> Task :services:request-service:compileJava
+> Task :services:request-service:processResources
+> Task :services:request-service:classes
+> Task :services:request-service:resolveMainClassName
+> Task :services:request-service:bootJar
+> Task :services:request-service:jar
+> Task :services:request-service:assemble
+> Task :libs:esm-test-support:compileJava
+> Task :libs:esm-test-support:processResources
+> Task :libs:esm-test-support:classes
+> Task :libs:esm-test-support:jar
+> Task :services:request-service:compileTestJava
+> Task :services:request-service:processTestResources NO-SOURCE
+> Task :services:request-service:testClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :services:request-service:test
+
+> Task :services:request-service:compileIntegrationTestJava FAILED
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:72: error: method status in class RequestServiceIT cannot be applied to given types;
+                .andExpect(status().isCreated()).andReturn();
+                           ^
+  required: String,long,String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:80: error: method status in class RequestServiceIT cannot be applied to given types;
+        return json.readTree(mvc.perform(b).andExpect(status().isCreated()).andReturn().getResponse().getContentAsString());
+                                                      ^
+  required: String,long,String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:84: error: method get in class RequestServiceIT cannot be applied to given types;
+        return json.readTree(mvc.perform(get(path).header("Authorization", token)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+                                         ^
+  required: String,String
+  found:    String
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:84: error: method status in class RequestServiceIT cannot be applied to given types;
+        return json.readTree(mvc.perform(get(path).header("Authorization", token)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+                                                                                             ^
+  required: String,long,String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:90: error: method status in class RequestServiceIT cannot be applied to given types;
+                .andExpect(status().is(expected));
+                           ^
+  required: String,long,String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:95: error: method status in class RequestServiceIT cannot be applied to given types;
+                .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"" + to + "\"}")).andExpect(status().is(expected));
+                                                                                                           ^
+  required: String,long,String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:106: error: method status in class RequestServiceIT cannot be applied to given types;
+                .content("{\"serviceId\":1,\"name\":\"Nope item\"}")).andExpect(status().isForbidden());
+                                                                                ^
+  required: String,long,String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:108: error: method status in class RequestServiceIT cannot be applied to given types;
+                .content("{\"serviceId\":1,\"name\":\"Bad\",\"steps\":[{\"stepOrder\":1,\"approverType\":\"ROLE\"}]}")).andExpect(status().isUnprocessableContent());
+                                                                                                                                  ^
+  required: String,long,String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:112: error: method status in class RequestServiceIT cannot be applied to given types;
+                .andExpect(status().isOk()).andExpect(jsonPath("$.steps.length()").value(1)).andExpect(jsonPath("$.name").value("Dock request v2"));
+                           ^
+  required: String,long,String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:113: error: method get in class RequestServiceIT cannot be applied to given types;
+        mvc.perform(get("/api/v1/catalogue").header("Authorization", oscar)).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(0));
+                    ^
+  required: String,String
+  found:    String
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:113: error: method status in class RequestServiceIT cannot be applied to given types;
+        mvc.perform(get("/api/v1/catalogue").header("Authorization", oscar)).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(0));
+                                                                                       ^
+  required: String,long,String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:198: error: method get in class RequestServiceIT cannot be applied to given types;
+        mvc.perform(get("/api/v1/requests/" + id).header("Authorization", oscar)).andExpect(status().isNotFound());
+                    ^
+  required: String,String
+  found:    String
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:198: error: method status in class RequestServiceIT cannot be applied to given types;
+        mvc.perform(get("/api/v1/requests/" + id).header("Authorization", oscar)).andExpect(status().isNotFound());
+                                                                                            ^
+  required: String,long,String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:202: error: method status in class RequestServiceIT cannot be applied to given types;
+                .content("{\"itemId\":" + cheapItem + "}")).andExpect(status().isNotFound());
+                                                                      ^
+  required: String,long,String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:204: error: method status in class RequestServiceIT cannot be applied to given types;
+                .content("{\"serviceId\":1,\"name\":\"Hijack\"}")).andExpect(status().isForbidden());
+                                                                             ^
+  required: String,long,String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:213: error: method get in class RequestServiceIT cannot be applied to given types;
+        mvc.perform(get("/api/v1/requests/" + id).header("Authorization", tina)).andExpect(status().isNotFound());
+                    ^
+  required: String,String
+  found:    String
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:213: error: method status in class RequestServiceIT cannot be applied to given types;
+        mvc.perform(get("/api/v1/requests/" + id).header("Authorization", tina)).andExpect(status().isNotFound());
+                                                                                           ^
+  required: String,long,String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:214: error: method get in class RequestServiceIT cannot be applied to given types;
+        mvc.perform(get("/api/v1/requests?size=500").header("Authorization", eve)).andExpect(status().isUnprocessableContent());
+                    ^
+  required: String,String
+  found:    String
+  reason: actual and formal argument lists differ in length
+/workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:214: error: method status in class RequestServiceIT cannot be applied to given types;
+        mvc.perform(get("/api/v1/requests?size=500").header("Authorization", eve)).andExpect(status().isUnprocessableContent());
+                                                                                             ^
+  required: String,long,String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+19 errors
+
+> Task :services:request-service:processIntegrationTestResources
+> Task :services:asset-service:compileJava
+> Task :services:asset-service:processResources
+> Task :services:asset-service:classes
+> Task :services:asset-service:resolveMainClassName
+> Task :services:asset-service:bootJar
+> Task :services:asset-service:jar
+> Task :services:asset-service:assemble
+> Task :services:asset-service:compileTestJava
+> Task :services:asset-service:processTestResources NO-SOURCE
+> Task :services:asset-service:testClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :services:asset-service:test
+
+> Task :services:asset-service:compileIntegrationTestJava FAILED
+/workspace/services/asset-service/src/integrationTest/java/com/esmhub/asset/service/AssetServiceIT.java:67: error: method post in class AssetServiceIT cannot be applied to given types;
+        return call(post("/api/v1/assets").header("Authorization", token).contentType(MediaType.APPLICATION_JSON)
+                    ^
+  required: String,String,String,int
+  found:    String
+  reason: actual and formal argument lists differ in length
+/workspace/services/asset-service/src/integrationTest/java/com/esmhub/asset/service/AssetServiceIT.java:164: error: method post in class AssetServiceIT cannot be applied to given types;
+        long phone = call(post("/api/v1/assets").header("Authorization", manager).contentType(MediaType.APPLICATION_JSON)
+                          ^
+  required: String,String,String,int
+  found:    String
+  reason: actual and formal argument lists differ in length
+2 errors
+
+> Task :services:asset-service:processIntegrationTestResources
+> Task :services:knowledge-service:compileJava
+> Task :services:knowledge-service:processResources
+> Task :services:knowledge-service:classes
+> Task :services:knowledge-service:resolveMainClassName
+> Task :services:knowledge-service:bootJar
+> Task :services:knowledge-service:jar
+> Task :services:knowledge-service:assemble
+> Task :services:knowledge-service:compileTestJava
+> Task :services:knowledge-service:processTestResources NO-SOURCE
+> Task :services:knowledge-service:testClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :services:knowledge-service:test
+
+> Task :services:knowledge-service:compileIntegrationTestJava FAILED
+/workspace/services/knowledge-service/src/integrationTest/java/com/esmhub/knowledge/service/KnowledgeServiceIT.java:59: error: method status in class KnowledgeServiceIT cannot be applied to given types;
+        String body = mvc.perform(rb).andExpect(status().is(status)).andReturn().getResponse().getContentAsString();
+                                                ^
+  required: String,long,String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+/workspace/services/knowledge-service/src/integrationTest/java/com/esmhub/knowledge/service/KnowledgeServiceIT.java:152: error: method status in class KnowledgeServiceIT cannot be applied to given types;
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/kb/articles")).andExpect(status().isUnauthorized());
+                                                                                 ^
+  required: String,long,String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+2 errors
+
+> Task :services:knowledge-service:processIntegrationTestResources
+> Task :services:notification-service:compileJava
+> Task :services:notification-service:processResources
+> Task :services:notification-service:classes
+> Task :services:notification-service:resolveMainClassName
+> Task :services:notification-service:bootJar
+> Task :services:notification-service:jar
+> Task :services:notification-service:assemble
+> Task :services:notification-service:compileTestJava
+> Task :services:notification-service:processTestResources NO-SOURCE
+> Task :services:notification-service:testClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :services:notification-service:test
+> Task :services:notification-service:compileIntegrationTestJava
+> Task :services:notification-service:processIntegrationTestResources
+> Task :services:notification-service:integrationTestClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by com.sun.jna.Native in an unnamed module (file:/cache/caches/modules-2/files-2.1/net.java.dev.jna/jna/5.18.1/b27ba04287cc4abe769642fe8318d39fc89bf937/jna-5.18.1.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+> Task :services:notification-service:integrationTest
+
+NotificationServiceIT > initializationError FAILED
+    java.lang.IllegalStateException at DefaultCacheAwareContextLoaderDelegate.java:195
+        Caused by: org.springframework.beans.factory.BeanCreationException at ConstructorResolver.java:657
+            Caused by: org.springframework.beans.BeanInstantiationException at SimpleInstantiationStrategy.java:183
+                Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException at ConstructorResolver.java:804
+                    Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException at ConstructorResolver.java:804
+                        Caused by: org.springframework.beans.factory.BeanCreationException at ConstructorResolver.java:657
+                            Caused by: org.springframework.beans.BeanInstantiationException at SimpleInstantiationStrategy.java:183
+                                Caused by: java.lang.IllegalArgumentException at Assert.java:475
+
+1 test completed, 1 failed
+
+> Task :services:notification-service:integrationTest FAILED
+
+FAILURE: Build completed with 4 failures.
+
+[Incubating] Problems report is available at: file:///workspace/build/reports/problems/problems-report.html
+
+1: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':services:request-service:compileIntegrationTestJava' (registered by plugin class 'org.gradle.api.plugins.JavaBasePlugin').
+> Compilation failed; see the compiler output below.
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:72: error: method status in class RequestServiceIT cannot be applied to given types;
+                  .andExpect(status().isCreated()).andReturn();
+                             ^
+    required: String,long,String,int
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:80: error: method status in class RequestServiceIT cannot be applied to given types;
+          return json.readTree(mvc.perform(b).andExpect(status().isCreated()).andReturn().getResponse().getContentAsString());
+                                                        ^
+    required: String,long,String,int
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:84: error: method get in class RequestServiceIT cannot be applied to given types;
+          return json.readTree(mvc.perform(get(path).header("Authorization", token)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+                                           ^
+    required: String,String
+    found:    String
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:84: error: method status in class RequestServiceIT cannot be applied to given types;
+          return json.readTree(mvc.perform(get(path).header("Authorization", token)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+                                                                                               ^
+    required: String,long,String,int
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:90: error: method status in class RequestServiceIT cannot be applied to given types;
+                  .andExpect(status().is(expected));
+                             ^
+    required: String,long,String,int
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:95: error: method status in class RequestServiceIT cannot be applied to given types;
+                  .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"" + to + "\"}")).andExpect(status().is(expected));
+                                                                                                             ^
+    required: String,long,String,int
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:106: error: method status in class RequestServiceIT cannot be applied to given types;
+                  .content("{\"serviceId\":1,\"name\":\"Nope item\"}")).andExpect(status().isForbidden());
+                                                                                  ^
+    required: String,long,String,int
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:108: error: method status in class RequestServiceIT cannot be applied to given types;
+                  .content("{\"serviceId\":1,\"name\":\"Bad\",\"steps\":[{\"stepOrder\":1,\"approverType\":\"ROLE\"}]}")).andExpect(status().isUnprocessableContent());
+                                                                                                                                    ^
+    required: String,long,String,int
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:112: error: method status in class RequestServiceIT cannot be applied to given types;
+                  .andExpect(status().isOk()).andExpect(jsonPath("$.steps.length()").value(1)).andExpect(jsonPath("$.name").value("Dock request v2"));
+                             ^
+    required: String,long,String,int
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:113: error: method get in class RequestServiceIT cannot be applied to given types;
+          mvc.perform(get("/api/v1/catalogue").header("Authorization", oscar)).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(0));
+                      ^
+    required: String,String
+    found:    String
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:113: error: method status in class RequestServiceIT cannot be applied to given types;
+          mvc.perform(get("/api/v1/catalogue").header("Authorization", oscar)).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(0));
+                                                                                         ^
+    required: String,long,String,int
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:198: error: method get in class RequestServiceIT cannot be applied to given types;
+          mvc.perform(get("/api/v1/requests/" + id).header("Authorization", oscar)).andExpect(status().isNotFound());
+                      ^
+    required: String,String
+    found:    String
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:198: error: method status in class RequestServiceIT cannot be applied to given types;
+          mvc.perform(get("/api/v1/requests/" + id).header("Authorization", oscar)).andExpect(status().isNotFound());
+                                                                                              ^
+    required: String,long,String,int
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:202: error: method status in class RequestServiceIT cannot be applied to given types;
+                  .content("{\"itemId\":" + cheapItem + "}")).andExpect(status().isNotFound());
+                                                                        ^
+    required: String,long,String,int
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:204: error: method status in class RequestServiceIT cannot be applied to given types;
+                  .content("{\"serviceId\":1,\"name\":\"Hijack\"}")).andExpect(status().isForbidden());
+                                                                               ^
+    required: String,long,String,int
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:213: error: method get in class RequestServiceIT cannot be applied to given types;
+          mvc.perform(get("/api/v1/requests/" + id).header("Authorization", tina)).andExpect(status().isNotFound());
+                      ^
+    required: String,String
+    found:    String
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:213: error: method status in class RequestServiceIT cannot be applied to given types;
+          mvc.perform(get("/api/v1/requests/" + id).header("Authorization", tina)).andExpect(status().isNotFound());
+                                                                                             ^
+    required: String,long,String,int
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:214: error: method get in class RequestServiceIT cannot be applied to given types;
+          mvc.perform(get("/api/v1/requests?size=500").header("Authorization", eve)).andExpect(status().isUnprocessableContent());
+                      ^
+    required: String,String
+    found:    String
+    reason: actual and formal argument lists differ in length
+  /workspace/services/request-service/src/integrationTest/java/com/esmhub/request/service/RequestServiceIT.java:214: error: method status in class RequestServiceIT cannot be applied to given types;
+          mvc.perform(get("/api/v1/requests?size=500").header("Authorization", eve)).andExpect(status().isUnprocessableContent());
+                                                                                               ^
+    required: String,long,String,int
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  19 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+==============================================================================
+
+2: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':services:asset-service:compileIntegrationTestJava' (registered by plugin class 'org.gradle.api.plugins.JavaBasePlugin').
+> Compilation failed; see the compiler output below.
+  /workspace/services/asset-service/src/integrationTest/java/com/esmhub/asset/service/AssetServiceIT.java:67: error: method post in class AssetServiceIT cannot be applied to given types;
+          return call(post("/api/v1/assets").header("Authorization", token).contentType(MediaType.APPLICATION_JSON)
+                      ^
+    required: String,String,String,int
+    found:    String
+    reason: actual and formal argument lists differ in length
+  /workspace/services/asset-service/src/integrationTest/java/com/esmhub/asset/service/AssetServiceIT.java:164: error: method post in class AssetServiceIT cannot be applied to given types;
+          long phone = call(post("/api/v1/assets").header("Authorization", manager).contentType(MediaType.APPLICATION_JSON)
+                            ^
+    required: String,String,String,int
+    found:    String
+    reason: actual and formal argument lists differ in length
+  2 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+==============================================================================
+
+3: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':services:knowledge-service:compileIntegrationTestJava' (registered by plugin class 'org.gradle.api.plugins.JavaBasePlugin').
+> Compilation failed; see the compiler output below.
+  /workspace/services/knowledge-service/src/integrationTest/java/com/esmhub/knowledge/service/KnowledgeServiceIT.java:59: error: method status in class KnowledgeServiceIT cannot be applied to given types;
+          String body = mvc.perform(rb).andExpect(status().is(status)).andReturn().getResponse().getContentAsString();
+                                                  ^
+    required: String,long,String,int
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  /workspace/services/knowledge-service/src/integrationTest/java/com/esmhub/knowledge/service/KnowledgeServiceIT.java:152: error: method status in class KnowledgeServiceIT cannot be applied to given types;
+          mvc.perform(MockMvcRequestBuilders.get("/api/v1/kb/articles")).andExpect(status().isUnauthorized());
+                                                                                   ^
+    required: String,long,String,int
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  2 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+==============================================================================
+
+4: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':services:notification-service:integrationTest'.
+> There were failing tests. See the report at: file:///workspace/services/notification-service/build/reports/tests/integrationTest/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+==============================================================================
+
+BUILD FAILED in 1m 54s
+56 actionable tasks: 46 executed, 10 up-to-date

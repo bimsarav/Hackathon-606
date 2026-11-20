@@ -1,0 +1,104 @@
+Unable to find image 'mcr.microsoft.com/playwright:v1.49.1-noble' locally
+v1.49.1-noble: Pulling from playwright
+54609b48ebc1: Pulling fs layer
+92dabfba1e59: Pulling fs layer
+24af91d9ea45: Pulling fs layer
+5fc6e5135115: Pulling fs layer
+5fc6e5135115: Waiting
+24af91d9ea45: Verifying Checksum
+24af91d9ea45: Download complete
+54609b48ebc1: Verifying Checksum
+54609b48ebc1: Download complete
+54609b48ebc1: Pull complete
+92dabfba1e59: Verifying Checksum
+92dabfba1e59: Download complete
+92dabfba1e59: Pull complete
+24af91d9ea45: Pull complete
+5fc6e5135115: Verifying Checksum
+5fc6e5135115: Download complete
+5fc6e5135115: Pull complete
+Digest: sha256:70e367e0cbf60340a5b5fd562f6247a34eb3196efab9f88a3dd56482d9fe09d2
+Status: Downloaded newer image for mcr.microsoft.com/playwright:v1.49.1-noble
+
+Running 6 tests using 1 worker
+
+  ✓  1 [chromium] › audit.spec.ts:4:1 › an auditor views the audit log (1.5s)
+  ✘  2 [chromium] › incident-lifecycle.spec.ts:4:1 › employee raises an incident, agent assigns it, technician resolves it, employee sees it resolved (1.9s)
+  ✓  3 [chromium] › knowledge.spec.ts:4:1 › KB search and read (2.3s)
+  ✓  4 [chromium] › rbac.spec.ts:4:1 › an employee cannot see the admin navigation (1.4s)
+  ✓  5 [chromium] › rbac.spec.ts:18:1 › an admin sees the admin navigation (1.2s)
+  ✘  6 [chromium] › request-approval.spec.ts:4:1 › a catalogue request is submitted and the manager approves it (2.8s)
+
+
+  1) [chromium] › incident-lifecycle.spec.ts:4:1 › employee raises an incident, agent assigns it, technician resolves it, employee sees it resolved 
+
+    Error: locator.click: Error: strict mode violation: getByRole('link', { name: 'Incidents' }) resolved to 2 elements:
+        1) <a class="" href="/incidents" data-discover="true">Incidents</a> aka getByRole('link', { name: 'Incidents', exact: true })
+        2) <a href="/incidents" data-discover="true">All my incidents</a> aka getByRole('link', { name: 'All my incidents' })
+
+    Call log:
+    [2m  - waiting for getByRole('link', { name: 'Incidents' })[22m
+
+
+       9 |   // Employee raises the incident
+      10 |   await signIn(page, USERS.employee);
+    > 11 |   await page.getByRole('link', { name: 'Incidents' }).click();
+         |                                                       ^
+      12 |   await page.getByRole('link', { name: 'New incident' }).click();
+      13 |   await page.getByLabel('Title').fill(title);
+      14 |   await page.getByLabel('Description').fill('The third floor printer keeps jamming on every job.');
+        at /work/tests/incident-lifecycle.spec.ts:11:55
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/incident-lifecycle-employe-616fe-t-employee-sees-it-resolved-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/incident-lifecycle-employe-616fe-t-employee-sees-it-resolved-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/incident-lifecycle-employe-616fe-t-employee-sees-it-resolved-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › request-approval.spec.ts:4:1 › a catalogue request is submitted and the manager approves it 
+
+    Error: locator.click: Error: strict mode violation: getByRole('link', { name: 'Approvals' }) resolved to 2 elements:
+        1) <a class="" href="/approvals" data-discover="true">Approvals</a> aka getByRole('link', { name: 'Approvals', exact: true })
+        2) <a href="/approvals" data-discover="true">Open approvals inbox</a> aka getByRole('link', { name: 'Open approvals inbox' })
+
+    Call log:
+    [2m  - waiting for getByRole('link', { name: 'Approvals' })[22m
+
+
+      16 |
+      17 |   await signIn(page, USERS.manager);
+    > 18 |   await page.getByRole('link', { name: 'Approvals' }).click();
+         |                                                       ^
+      19 |   const row = page.getByTestId('approval-row').filter({ hasText: title });
+      20 |   await expect(row).toBeVisible();
+      21 |   await row.getByRole('button', { name: /^Approve/ }).click();
+        at /work/tests/request-approval.spec.ts:18:55
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/request-approval-a-catalog-8722d-and-the-manager-approves-it-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/request-approval-a-catalog-8722d-and-the-manager-approves-it-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/request-approval-a-catalog-8722d-and-the-manager-approves-it-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › incident-lifecycle.spec.ts:4:1 › employee raises an incident, agent assigns it, technician resolves it, employee sees it resolved 
+    [chromium] › request-approval.spec.ts:4:1 › a catalogue request is submitted and the manager approves it 
+  4 passed (12.5s)
+npm notice
+npm notice New major version of npm available! 10.9.0 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+EXIT 1

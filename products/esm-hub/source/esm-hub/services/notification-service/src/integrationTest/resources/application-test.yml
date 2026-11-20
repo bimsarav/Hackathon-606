@@ -6,3 +6,4 @@ esm:
   notification:
     max-attempts: 3
     sender-enabled: false
+management.health.mail.enabled: false

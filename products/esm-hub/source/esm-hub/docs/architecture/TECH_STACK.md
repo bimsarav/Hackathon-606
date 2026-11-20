@@ -34,6 +34,12 @@ This document follows the organisation's Technology Stack & Engineering Standard
 | Packaging/deploy | Docker images (`eclipse-temurin:27-jre`, non-root), Docker Compose, GitHub Actions | §11. Kubernetes is **not** used because Compose is enough for the stated scale (§19) |
 | Email (local) | Mailpit | SMTP sink with a UI for demo and testing only |
 
+## 2a. Data engineering assessment (§22.3)
+**No separate data engineering platform is required.** The data needs are covered inside the application stack:
+- Cross-domain reporting (FR-13) uses a CQRS read model: reporting-service consumes the Kafka state topics into its own PostgreSQL projections and computes KPIs in SQL ([ADR-0007](adr/0007-cqrs-reporting.md)). The volume is moderate and near-real-time is enough, so no warehouse, stream processor or orchestrator is needed.
+- The legacy dump is a one-off import, repaired and turned into per-service seed migrations ([ADR-0008](adr/0008-legacy-seed.md)), not a recurring pipeline. Data-quality findings: [data-quality-report.md](../data/data-quality-report.md).
+- Revisit this if the PO asks for historical analytics across years, external BI tools on raw data, or continuous sync with other systems. That would trigger §22.3 (likely batch ELT into an analytical store).
+
 ## 3. Deviations from the standard, recorded openly
 | Standard | Deviation | Reason and mitigation |
 |---|---|---|

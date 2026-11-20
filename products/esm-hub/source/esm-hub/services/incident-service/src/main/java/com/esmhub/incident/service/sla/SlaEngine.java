@@ -57,7 +57,10 @@ public final class SlaEngine {
     private static ZonedDateTime[] window(Calendar cal, LocalDate day) {
         WorkingHours h = cal.hours().get(day.getDayOfWeek());
         if (h == null || cal.holidays().contains(day)) return null;
-        return new ZonedDateTime[] {ZonedDateTime.of(day, h.start(), cal.zone()), ZonedDateTime.of(day, h.end(), cal.zone())};
+        // LocalTime.MAX means "until midnight": using the next midnight keeps consecutive days gap-free (24/7 calendar)
+        ZonedDateTime end = LocalTime.MAX.equals(h.end()) ? ZonedDateTime.of(day.plusDays(1), LocalTime.MIDNIGHT, cal.zone())
+                : ZonedDateTime.of(day, h.end(), cal.zone());
+        return new ZonedDateTime[] {ZonedDateTime.of(day, h.start(), cal.zone()), end};
     }
 
     /** The instant {@code minutes} working minutes after {@code start}. */
