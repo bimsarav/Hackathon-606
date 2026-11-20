@@ -3,10 +3,13 @@ import { api, errorText, type Meta, type Scenario, type ScenarioSummary, type Se
 import { CancelView } from "./CancelView";
 import { DelayView } from "./DelayView";
 import { Launcher } from "./Launcher";
+import { WatchlistView } from "./WatchlistView";
 import { utc } from "./format";
 
 const STORAGE_KEY = "disruption-advisor-session";
 const OPEN_KEY = "disruption-advisor-open-scenario";
+const VIEW_KEY = "disruption-advisor-view";
+type View = "scenario" | "watchlist";
 
 function remember(key: string, value: string | null) {
   try {
@@ -118,6 +121,14 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const [history, setHistory] = useState<ScenarioSummary[]>([]);
   const [load, setLoad] = useState<Load>({ kind: "idle" });
+  const [view, setView] = useState<View>(() => {
+    try {
+      return sessionStorage.getItem(VIEW_KEY) === "watchlist" ? "watchlist" : "scenario";
+    } catch {
+      return "scenario";
+    }
+  });
+  useEffect(() => remember(VIEW_KEY, view), [view]);
 
   const refreshHistory = useCallback(() => {
     api.scenarios().then(setHistory).catch(() => setHistory([]));
@@ -150,6 +161,7 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
   useEffect(() => remember(OPEN_KEY, scenario?.id ?? null), [scenario?.id]);
 
   async function run(label: string, action: () => Promise<Scenario>) {
+    setView("scenario");
     setLoad({ kind: "busy", label });
     try {
       const s = await action();
@@ -231,13 +243,33 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
           </section>
         </aside>
         <main id="main" aria-live="polite" aria-busy={load.kind === "busy"}>
-          {load.kind === "busy" && <p className="status">{load.label}</p>}
-          {load.kind === "error" && (
+          <nav className="tabs view-tabs" aria-label="Views">
+            <button type="button" className={`tab ${view === "scenario" ? "active" : ""}`} aria-pressed={view === "scenario"}
+              onClick={() => setView("scenario")}>
+              Scenario
+            </button>
+            <button type="button" className={`tab ${view === "watchlist" ? "active" : ""}`} aria-pressed={view === "watchlist"}
+              onClick={() => setView("watchlist")}>
+              Delay watchlist (7 days)
+            </button>
+          </nav>
+          {view === "watchlist" && meta && (
+            <WatchlistView
+              busy={load.kind === "busy"}
+              onAnalyse={(flightId, delay) =>
+                run(`Analysing a ${delay}-minute delay…`, () =>
+                  api.createScenario({ kind: "DELAY", flight_id: flightId, delay_minutes: delay, weights: meta.default_weights }),
+                )
+              }
+            />
+          )}
+          {view === "scenario" && load.kind === "busy" && <p className="status">{load.label}</p>}
+          {view === "scenario" && load.kind === "error" && (
             <p className="error" role="alert">
               {load.message}
             </p>
           )}
-          {!scenario && load.kind !== "busy" && (
+          {view === "scenario" && !scenario && load.kind !== "busy" && (
             <section className="empty">
               <h1>Start with a disruption</h1>
               <p>
@@ -248,10 +280,10 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
               <p className="muted">Every recommendation needs a person to approve it. Nothing is changed in airline systems.</p>
             </section>
           )}
-          {scenario && meta && scenario.result.type === "DELAY" && (
+          {view === "scenario" && scenario && meta && scenario.result.type === "DELAY" && (
             <DelayView scenario={scenario} result={scenario.result} meta={meta} onUpdate={setScenario} />
           )}
-          {scenario && meta && scenario.result.type === "CANCEL" && (
+          {view === "scenario" && scenario && meta && scenario.result.type === "CANCEL" && (
             <CancelView scenario={scenario} result={scenario.result} meta={meta} onUpdate={setScenario} />
           )}
         </main>

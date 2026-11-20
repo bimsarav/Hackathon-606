@@ -230,6 +230,78 @@ export interface Decision {
   decided_at: string;
 }
 
+// --- Phase 2: delay risk (app/risk.py, app/ml/delay_risk.py) ---
+export interface RiskReason {
+  feature: string;
+  text: string;
+  contribution: number;
+}
+
+export interface RiskFlight {
+  flight_id: string;
+  flight_number: string;
+  origin: string;
+  destination: string;
+  std: string;
+  sta: string;
+  tail: string | null;
+  aircraft_model: string | null;
+  p_15: number;
+  p_30: number;
+  p_60: number;
+  p_120: number;
+  planning_delay_minutes: number | null;
+  risk_band: "low" | "medium" | "high";
+  reasons: RiskReason[];
+  connecting_pax: number;
+  expected_misconnects: number;
+}
+
+export interface Watchlist {
+  from_utc: string;
+  days: number;
+  band: string;
+  totals: { flights: number; high: number; medium: number; expected_misconnects: number | null };
+  flights: RiskFlight[];
+}
+
+export interface ConnectionRisk {
+  pnr: string;
+  passenger_id: string | null;
+  outbound_flight_id: string;
+  outbound_flight_number: string;
+  hub: string;
+  final_destination: string;
+  connection_minutes: number;
+  mct_minutes: number;
+  default_mct: boolean;
+  slack_minutes: number;
+  misconnect_risk: number;
+}
+
+export interface ModelMetrics {
+  observed_rate: number;
+  auc: number | null;
+  brier: number;
+  baseline_auc?: number | null;
+  baseline_brier?: number;
+  climatology_brier: number;
+}
+
+export interface ModelCard {
+  model: string;
+  trained_at: string;
+  thresholds_minutes: number[];
+  features: string[];
+  evaluation: {
+    train: string;
+    test: string;
+    metrics_by_threshold: Record<string, ModelMetrics>;
+    connection_backtest: { slack: string; pairs: number; predicted: number; observed: number }[];
+  };
+  assumptions: string[];
+}
+
 let token: string | null = null;
 export const setToken = (value: string | null): void => {
   token = value;
@@ -271,6 +343,11 @@ export const api = {
   decisions: (id: string) => request<Decision[]>(`/api/v1/scenarios/${id}/decisions`),
   decide: (id: string, target: string, action: "APPROVE" | "REJECT", comment = "") =>
     post<Decision>(`/api/v1/scenarios/${id}/decisions`, { target, action, comment }),
+  watchlist: (band: "all" | "medium" | "high", sort: "misconnects" | "delay") =>
+    request<Watchlist>(`/api/v1/risk/watchlist?days=7&band=${band}&sort=${sort}&limit=60`),
+  flightRisk: (flightId: string) =>
+    request<{ flight: RiskFlight; connections: ConnectionRisk[] }>(`/api/v1/risk/flights/${encodeURIComponent(flightId)}?limit=30`),
+  modelCard: () => request<ModelCard>("/api/v1/risk/model"),
   message: (id: string, customerKey: string) =>
     post<{ text: string; source: string }>(`/api/v1/scenarios/${id}/messages`, { customer_key: customerKey }),
 };

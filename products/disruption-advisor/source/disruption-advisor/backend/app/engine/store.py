@@ -16,6 +16,7 @@ from typing import Any
 import duckdb
 
 TABLES = ("flights", "pax_segments", "customers", "aircraft", "mct", "airports", "booking_classes")
+RISK_TABLES = ("flight_risk", "connection_risk")  # phase 2 (ingest stage 3); optional so older data still loads
 
 
 @dataclass(frozen=True)
@@ -60,6 +61,13 @@ class OpsStore:
             self._con.execute(f"CREATE TABLE {table} AS SELECT * FROM read_parquet('{ops_dir / table}.parquet')")
         self._con.execute("CREATE INDEX idx_pax_flight ON pax_segments (flight_id)")
         self._con.execute("CREATE INDEX idx_pax_pnr ON pax_segments (pnr)")
+        self.has_risk = all((ops_dir / f"{t}.parquet").exists() for t in RISK_TABLES)
+        if self.has_risk:
+            for table in RISK_TABLES:
+                self._con.execute(f"CREATE TABLE {table} AS SELECT * FROM read_parquet('{ops_dir / table}.parquet')")
+            self._con.execute("CREATE INDEX idx_conn_in ON connection_risk (inbound_flight_id)")
+        card = ops_dir / "model_card.json"
+        self.model_card: dict[str, Any] = json.loads(card.read_text()) if card.exists() else {}
         report = ops_dir / "ingest_report.json"
         self.report: dict[str, Any] = json.loads(report.read_text()) if report.exists() else {}
 

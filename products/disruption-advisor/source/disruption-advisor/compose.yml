@@ -18,6 +18,7 @@ x-api-env: &api-env
   TOKEN_SECRET: ${TOKEN_SECRET:?set TOKEN_SECRET in settings.env}
   ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
   AI_MODEL: ${AI_MODEL:-claude-opus-5-5}
+  DEFAULT_MCT_MINUTES: ${DEFAULT_MCT_MINUTES:-50}
 
 services:
   db:
@@ -60,6 +61,7 @@ services:
       INGEST_MEMORY_LIMIT: ${INGEST_MEMORY_LIMIT:-4GB}
       DEMO_SCENARIO: ${DEMO_SCENARIO:-false}
       OPERATING_CARRIERS: ${OPERATING_CARRIERS:-G9}
+      DEFAULT_MCT_MINUTES: ${DEFAULT_MCT_MINUTES:-50}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
     volumes:
       - ${INPUT_DIR:?set INPUT_DIR (folder with the airline extracts) in settings.env}:/input:ro

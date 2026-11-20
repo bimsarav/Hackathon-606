@@ -44,3 +44,12 @@
 > **PAUSED 2026-11-20T19:31Z by user** ("pause remaining steps until further notice"): T-400.10 reboot test and T-400.11 hand-over on hold.
 
 > 2026-11-20T20:09Z: MVP close-out steps 1-6 DONE (user 'resume 1-6, do not proceed to phase 2'). Open: option override (not approved), commit + log archive (on user request), SSH key rotation (user).
+
+## T-500 disruption-advisor Phase 2 "Predict" (approved by user 2026-11-21: "start phase 2 now"; Phase 3 needs separate approval)
+Scope (R/docs/delivery/MVP_AND_INCREMENTAL_PLAN.md): delay-risk model (LightGBM, calibrated, SHAP reasons) · 7-day watchlist feeding Scenario A · per-passenger misconnect risk · HTTPS (Caddy + Let's Encrypt, sslip.io, :8888 kept) · nightly PostgreSQL backup + restore test
+- [x] T-501 design update: phase 2 diagrams + ADR (model, features known 7 days ahead, time split) → tell user where to view
+- [x] T-502 data study on history_flights (labels, features, baseline) → docs/testing/model-card.md
+- [x] T-503 training stage (ingest stage 3 → /data/models), calibration, metrics vs baseline, unit tests
+- [ ] T-504 API: risk per flight, watchlist, misconnect risk per passenger; UI: watchlist page + risk chips; tests + e2e
+- [ ] T-505 HTTPS (Caddy, sslip.io) + nightly backup + restore test
+- [ ] T-506 deploy, verify (smoke, e2e, reboot check), docs (Confluence, README, methods PDF), report

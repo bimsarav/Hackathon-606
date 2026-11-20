@@ -14,6 +14,7 @@ from testcontainers.community.postgres import PostgresContainer
 
 from app.config import Settings
 from app.main import create_app
+from app.ml import delay_risk
 from tests.ops_fixture import t, write_ops
 
 POSTGRES_IMAGE = "postgres:18.7-alpine"
@@ -31,7 +32,7 @@ def alembic_config() -> Iterator[Config]:
 @pytest.fixture(scope="session")
 def data_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
     path = tmp_path_factory.mktemp("data")
-    write_ops(path)
+    delay_risk.run(write_ops(path), default_mct=50)  # phase 2 outputs, as ingest stage 3 writes them
     return path
 
 

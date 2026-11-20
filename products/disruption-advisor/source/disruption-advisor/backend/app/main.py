@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app import advisor, health
+from app import advisor, health, risk
 from app.config import Settings, get_settings
 from app.engine.explain import Explainer
 from app.engine.store import OpsStore
@@ -66,4 +66,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     register_error_handlers(app)
     app.include_router(health.router)
     app.include_router(advisor.router)
+    app.include_router(risk.router)
     return app

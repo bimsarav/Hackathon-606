@@ -8,7 +8,7 @@ Day 2026-11-21, hub SHJ, times UTC.
 Seats: H1 is full, F4 has 2 free, Y1 has 5 free → 7 seats for the 10 seated passengers of X1 (+1 lap infant).
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -218,5 +218,48 @@ def write_ops(data_dir: Path) -> Path:
     }
     for name, rows in tables.items():
         pq.write_table(pa.Table.from_pylist(rows), ops / f"{name}.parquet")
+    pq.write_table(pa.Table.from_pylist(history()), ops / "history_flights.parquet")
     (ops / "ingest_report.json").write_text('{"counts": {"flights": 9}, "quality": {}}')
     return ops
+
+
+# History for the delay-risk model (phase 2): 1 Jul - 18 Nov 2026, synthetic with a planted pattern.
+# KHI-SHJ in the morning is late 60+ minutes on 70% of days; DOH-SHJ is almost always on time; the rest in between.
+HISTORY_ROUTES = (
+    ("G9001", "T1", "KHI", "SHJ", 8, 120, 0.70),
+    ("G9002", "T1", "SHJ", "LHE", 11, 180, 0.30),
+    ("G9101", "T2", "DOH", "SHJ", 6, 60, 0.03),
+    ("G9102", "T2", "SHJ", "BKK", 11, 360, 0.15),
+    ("G9301", "T4", "SHJ", "CAI", 11, 240, 0.10),
+)
+
+
+def history() -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    start = datetime(2026, 7, 1)
+    for day in range(140):
+        for n, (fn, tail, o, d, hour, block, late_share) in enumerate(HISTORY_ROUTES):
+            std = start + timedelta(days=day, hours=hour)
+            u = ((day * 7919 + n * 104729) % 1000) / 1000  # deterministic, evenly spread
+            delay = 75 + (day % 4) * 20 if u < late_share else (day * 13 + n * 7) % 12
+            sta = std + timedelta(minutes=block)
+            rows.append(
+                {
+                    "flight_id": f"{fn}_{std:%Y%m%d%H%M}",
+                    "airline": "G9",
+                    "tail": tail,
+                    "flight_number": fn,
+                    "origin": o,
+                    "destination": d,
+                    "std": std,
+                    "sta": sta,
+                    "atd": std + timedelta(minutes=delay),
+                    "ata": sta + timedelta(minutes=max(delay - 5, 0)),
+                    "operated": True,
+                    "diverted": False,
+                    "aircraft_model": "A320-174",
+                    "capacity": 174,
+                    "booked_pax": 150,
+                }
+            )
+    return rows

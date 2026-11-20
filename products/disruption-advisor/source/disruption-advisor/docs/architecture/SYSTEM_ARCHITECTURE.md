@@ -274,3 +274,53 @@ flowchart LR
 - **Observability:** JSON logs with request id; `/health/live` and `/health/ready` (PostgreSQL and ops store); container healthchecks.
 - **Time:** all logic runs in UTC; local times come from the airport time-zone table (Q9, Q22).
 - **Limits (MVP):** G9 flights only (no partner or other carriers), no crew legality (no crew data), no equipment change, no bus legs, simulated "now" = 2026-11-20 (Q2).
+
+## 10. Phase 2: Predict (approved by the user on 21 Nov 2026)
+Phase 2 adds a forward view (which flights are likely to be late in the next 7 days, and which passengers are likely to misconnect) and production basics (HTTPS, nightly backups). The engine and the human approval loop of phase 1 are unchanged: predictions only rank and pre-fill, a person still runs and approves the scenario.
+
+### 10.1 Delay-risk pipeline
+```mermaid
+flowchart LR
+  H[(history_flights<br/>63k G9 flights<br/>1 Jan – 18 Nov 2026)] --> F[features known<br/>7 days ahead]
+  W[(flights in the window<br/>19 – 30 Nov, tail plan,<br/>bookings)] --> F
+  F --> T[train: LightGBM<br/>one model per threshold<br/>15 · 30 · 60 · 120 · 180 min]
+  T --> C[calibrate: isotonic<br/>on a later month]
+  C --> E[evaluate on the last weeks<br/>vs a route × hour baseline<br/>AUC, Brier, reliability]
+  C --> S[score the window flights]
+  S --> R[("flight_risk.parquet<br/>P(delay ≥ t) per threshold,<br/>planning delay P80,<br/>top reasons from SHAP")]
+  E --> MC[(model_card.json<br/>metrics, data range, features)]
+  R --> API[api: watchlist,<br/>risk on flights,<br/>misconnect risk per passenger]
+```
+- **Runs in the ingest** (stage 3, after the operating picture), so a new data drop retrains and rescores without a separate service. Deterministic (fixed seeds, single thread), so the same data gives the same model.
+- **Features known 7 days ahead only** (no actual times of the day itself): departure station, arrival station, departure hour (local) and weekday, aircraft type, position of the flight in the aircraft's day, scheduled turn buffer before it, booked load factor, and the recent delay rate of the station and of the route (28 days, ending 7 days before the flight, so it is known in time).
+- **Time-ordered validation**, never random: train on the oldest months, calibrate on the next month, test on the most recent weeks. The model card states the numbers and is shown in the UI.
+- **Reasons:** LightGBM's built-in TreeSHAP contributions, mapped to plain phrases ("evening departures from SHJ run late", "tight 40-minute turn").
+
+### 10.2 From delay risk to passengers
+```mermaid
+flowchart TB
+  P["P(departure delay ≥ t)<br/>t = 15, 30, 60, 120, 180"] --> Sv["delay curve S(t)<br/>monotone, interpolated"]
+  Sv --> P80[planning delay = delay<br/>exceeded with 20% chance]
+  Sv --> M["misconnect risk per connecting passenger<br/>= S(connection time − MCT)"]
+  P80 --> A[Scenario A pre-filled<br/>from the watchlist]
+  M --> WL[watchlist: expected misconnects<br/>per flight = Σ risk]
+```
+- Arrival delay is taken as the departure delay (block-time recovery ignored; conservative), and the onward flight is assumed on time. Both are stated as assumptions in the UI.
+
+### 10.3 Deployment additions
+```mermaid
+flowchart LR
+  user([OCC / PCU]) -->|https://92-5-154-198.sslip.io| caddy
+  user -->|http://92.5.154.198:8888 kept| web
+  subgraph compose [docker compose]
+    caddy[caddy: TLS, Let's Encrypt,<br/>HSTS, :80 → :443] --> web
+    web --> api
+    api --> db[(PostgreSQL)]
+    backup[backup: nightly pg_dump<br/>02:00 UTC, keep 14] --> db
+  end
+  backup --> dumps[/~/backups/disruption-advisor<br/>on the host disk/]
+  dumps -.->|scripts/restore-test.sh| check[restore into a temporary<br/>PostgreSQL, compare row counts]
+```
+- **HTTPS:** Caddy obtains and renews the certificate itself. sslip.io maps the hostname to the server IP, so no DNS setup is needed. `:8888` stays for the existing links.
+- **Backups** stay on the server disk (no off-site target was supplied); off-site copies are a phase 4 item. The restore test is run after deployment and recorded.
+- Details: [ADR 0008](adr/0008-delay-risk-model.md), [ADR 0009](adr/0009-https-and-backups.md).

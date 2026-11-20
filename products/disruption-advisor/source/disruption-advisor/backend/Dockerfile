@@ -3,6 +3,8 @@ ARG PYTHON_IMAGE=python:3.14.10-slim-trixie
 FROM ghcr.io/astral-sh/uv:0.13.9 AS uv
 
 FROM ${PYTHON_IMAGE} AS base
+# libgomp1: OpenMP runtime that LightGBM (delay-risk model, phase 2) loads
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/*
 COPY --from=uv /uv /uvx /usr/local/bin/
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 UV_LINK_MODE=copy UV_PYTHON_DOWNLOADS=never
 WORKDIR /app
@@ -21,7 +23,8 @@ COPY app ./app
 FROM ${PYTHON_IMAGE} AS runtime
 # Security: apply OS updates published after the base image, and drop pip (unused at runtime; uv built the venv),
 # whose vendored libraries otherwise show up in vulnerability scans.
-RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/* \
+RUN apt-get update && apt-get upgrade -y --no-install-recommends \
+ && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/* \
  && python -m pip uninstall -y pip && rm -rf /usr/local/lib/python3.14/ensurepip/_bundled \
  && groupadd --system app && useradd --system --gid app --home-dir /app --shell /usr/sbin/nologin app \
  && mkdir -p /data && chown app:app /data

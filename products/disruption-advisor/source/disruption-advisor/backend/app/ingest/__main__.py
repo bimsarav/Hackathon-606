@@ -8,6 +8,7 @@ Stage 2 (raw -> ops, seconds) runs when the inputs, the
 options or the build code changed.
 OPERATING_CARRIERS (default G9) limits the picture to those carriers.
 DEMO_SCENARIO=true appends the labelled synthetic demo scenario (app/ingest/demo.py).
+Stage 3 (phase 2) trains the delay-risk model and scores the window (app/ml/delay_risk.py, about a minute).
 """
 
 import argparse
@@ -19,6 +20,7 @@ import sys
 from pathlib import Path
 
 from app.ingest import build, convert, demo
+from app.ml import delay_risk
 
 log = logging.getLogger("ingest")
 
@@ -50,7 +52,9 @@ def main() -> int:
     raw_marker, ops_marker = data_dir / "ingest_fingerprint.txt", data_dir / "ops_fingerprint.txt"
     inputs = fingerprint(input_dir)
     # stage 2 also reruns when its code changes (build rules, synthetic data), so a deploy picks up new logic
-    code = hashlib.sha256(b"".join(Path(m.__file__ or "").read_bytes() for m in (build, demo))).hexdigest()[:16]
+    code = hashlib.sha256(b"".join(Path(m.__file__ or "").read_bytes() for m in (build, demo, delay_risk))).hexdigest()[
+        :16
+    ]
     ops_key = f"{inputs}|demo={with_demo}|carriers={','.join(carriers)}|code={code}"
 
     # bookings must be in the current layout: name-free, by departure month (an older dep_year layout is rebuilt)
@@ -73,6 +77,12 @@ def main() -> int:
     log.info("stage 2 done: %s", json.dumps(report["counts"]))
     if with_demo:
         log.info("demo scenario added: %s", json.dumps(demo.add_demo_scenario(data_dir / "ops")))
+    # stage 3 (phase 2): delay-risk model, trained and scored on the fresh operating picture
+    if (data_dir / "ops" / "history_flights.parquet").exists():
+        mct = delay_risk.default_mct_from_env(os.environ.get("DEFAULT_MCT_MINUTES"))
+        log.info("stage 3 done: %s", json.dumps(delay_risk.run(data_dir / "ops", default_mct=mct)))
+    else:
+        log.warning("stage 3 skipped: no history_flights.parquet")
     ops_marker.write_text(ops_key)
     return 0
 

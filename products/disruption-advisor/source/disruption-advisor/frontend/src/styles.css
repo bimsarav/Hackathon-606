@@ -596,3 +596,67 @@ tr.detail td {
   color: var(--accent);
   font-weight: 600;
 }
+
+/* Phase 2: delay watchlist */
+.view-tabs {
+  max-width: 30rem;
+}
+.watch-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0.8rem 0;
+}
+.watch-filters select {
+  margin-left: 0.3rem;
+}
+tr.clickable {
+  cursor: pointer;
+}
+tr.clickable:hover,
+tr.clickable.selected {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.risk-high {
+  background: var(--bad-bg);
+  color: var(--bad);
+  border-color: var(--bad);
+}
+.risk-medium {
+  background: var(--warn-bg);
+  color: var(--warn);
+  border-color: var(--warn);
+}
+.risk-low {
+  background: var(--ok-bg);
+  color: var(--ok);
+  border-color: var(--ok);
+}
+.detail-row > td {
+  background: var(--bg);
+}
+.risk-detail {
+  display: grid;
+  grid-template-columns: minmax(16rem, 1fr) minmax(20rem, 1.6fr);
+  gap: 1.2rem;
+}
+.risk-detail h3 {
+  margin-top: 0.2rem;
+}
+.reasons {
+  padding-left: 1.1rem;
+}
+.model-card {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.8rem;
+}
+.model-card summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+@media (max-width: 760px) {
+  .risk-detail {
+    grid-template-columns: 1fr;
+  }
+}
