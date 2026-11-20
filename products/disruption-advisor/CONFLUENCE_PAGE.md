@@ -31,7 +31,8 @@ Today OCC, crew control and the PCU each work with different information. The go
 | What-if: adjustable priority weights | Done |
 | History data: G9 flights 1 Jan to 18 Nov 2026 with actual times, aircraft chains (actual order), delay codes, diversions and bookings (`history_flights.parquet`), for backtests and prediction | Done (data; not yet used in the UI) |
 | Backtest of delay propagation on 1,634 real delays (Jan-Nov 2026): mean error 25 min vs 57 min without knock-on; next-leg delays caught 97% at 99.7% precision. Median recovery turns (60/48 min) reduce the error to 22 min. `python -m app.backtest`, docs/testing/backtest.md | Done |
-| Synthetic passenger ID, passport and national ID per person (same person keeps them across bookings); API shows initials only, never full names | Done |
+| Synthetic passenger ID, passport and national ID per person over all bookings Oct 2025 - Mar 2027 (6.29M persons, same IDs in the app and the shared export); API shows initials only, never full names | Done |
+| Shareable bookings without names: `python -m app.ingest.share` writes all 27.9M booking rows by departure month (about 950 MB) for a shared drive, never Git | Done |
 | Plain-English explanations and passenger message drafts (Claude AI, with template fallback) | Done |
 | Approve or reject with an audit trail; demo roles OCC and PCU | Done |
 | Approve a non-recommended option (override with reason) | Not done (proposed) |

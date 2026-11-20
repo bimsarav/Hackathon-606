@@ -78,3 +78,8 @@ git init && git add . && git commit -m "Disruption Advisor MVP"
 git remote add origin <your-repo-url> && git push -u origin main
 ```
 `.env`, data and build output are git-ignored. Check `git status` before the first push.
+
+## Data for analysis (optional)
+After the ingest, inside the api container or a local backend environment:
+- `python -m app.backtest`: replays real 2026 delays through the engine (`ops/backtest_report.json`, see docs/testing/backtest.md).
+- `python -m app.ingest.share`: all bookings (Oct 2025 - Mar 2027) without names, with the synthetic passenger ID, passport and national ID, by departure month in `DATA_DIR/share/` (about 950 MB). Share it through a drive, never Git.

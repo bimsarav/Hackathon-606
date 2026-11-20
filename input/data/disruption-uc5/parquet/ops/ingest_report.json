@@ -8,20 +8,29 @@
     "airports": 142,
     "aircraft": 110,
     "booking_classes": 388,
+    "passenger_identity": 14395846,
     "customers": 174723,
     "pax_segments": 299419,
-    "flights": 4646,
+    "flights": 2614,
+    "history_flights": 63322,
     "mct": 39
   },
   "quality": {
     "segments_without_flight": 518,
     "overbooked_flights": 47,
     "capacity_sources": {
-      "assumed-a320-174": 2390,
+      "assumed-a320-174": 461,
       "inferred-from-max-pax": 426,
-      "inventory-exact": 1830
+      "inventory-exact": 1727
     },
-    "flights_without_sta": 2
+    "flights_without_sta": 0,
+    "history": {
+      "flights": 63322,
+      "not_operated": 105,
+      "diverted": 157,
+      "with_bookings": 62553,
+      "chain_same_station_share": 0.9967
+    }
   },
-  "built_at": "2026-11-20T22:43:37"
+  "built_at": "2026-11-21T01:57:21"
 }

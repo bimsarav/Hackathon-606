@@ -12,6 +12,7 @@ Outputs:
   customers.parquet       one row per passenger key: 12-month travel history (real) and loyalty tier (synthetic)
   pax_segments.parquet    active passenger-segments in the window with enrichment and SSRs
   mct.parquet             hub connection times
+  passenger_identity.parquet synthetic passenger ID, passport and national ID per (pnr, customer_key), all bookings
   history_flights.parquet G9 flights 1 Jan 2026 to the window start with actual times, aircraft chain, bookings
   ingest_report.json      counts, mismatches and data-quality notes (shown in the UI)
 """
@@ -29,8 +30,8 @@ import duckdb
 AIRPORTS_CSV = Path(__file__).resolve().parent.parent / "data" / "airports.csv"
 NONREV_CODES = ("VI", "DU", "DT", "Z", "DUMKT", "GD", "DUFAM")
 AMBIGUOUS_NAME_PNRS = 60
-BOOKINGS_PER_PERSON = 2  # common names: bookings per synthetic person in the 12-day window
-MAX_WINDOW_BOOKINGS_PER_NAME = 4  # more bookings than this in the window: treat the name as common too
+COMMON_NAME_BOOKINGS = 60  # a name with more bookings than this (all extracts) is shared by several people
+BOOKINGS_PER_PERSON = 6  # common names: bookings per synthetic person (Oct 2025 - Mar 2027)
 DEFAULT_MODEL, DEFAULT_SEATS = "A320 (assumed)", 174
 # Deterministic special-service rates for adults (synthetic, Q5): cumulative thresholds on a hash in [0, 1).
 SSR_RATES = (
@@ -127,6 +128,44 @@ def build(data_dir: Path, window: Window = DEFAULT_WINDOW) -> dict[str, Any]:
         FROM k LEFT JOIN e USING (booking_code)""",
     )
 
+    # Synthetic identity over ALL bookings (Oct 2025 - Mar 2027): the extracts have no passenger ID or documents.
+    # A name is one person unless it is common (more than COMMON_NAME_BOOKINGS bookings); then its bookings are
+    # split by home airport (origin of the booking's first leg) and grouped about BOOKINGS_PER_PERSON per person,
+    # so repeat travellers keep one ID across bookings. Documents are unique: serial = shuffled rank of the person.
+    # The same table feeds the app (pax_segments) and the shared bookings export (app.ingest.share).
+    c.execute(f"""
+        CREATE TEMP TABLE ident_all AS
+        WITH b AS (SELECT pnr, lower(trim(first_name)) || '|' || lower(trim(last_name)) AS name_key, pax_type,
+                          origin, dep_utc
+                   FROM {bookings} WHERE first_name IS NOT NULL AND last_name IS NOT NULL),
+             home AS (SELECT pnr, arg_min(origin, dep_utc) AS home FROM b GROUP BY 1),
+             people AS (SELECT pnr, name_key, min(pax_type) AS pax_type FROM b GROUP BY 1, 2),
+             named AS (SELECT p.*, h.home, count(*) OVER (PARTITION BY p.name_key) AS n_name,
+                              count(*) OVER (PARTITION BY p.name_key, h.home) AS n_home
+                       FROM people p JOIN home h USING (pnr)),
+             seed AS (SELECT *, n_name > {COMMON_NAME_BOOKINGS} AS common,
+                             CASE WHEN n_name > {COMMON_NAME_BOOKINGS}
+                                  THEN substr(sha256(name_key), 1, 16) || '|' || home || '|' ||
+                                       ((('0x' || substr(md5('bk|' || pnr), 1, 8))::UBIGINT)
+                                        % greatest(ceil(n_home / {BOOKINGS_PER_PERSON})::UBIGINT, 1))::VARCHAR
+                                  ELSE substr(sha256(name_key), 1, 16) END AS person_seed
+                      FROM named),
+             k AS (SELECT person_seed, row_number() OVER (ORDER BY sha256('pp|' || person_seed)) AS k
+                   FROM (SELECT DISTINCT person_seed FROM seed))
+        SELECT s.pnr, s.name_key, substr(sha256(s.name_key), 1, 16) AS customer_key, s.pax_type,
+               'PAX' || upper(substr(sha256('pid|' || s.person_seed), 1, 12)) AS passenger_id,
+               chr(65 + (('0x' || substr(sha256('pp|' || s.person_seed), 1, 4))::INTEGER % 26)::INTEGER)
+                   || lpad((10000000 + k.k)::VARCHAR, 8, '0') AS passport_number_synthetic,
+               -- Emirates ID layout 784-YYYY-NNNNNNN-C (birth year, serial, check digit); demo format for everyone
+               '784-' || (1955 + (('0x' || substr(sha256('ny|' || s.person_seed), 1, 4))::INTEGER % 50))::VARCHAR
+                   || '-' || lpad(k.k::VARCHAR, 7, '0') || '-'
+                   || ((('0x' || substr(sha256('nc|' || s.person_seed), 1, 2))::INTEGER % 10))::VARCHAR
+                   AS national_id_synthetic,
+               CASE WHEN s.common THEN 'common-name: split by home airport' ELSE 'one-person-per-name' END
+                   AS identity_rule
+        FROM seed s JOIN k USING (person_seed)""")
+    counts["passenger_identity"] = out("passenger_identity", "SELECT * EXCLUDE (name_key) FROM ident_all")
+
     # Window segments (latest active row per passenger-segment wins).
     c.execute(f"""
         CREATE TEMP TABLE seg AS
@@ -182,28 +221,7 @@ def build(data_dir: Path, window: Window = DEFAULT_WINDOW) -> dict[str, Any]:
              inf AS (SELECT pnr, name_key, dense_rank() OVER (PARTITION BY pnr ORDER BY name_key) AS n
                      FROM (SELECT DISTINCT pnr, name_key FROM seg WHERE pax_type = 'IN')),
              ad AS (SELECT pnr, name_key, dense_rank() OVER (PARTITION BY pnr ORDER BY name_key) AS n
-                    FROM (SELECT DISTINCT pnr, name_key FROM seg WHERE pax_type = 'AD')),
-             -- synthetic identity (Q-identity): the extract has no passenger ID. A name is one person unless it is
-             -- very common; then bookings are split by home airport (origin of the booking's first leg) and
-             -- grouped about BOOKINGS_PER_PERSON per person, so repeat travellers keep one ID across bookings.
-             home AS (SELECT pnr, arg_min(origin, dep_utc) AS home FROM seg GROUP BY 1),
-             named AS (SELECT DISTINCT s.pnr, s.name_key, substr(sha256(s.name_key), 1, 16) AS ck, h.home,
-                              coalesce(cu.ambiguous_common_name, FALSE) AS common
-                       FROM seg s JOIN home h USING (pnr)
-                       LEFT JOIN customers cu ON cu.customer_key = substr(sha256(s.name_key), 1, 16)),
-             grp AS (SELECT * REPLACE (common OR n_name > {MAX_WINDOW_BOOKINGS_PER_NAME} AS common)
-                     FROM (SELECT *, count(*) OVER (PARTITION BY name_key, home) AS n_home,
-                                  count(*) OVER (PARTITION BY name_key) AS n_name FROM named)),
-             seed AS (SELECT pnr, name_key,
-                             CASE WHEN common THEN ck || '|' || home || '|' ||
-                                  ((('0x' || substr(md5('bk|' || pnr), 1, 8))::UBIGINT)
-                                   % greatest(ceil(n_home / {BOOKINGS_PER_PERSON})::UBIGINT, 1))::VARCHAR
-                                  ELSE ck END AS person_seed,
-                             CASE WHEN common THEN 'common-name: split by home airport'
-                                  ELSE 'one-person-per-name' END AS identity_rule
-                      FROM grp),
-             -- unique documents per person: serial from a shuffled ranking of persons
-             ident AS (SELECT *, dense_rank() OVER (ORDER BY sha256('pp|' || person_seed)) AS k FROM seed)
+                    FROM (SELECT DISTINCT pnr, name_key FROM seg WHERE pax_type = 'AD'))
         SELECT s.flight_number || '_' || strftime(s.dep_utc, '%Y%m%d%H%M') AS flight_id,
                s.pnr, substr(sha256(s.name_key), 1, 16) AS customer_key, s.first_name, s.last_name, s.pax_type,
                s.flight_number, s.dep_utc, s.origin, s.destination, s.booking_code,
@@ -220,18 +238,11 @@ def build(data_dir: Path, window: Window = DEFAULT_WINDOW) -> dict[str, Any]:
                CASE WHEN s.pax_type IN ('IN') OR (s.pax_type = 'CH' AND p.adults = 0) THEN 'data'
                     ELSE 'synthetic' END AS ssr_source,
                CASE WHEN s.pax_type = 'IN' THEN substr(sha256(a.name_key), 1, 16) END AS infant_with_customer_key,
-               -- synthetic identity (see the ident CTE above)
-               'PAX' || upper(substr(sha256('pid|' || id.person_seed), 1, 12)) AS passenger_id,
-               chr(65 + (('0x' || substr(sha256('pp|' || id.person_seed), 1, 4))::INTEGER % 26)::INTEGER)
-                   || lpad((10000000 + id.k)::VARCHAR, 8, '0') AS passport_number_synthetic,
-               -- Emirates ID layout 784-YYYY-NNNNNNN-C (birth year, serial, check digit); demo format for everyone
-               '784-' || (1955 + (('0x' || substr(sha256('ny|' || id.person_seed), 1, 4))::INTEGER % 50))::VARCHAR
-                   || '-' || lpad(id.k::VARCHAR, 7, '0') || '-'
-                   || ((('0x' || substr(sha256('nc|' || id.person_seed), 1, 2))::INTEGER % 10))::VARCHAR
-                   AS national_id_synthetic,
+               -- synthetic identity from passenger_identity (all bookings, see above)
+               id.passenger_id, id.passport_number_synthetic, id.national_id_synthetic,
                id.identity_rule
         FROM seg s
-        JOIN ident id ON id.pnr = s.pnr AND id.name_key = s.name_key
+        JOIN ident_all id ON id.pnr = s.pnr AND id.name_key = s.name_key
         JOIN pnr p ON p.pnr = s.pnr
         LEFT JOIN booking_classes bc ON bc.booking_code = coalesce(s.booking_code, '(blank)')
         LEFT JOIN inf i ON i.pnr = s.pnr AND i.name_key = s.name_key
