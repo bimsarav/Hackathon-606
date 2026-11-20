@@ -10,3 +10,25 @@ products/**/playwright-report/
 products/**/.env
 # Archived logs of finished product runs are local only; the live (unfinished-run) logs ARE committed
 execution/archive/
+
+# Cloud environment details may arrive in a folder under input/ (user 2026-11-20).
+# Never commit credentials from it; non-secret descriptions (provider, region, domain) stay tracked.
+input/**/.env*
+input/**/*.pem
+input/**/*.key
+input/**/*.p12
+input/**/*.pfx
+input/**/*.jks
+input/**/*.ppk
+input/**/id_rsa*
+input/**/id_ed25519*
+input/**/*kubeconfig*
+input/**/*.kubeconfig
+input/**/*credential*
+input/**/*secret*
+input/**/*token*
+input/**/*password*
+input/**/*.tfvars
+input/**/*.tfstate*
+input/**/service-account*.json
+input/**/*sa-key*.json

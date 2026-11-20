@@ -1,3 +1,4 @@
 # errors.log: new product run started 2026-11-19T16:55Z (previous run: execution/archive/esmp-first-challenge-20261119T165511Z)
 2026-11-20T06:36Z | T-005.2 | 5 services (asset, audit, knowledge, notification, reporting) crash-looped in compose: no JwtDecoder (jwk-set-uri missing outside test profile; ITs passed via test public key) | Fix: !test profile jwk-set-uri as in request-service | FIXED (verified by smoke test 2026-11-20T08:29Z)
 2026-11-20T08:34Z | T-005.2 | E2E run1/run2 failures: ambiguous nav link locators (strict mode) and nginx login rate limit 429 | Fixed in e2e specs/helpers (nav-scoped exact locators; 429-aware retry); rate limit kept | FIXED (run3 6/6)
+2026-11-20T09:02Z | T-201b | heredoc without quotes ran 3 backtick paths as commands (permission denied, no effect) and stripped them from MASTER_RULES + CHECKPOINT_PROTOCOL | restored; use quoted heredocs | FIXED

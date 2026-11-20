@@ -27,7 +27,7 @@ done
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 DEST="execution/archive/${NAME}-${STAMP}"
 [ -e "$DEST" ] && { echo "archive already exists: $DEST" >&2; exit 1; }
-TRACKING=(PROJECT_STATUS CURRENT_TASK NEXT_ACTION TASK_BACKLOG DECISIONS ASSUMPTIONS BLOCKERS CHANGELOG RESUME)
+TRACKING=(PROJECT_STATUS CURRENT_TASK NEXT_ACTION TASK_BACKLOG DECISIONS ASSUMPTIONS BLOCKERS CHANGELOG RESUME DEPLOYMENT_STATUS)
 
 if [ -z "$YES" ]; then
   read -r -p "Archive the current run as '$NAME' ($STATUS) and reset logs + tracking files? [y/N] " a

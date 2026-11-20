@@ -20,5 +20,5 @@
 - [x] T-002.7 MASTER_PROMPT: stack selection menu workflow merged into §9.16 (user 2026-11-20)
 - [x] T-004.1 directory-service (reference) 
 - [x] T-004.2..5 services (agents; verified by T-005.1) · [x] T-004.6 gateway, Dockerfile, compose (stack healthy) · [x] T-004.7 frontend
-- [x] T-005.1 full build (253 tests green) · [~] T-005.2 package + stack + Playwright E2E (stack + smoke + E2E 6/6 done; package + Trivy pending) · [ ] T-006.1 CI/scripts/runbooks · [ ] T-007.1 delivery, README, CONFLUENCE_PAGE.md, packaging check
+- [x] T-005.1 full build (253 tests green) · [~] T-005.2 package + stack + Playwright E2E (stack + smoke + E2E 6/6 done; package + Trivy pending) · [ ] T-006.1 CI/scripts/runbooks · [ ] T-008 cloud deployment (MASTER_PROMPT §13; BLOCKED B-002; state execution/DEPLOYMENT_STATUS.md): T-008.1 discovery · T-008.2 architecture + ADR · T-008.3 infra/config/secrets · T-008.4 deploy · T-008.5 verify (§13.9, Playwright vs cloud URL) · T-008.6 docs/deployment + handover · [ ] T-007.1 (after T-008) delivery, README, CONFLUENCE_PAGE.md, packaging check
 - [x] T-900 (sub-task) token-reduction review delivered by the background agent

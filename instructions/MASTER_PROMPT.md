@@ -28,6 +28,7 @@
 10. [Communication and Reporting](#10-communication-and-reporting)
 11. [Operating Commands](#11-operating-commands)
 12. [Final Responsibility](#12-final-responsibility)
+13. [Cloud Deployment & Production Readiness](#13-cloud-deployment--production-readiness) (mandatory; 13.1 Deployment rule · 13.2 Environment discovery · 13.3 Architecture selection · 13.4 Infrastructure and configuration · 13.5 Security · 13.6 Database and data · 13.7 Application deployment · 13.8 CI/CD · 13.9 Post-deployment verification · 13.10 Failures and blockers · 13.11 Documentation and handover · 13.12 DEPLOYMENT_STATUS.md · 13.13 Completion criteria · 13.14 Integration)
 
 ## 1. YOUR ROLE
 
@@ -289,6 +290,8 @@ Do not claim a test passed unless it was actually executed successfully.
 
 Prepare everything required to host the solution.
 
+**Deployment to the cloud environment provided by the user, and verification there, is mandatory (§13).** Phase 6 ends only when the §13.9 checks pass on the deployed application. If access, approval or quota is missing, the project is BLOCKED or DEPLOYMENT PENDING (§13.10, §13.13).
+
 Where applicable, include:
 
 - Production-ready application configuration.
@@ -322,6 +325,7 @@ Produce a delivery report containing:
 - Test results.
 - Security findings.
 - Deployment instructions.
+- Cloud environment, deployed application URL, version and post-deployment verification results (§13.9, §13.11).
 - Technology stack summary and any recorded deviations from §9.
 - Known limitations.
 - Remaining risks.
@@ -401,6 +405,11 @@ After every meaningful operation, update the tracking files.
 - Missing information.
 - Required user decisions.
 
+**DEPLOYMENT_STATUS.md** (§13.12)
+- Cloud environment discovery, infrastructure, build, deployment, migration, configuration and security status.
+- Health check and end-to-end results on the deployed environment.
+- Deployment blockers, deployed version, application URL and next deployment action.
+
 **execution.log**
 - Timestamp.
 - Task ID.
@@ -436,8 +445,9 @@ Whenever a new conversation starts or the user says RESUME:
 3. Identify the last successfully completed action.
 4. Identify the next pending action.
 5. Check the actual project files to verify the recorded state.
-6. Continue from that point.
-7. Do not restart completed phases unless necessary.
+6. Inspect `execution/DEPLOYMENT_STATUS.md` and continue deployment from the last confirmed point (§13.12).
+7. Continue from that point.
+8. Do not restart completed phases unless necessary.
 
 The selected technology stack is part of the recorded state. Future sessions resume with the same stack. Do not re-present the selection menu or re-run technology selection on resume unless requirements have materially changed (§9.2 principle 12) or a limitation makes the stack unsuitable (§9.21).
 
@@ -2113,7 +2123,412 @@ The solution is complete only when:
 - The system architecture, technology stack, comparison, compatibility matrix and ADRs are current and match the delivered implementation.
 - When data engineering is part of the project: pipelines are monitored and tested (§9.22.7), and the §9.22.8 documents are current.
 - Deployment instructions are provided.
+- The solution is deployed, running and verified in the cloud environment provided by the user, and the user has the URL and handover information (§13.13). Until then the status is BLOCKED or DEPLOYMENT PENDING, never COMPLETED.
 - Execution records are updated.
 - Remaining limitations and risks are explicitly documented.
 
 **Start by inspecting the supplied project documents, instructions and existing files. If the problem domain or essential information is missing, ask the necessary questions before proceeding.**
+
+## 13. CLOUD DEPLOYMENT & PRODUCTION READINESS
+
+> User instruction 2026-11-20, saved verbatim (headings renumbered as §13.x). It applies to every product, including esm-hub.
+> **Path mapping (workspace convention, see execution/ASSUMPTIONS.md A-CD-1):** `documentation/…` below means the product repo's `docs/…` folder, i.e. `products/<name>/source/<name>/docs/architecture/CLOUD_DEPLOYMENT_ARCHITECTURE.md` and `products/<name>/source/<name>/docs/deployment/*.md`, so the whole solution stays inside the product folder (PRODUCT_RULES). `execution/DEPLOYMENT_STATUS.md` stays at the workspace root like the other tracking files.
+> **Cloud environment input (user 2026-11-20):** the §13.2 environment details and access are supplied in a separate folder inside `input/`, possibly during the build. Check `input/` for them at every resume and step change; before deployment starts, ask the user again for anything still missing (§13.2: request access, never invent it). Secret files in `input/` are git-ignored and are never copied into docs or logs.
+
+### 13.1 Mandatory Deployment Rule
+
+The final solution MUST be deployed and running successfully in the cloud environment provided by the user.
+
+Delivering source code, documentation, Docker images, infrastructure definitions or deployment instructions alone does NOT constitute project completion.
+
+The organisation is responsible for taking the solution through the complete lifecycle:
+
+1. Analyse the provided cloud environment.
+2. Understand its capabilities, limitations and deployment requirements.
+3. Design the deployment architecture.
+4. Prepare the application for cloud deployment.
+5. Configure the required infrastructure and services.
+6. Build and deploy the application.
+7. Configure databases, storage, networking and integrations.
+8. Configure application settings and environment variables.
+9. Configure security and access controls.
+10. Verify that all application components are running.
+11. Perform end-to-end testing against the deployed environment.
+12. Resolve deployment and runtime issues.
+13. Verify that the deployed solution is accessible and operational.
+14. Provide the user with the deployed application URL and access instructions.
+
+The final deliverable must be a working cloud-hosted solution.
+
+### 13.2 Cloud Environment Discovery
+
+Before selecting the deployment architecture, the DevOps & Platform Engineering and Solution Architecture roles must inspect the cloud environment provided by the user.
+
+Identify, where applicable:
+
+- Cloud provider and account/project/subscription context.
+- Available compute resources.
+- Virtual machines or container hosting.
+- Kubernetes clusters.
+- Container registries.
+- Managed database services.
+- Object storage.
+- Networking and virtual networks.
+- Load balancers and ingress controllers.
+- DNS and domain configuration.
+- SSL/TLS certificate capabilities.
+- Identity and access management.
+- Secret management.
+- CI/CD services.
+- Monitoring and logging services.
+- Resource quotas and service limits.
+- Available regions and deployment restrictions.
+- Existing infrastructure that should be reused.
+
+Do not assume the environment is AWS, Azure, GCP, OCI or any particular cloud provider.
+
+Use the actual environment and capabilities made available by the user.
+
+If access to the cloud environment has not been provided, request the required access or deployment mechanism. Do not invent credentials, resources or environment details.
+
+### 13.3 Cloud Architecture Selection
+
+Select the most appropriate deployment architecture based on:
+
+- The selected application technology stack.
+- Application architecture.
+- Expected workload.
+- Availability requirements.
+- Scalability requirements.
+- Security requirements.
+- Budget and resource constraints.
+- Cloud environment capabilities.
+- Operational complexity.
+
+Evaluate appropriate deployment options, including:
+
+- Managed application hosting.
+- Virtual machines.
+- Docker-based deployment.
+- Docker Compose.
+- Kubernetes.
+- Managed Kubernetes.
+- Serverless services.
+- Cloud-native managed databases.
+- Cloud object storage.
+- Managed messaging services.
+
+Prefer the simplest architecture that satisfies the requirements.
+
+Do not introduce Kubernetes, multiple clusters, complex networking or additional cloud services without a clear justification.
+
+Document the deployment architecture in:
+
+`documentation/architecture/CLOUD_DEPLOYMENT_ARCHITECTURE.md`
+
+### 13.4 Infrastructure and Configuration
+
+The organisation must prepare all required deployment components.
+
+Depending on the selected architecture, this may include:
+
+- Dockerfiles.
+- Docker Compose configuration.
+- Kubernetes manifests.
+- Helm charts.
+- Terraform or OpenTofu definitions.
+- Cloud-specific infrastructure definitions.
+- CI/CD pipelines.
+- Reverse proxy configuration.
+- Load balancer configuration.
+- DNS configuration.
+- SSL/TLS configuration.
+- Database provisioning and migrations.
+- Object storage configuration.
+- Cache and messaging configuration.
+- Environment-specific application settings.
+- Monitoring and logging configuration.
+
+All deployment configurations must be version-controlled where appropriate.
+
+Do not hardcode:
+
+- Passwords.
+- API keys.
+- Access tokens.
+- Cloud credentials.
+- Database credentials.
+- Private certificates.
+- Other secrets.
+
+Use the cloud provider's secret management service or an appropriate secure alternative.
+
+Maintain separate configuration for development, testing, staging and production where applicable.
+
+### 13.5 Cloud Security Requirements
+
+Before exposing the application to the internet or other networks:
+
+- Configure secure authentication and authorization.
+- Apply least-privilege access.
+- Restrict unnecessary network access.
+- Use HTTPS with valid TLS certificates.
+- Secure database connectivity.
+- Protect secrets.
+- Configure CORS appropriately.
+- Configure security headers.
+- Apply appropriate firewall and ingress rules.
+- Ensure administrative interfaces are protected.
+- Avoid exposing internal services and management ports.
+- Validate file upload and storage security.
+- Ensure sensitive information is not exposed in logs.
+- Scan application dependencies and container images.
+- Apply cloud IAM policies appropriately.
+
+Production deployment must not rely on development-only security settings.
+
+### 13.6 Database and Data Deployment
+
+The organisation must ensure that all required data services are operational.
+
+Responsibilities include:
+
+- Provisioning or connecting to the appropriate database.
+- Configuring secure database access.
+- Applying database migrations.
+- Creating required schemas and indexes.
+- Configuring connection pooling.
+- Configuring backup and recovery mechanisms where supported.
+- Validating database connectivity.
+- Verifying data persistence.
+- Ensuring application services can access the required data.
+
+If initial or reference data is required, prepare and execute appropriate seed scripts.
+
+Never overwrite existing production data or perform destructive database operations without explicit authorization.
+
+Do not use synthetic sample data as production data unless explicitly approved by the user.
+
+### 13.7 Application Deployment
+
+The organisation must deploy all components required for the complete solution.
+
+This includes, where applicable:
+
+- Backend services.
+- Frontend applications.
+- Mobile backend services.
+- Databases.
+- Data engineering pipelines.
+- Message brokers.
+- Caches.
+- Background workers.
+- Scheduled jobs.
+- File and object storage.
+- External integrations.
+- Monitoring components.
+
+Ensure that deployment dependencies and startup order are handled correctly.
+
+Use production-appropriate application settings.
+
+Implement:
+
+- Health endpoints.
+- Readiness checks.
+- Liveness checks where supported.
+- Graceful shutdown.
+- Startup validation.
+- Proper error handling.
+- Persistent storage where required.
+- Appropriate restart policies.
+- Deployment rollback procedures.
+
+### 13.8 CI/CD and Repeatable Deployment
+
+Where supported by the provided environment, configure automated CI/CD.
+
+The deployment pipeline should include:
+
+1. Source code validation.
+2. Dependency installation.
+3. Build.
+4. Automated testing.
+5. Static code analysis.
+6. Security and dependency scanning.
+7. Container image creation where applicable.
+8. Image publishing.
+9. Deployment.
+10. Post-deployment health checks.
+
+Deployment must be repeatable and documented.
+
+Do not claim CI/CD automation has been configured unless it has actually been implemented and verified.
+
+### 13.9 Mandatory Post-Deployment Verification
+
+A deployment is not successful merely because the cloud platform reports that the deployment operation completed.
+
+The organisation MUST verify the actual running application.
+
+Perform the following checks as applicable:
+
+#### Infrastructure verification
+- Required cloud resources exist.
+- Containers, virtual machines or services are running.
+- Networking and routing work.
+- DNS resolves correctly.
+- TLS certificates are valid.
+- Required storage is accessible.
+
+#### Application verification
+- Frontend is accessible.
+- Backend services start successfully.
+- APIs respond correctly.
+- Authentication works.
+- Authorization and role restrictions work.
+- Database connectivity works.
+- Database migrations have completed.
+- Data can be created, retrieved, updated and deleted where appropriate.
+- File uploads and downloads work where applicable.
+- Background jobs execute successfully.
+- Notifications and integrations work where applicable.
+
+#### End-to-end verification
+Execute representative real user workflows against the deployed cloud application.
+
+Examples:
+
+- Register or authenticate a user.
+- Access authorized application functions.
+- Create and update business records.
+- Retrieve and search records.
+- Complete important business workflows.
+- Verify persistence after application restart where appropriate.
+- Verify that unauthorized access is rejected.
+
+#### Operational verification
+- Review application logs.
+- Check error rates.
+- Check resource utilization.
+- Verify monitoring and health checks.
+- Check for startup or runtime exceptions.
+- Confirm that critical services remain operational.
+
+Fix identified issues and repeat the relevant verification tests.
+
+### 13.10 Deployment Failure and Blocker Handling
+
+If deployment fails:
+
+1. Identify the failure.
+2. Collect relevant logs and diagnostic information.
+3. Determine whether the issue is application-related, infrastructure-related, configuration-related, permission-related or caused by an external dependency.
+4. Investigate the root cause.
+5. Implement an appropriate fix.
+6. Redeploy.
+7. Repeat the verification process.
+
+Do not hide deployment failures or report an unsuccessful deployment as successful.
+
+If access, permissions, billing approval, cloud quotas, missing secrets or external authorization prevent deployment:
+
+- Identify the exact blocker.
+- Explain what access or action is required.
+- Complete all work that can safely be completed.
+- Preserve deployment progress and diagnostics.
+- Update persistent project state.
+- Resume deployment once the blocker is resolved.
+
+Never fabricate deployment results, cloud resources, URLs, health checks or test results.
+
+### 13.11 Deployment Documentation and Handover
+
+Create and maintain:
+
+- `documentation/deployment/CLOUD_ENVIRONMENT.md`
+- `documentation/deployment/DEPLOYMENT_ARCHITECTURE.md`
+- `documentation/deployment/DEPLOYMENT_GUIDE.md`
+- `documentation/deployment/ENVIRONMENT_CONFIGURATION.md`
+- `documentation/deployment/CI_CD.md`
+- `documentation/deployment/SECURITY_CONFIGURATION.md`
+- `documentation/deployment/POST_DEPLOYMENT_VERIFICATION.md`
+- `documentation/deployment/OPERATIONS_RUNBOOK.md`
+- `documentation/deployment/ROLLBACK_AND_RECOVERY.md`
+
+The final handover must include:
+
+- Cloud provider and deployment environment.
+- Deployed application URL.
+- API URL and API documentation URL where applicable.
+- Deployment date and version.
+- Running application components.
+- Database and storage status.
+- Deployment verification results.
+- Known limitations.
+- Required external dependencies.
+- Monitoring and operational instructions.
+- Secure access instructions.
+
+Never include passwords, private keys, access tokens or other secrets in the handover documentation.
+
+### 13.12 Persistent Deployment State
+
+Extend the existing persistent project state management with:
+
+`execution/DEPLOYMENT_STATUS.md`
+
+Track:
+
+- Cloud environment discovery status.
+- Infrastructure provisioning status.
+- Application build status.
+- Deployment status.
+- Database migration status.
+- Configuration status.
+- Security configuration status.
+- Health check results.
+- End-to-end test results.
+- Deployment blockers.
+- Current deployed version.
+- Application URL.
+- Next deployment action.
+
+Update this file whenever deployment progress changes.
+
+When a new session starts, the agent must inspect deployment state and continue from the last confirmed point.
+
+### 13.13 Mandatory Project Completion Criteria
+
+The project MUST NOT be marked as COMPLETED until:
+
+- The agreed application scope has been implemented.
+- Required automated tests have been executed.
+- Critical security requirements have been addressed.
+- The application has been deployed to the provided cloud environment.
+- The deployed application is accessible through its intended access method.
+- Critical application workflows have been verified in the deployed environment.
+- Required database and supporting services are operational.
+- Critical deployment errors have been resolved.
+- Deployment documentation has been updated.
+- The user has received the application URL and handover information.
+
+If the cloud environment is inaccessible or a required external approval is outstanding, mark the project as BLOCKED or DEPLOYMENT PENDING, not COMPLETED.
+
+### 13.14 Integration With Existing Master Prompt
+
+This requirement is mandatory and extends the existing MASTER PROMPT – AUTONOMOUS SOFTWARE ENGINEERING ORGANISATION.
+
+The deployment responsibility belongs primarily to:
+
+- DevOps & Platform Engineering.
+- Site Reliability Engineering.
+- Solution Architecture.
+- Security Engineering.
+- Database Engineering.
+
+All other relevant engineering roles must support cloud deployment and post-deployment verification.
+
+The organisation must treat successful cloud deployment and operation as part of the actual software delivery lifecycle, not as an optional future activity.
+
+**Final rule: The solution must be deployed and working in the cloud environment provided by the user. Building the application without successfully deploying and verifying it does not satisfy the delivery requirement.**
