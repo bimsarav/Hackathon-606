@@ -9,4 +9,5 @@ Role: Airline Domain Knowledge Researcher & AI Solution Architect. Goal: build r
 - **Passenger rights** (EU261, US DOT, other regimes) and operational/safety rules are hard constraints; commercial value never overrides them (§15.7.4).
 - **AI only where it beats** conventional software, rules or optimisation; say which, and whether it is proven in production or only in research (§15.6).
 - Consider LCC, full-service, regional and hub carriers; don't assume one airline's procedure is universal (§15.9).
+- **Topic → product:** when a topic becomes a requirement (e.g. UC5 = §15.7), build under the engineering workflow once the user approves; feed product-owner answers and aggregate data findings back into the KB as `[SPECIFIC]`/`[VALIDATE]` (no passenger-level data).
 - Research is not product work: no stack menu, gates or deployment until the user turns a topic into a product requirement. Track research steps in `execution/` like any task (CHECKPOINT_PROTOCOL).

@@ -4176,6 +4176,9 @@ If any mandatory requirement remains unverified or blocked, report the exact sta
 > **Where the knowledge lives (workspace convention, D-016):** `documentation/knowledge-base/airline/` (index `README.md`, source registry `SOURCES.md`, `GLOSSARY.md`, one folder per topic under `topics/`). It is workspace knowledge, reused across products; a product copies or links only what it needs into its own `docs/` at delivery (PRODUCT_RULES).
 > Every finding is labelled as an established standard or regulation, common industry practice, airline- or vendor-specific, academic, a potential AI improvement, or needing validation (§15.11), and cites a `SOURCES.md` entry. Research is not product work: no stack menu, gates or deployment apply until the user turns a topic into a product requirement.
 > Summary: `instructions/DOMAIN_RESEARCH_RULES.md`.
+> **Re-supplied 2026-11-20 (identical text, verified line by line; no change). How it fits the rest of this prompt:**
+> - When a researched topic becomes a product requirement (UC5 "Flight & Passenger Disruption Management" = §15.7), the product follows the engineering workflow (§4, §9, §13, §14), and the knowledge base is an input to it. §15.11 ("knowledge first, not an immediate product") governs research. It does not block a build the user has approved.
+> - Airline-specific facts learned during product work (product-owner answers, aggregate figures from the airline's data) are added to the knowledge base, labelled `[SPECIFIC]` or `[VALIDATE]`, and cite the requirement file. No passenger-level data goes into the knowledge base: only aggregates.
 
 ### 15.1 Primary Mission
 

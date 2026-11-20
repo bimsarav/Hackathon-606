@@ -206,3 +206,16 @@ Research gaps for the next pass:
 ## 14. References and Source Links
 
 All 261 sources, with tier, publisher, date, URL and access date, are in `../../SOURCES.md`, grouped by note. Twenty sources are cited by more than one note; the registry lists them, and they are the cross-checked core (for example, the IATA Interline IROPS guidance, the DOT Southwest consent order, the INFORMS OPSD paper, the US refund rule, and the Amadeus Passenger Recovery material).
+
+## 15. Airline-specific findings from the UC5 requirement (added 2026-11-20)
+
+UC5 (input/requirements/Disruption_Management_UC5.docx, the briefing transcript and the product-owner Q&A of 2026-11-20) turned this topic into a product requirement for an Air Arabia–group network with its hub at Sharjah (SHJ). These facts are specific to that airline and close or narrow some of the §13 gaps. Aggregates only; the details are in `execution/QUESTIONS_UC5.md` and the git-ignored `input/data/disruption-uc5/synthetic/README.md`.
+
+- **Seat capacity** comes from the inventory allocation, not the aircraft: **CURTAIL** lowers a flight's sellable limit (e.g. 170 → 160) and **OVERSELL** raises it. A recovery model must use the curtailed or oversold capacity. `[SPECIFIC]` (product owner)
+- **Connection window at SHJ:** 15 min to 20 h. A published hub MCT table covers 39 routings through SHJ at 50–55 min, with a 1,200 min maximum. Compare the IATA MCT standards in [03 §1]. `[SPECIFIC]`
+- **Recovery levers accepted:** aircraft swap, equipment change, delay and cancellation. Build two first: delay and same-type aircraft swap. `[SPECIFIC]` (product owner)
+- **Bookings and inventory can disagree** at any moment, because sales run in parallel and booking extracts lag. The process must keep working when they don't match. This adds a data-latency constraint to [05 §1] (late or out-of-order data). `[SPECIFIC]`
+- **The decision model is advisory.** The briefing describes OCC, crew control and the PCU working with different information, and asks for an agent that combines impact, evaluates options and explains its recommendation. This matches the human-in-the-loop pattern in §5 and [05 §8]. `[SPECIFIC]`
+- **Delay-cause mix (Jan–Nov 2026 punctuality data, G9 only):** reactionary codes 91–96 make up about 76% of coded delay minutes, departure and arrival codes counted together. That is far above the 46% European average [S-N01]. Knock-on delay through aircraft rotation dominates at this LCC hub, which supports the propagation-first approach in §10. `[SPECIFIC]` `[VALIDATE]` (coding practice)
+- **Data gaps confirmed at this airline:** no loyalty tier, no passenger identity beyond the name, no SSRs, no crew data, and no fare-family mapping in the supplied extracts. These are the §13 questions 1, 4 and 5 in practice. They are filled with labelled synthetic data for the prototype. `[VALIDATE]`
+
