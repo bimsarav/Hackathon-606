@@ -177,7 +177,7 @@ def write_bookings_without_names(con: duckdb.DuckDBPyConnection, target: Path) -
         CREATE TEMP TABLE ident AS
         WITH n AS (SELECT pnr, lower(trim(first_name)) || '|' || lower(trim(last_name)) AS name_key, origin, dep_utc
                    FROM b WHERE first_name IS NOT NULL AND last_name IS NOT NULL),
-             home AS (SELECT pnr, arg_min(origin, dep_utc) AS home FROM n GROUP BY 1),
+             home AS (SELECT pnr, arg_min(origin, (dep_utc, origin)) AS home FROM n GROUP BY 1),  -- ties: lowest code
              people AS (SELECT DISTINCT pnr, name_key FROM n),
              named AS (SELECT p.*, h.home, count(*) OVER (PARTITION BY p.name_key) AS n_name,
                               count(*) OVER (PARTITION BY p.name_key, h.home) AS n_home

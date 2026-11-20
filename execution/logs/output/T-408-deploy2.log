@@ -1,0 +1,11 @@
+ Image disruption-advisor-web:latest Built 
+2026-11-20 23:16:59,509 INFO stage 1 done: {"rotation": 4646, "punctuality": 65943, "mct": 39, "inventory": 368873, "inventory_rejected": 1, "schedule": 6143, "schedule_rejected": 0, "bookings": {"loaded": 27879509, "rejected": 0, "persons": 6286595, "supplied_parquet": 1}}
+2026-11-20 23:16:59,509 INFO stage 2: building the operating picture
+2026-11-20 23:17:06,926 INFO stage 2 done: {"airports": 142, "aircraft": 81, "booking_classes": 388, "customers": 174723, "pax_segments": 299417, "flights": 2614, "history_flights": 63322, "mct": 39}
+2026-11-20 23:17:07,296 INFO demo scenario added: {"demo_flights": 9, "demo_pax_segments": 48, "demo_customers": 24}
+ Container disruption-advisor-db-1 Healthy 
+api Up 6 seconds (healthy)
+db Up 3 hours (healthy)
+ingest Exited (0) 6 seconds ago
+migrate Exited (0) 7 seconds ago
+web Up About an hour (healthy)

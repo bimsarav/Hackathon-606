@@ -1,2 +1,24 @@
  Image disruption-advisor-web:latest Built 
 Fri Nov 20 10:47:03 PM UTC 2026
+2026-11-20 22:51:08,173 INFO bookings month cleaned
+2026-11-20 22:51:08,865 INFO bookings month cleaned
+2026-11-20 23:05:00,585 INFO stage 1 done: {"rotation": 4646, "punctuality": 65943, "mct": 39, "inventory": 368873, "inventory_rejected": 1, "schedule": 6143, "schedule_rejected": 0, "bookings": {"loaded": 27879509, "rejected": 2, "persons": 6286594}}
+2026-11-20 23:05:00,680 INFO stage 2: building the operating picture
+2026-11-20 23:05:06,746 INFO stage 2 done: {"airports": 142, "aircraft": 81, "booking_classes": 388, "customers": 174723, "pax_segments": 299417, "flights": 2614, "history_flights": 63322, "mct": 39}
+2026-11-20 23:05:07,915 INFO demo scenario added: {"demo_flights": 9, "demo_pax_segments": 48, "demo_customers": 24}
+Fri Nov 20 11:05:10 PM UTC 2026
+
+real	18m6.987s
+user	0m0.141s
+sys	0m0.065s
+Fri Nov 20 11:05:24 PM UTC 2026
+ Container disruption-advisor-api-1 Healthy 
+ Container disruption-advisor-db-1 Healthy 
+Fri Nov 20 11:05:33 PM UTC 2026
+ingest-1  | 2026-11-20 23:05:27,209 INFO stage 1 skipped: extracts unchanged
+ingest-1  | 2026-11-20 23:05:27,210 INFO stage 2 skipped: operating picture is current
+api Up 6 seconds (healthy)
+db Up 3 hours (healthy)
+ingest Exited (0) 6 seconds ago
+migrate Exited (0) 7 seconds ago
+web Up About an hour (healthy)

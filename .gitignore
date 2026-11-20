@@ -44,5 +44,6 @@ input/data/disruption-uc5/parquet/raw/bookings/*
 # Secrets supplied by the user (e.g. AI_API_KEY, user 2026-11-20). Never commit, print or log.
 input/secrets/
 
+
 # Runtime settings with secrets (API keys) - never commit (2026-11-21)
 products/**/settings.env

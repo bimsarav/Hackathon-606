@@ -82,3 +82,23 @@ def test_supplied_bookings_need_every_column_and_no_names(tmp_path: Path, monkey
 
 def test_no_supplied_bookings_means_convert_the_zip(tmp_path: Path) -> None:
     assert convert.supplied_bookings(tmp_path) is None
+
+
+def test_identity_does_not_depend_on_row_order(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """A common name is split by home airport; a PNR with two first legs at the same minute must get one home."""
+    monkeypatch.setattr(convert, "COMMON_NAME_BOOKINGS", 1)  # every repeated name counts as common
+    monkeypatch.setattr(convert, "BOOKINGS_PER_PERSON", 1)
+    rows = [
+        "('T1', 'Ali', 'Khan', 'SHJ', 'KHI', TIMESTAMP '2026-03-06 03:05:00')",
+        "('T1', 'Ali', 'Khan', 'DXB', 'KHI', TIMESTAMP '2026-03-06 03:05:00')",  # tie with the leg above
+        "('T2', 'Ali', 'Khan', 'SHJ', 'DOH', TIMESTAMP '2026-04-01 10:00:00')",
+        "('T3', 'Ali', 'Khan', 'DXB', 'CAI', TIMESTAMP '2026-05-01 10:00:00')",
+    ]
+    results = []
+    for n, order in enumerate((rows, rows[::-1], rows[1:] + rows[:1])):
+        con = duckdb.connect()
+        con.execute(f"""CREATE TABLE b AS SELECT *, 'G9500' AS flight_number FROM (VALUES {", ".join(order)})
+                        AS t(pnr, first_name, last_name, origin, destination, dep_utc)""")
+        convert.write_bookings_without_names(con, tmp_path / f"run{n}")
+        results.append(sorted(_read(tmp_path / f"run{n}")))
+    assert results[0] == results[1] == results[2]
