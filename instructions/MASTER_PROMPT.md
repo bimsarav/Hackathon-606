@@ -1,6 +1,6 @@
 # MASTER PROMPT – AUTONOMOUS SOFTWARE ENGINEERING ORGANISATION
 
-> Supplied by the user on 2026-11-19 and updated at the user's request on 2026-11-20 (including reusable stack profiles, §9.16.0, and the data engineering standards, §9.22) to integrate the **Technology Stack & Engineering Standards** and, the same day, the **Technology Stack Selection** workflow with its numbered selection menu (both in §9). Earlier versions is in git history. These are the highest-authority project rules after live user instructions.
+> Supplied by the user on 2026-11-19 and updated at the user's request on 2026-11-20 (including reusable stack profiles, §9.16.0, and the data engineering standards, §9.22, and the specialised database-dump → classification → recommendation workflow, §9.23) to integrate the **Technology Stack & Engineering Standards** and, the same day, the **Technology Stack Selection** workflow with its numbered selection menu (both in §9). Earlier versions is in git history. These are the highest-authority project rules after live user instructions.
 
 ## TABLE OF CONTENTS
 
@@ -25,6 +25,7 @@
    - 9.18 Project-Specific Technology Architecture · 9.19 Technology Restrictions
    - 9.20 Technology Stack Review and Maintenance · 9.21 Version Compatibility and Stack Consistency
    - 9.22 Data Engineering Technology Stack & Engineering Standards (9.22.1 Objective · 9.22.2 Ecosystem · 9.22.3 Architecture selection · 9.22.4 Selection checkpoint · 9.22.5 Implementation requirements · 9.22.6 Project structure · 9.22.7 Testing · 9.22.8 Documentation · 9.22.9 Integration)
+   - 9.23 Specialised Data Engineering & Machine Learning Workflow: database dump → data preparation → classification → recommendation (9.23.1 Applicability · 9.23.2 Technology selection · 9.23.3 Dump restoration and extraction · 9.23.4 Cleaning · 9.23.5 EDA · 9.23.6 Features and leakage · 9.23.7 Classification · 9.23.8 Recommendation · 9.23.9 Experiment tracking · 9.23.10 Serving · 9.23.11 Structure · 9.23.12 Documents · 9.23.13 Quality gates · 9.23.14 Precedence · 9.23.15 Completion)
 10. [Communication and Reporting](#10-communication-and-reporting)
 11. [Operating Commands](#11-operating-commands)
 12. [Final Responsibility](#12-final-responsibility)
@@ -106,7 +107,8 @@ project-root/
 │
 ├── documentation/
 │   ├── business/
-│   ├── data-engineering/              (only when data engineering is required; §9.22.8)
+│   ├── data-engineering/              (only when data engineering is required; §9.22.8, §9.23.12)
+│   ├── machine-learning/              (only when §9.23 classification or recommendation is required; §9.23.12)
 │   ├── architecture/
 │   │   ├── SYSTEM_ARCHITECTURE.md
 │   │   ├── TECH_STACK.md
@@ -183,6 +185,7 @@ Work in the following phases.
 - Identify integrations, constraints and dependencies.
 - Identify hosting, deployment, licensing and technology constraints, including technologies already in use or mandated.
 - Determine whether the project needs data engineering capabilities (§9.22.1, §9.22.3), and record the outcome either way.
+- Determine whether the specialised database-dump / classification / recommendation workflow applies (§9.23.1), and which of its stages are actually required (§9.23.14); record the outcome either way.
 - Identify missing information and ambiguities.
 
 Ask the user questions whenever clarification is necessary.
@@ -201,6 +204,7 @@ Prepare:
 - Technology justification, comparison and compatibility (§9.16.6).
 - Database and data models.
 - Data engineering architecture and the §9.22.5 design items, when data engineering is required (§9.22).
+- When §9.23 applies: the required workflow stages, model delivery approach (online vs batch, §9.23.10) and quality gates (§9.23.13).
 - API specifications.
 - Security architecture.
 - Deployment architecture.
@@ -226,6 +230,7 @@ Technology selection happens after the Phase 1 problem-domain analysis and befor
 3. Every major technology choice has an ADR in `ARCHITECTURE_DECISIONS/`.
 4. Compatible versions are defined from official sources (§9.21).
 4a. When data engineering is required: the §9.22.8 documents exist, covering the §9.22.5 design items 1–13.
+4b. When §9.23 applies: the data and ML stack is in the approved options (§9.23.2), and its applicable gates (§9.23.13) are planned.
 
 **Before Phase 4 (implementation):**
 
@@ -274,6 +279,7 @@ Validate:
 - Frontend and mobile tests where applicable.
 - End-to-end, regression and database migration tests.
 - Data pipeline, data quality, idempotency, backfill/replay and recovery tests when data engineering is part of the project (§9.22.7).
+- When §9.23 applies: data quality, leakage, model evaluation and inference tests, and quality gates 1–7 (§9.23.13).
 - Database integrity.
 - Performance and scalability.
 - Security vulnerabilities, including dependency, container and secret scanning (§9.12).
@@ -888,6 +894,7 @@ Standards:
 - Version datasets, models and configurations.
 - Monitor model quality and drift.
 - Avoid introducing LLMs or vector databases without a clear use case.
+- For database-dump analysis, classification and recommendation projects, follow the specialised workflow in §9.23.
 
 ### 9.9 API and Integration Standards
 
@@ -1147,6 +1154,7 @@ Before recommending a technology stack:
 7. Evaluate security, privacy and compliance requirements.
 8. Identify deployment and hosting constraints, and any user-mandated technologies.
 8a. Determine whether data engineering is required, and which capabilities (§9.22.1, §9.22.3).
+8b. Determine whether the §9.23 workflow applies; if so, include a suitable data and ML stack in the options (§9.23.2; default starter stack unless the requirements justify more).
 9. Identify scalability, availability and performance expectations.
 10. Identify potential future expansion requirements.
 
@@ -1273,6 +1281,7 @@ Create and maintain these files:
 - `documentation/architecture/COMPATIBILITY_MATRIX.md`
 - `documentation/architecture/ARCHITECTURE_DECISIONS/` – one ADR per major technology decision.
 - When data engineering is required: the `documentation/data-engineering/` documents (§9.22.8).
+- When §9.23 applies: the §9.23.12 data-engineering and machine-learning documents.
 
 The compatibility matrix must include:
 
@@ -2070,6 +2079,770 @@ The data engineering stack must be selected as part of the overall solution arch
 
 The selected data engineering architecture must remain consistent throughout implementation and future resumed sessions (§9.21).
 
+### 9.23 Specialised Data Engineering & Machine Learning Workflow (Database Dump → Data Preparation → Classification → Recommendation)
+
+> User instruction 2026-11-20, saved verbatim (headings renumbered as §9.23.x; the project tree in §9.23.11 is put in a code block). It extends §9.8 (AI/ML) and §9.22 (data engineering) and applies to every product whose problem domain matches §9.23.1, assessed in Phase 1.
+> **Path mapping (A-CD-1, as for §13):** `documentation/…` means the product repo's `docs/…`; the §9.23.11 tree lives inside `products/<name>/source/<name>/`. "The existing mandatory Cloud Deployment & Production Readiness Requirement" in §9.23.10 is §13.
+
+#### 9.23.1 Purpose and Applicability
+
+When the problem domain involves analysing an existing database dump, cleaning and preparing data, discovering patterns, building classification models or developing recommendation systems, the organisation MUST evaluate and apply this specialised workflow.
+
+The objective is to build a reliable, reproducible and maintainable data and machine learning solution that can:
+
+1. Restore and inspect the supplied database.
+2. Extract and profile the available data.
+3. Identify data quality issues.
+4. Clean, normalize and transform the data.
+5. Perform exploratory data analysis.
+6. Engineer relevant features.
+7. Develop classification models.
+8. Develop recommendation models.
+9. Evaluate and compare model performance.
+10. Track experiments and preserve reproducibility.
+11. Package and deploy the selected solution.
+12. Monitor data quality and model performance.
+
+This workflow must be adapted to the actual dataset and business problem. Not every stage or technology is mandatory for every project.
+
+#### 9.23.2 Technology Selection
+
+Use the existing mandatory numbered technology selection process defined in the master prompt.
+
+When this specialised workflow applies, the agent must include a suitable data engineering and machine learning stack in its proposed technology options.
+
+The following is the preferred starting technology ecosystem:
+
+| Area | Preferred technologies |
+|---|---|
+| Programming | Python |
+| Database restoration | Docker, native database tools |
+| Database connectivity | python-oracledb, psycopg, SQLAlchemy, MySQL Connector/Python |
+| Columnar storage | Apache Parquet, PyArrow |
+| Analytical querying | DuckDB |
+| Data processing | Polars, pandas |
+| Data profiling | ydata-profiling, Sweetviz |
+| Data validation | Pandera, Great Expectations |
+| Exploration | JupyterLab, VS Code |
+| Feature engineering | SQL, DuckDB, scikit-learn |
+| Classification | scikit-learn, LightGBM, XGBoost, CatBoost |
+| Hyperparameter optimization | Optuna |
+| Class imbalance | imbalanced-learn, class weights |
+| Explainability | SHAP |
+| Recommendation | implicit, LightFM, mlxtend |
+| Similarity search | FAISS, pgvector |
+| Deep learning | PyTorch, TorchRec |
+| Model benchmarking | RecBole, Surprise |
+| Experiment tracking | MLflow, Weights & Biases |
+| Data versioning | DVC |
+| Pipeline orchestration | Prefect, Dagster |
+| Environment management | uv, Conda |
+| Model API | FastAPI |
+| Model packaging | Docker, ONNX where appropriate |
+| Model monitoring | Evidently |
+| Testing | Pytest |
+| Code quality | Ruff, mypy or Pyright |
+
+The agent must verify current framework support, dependency compatibility and suitability before selecting versions.
+
+**Default starter stack:**
+
+Python + DuckDB + Polars/pandas + PyArrow + scikit-learn + LightGBM + Optuna + MLflow + FastAPI.
+
+This is a starting recommendation, not a mandatory fixed architecture. Introduce Spark, Airflow, distributed processing, deep learning or other heavier infrastructure only when the requirements justify them.
+
+#### 9.23.3 Database Dump Ingestion and Restoration
+
+##### 9.23.3.1 Database discovery
+
+Before restoring the supplied dump, identify:
+
+- Database engine: Oracle, PostgreSQL, MySQL or another supported engine.
+- Database version, where identifiable.
+- Dump format and size.
+- Schema and object structure.
+- Tables, views, indexes, constraints and relationships.
+- Stored procedures, functions and triggers where applicable.
+- Character encoding and collation.
+- Data types and database-specific features.
+- Potentially sensitive information.
+- Dependencies required for restoration.
+
+Do not assume the database engine based only on the file extension.
+
+##### 9.23.3.2 Isolated database restoration
+
+Restore the dump into a disposable, isolated instance of the same database engine whenever possible.
+
+Preferred approach:
+
+- Use Docker for local or temporary database instances.
+- Use a compatible database version.
+- Preserve the original dump unchanged.
+- Use a separate database and storage location for each restoration attempt.
+- Avoid connecting experimental pipelines to production databases.
+- Record restoration commands and database configuration.
+
+The agent must not execute destructive operations against an existing database.
+
+If the dump cannot be restored using the available environment, investigate compatibility issues and identify an appropriate alternative restoration approach.
+
+##### 9.23.3.3 Data extraction
+
+After restoration:
+
+- Inspect the database schema.
+- Identify relevant tables and relationships.
+- Determine table sizes and row counts.
+- Identify primary keys and foreign keys.
+- Inspect indexes and constraints.
+- Identify candidate target variables and useful features.
+- Identify date and timestamp fields.
+- Identify sensitive or personal information.
+
+Extract relevant datasets into analytical formats.
+
+Preferred formats:
+
+- Apache Parquet for medium and large datasets.
+- CSV for small datasets or simple interoperability.
+- Apache Arrow for efficient in-memory data exchange.
+
+Preferred libraries:
+
+- PyArrow.
+- Polars.
+- pandas.
+- python-oracledb for Oracle.
+- psycopg for PostgreSQL.
+- MySQL Connector/Python for MySQL.
+- SQLAlchemy where database abstraction is beneficial.
+
+Use chunked extraction or incremental processing when datasets exceed available memory.
+
+##### 9.23.3.4 Analytical querying
+
+Use DuckDB to query Parquet and other supported analytical files directly.
+
+Prefer DuckDB for:
+
+- Data profiling.
+- Exploratory SQL queries.
+- Aggregations.
+- Joins.
+- Data quality investigation.
+- Feature engineering.
+- Dataset preparation.
+
+Avoid repeatedly querying the restored transactional database for analytical operations when an extracted analytical dataset is sufficient.
+
+#### 9.23.4 Data Cleaning and Exploration
+
+##### 9.23.4.1 Core technologies
+
+Use:
+
+- Python.
+- Polars for larger datasets and memory-efficient processing.
+- pandas for broad ecosystem compatibility and smaller datasets.
+- DuckDB for analytical SQL.
+- PyArrow for columnar data handling.
+- JupyterLab or VS Code for exploratory work.
+
+Use ydata-profiling or Sweetviz for initial data profiling where appropriate.
+
+Use Pandera or Great Expectations to define and validate data quality rules.
+
+##### 9.23.4.2 Initial data assessment
+
+Generate a data profiling report containing:
+
+- Number of records.
+- Number of columns.
+- Data types.
+- Null and missing-value percentages.
+- Unique value counts.
+- Duplicate records.
+- Cardinality.
+- Value distributions.
+- Outliers.
+- Invalid or inconsistent values.
+- Date ranges.
+- Relationships between datasets.
+- Potential target variables.
+- Candidate classification features.
+- Candidate recommendation entities and interactions.
+
+##### 9.23.4.3 Cleaning operations
+
+Evaluate and apply the following operations where justified:
+
+1. Correct data types.
+2. Parse dates and timestamps.
+3. Standardize time zones.
+4. Handle missing and null values.
+5. Identify and handle duplicate records.
+6. Normalize categorical values.
+7. Standardize inconsistent labels.
+8. Validate numerical ranges.
+9. Investigate and handle outliers.
+10. Remove test, dummy and junk records.
+11. Resolve inconsistent relationships.
+12. Validate primary and foreign key relationships.
+13. Identify invalid or corrupted records.
+
+Do not automatically delete unusual records or outliers. First determine whether they represent errors or legitimate business activity.
+
+Maintain a record of cleaning decisions, affected records and transformation rules.
+
+##### 9.23.4.4 Data privacy
+
+If the database contains personally identifiable information or other sensitive data:
+
+- Identify sensitive fields before processing.
+- Mask, tokenize or hash data where appropriate.
+- Minimize access to raw records.
+- Keep raw dumps and sensitive extracts out of Git.
+- Restrict access to temporary database instances.
+- Use synthetic or anonymized datasets for development where possible.
+- Never expose sensitive information in logs, notebooks, reports or model explanations.
+- Apply the existing security, privacy and data governance requirements.
+
+Do not upload sensitive datasets to external services unless explicitly authorized.
+
+#### 9.23.5 Exploratory Data Analysis
+
+Perform structured exploratory data analysis before model development.
+
+Investigate:
+
+- Distribution of numerical variables.
+- Distribution of categorical variables.
+- Relationships between features.
+- Correlations.
+- Class distribution.
+- Missing data patterns.
+- Temporal patterns.
+- Entity activity patterns.
+- User or customer behaviour.
+- Transaction frequency.
+- Product or item popularity.
+- Data leakage risks.
+- Potential bias and sampling issues.
+
+Produce visualizations and reports where they provide useful insights.
+
+Move stable exploratory logic from notebooks into reusable Python modules.
+
+Notebooks must not become the only location of production transformation or model logic.
+
+#### 9.23.6 Feature Engineering
+
+Use SQL and DuckDB for joins, aggregations and analytical transformations where efficient.
+
+Use scikit-learn pipelines for reproducible preprocessing.
+
+Evaluate:
+
+- Numerical transformations.
+- Categorical encoding.
+- Missing-value imputation.
+- Feature scaling.
+- Date and time features.
+- Frequency-based features.
+- Recency features.
+- Aggregated entity features.
+- Behavioural features.
+- Interaction features.
+- Domain-specific features.
+
+For customer or user behaviour, consider:
+
+- Recency.
+- Frequency.
+- Monetary value.
+- Activity counts.
+- Purchase or interaction history.
+- Engagement measures.
+
+Use ColumnTransformer, Pipeline and appropriate encoders and scalers from scikit-learn.
+
+All preprocessing must be fitted using training data only. Apply the fitted transformations to validation, test and inference datasets.
+
+##### 9.23.6.1 Data leakage prevention
+
+This is a mandatory requirement.
+
+- Use time-aware data splits when records have temporal meaning.
+- Never use future information to predict past outcomes.
+- Do not calculate features using information unavailable at prediction time.
+- Fit encoders, scalers and imputers only on training data.
+- Keep target information out of model features.
+- Check for duplicate or overlapping entities across splits where this could invalidate evaluation.
+- Document the split strategy.
+
+#### 9.23.7 Classification Model Development
+
+##### 9.23.7.1 Baseline model
+
+Begin with a simple, interpretable baseline.
+
+Preferred baseline:
+
+- Logistic Regression using scikit-learn.
+
+Other suitable baselines may include:
+
+- Decision Tree.
+- Random Forest.
+- DummyClassifier.
+
+##### 9.23.7.2 Candidate production models
+
+Evaluate models appropriate for the dataset.
+
+Preferred candidates for structured tabular data:
+
+- LightGBM.
+- XGBoost.
+- CatBoost.
+- Random Forest.
+- Gradient Boosting.
+- Logistic Regression.
+
+Use CatBoost when categorical features are important and its handling of those features is advantageous.
+
+Do not assume that gradient-boosted trees are always best. Compare against suitable baselines and select using validation results.
+
+##### 9.23.7.3 Hyperparameter tuning
+
+Evaluate:
+
+- Optuna.
+- RandomizedSearchCV.
+- GridSearchCV.
+
+Use a controlled search strategy and avoid excessive experimentation without measurable benefit.
+
+##### 9.23.7.4 Class imbalance
+
+When class distribution is imbalanced, evaluate:
+
+- Class weights.
+- imbalanced-learn.
+- Under-sampling.
+- Over-sampling.
+- SMOTE where appropriate.
+- Threshold optimization.
+
+Perform resampling only within the training process. Never resample the test dataset before final evaluation.
+
+##### 9.23.7.5 Evaluation metrics
+
+Do not rely solely on accuracy.
+
+Select appropriate metrics based on business objectives and class distribution.
+
+Evaluate:
+
+- Precision.
+- Recall.
+- F1-score.
+- PR-AUC.
+- ROC-AUC where appropriate.
+- Confusion matrix.
+- Calibration.
+- Log loss.
+- Per-class performance.
+- Business-specific error costs.
+
+Use SHAP or another suitable explainability technique to understand feature contributions where appropriate.
+
+The final classification model must be selected based on validation performance, reliability, interpretability and business suitability.
+
+#### 9.23.8 Recommendation Model Development
+
+The agent must first identify the available recommendation data.
+
+Determine whether the dataset contains:
+
+- Users or customers.
+- Products, services or items.
+- Purchases.
+- Clicks.
+- Views.
+- Ratings.
+- Bookings.
+- Transactions.
+- Searches.
+- User-item interactions.
+- Item attributes.
+- User attributes.
+- Timestamps.
+
+Determine whether the available information represents explicit feedback, implicit feedback or content-only data.
+
+##### 9.23.8.1 Baseline recommendations
+
+Begin with simple baselines:
+
+- Most popular items.
+- Most frequently purchased items.
+- Recently popular items.
+- Category-based recommendations.
+- Co-occurrence recommendations.
+- Association rules using mlxtend.
+
+These baselines establish a performance reference for more advanced models.
+
+##### 9.23.8.2 Collaborative filtering
+
+For implicit feedback such as views, clicks and purchases, evaluate:
+
+- implicit library.
+- Alternating Least Squares (ALS).
+- Bayesian Personalized Ranking (BPR).
+- LightFM.
+
+For explicit feedback such as ratings, evaluate suitable rating prediction approaches and benchmarking tools.
+
+##### 9.23.8.3 Content-based and hybrid recommendations
+
+When item or user attributes are available, evaluate:
+
+- TF-IDF.
+- Feature-based similarity.
+- Embeddings.
+- Cosine similarity.
+- Hybrid recommendation models.
+- FAISS.
+- pgvector.
+
+Combine interaction history with item and user attributes when it provides measurable improvement.
+
+##### 9.23.8.4 Deep learning recommendations
+
+Only consider deep learning when data volume, interaction density, complexity and business value justify the additional cost.
+
+Evaluate:
+
+- PyTorch.
+- TorchRec.
+- Two-tower recommendation architectures.
+- Embedding-based retrieval.
+- Neural collaborative filtering.
+- Other suitable recommendation architectures.
+
+Do not introduce deep learning simply because it is available.
+
+##### 9.23.8.5 Recommendation evaluation
+
+Evaluate using a time-based holdout where historical interaction data permits it.
+
+Metrics should include:
+
+- Recall@K.
+- Precision@K.
+- NDCG@K.
+- MAP@K.
+- Hit Rate@K.
+- Catalog coverage.
+- Diversity.
+- Novelty.
+- Popularity bias.
+
+Use RecBole or Surprise where appropriate for benchmarking and experimentation.
+
+The agent must explain how recommendations are generated and identify cold-start limitations for new users and items.
+
+#### 9.23.9 Experiment Tracking and Reproducibility
+
+Use MLflow as the preferred experiment tracking and model lifecycle tool.
+
+Weights & Biases may be used as an alternative when justified.
+
+Track:
+
+- Dataset version.
+- Data preparation version.
+- Feature definitions.
+- Model type.
+- Model parameters.
+- Hyperparameters.
+- Training configuration.
+- Evaluation metrics.
+- Experiment identifiers.
+- Model artifacts.
+- Code version.
+- Dependency versions.
+
+Evaluate DVC for data and pipeline versioning.
+
+Use Prefect or Dagster when the workflow requires orchestration.
+
+Use uv or Conda for reproducible Python environments and maintain dependency lock files.
+
+All important experiments must be reproducible.
+
+Do not store sensitive raw data or credentials in experiment tracking artifacts.
+
+#### 9.23.10 Model Serving and Deployment
+
+Deployment must follow the existing mandatory Cloud Deployment & Production Readiness Requirement.
+
+The model delivery approach must be selected based on business usage and latency requirements.
+
+##### 9.23.10.1 Online inference
+
+Use FastAPI to expose model inference through APIs where online predictions are required.
+
+Consider:
+
+- Classification prediction endpoints.
+- Recommendation endpoints.
+- Model metadata endpoints.
+- Health endpoints.
+- Readiness endpoints.
+- Authentication and authorization.
+- Request validation.
+- Rate limiting.
+- Error handling.
+- Structured logging.
+
+Package the selected model using an appropriate format:
+
+- scikit-learn serialization where appropriate.
+- LightGBM or XGBoost native model formats.
+- ONNX when interoperability or inference optimization is beneficial.
+
+Do not load untrusted serialized model files. Use trusted model artifacts and controlled deployment processes.
+
+##### 9.23.10.2 Batch inference
+
+When immediate predictions are unnecessary, prefer scheduled batch scoring.
+
+The workflow should:
+
+1. Load the approved model.
+2. Retrieve the required input data.
+3. Apply the same preprocessing used during training.
+4. Generate predictions or recommendations.
+5. Validate prediction output.
+6. Write results to an appropriate database table or storage location.
+7. Record model version and scoring timestamp.
+8. Monitor execution and failures.
+
+Batch inference should be preferred over online inference when it meets the business requirements and reduces operational complexity.
+
+##### 9.23.10.3 Model monitoring
+
+Evaluate Evidently or equivalent monitoring tools.
+
+Monitor:
+
+- Data drift.
+- Feature drift.
+- Prediction distribution.
+- Model performance when ground truth becomes available.
+- Missing or invalid inference inputs.
+- Prediction failures.
+- Inference latency.
+- Model version.
+- Recommendation quality.
+- Pipeline failures.
+
+Define retraining criteria and approval requirements.
+
+Do not automatically replace production models without appropriate validation and release controls.
+
+#### 9.23.11 Project Structure
+
+Adapt the existing project structure rather than introducing a conflicting or duplicate directory hierarchy.
+
+A suitable Python data and ML project may use:
+
+```
+source/
+  data-engineering/
+    ingestion/
+    extraction/
+    cleaning/
+    profiling/
+    transformations/
+    feature_engineering/
+    validation/
+    pipelines/
+    orchestration/
+  machine-learning/
+    classification/
+    recommendation/
+    preprocessing/
+    evaluation/
+    explainability/
+    training/
+    inference/
+    models/
+  api/
+  shared/
+
+notebooks/
+  exploration/
+  experiments/
+
+data/
+  raw/
+  interim/
+  processed/
+  features/
+  external/
+
+models/
+  classification/
+  recommendation/
+  artifacts/
+
+tests/
+  unit/
+  integration/
+  data_quality/
+  model/
+  api/
+
+configuration/
+  development/
+  testing/
+  production/
+
+documentation/
+  data-engineering/
+  machine-learning/
+  architecture/
+```
+
+Important:
+
+- Raw data must not be committed to Git.
+- Generated datasets and model artifacts must follow the project's data and artifact storage policy.
+- Large files must use appropriate external storage or data versioning.
+- Notebooks are for exploration, not the sole production implementation.
+- Avoid creating directories that are not required by the selected architecture.
+
+#### 9.23.12 Mandatory Documentation and Deliverables
+
+Maintain the following documentation where applicable:
+
+- `documentation/data-engineering/DATABASE_RESTORATION.md`
+- `documentation/data-engineering/DATA_PROFILING.md`
+- `documentation/data-engineering/DATA_CLEANING.md`
+- `documentation/data-engineering/DATA_DICTIONARY.md`
+- `documentation/data-engineering/DATA_QUALITY.md`
+- `documentation/data-engineering/FEATURE_ENGINEERING.md`
+- `documentation/machine-learning/CLASSIFICATION_MODEL_REPORT.md`
+- `documentation/machine-learning/RECOMMENDATION_MODEL_REPORT.md`
+- `documentation/machine-learning/MODEL_COMPARISON.md`
+- `documentation/machine-learning/EXPERIMENT_TRACKING.md`
+- `documentation/machine-learning/MODEL_DEPLOYMENT.md`
+- `documentation/machine-learning/MODEL_MONITORING.md`
+
+The model reports must include:
+
+- Dataset description.
+- Data preparation steps.
+- Training and evaluation methodology.
+- Feature descriptions.
+- Baseline results.
+- Candidate model comparisons.
+- Selected model and justification.
+- Evaluation metrics.
+- Known limitations.
+- Reproducibility instructions.
+
+#### 9.23.13 Mandatory Quality Gates
+
+The following gates must be satisfied before moving to the next stage.
+
+**Gate 1 – Database restoration**
+- Original dump preserved.
+- Database restored successfully.
+- Schema inspected.
+- Data extraction validated.
+
+**Gate 2 – Data preparation**
+- Data profiling completed.
+- Cleaning rules documented.
+- Data quality checks implemented.
+- Sensitive data handled appropriately.
+- Prepared dataset validated.
+
+**Gate 3 – Feature engineering**
+- Features documented.
+- Leakage checks completed.
+- Training, validation and test splits defined.
+- Preprocessing reproducible.
+
+**Gate 4 – Classification**
+- Baseline evaluated.
+- Candidate models compared.
+- Suitable metrics reported.
+- Selected model justified.
+
+**Gate 5 – Recommendation**
+- Recommendation strategy justified by available data.
+- Baselines evaluated.
+- Candidate algorithms compared where appropriate.
+- Ranking metrics reported.
+- Cold-start limitations documented.
+
+**Gate 6 – Reproducibility**
+- Dependencies locked.
+- Experiments tracked.
+- Model artifacts versioned.
+- Training and evaluation repeatable.
+
+**Gate 7 – Deployment**
+- Model or batch scoring service deployed where required.
+- Deployed service verified.
+- Inference or scoring tested.
+- Monitoring configured where applicable.
+- Cloud deployment requirements satisfied.
+
+#### 9.23.14 Integration and Precedence Rules
+
+This specialised workflow extends the existing master prompt. It does not create a separate engineering organisation or override existing requirements.
+
+Apply the following precedence:
+
+1. Existing security, privacy and data protection rules remain mandatory.
+2. Existing user instructions and approved project decisions take precedence over default technology recommendations.
+3. The existing numbered technology selection process governs stack approval.
+4. This section provides specialised implementation guidance for database-dump-based data and ML projects.
+5. Existing architecture, testing, deployment, documentation and persistent state requirements remain applicable.
+
+Do not duplicate existing technology catalogues, deployment procedures, security requirements or session management instructions. Reference and reuse those sections.
+
+If a technology is already selected and approved, do not silently replace it with a technology from this section.
+
+If the project does not require classification or recommendation models, do not build them merely because this workflow describes them.
+
+If a project requires only data extraction and cleaning, implement only the necessary stages.
+
+#### 9.23.15 Definition of Completion
+
+For projects using this workflow, completion requires:
+
+- Database restoration and extraction successfully verified.
+- Data profiling and cleaning completed.
+- Data quality rules implemented.
+- Feature engineering documented.
+- Required classification and recommendation models evaluated.
+- Selected models justified by measurable results.
+- Experiments and artifacts reproducible.
+- Required APIs or batch scoring deployed.
+- Cloud deployment and post-deployment verification completed.
+- Technical documentation and operational handover provided.
+
+Do not claim that a model is production-ready based solely on successful training. Production readiness requires appropriate evaluation, reproducibility, security, deployment and monitoring.
+
 ## 10. COMMUNICATION AND REPORTING
 
 At the end of each working session, provide a concise report:
@@ -2122,6 +2895,7 @@ The solution is complete only when:
 - Documentation is available.
 - The system architecture, technology stack, comparison, compatibility matrix and ADRs are current and match the delivered implementation.
 - When data engineering is part of the project: pipelines are monitored and tested (§9.22.7), and the §9.22.8 documents are current.
+- When the §9.23 workflow applies: its definition of completion (§9.23.15) is met.
 - Deployment instructions are provided.
 - The solution is deployed, running and verified in the cloud environment provided by the user, and the user has the URL and handover information (§13.13). Until then the status is BLOCKED or DEPLOYMENT PENDING, never COMPLETED.
 - Execution records are updated.

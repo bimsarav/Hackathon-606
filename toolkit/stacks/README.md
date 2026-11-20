@@ -21,3 +21,5 @@ Application stacks not yet built (build when a product first selects one, then a
 - Re-verify a profile when its `VERIFIED.md` is older than 30 days and it is about to be used, and after any change to it.
 - Improvements found while building a product (bug fixes, missing hardening) go back into the profile, followed by `scripts/verify-profile.sh`.
 - Delivered products keep their own pinned copy. A profile update never changes them.
+
+Data + ML workflow (MASTER_PROMPT §9.23, user 2026-11-20): **no profile yet**. Candidate: `python-ml-tabular` (uv + DuckDB + Polars/pandas + PyArrow + Pandera + scikit-learn + LightGBM + Optuna + MLflow + FastAPI + Evidently, Pytest/Ruff/mypy; isolated dump restore via Docker). Build and verify it (scripts/verify-profile.sh) the first time a product needs §9.23; until then verify versions per §9.21.

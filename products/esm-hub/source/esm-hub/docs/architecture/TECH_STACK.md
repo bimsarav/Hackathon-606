@@ -34,11 +34,16 @@ This document follows the organisation's Technology Stack & Engineering Standard
 | Packaging/deploy | Docker images (`eclipse-temurin:27-jre`, non-root), Docker Compose, GitHub Actions | §11. Kubernetes is **not** used because Compose is enough for the stated scale (§19) |
 | Email (local) | Mailpit | SMTP sink with a UI for demo and testing only |
 
-## 2a. Data engineering assessment (§22.3)
+## 2a. Data engineering assessment (§9.22.3)
 **No separate data engineering platform is required.** The data needs are covered inside the application stack:
 - Cross-domain reporting (FR-13) uses a CQRS read model: reporting-service consumes the Kafka state topics into its own PostgreSQL projections and computes KPIs in SQL ([ADR-0007](adr/0007-cqrs-reporting.md)). The volume is moderate and near-real-time is enough, so no warehouse, stream processor or orchestrator is needed.
 - The legacy dump is a one-off import, repaired and turned into per-service seed migrations ([ADR-0008](adr/0008-legacy-seed.md)), not a recurring pipeline. Data-quality findings: [data-quality-report.md](../data/data-quality-report.md).
-- Revisit this if the PO asks for historical analytics across years, external BI tools on raw data, or continuous sync with other systems. That would trigger §22.3 (likely batch ELT into an analytical store).
+- Revisit this if the PO asks for historical analytics across years, external BI tools on raw data, or continuous sync with other systems. That would trigger §9.22.3 (likely batch ELT into an analytical store).
+
+**Specialised dump → classification → recommendation workflow (MASTER_PROMPT §9.23), assessed 2026-11-20:** applies only in part.
+- Applicable stages, already done: the supplied PostgreSQL dump was loaded into a disposable PostgreSQL 16 container with the original file untouched in `input/data/` (load defects L1–L4 fixed in the generator, not in the dump; rerun with `tools/profiling/run_profile.sh`); it was profiled and its quality issues documented ([data-quality-report.md](../data/data-quality-report.md)), and the repairs became versioned seed migrations ([ADR-0008](adr/0008-legacy-seed.md)). The data is synthetic (no PII), as the problem statement says.
+- Not applicable: no requirement in the problem statement or the requirements analysis asks for a classification or recommendation model. "Classify" in the incident lifecycle means manual categorisation by an agent. Per §9.23.14, no ML stack, models or ML documents are built.
+- Possible future use, not in scope and needs PO approval: incident category/priority suggestion (classification) or KB article suggestion while raising an incident (recommendation). The dump has about 150 incidents, too few for a reliable model; revisit with real history.
 
 ## 3. Deviations from the standard, recorded openly
 | Standard | Deviation | Reason and mitigation |
