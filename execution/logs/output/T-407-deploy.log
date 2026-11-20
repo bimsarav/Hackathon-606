@@ -1,0 +1,12 @@
+ Image disruption-advisor-web:latest Built 
+ Container disruption-advisor-web-1 Healthy 
+ Container disruption-advisor-db-1 Healthy 
+ingest-1  | 2026-11-20 22:28:35,774 INFO stage 1 skipped: extracts unchanged
+ingest-1  | 2026-11-20 22:28:35,774 INFO stage 2: building the operating picture
+ingest-1  | 2026-11-20 22:29:02,682 INFO stage 2 done: {"airports": 142, "aircraft": 81, "booking_classes": 388, "passenger_identity": 14395846, "customers": 174723, "pax_segments": 299419, "flights": 2614, "history_flights": 63322, "mct": 39}
+ingest-1  | 2026-11-20 22:29:03,379 INFO demo scenario added: {"demo_flights": 9, "demo_pax_segments": 48, "demo_customers": 24}
+api Up 6 seconds (healthy)
+db Up 3 hours (healthy)
+ingest Exited (0) 10 seconds ago
+migrate Exited (0) 38 seconds ago
+web Up 33 minutes (healthy)

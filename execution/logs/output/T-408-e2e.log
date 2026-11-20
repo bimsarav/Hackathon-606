@@ -1,0 +1,8 @@
+
+Running 3 tests using 1 worker
+
+  ✓  1 [chromium] › tests/advisor.spec.ts:14:1 › wrong password is rejected and the API needs a token (257ms)
+  ✓  2 [chromium] › tests/advisor.spec.ts:23:1 › scenario A: a delay is assessed, options compared, recommendation approved (22.8s)
+  ✓  3 [chromium] › tests/advisor.spec.ts:54:1 › scenario B: a cancellation ranks passengers by tier and re-runs with new weights (5.9s)
+
+  3 passed (29.4s)

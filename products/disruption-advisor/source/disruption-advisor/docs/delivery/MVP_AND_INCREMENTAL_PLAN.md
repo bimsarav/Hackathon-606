@@ -72,6 +72,8 @@ Delivery cadence (user instruction 2026-11-20): design first, MVP first, host th
 - Side-by-side strategy comparison (for example "protect most passengers" vs "lowest cost" vs "least delay").
 
 ## Phase 4 — Extend (needs approval)
+- **Unaccompanied minors (future enhancement, removed from MVP scope 2026-11-21):** UMNR identification, mandatory priority (EU261 Art. 11), supervision during long waits, guardian notification, and handover rules.
+- **Partner and other carriers (future enhancement, removed from MVP scope 2026-11-21):** bring the group and partner carriers in the extracts (3L, 3O, E5, 9P, 4P) back into the operating picture (`OPERATING_CARRIERS`). That covers their flights as rebooking alternatives (interline and group re-accommodation, with bilateral agreements), their aircraft as swap candidates, and cross-carrier connections.
 - Equipment change (different type or capacity) and bus + air journeys.
 - Crew legality, when crew data exists.
 - Replace synthetic data with real loyalty, SSR, fare-family and aircraft files as they arrive.

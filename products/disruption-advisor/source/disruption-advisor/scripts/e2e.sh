@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Playwright end-to-end tests in Docker against a running stack.
-#   scripts/e2e.sh                       → http://localhost:${WEB_PORT} (from .env)
+#   scripts/e2e.sh                       → http://localhost:${WEB_PORT} (from settings.env)
 #   E2E_BASE_URL=http://host:8888 scripts/e2e.sh
-# Signs in with the first DEMO_USERS entry from .env (or E2E_USER / E2E_PASSWORD).
+# Signs in with the first DEMO_USERS entry from settings.env (or E2E_USER / E2E_PASSWORD).
 set -euo pipefail
 cd "$(dirname "$0")/.."
-set -a; [ -f .env ] && . ./.env; set +a
+set -a; if [ -f settings.env ]; then . ./settings.env; elif [ -f .env ]; then . ./.env; fi; set +a
 FIRST="${DEMO_USERS%%,*}"
 E2E_USER="${E2E_USER:-${FIRST%%:*}}"
 REST="${FIRST#*:}"; E2E_PASSWORD="${E2E_PASSWORD:-${REST%%:*}}"

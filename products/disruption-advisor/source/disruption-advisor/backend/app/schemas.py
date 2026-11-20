@@ -48,6 +48,10 @@ class Reprioritise(Strict):
     weights: Weights
 
 
+class SelectOption(Strict):
+    option_key: str = Field(min_length=1, max_length=40, pattern=r"^[A-Za-z0-9:_\-]+$")
+
+
 class ScenarioRead(BaseModel):
     id: uuid.UUID
     kind: str

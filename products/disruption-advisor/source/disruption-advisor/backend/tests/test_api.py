@@ -67,6 +67,29 @@ def test_delay_scenario_end_to_end_with_decision(client: TestClient, auth: dict[
     assert [s["id"] for s in client.get("/api/v1/scenarios", headers=auth).json()] == [scenario["id"]]
 
 
+def test_selecting_another_option_recomputes_and_is_kept_on_what_if(client: TestClient, auth: dict[str, str]) -> None:
+    scenario = client.post(
+        "/api/v1/scenarios", headers=auth, json={"kind": "DELAY", "flight_id": F1, "delay_minutes": 150}
+    ).json()
+    result = scenario["result"]
+    other = next(o["key"] for o in result["options"] if o["key"] != result["recommended_key"])
+    chosen = client.post(f"/api/v1/scenarios/{scenario['id']}/select", headers=auth, json={"option_key": other})
+    assert chosen.status_code == 200
+    assert chosen.json()["result"]["selected_key"] == other
+    assert chosen.json()["result"]["recommended_key"] == result["recommended_key"]
+    weights = {"loyalty": 50, "frequency": 0, "fare_value": 0, "ancillaries": 0, "journey": 0, "booking": 0}
+    rerun = client.post(f"/api/v1/scenarios/{scenario['id']}/reprioritise", headers=auth, json={"weights": weights})
+    assert rerun.json()["result"]["selected_key"] == other  # what-if keeps the controller's choice
+    unknown = client.post(f"/api/v1/scenarios/{scenario['id']}/select", headers=auth, json={"option_key": "swap:NOPE"})
+    assert unknown.status_code == 404
+
+
+def test_cancellation_has_no_options_to_select(client: TestClient, auth: dict[str, str]) -> None:
+    scenario = client.post("/api/v1/scenarios", headers=auth, json={"kind": "CANCEL", "flight_id": X1}).json()
+    response = client.post(f"/api/v1/scenarios/{scenario['id']}/select", headers=auth, json={"option_key": "absorb"})
+    assert response.status_code == 422
+
+
 def test_cancellation_what_if_and_message_draft(client: TestClient, auth: dict[str, str]) -> None:
     scenario = client.post("/api/v1/scenarios", headers=auth, json={"kind": "CANCEL", "flight_id": X1}).json()
     rows = scenario["result"]["passengers"]

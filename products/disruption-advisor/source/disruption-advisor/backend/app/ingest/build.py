@@ -12,6 +12,7 @@ Outputs:
   customers.parquet       one row per passenger key: 12-month travel history (real) and loyalty tier (synthetic)
   pax_segments.parquet    active passenger-segments in the window with enrichment and SSRs
   mct.parquet             hub connection times
+  history_flights.parquet G9 flights 1 Jan 2026 to the window start with actual times, aircraft chain, bookings
   ingest_report.json      counts, mismatches and data-quality notes (shown in the UI)
 """
 
@@ -19,7 +20,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -49,6 +50,14 @@ class Window:
 
 
 DEFAULT_WINDOW = Window(datetime(2026, 11, 20), datetime(2026, 11, 19), datetime(2026, 12, 1))
+# Scope (user decision 2026-11-21): only the airline's own flights. Partner and other carriers in the extracts
+# (3L, 3O, E5, 9P, 4P) are excluded from the operating picture; including them is a future enhancement.
+DEFAULT_CARRIERS: tuple[str, ...] = ("G9",)
+
+
+def _months(start: datetime, end: datetime) -> str:
+    """Partition filter on dep_month (YYYY-MM) so DuckDB reads only the months in [start, end]."""
+    return f"dep_month BETWEEN '{start:%Y-%m}' AND '{end:%Y-%m}'"
 
 
 def _u(expr: str, salt: str) -> str:
@@ -56,12 +65,15 @@ def _u(expr: str, salt: str) -> str:
     return f"(('0x' || substr(md5('{salt}|' || {expr}), 1, 12))::UBIGINT / 281474976710656.0)"
 
 
-def build(data_dir: Path, window: Window = DEFAULT_WINDOW) -> dict[str, Any]:
+def build(
+    data_dir: Path, window: Window = DEFAULT_WINDOW, carriers: tuple[str, ...] = DEFAULT_CARRIERS
+) -> dict[str, Any]:
     raw, ops = data_dir / "raw", data_dir / "ops"
     ops.mkdir(parents=True, exist_ok=True)
     c = duckdb.connect()
     w_start, w_end, snap = (f"TIMESTAMP '{t:%Y-%m-%d %H:%M:%S}'" for t in (window.start, window.end, window.snapshot))
     bookings = f"read_parquet('{raw}/bookings/*/*.parquet', hive_partitioning = true)"
+    in_scope = "(" + ", ".join(f"'{c}'" for c in carriers if c.isalnum()) + ")"  # codes are alphanumeric only
     active = "res_status = 'CNF' AND seg_status = 'CNF' AND flight_status = 'ACT'"
 
     def out(name: str, sql: str) -> int:
@@ -80,7 +92,9 @@ def build(data_dir: Path, window: Window = DEFAULT_WINDOW) -> dict[str, Any]:
         f"""
         WITH legs AS (
             SELECT airline, reg, sai, std, try_cast(pax AS INTEGER) AS pax FROM '{raw}/rotation.parquet'
-            UNION ALL SELECT airline, reg, sai, std, try_cast(pax AS INTEGER) FROM '{raw}/punctuality.parquet'),
+            WHERE airline IN {in_scope}
+            UNION ALL SELECT airline, reg, sai, std, try_cast(pax AS INTEGER) FROM '{raw}/punctuality.parquet'
+            WHERE airline IN {in_scope}),
         inv AS (SELECT DISTINCT flight_number, dep_utc, aircraft_model, adult_capacity FROM '{raw}/inventory.parquet'),
         hits AS (
             SELECT l.reg, i.aircraft_model, max(i.adult_capacity) AS seats, count(*) AS n
@@ -128,29 +142,32 @@ def build(data_dir: Path, window: Window = DEFAULT_WINDOW) -> dict[str, Any]:
     c.execute(f"""
         CREATE TEMP TABLE seg AS
         SELECT * FROM (
-            SELECT pnr, first_name, last_name, pax_type, flight_number, dep_utc, origin, destination, booking_code,
+            SELECT pnr, customer_key, pax_type, flight_number, dep_utc, origin, destination, booking_code,
                    total_fare, anci_charges, baggage_kg, meals, seat_code, is_lms_member, sales_channel, booking_ts,
-                   lower(trim(first_name)) || '|' || lower(trim(last_name)) AS name_key,
-                   row_number() OVER (PARTITION BY pnr, first_name, last_name, flight_number, dep_utc
+                   passenger_id, passport_number_synthetic, national_id_synthetic, identity_rule,
+                   row_number() OVER (PARTITION BY pnr, customer_key, flight_number, dep_utc
                                       ORDER BY booking_ts DESC) AS rn
             FROM {bookings}
-            WHERE dep_year IN ({window.start.year}, {window.end.year}) AND dep_utc >= {w_start} AND dep_utc < {w_end}
-              AND {active})
+            WHERE {_months(window.start, window.end)} AND dep_utc >= {w_start} AND dep_utc < {w_end}
+              AND customer_key IS NOT NULL
+              AND {active}
+              AND (substr(flight_number, 1, 2) IN {in_scope} OR starts_with(flight_number, '02')))
         WHERE rn = 1""")
 
-    # Customer profiles (Q4): real 12-month history by name key; synthetic tier for loyalty members.
+    # Customer profiles (Q4): real 12-month history by customer key (hash of the name);
+    # synthetic tier for loyalty members.
     counts["customers"] = out(
         "customers",
         f"""
         WITH hist AS (
-            SELECT lower(trim(first_name)) || '|' || lower(trim(last_name)) AS name_key, count(*) AS flown_12m,
+            SELECT customer_key, count(*) AS flown_12m,
                    count(DISTINCT pnr) AS pnrs_12m, bool_or(is_lms_member) AS member_hist
             FROM {bookings}
-            WHERE dep_year IN ({window.snapshot.year - 1}, {window.snapshot.year})
+            WHERE {_months(window.snapshot - timedelta(days=366), window.snapshot)} AND customer_key IS NOT NULL
               AND dep_utc >= {snap} - INTERVAL 365 DAY AND dep_utc < {snap} AND {active}
             GROUP BY 1),
-        people AS (SELECT name_key, bool_or(is_lms_member) AS member_now FROM seg GROUP BY 1)
-        SELECT substr(sha256(p.name_key), 1, 16) AS customer_key,
+        people AS (SELECT customer_key, bool_or(is_lms_member) AS member_now FROM seg GROUP BY 1)
+        SELECT p.customer_key,
                coalesce(p.member_now, FALSE) OR coalesce(h.member_hist, FALSE) AS is_loyalty_member,
                coalesce(h.flown_12m, 0) AS flown_segments_12m, coalesce(h.pnrs_12m, 0) AS bookings_12m,
                coalesce(h.pnrs_12m, 0) > {AMBIGUOUS_NAME_PNRS} AS ambiguous_common_name,
@@ -161,27 +178,27 @@ def build(data_dir: Path, window: Window = DEFAULT_WINDOW) -> dict[str, Any]:
                CASE WHEN coalesce(h.pnrs_12m, 0) > {AMBIGUOUS_NAME_PNRS} THEN 'unknown'
                     WHEN coalesce(h.flown_12m, 0) >= 12 THEN 'frequent'
                     WHEN coalesce(h.flown_12m, 0) >= 4 THEN 'regular' ELSE 'occasional' END AS travel_frequency_band
-        FROM people p LEFT JOIN hist h USING (name_key)""",
+        FROM people p LEFT JOIN hist h USING (customer_key)""",
     )
 
     ssr_case = "\n".join(
-        f"WHEN s.pax_type = 'AD' AND {_u('s.pnr || s.name_key', 'ssr')} < {rate} THEN '{code}'"
+        f"WHEN s.pax_type = 'AD' AND {_u('s.pnr || s.customer_key', 'ssr')} < {rate} THEN '{code}'"
         for code, rate in SSR_RATES
     )
     counts["pax_segments"] = out(
         "pax_segments",
         f"""
-        WITH pnr AS (SELECT pnr, count(DISTINCT name_key) AS pnr_size,
-                            count(DISTINCT name_key) FILTER (WHERE pax_type = 'AD') AS adults,
-                            count(DISTINCT name_key) FILTER (WHERE pax_type = 'IN') AS infants,
-                            count(DISTINCT name_key) FILTER (WHERE pax_type = 'CH') AS children
+        WITH pnr AS (SELECT pnr, count(DISTINCT customer_key) AS pnr_size,
+                            count(DISTINCT customer_key) FILTER (WHERE pax_type = 'AD') AS adults,
+                            count(DISTINCT customer_key) FILTER (WHERE pax_type = 'IN') AS infants,
+                            count(DISTINCT customer_key) FILTER (WHERE pax_type = 'CH') AS children
                      FROM seg GROUP BY 1),
-             inf AS (SELECT pnr, name_key, dense_rank() OVER (PARTITION BY pnr ORDER BY name_key) AS n
-                     FROM (SELECT DISTINCT pnr, name_key FROM seg WHERE pax_type = 'IN')),
-             ad AS (SELECT pnr, name_key, dense_rank() OVER (PARTITION BY pnr ORDER BY name_key) AS n
-                    FROM (SELECT DISTINCT pnr, name_key FROM seg WHERE pax_type = 'AD'))
+             inf AS (SELECT pnr, customer_key, dense_rank() OVER (PARTITION BY pnr ORDER BY customer_key) AS n
+                     FROM (SELECT DISTINCT pnr, customer_key FROM seg WHERE pax_type = 'IN')),
+             ad AS (SELECT pnr, customer_key, dense_rank() OVER (PARTITION BY pnr ORDER BY customer_key) AS n
+                    FROM (SELECT DISTINCT pnr, customer_key FROM seg WHERE pax_type = 'AD'))
         SELECT s.flight_number || '_' || strftime(s.dep_utc, '%Y%m%d%H%M') AS flight_id,
-               s.pnr, substr(sha256(s.name_key), 1, 16) AS customer_key, s.first_name, s.last_name, s.pax_type,
+               s.pnr, s.customer_key, s.pax_type,
                s.flight_number, s.dep_utc, s.origin, s.destination, s.booking_code,
                coalesce(bc.revenue_type, 'REVENUE') AS revenue_type,
                coalesce(bc.fare_family_synthetic, 'Other') AS fare_family_synthetic,
@@ -189,17 +206,18 @@ def build(data_dir: Path, window: Window = DEFAULT_WINDOW) -> dict[str, Any]:
                coalesce(s.baggage_kg, 0) AS baggage_kg, s.meals IS NOT NULL AS has_meal,
                s.seat_code IS NOT NULL AS has_seat, s.sales_channel,
                p.pnr_size, p.adults, p.children, p.infants,
-               CASE WHEN s.pax_type = 'CH' AND p.adults = 0 THEN 'UMNR'
-                    WHEN s.pax_type = 'IN' THEN 'INFT'
+               -- Unaccompanied minors (UMNR) are out of scope (user 2026-11-21): no UMNR code is derived.
+               CASE WHEN s.pax_type = 'IN' THEN 'INFT'
                     {ssr_case}
                END AS ssr_code,
-               CASE WHEN s.pax_type IN ('IN') OR (s.pax_type = 'CH' AND p.adults = 0) THEN 'data'
-                    ELSE 'synthetic' END AS ssr_source,
-               CASE WHEN s.pax_type = 'IN' THEN substr(sha256(a.name_key), 1, 16) END AS infant_with_customer_key
+               CASE WHEN s.pax_type = 'IN' THEN 'data' ELSE 'synthetic' END AS ssr_source,
+               CASE WHEN s.pax_type = 'IN' THEN substr(sha256(a.customer_key), 1, 16) END AS infant_with_customer_key,
+               -- synthetic identity, supplied with the bookings (stage 1, app.ingest.convert)
+               s.passenger_id, s.passport_number_synthetic, s.national_id_synthetic, s.identity_rule
         FROM seg s
-        JOIN pnr p USING (pnr)
+        JOIN pnr p ON p.pnr = s.pnr
         LEFT JOIN booking_classes bc ON bc.booking_code = coalesce(s.booking_code, '(blank)')
-        LEFT JOIN inf i ON i.pnr = s.pnr AND i.name_key = s.name_key
+        LEFT JOIN inf i ON i.pnr = s.pnr AND i.customer_key = s.customer_key
         LEFT JOIN ad a ON a.pnr = s.pnr AND a.n = ((i.n - 1) % greatest(p.adults, 1)) + 1
         ORDER BY s.dep_utc, s.flight_number, s.pnr""",
     )
@@ -212,7 +230,8 @@ def build(data_dir: Path, window: Window = DEFAULT_WINDOW) -> dict[str, Any]:
             SELECT airline, reg AS tail, sai AS flight_number, dep AS origin, arr AS destination, std,
                    coalesce(try_strptime(sta, '%Y-%m-%d %H:%M:%S'), pta) AS sta, atd, ata, dep_dly, arr_dly,
                    op_type, status, try_cast(pax AS INTEGER) AS pax_reported
-            FROM '{raw}/rotation.parquet' WHERE std >= {w_start} AND std < {w_end}),
+            FROM '{raw}/rotation.parquet'
+            WHERE std >= {w_start} AND std < {w_end} AND airline IN {in_scope}),
         inv AS (
             SELECT flight_number, dep_utc, any_value(aircraft_model) AS model, max(adult_capacity) AS cap,
                    max(CASE curtail_oversell WHEN 'OVERSELL' THEN curtail_oversell_count
@@ -233,6 +252,52 @@ def build(data_dir: Path, window: Window = DEFAULT_WINDOW) -> dict[str, Any]:
         ORDER BY r.tail, r.std""",
     )
 
+    # History (G9, 1 Jan 2026 up to the window start): real flights with actual times, from the punctuality
+    # extract. Used to measure rules (turn times), replay real disruptions (backtest) and for prediction.
+    # Each aircraft's legs are ordered by actual departure: delays and tail swaps make scheduled times overlap.
+    counts["history_flights"] = out(
+        "history_flights",
+        f"""
+        WITH p AS (
+            SELECT airline, reg AS tail, sai AS flight_number, dep AS origin, arr AS destination,
+                   try_cast(std AS TIMESTAMP) AS std, try_cast(sta AS TIMESTAMP) AS sta,
+                   try_cast(atd AS TIMESTAMP) AS atd, try_cast(ata AS TIMESTAMP) AS ata,
+                   dep_dly, arr_dly, op_type,
+                   trim(regexp_replace(coalesce(dlycode, ''), '\\s+', ' ', 'g')) AS dep_delay_codes,
+                   trim(regexp_replace(coalesce(dcode, ''), '\\s+', ' ', 'g')) AS arr_delay_codes,
+                   try_cast(pax AS INTEGER) AS pax_reported, trim(diversion) = 'Yes' AS diverted
+            FROM '{raw}/punctuality.parquet'
+            WHERE airline = 'G9' AND try_cast(std AS TIMESTAMP) < {w_start}),
+        f AS (
+            SELECT flight_number || '_' || strftime(std, '%Y%m%d%H%M') AS flight_id, *, atd IS NOT NULL AS operated
+            FROM p
+            -- one row per flight: if a planned flight was replaced (e.g. new destination), keep the one that flew
+            QUALIFY row_number() OVER (PARTITION BY flight_number, std ORDER BY atd IS NOT NULL DESC, tail) = 1),
+        booked AS (
+            SELECT flight_number, dep_utc, count(*) FILTER (WHERE pax_type <> 'IN') AS booked_seats,
+                   count(*) AS booked_pax
+            FROM {bookings}
+            WHERE {_months(datetime(2026, 1, 1), window.start)} AND dep_utc < {w_start} AND {active}
+            GROUP BY 1, 2),
+        chain AS (
+            SELECT flight_id,
+                   row_number() OVER w AS leg_no,
+                   lead(flight_id) OVER w AS next_flight_id,
+                   lead(origin) OVER w = destination AS next_from_same_station,
+                   date_diff('minute', ata, lead(atd) OVER w) AS actual_turn_minutes,
+                   date_diff('minute', sta, lead(std) OVER w) AS scheduled_turn_minutes
+            FROM f WHERE operated AND tail IS NOT NULL
+            WINDOW w AS (PARTITION BY tail ORDER BY atd))
+        SELECT f.*, ac.aircraft_model, coalesce(ac.seats, {DEFAULT_SEATS})::INTEGER AS capacity,
+               coalesce(b.booked_seats, 0) AS booked_seats, coalesce(b.booked_pax, 0) AS booked_pax,
+               c.leg_no, c.next_flight_id, c.next_from_same_station, c.actual_turn_minutes, c.scheduled_turn_minutes
+        FROM f
+        LEFT JOIN aircraft ac ON ac.registration = f.tail
+        LEFT JOIN booked b ON b.flight_number = f.flight_number AND b.dep_utc = f.std
+        LEFT JOIN chain c USING (flight_id)
+        ORDER BY f.tail, coalesce(f.atd, f.std)""",
+    )
+
     counts["mct"] = out(
         "mct",
         f"""
@@ -249,9 +314,23 @@ def build(data_dir: Path, window: Window = DEFAULT_WINDOW) -> dict[str, Any]:
         "overbooked_flights": c.execute("SELECT count(*) FROM flights WHERE available_seats < 0").fetchone()[0],  # type: ignore[index]
         "capacity_sources": dict(c.execute("SELECT capacity_source, count(*) FROM flights GROUP BY 1").fetchall()),
         "flights_without_sta": c.execute("SELECT count(*) FROM flights WHERE sta IS NULL").fetchone()[0],  # type: ignore[index]
+        "history": dict(
+            zip(
+                ["flights", "not_operated", "diverted", "with_bookings", "chain_same_station_share"],
+                c.execute(
+                    """SELECT count(*), count(*) FILTER (WHERE NOT operated), count(*) FILTER (WHERE diverted),
+                              count(*) FILTER (WHERE booked_pax > 0),
+                              round(avg(next_from_same_station::INTEGER) FILTER (WHERE next_flight_id IS NOT NULL), 4)
+                       FROM history_flights"""
+                ).fetchone()
+                or (),
+                strict=False,
+            )
+        ),
     }
     report = {
         "window": {k: str(v) for k, v in vars(window).items()},
+        "carriers_in_scope": list(carriers),
         "counts": counts,
         "quality": quality,
         "built_at": datetime.now().isoformat(timespec="seconds"),

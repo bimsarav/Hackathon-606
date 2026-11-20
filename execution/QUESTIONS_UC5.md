@@ -18,7 +18,7 @@ Status: questions closed 2026-11-20. Data Q4–Q11 → synthetic data plus assum
 | 11 | Delay code scheme | OPEN |
 | 12 | Priority order and passenger-rights regimes | OPEN |
 | 13 | Allowed recovery levers, crew | PO (Q&A): aircraft swap, equipment change, delay and cancellation are all valid. Build two levers first, add a third only if time allows. Which two, and crew: OPEN |
-| 14 | Rebooking scope (own/group/other carriers, next day) | OPEN |
+| 14 | Rebooking scope (own/group/other carriers, next day) | Agent default, then user 2026-11-21: own G9 flights only within 24 h, then next day + hotel; partner/other carriers = future enhancement |
 | 15 | Cost figures | OPEN |
 | 16 | Disruption definition | Default: ≥15 min, ≥60 min, cancellation |
 | 17 | Message language and channel | English only |
@@ -28,7 +28,7 @@ Status: questions closed 2026-11-20. Data Q4–Q11 → synthetic data plus assum
 | 21 | Agent authority | Recommend only (human approves) |
 | 22 | Airport time zones | Use a public time-zone dataset |
 | 23 | Bus legs (02 prefix) as connections / rebooking alternative | PO: flights only for now; buses later [interpretation, confirm] |
-| 24 | Other airlines in rotation file (3L, 9P, 3O, E5, 4P) | Include them where we have data |
+| 24 | Other airlines in rotation file (3L, 9P, 3O, E5, 4P) | ~~Include them where we have data~~ **Changed 2026-11-21 (user): removed from scope and from the operating data; future enhancement.** Only G9 (`OPERATING_CARRIERS=G9`) |
 | 25 | Registration → aircraft type/seat list | PO: take seat counts from the inventory allocation, including curtail and oversell. A registration → aircraft model file may be uploaded later (pending) |
 | 26 | Claude API key delivery; template fallback without key | OPEN (proposed: git-ignored .env; template fallback) |
 | 27 | Booking vs inventory mismatch | PO: expected (bookings lag inventory, sales run in parallel). The process must not break on a mismatch. Synthetic bookings may be added, or bookings marked cancelled, to fill gaps |
@@ -39,3 +39,5 @@ Status: questions closed 2026-11-20. Data Q4–Q11 → synthetic data plus assum
 | 4–11 | Open data questions | User: create synthetic data from knowledge plus the given data → done (see synthetic/README.md) |
 | 12–15 | Open rule questions | User: agent's suggestion → recorded in synthetic/README.md "Rule defaults" |
 | 26 | AI API key | Supplied as a file; moved to input/secrets/AI_API_KEY (git-ignored, 600). Template fallback when absent |
+| 31 | Unaccompanied minors | User 2026-11-21: out of scope; future enhancement (no UMNR code derived, not in priority tiers or the demo) |
+| 32 | Care for long waits (e.g. 19 h connection) | User 2026-11-21: add care rules: meals by wait, hotel + transport for 8 h+/overnight, refund/return option, transit-visa and assistance flags; costs and messages updated |

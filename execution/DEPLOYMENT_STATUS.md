@@ -1,6 +1,6 @@
 # Deployment Status — disruption-advisor (MASTER_PROMPT §13.12, §14; phase gates per D-018)
 Overall: **PHASE 1 (MVP) DEPLOYED (verified incl. reboot test)** · Updated: 2026-11-20T19:58Z · Phase 2 NOT started (user: do not proceed) · URL: http://92.5.154.198:8888
-Target: OCI VM 92.5.154.198 (same host as the esm-hub discovery below), port 8888, code ~/apps/disruption-advisor, extracts ~/disruption-advisor-input (700 + ACL for container uid 999), secrets ~/apps/disruption-advisor/.env (600). Demo logins: workspace input/secrets/disruption-advisor-demo-logins.txt (git-ignored).
+Target: OCI VM 92.5.154.198 (same host as the esm-hub discovery below), port 8888, code ~/apps/disruption-advisor, extracts ~/disruption-advisor-input (700 + ACL for container uid 999), secrets ~/apps/disruption-advisor/settings.env (600; .env is a link to it). Demo logins: workspace input/secrets/disruption-advisor-demo-logins.txt (git-ignored).
 
 | Phase | Status | Approval |
 |---|---|---|

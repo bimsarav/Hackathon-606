@@ -9,10 +9,30 @@ Rules (assumptions are configurable and shown in the UI):
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 
 from app.engine.store import Leg
+
+
+@dataclass(frozen=True)
+class TurnTimes:
+    """Minimum ground time between two legs of one aircraft, per station (measured), with a default."""
+
+    default: timedelta
+    by_station: Mapping[str, timedelta] = field(default_factory=dict)
+
+    def at(self, station: str) -> timedelta:
+        return self.by_station.get(station, self.default)
+
+
+Turn = timedelta | TurnTimes
+
+
+def turn_at(min_turn: Turn, station: str) -> timedelta:
+    """Minimum turn at ``station``; a plain timedelta applies everywhere."""
+    return min_turn.at(station) if isinstance(min_turn, TurnTimes) else min_turn
 
 
 @dataclass(frozen=True)
@@ -45,7 +65,7 @@ class RotationPlan:
         return sum(t.leg.booked_pax for t in self.delayed())
 
 
-def propagate(legs: list[Leg], ready_at: datetime, min_turn: timedelta, operated_by: str) -> list[LegTiming]:
+def propagate(legs: list[Leg], ready_at: datetime, min_turn: Turn, operated_by: str) -> list[LegTiming]:
     """Fly ``legs`` in order with an aircraft that is ready to depart at ``ready_at``."""
     out: list[LegTiming] = []
     ready = ready_at
@@ -53,11 +73,11 @@ def propagate(legs: list[Leg], ready_at: datetime, min_turn: timedelta, operated
         new_std = max(leg.std, ready)
         new_sta = new_std + (leg.sta - leg.std)
         out.append(LegTiming(leg, operated_by, new_std, new_sta))
-        ready = new_sta + min_turn
+        ready = new_sta + turn_at(min_turn, leg.destination)
     return out
 
 
-def absorb_delay(disrupted: Leg, rest: list[Leg], delay: timedelta, min_turn: timedelta) -> RotationPlan:
+def absorb_delay(disrupted: Leg, rest: list[Leg], delay: timedelta, min_turn: Turn) -> RotationPlan:
     """Option 1: the same aircraft operates its rotation; the delay carries forward until slack absorbs it."""
     plan = RotationPlan()
     for t in propagate([disrupted, *rest], disrupted.std + delay, min_turn, disrupted.tail):
@@ -77,7 +97,7 @@ def swap_rotations(
     disrupted: Leg,
     rest: list[Leg],
     delay: timedelta,
-    min_turn: timedelta,
+    min_turn: Turn,
     candidate_tail: str,
     candidate_legs: list[Leg],
 ) -> RotationPlan | None:
@@ -101,8 +121,8 @@ def swap_rotations(
         return None  # the candidate is airborne at takeover time
     if not before and not after:
         return None
-    candidate_ready = (before[-1].sta + min_turn) if before else takeover_from
-    delayed_ready = disrupted.std + delay + (disrupted.sta - disrupted.std) + min_turn
+    candidate_ready = (before[-1].sta + turn_at(min_turn, before[-1].destination)) if before else takeover_from
+    delayed_ready = disrupted.std + delay + (disrupted.sta - disrupted.std) + turn_at(min_turn, disrupted.destination)
 
     plan = RotationPlan()
     # The disrupted leg itself still arrives late (the delay is on the inbound leg).

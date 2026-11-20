@@ -17,14 +17,16 @@ Details: [docs/architecture/SYSTEM_ARCHITECTURE.md](docs/architecture/SYSTEM_ARC
   - `Flight Schedule.csv`
   - `Connection Time.xlsx`
   - `Flight_Punctuality_Jan-Nov_2026_Combined.xlsx`
-  - `Past & Future Booking Data.zip`
+  - the bookings, in either form:
+    - `parquet/raw/bookings/dep_month=YYYY-MM/*.parquet`: name-free bookings (the current format, used as they are), or
+    - `Past & Future Booking Data.zip`: the original extract, converted to the name-free format on the first run.
 
   They are mounted read-only and never committed.
 
 ## Run
 ```bash
-cp .env.example .env      # set INPUT_DIR, passwords, DEMO_USERS, TOKEN_SECRET (and optionally ANTHROPIC_API_KEY)
-chmod 600 .env
+scripts/init-settings.sh  # creates settings.env (visible, mode 600) and the link .env -> settings.env that Compose reads
+# then edit settings.env: INPUT_DIR, passwords, DEMO_USERS, TOKEN_SECRET (and optionally ANTHROPIC_API_KEY)
 docker compose up -d --build
 ```
 Then open `http://localhost:${WEB_PORT}`. The API docs are at `/api/docs`.
@@ -39,8 +41,8 @@ Start-up runs in this order:
 Every long-running service restarts by itself, including after a server reboot.
 
 ## How the data is used
-- **Stage 1 (`app/ingest/convert.py`):** converts every extract to typed Parquet (bookings: 27.9M rows, partitioned by year, zstd). Malformed rows are counted and skipped.
-- **Stage 2 (`app/ingest/build.py`):** builds the operating picture for 19–30 Nov 2026:
+- **Stage 1 (`app/ingest/convert.py`):** converts every extract to typed Parquet. Bookings (27.9M rows) are stored **without names**: first and last name are replaced by `customer_key` (hash of the name) and a synthetic identity (`passenger_id`, `passport_number_synthetic`, `national_id_synthetic`, `identity_rule`), partitioned by departure month (`dep_month=YYYY-MM`), zstd. Supplied name-free Parquet is checked and copied in seconds; the zip takes 4–15 minutes. Malformed rows are counted and skipped.
+- **Stage 2 (`app/ingest/build.py`):** builds the operating picture for 19–30 Nov 2026, for the carriers in `OPERATING_CARRIERS` (default `G9` only; partner and other carriers are a future enhancement):
   - flights with tail, times and capacity;
   - passenger segments;
   - customer profiles.
@@ -50,7 +52,7 @@ Every long-running service restarts by itself, including after a server reboot.
 
 ## Tests
 ```bash
-scripts/check.sh                 # backend lint, format, strict types, 22 tests (Testcontainers PostgreSQL); frontend type check, tests, build
+scripts/check.sh                 # backend lint, format, strict types, 39 tests (Testcontainers PostgreSQL); frontend type check, tests, build
 scripts/e2e.sh                   # Playwright end-to-end tests against the running stack (E2E_BASE_URL to target a server)
 scripts/smoke.sh [base-url]      # post-deployment smoke test against a running stack (read-mostly)
 scripts/check.sh lock            # after editing dependencies: refresh uv.lock / package-lock.json
@@ -68,7 +70,7 @@ Logs are written to `logs/`.
 | `/healthz`; API `/health/live`, `/health/ready` | Health (readiness = database + operating data loaded) |
 
 ## Configuration
-Everything is set through environment variables; see `.env.example`.
+Everything is set in **`settings.env`** (template: `settings.env.example`). Docker Compose reads it through the link `.env`, because Compose only looks for a file with that name.
 - **Data and access:** `INPUT_DIR`, `DEMO_USERS`, `TOKEN_SECRET`, `ANTHROPIC_API_KEY`, `AI_MODEL`.
 - **Rule and cost defaults:** `MIN_TURN_MINUTES`, `DEFAULT_MCT_MINUTES`, `REBOOKING_WINDOW_HOURS`, `COST_DELAY_PER_MINUTE`, `COST_HOTEL_PER_NIGHT`, `COST_MEAL_VOUCHER`, `COST_REBOOKING_HANDLING`, `NOW_UTC` (demo clock).
 
@@ -77,4 +79,9 @@ Everything is set through environment variables; see `.env.example`.
 git init && git add . && git commit -m "Disruption Advisor MVP"
 git remote add origin <your-repo-url> && git push -u origin main
 ```
-`.env`, data and build output are git-ignored. Check `git status` before the first push.
+`settings.env`, the `.env` link, data and build output are git-ignored. Check `git status` before the first push.
+
+## Data for analysis (optional)
+After the ingest, inside the api container or a local backend environment:
+- `python -m app.backtest`: replays real 2026 delays through the engine (`ops/backtest_report.json`, see docs/testing/backtest.md).
+- `python -m app.ingest.share`: copies the name-free bookings (Oct 2025 - Mar 2027, by departure month) with a README to `DATA_DIR/share/` (about 950 MB). Share it through a drive, never Git.

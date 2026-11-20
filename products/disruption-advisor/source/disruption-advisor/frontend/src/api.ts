@@ -139,6 +139,17 @@ export interface PassengerRow {
   onward_ok: boolean | null;
   split: boolean;
   assignment_reason: string;
+  missed_inbound_flight?: string | null;
+  care?: {
+    summary: string;
+    wait_minutes: number | null;
+    meals: number;
+    hotel: boolean;
+    transport: boolean;
+    refund_option: boolean;
+    flags: string[];
+    cost_aed: number;
+  };
   message: string;
 }
 
@@ -157,6 +168,8 @@ export interface Rebooking {
   protected: number;
   unprotected: number;
   groups_split: number;
+  care_cost_aed?: number;
+  hotel_rooms?: number;
 }
 
 interface ResultBase {
@@ -173,6 +186,7 @@ export interface DelayResult extends ResultBase {
   delay_minutes: number;
   options: RecoveryOption[];
   recommended_key: string;
+  selected_key?: string;
   misconnections: { pnr: string; customer_key: string; outbound_flight_number: string; final_destination: string;
     planned_minutes: number; new_minutes: number | null; mct_minutes: number }[];
 }
@@ -252,6 +266,8 @@ export const api = {
   scenarios: () => request<ScenarioSummary[]>("/api/v1/scenarios"),
   scenario: (id: string) => request<Scenario>(`/api/v1/scenarios/${id}`),
   reprioritise: (id: string, weights: Weights) => post<Scenario>(`/api/v1/scenarios/${id}/reprioritise`, { weights }),
+  selectOption: (id: string, optionKey: string) =>
+    post<Scenario>(`/api/v1/scenarios/${id}/select`, { option_key: optionKey }),
   decisions: (id: string) => request<Decision[]>(`/api/v1/scenarios/${id}/decisions`),
   decide: (id: string, target: string, action: "APPROVE" | "REJECT", comment = "") =>
     post<Decision>(`/api/v1/scenarios/${id}/decisions`, { target, action, comment }),

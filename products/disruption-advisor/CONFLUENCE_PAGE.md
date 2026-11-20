@@ -29,10 +29,17 @@ Today OCC, crew control and the PCU each work with different information. The go
 | Recovery options: absorb the delay or swap with a same-type aircraft, with delay, missed connections, EU261 estimate and cost; recommendation | Done |
 | Scenario B: cancellation with limited seats; passengers ranked by tier and weighted score; rebooking with an optimiser that keeps bookings together | Done |
 | What-if: adjustable priority weights | Done |
+| History data: G9 flights 1 Jan to 18 Nov 2026 with actual times, aircraft chains (actual order), delay codes, diversions and bookings (`history_flights.parquet`), for backtests and prediction | Done (data; not yet used in the UI) |
+| Backtest of delay propagation on 1,634 real delays (Jan-Nov 2026): mean error 25 min vs 57 min without knock-on; next-leg delays caught 97% at 99.7% precision. Median recovery turns (60/48 min) reduce the error to 22 min. `python -m app.backtest`, docs/testing/backtest.md | Done |
+| Synthetic passenger ID, passport and national ID per person over all bookings Oct 2025 - Mar 2027 (6.29M persons, same IDs in the app and the shared export). Since 21 Nov 2026 the bookings are stored without names (name-free format by departure month) and passengers are shown by their synthetic passenger ID | Done |
+| Name-free bookings format (21 Nov 2026): the ingest accepts the bookings as name-free Parquet by departure month, or converts the zip to that format; `python -m app.ingest.share` copies them (about 950 MB) for a shared drive, never Git | Done |
 | Plain-English explanations and passenger message drafts (Claude AI, with template fallback) | Done |
 | Approve or reject with an audit trail; demo roles OCC and PCU | Done |
 | Approve a non-recommended option (override with reason) | Not done (proposed) |
 | Delay prediction, HTTPS, AI agent, cancellation as a recovery option, crew, equipment change | Not done (later phases) |
+| Partner and other carriers (3L, 3O, E5, 9P, 4P): their flights for rebooking, their aircraft for swaps | Not done (future enhancement; MVP covers G9 only) |
+| Unaccompanied minors (priority, supervision, guardian notification) | Not done (future enhancement) |
+| Care while waiting: meals by wait time, hotel + transport for long or overnight waits, refund / return option, transit-visa and assistance flags | Done (21 Nov 2026) |
 
 ## Architecture
 ```
@@ -73,7 +80,7 @@ Today OCC, crew control and the PCU each work with different information. The go
 | Quality | Ruff, mypy strict, pytest, Testcontainers, Vitest, Playwright 1.65, Trivy |
 
 ## Methods (summary)
-- **Delay propagation:** each later flight departs at the later of its scheduled time and the previous arrival plus a 40-minute minimum turn.
+- **Delay propagation:** each later flight departs at the later of its scheduled time and the previous arrival plus a minimum turn measured from G9 2026 actual turns (fastest 5%): 51 minutes at SHJ, 36 minutes at outstations.
 - **Recovery options:** absorb the delay, or swap the remaining rotations with a same-type aircraft on the ground at the hub. Each option is costed:
   - delay minutes x AED 400;
   - meal care for passengers delayed 2 hours or more;
@@ -81,7 +88,7 @@ Today OCC, crew control and the PCU each work with different information. The go
   - missed-connection handling.
 
   The cheapest option is recommended.
-- **Passenger priority:** strict tiers first: mandated care (special assistance, unaccompanied minors, infants), then urgency (onward connections), then others; non-revenue passengers come last. Inside a tier, a weighted score orders passengers: loyalty, travel frequency, fare, ancillaries, journey, family or group.
+- **Passenger priority:** strict tiers first: mandated care (special assistance, infants), then urgency (onward connections), then others; non-revenue passengers come last. Inside a tier, a weighted score orders passengers: loyalty, travel frequency, fare, ancillaries, journey, family or group.
 - **Rebooking:** a 0/1 integer programme (CP-SAT) keeps bookings together and never exceeds free seats. It returns a proven optimal plan in under a second.
 - **Explainability by design:** every number traces to a formula, with points per attribute, the tier rule, a cost breakdown and seat reasons. The AI only words the engine's facts.
 
@@ -91,13 +98,13 @@ The full methods document with references is `docs/delivery/Disruption_Advisor_M
 | Environment | Where | Notes |
 |---|---|---|
 | Local | Docker Compose on a workstation | `docker compose up -d --build` |
-| Demo (MVP) | OCI VM, port 8888 | Secrets only in the server `.env` (mode 600); automatic restart verified by a reboot test on 20 Nov 2026 |
+| Demo (MVP) | OCI VM, port 8888 | Secrets only in the server `settings.env` (mode 600); automatic restart verified by a reboot test on 20 Nov 2026 |
 
 ## How to build, run and test
 ```
-cp .env.example .env            # set INPUT_DIR, passwords, DEMO_USERS, TOKEN_SECRET, optional ANTHROPIC_API_KEY
+scripts/init-settings.sh        # creates settings.env (visible) + the .env link Compose reads; then fill it in
 docker compose up -d --build    # first ingest takes 4-15 minutes
-scripts/check.sh                # lint, types, 22 backend tests, 5 frontend tests, build
+scripts/check.sh                # lint, types, 39 backend tests, 5 frontend tests, build
 scripts/e2e.sh                  # Playwright end-to-end tests against the running stack
 scripts/smoke.sh <base-url>     # post-deployment smoke test
 ```
@@ -115,7 +122,7 @@ scripts/smoke.sh <base-url>     # post-deployment smoke test
 
 ## Security
 - **Sign-in:** demo authentication with two roles, signed expiring tokens and a rate limit on sign-in. Production will use the airline's identity provider (OIDC).
-- **Secrets:** only in the server `.env`; never in the repository. The airline data is git-ignored and mounted read-only.
+- **Secrets:** only in the server `settings.env`; never in the repository. The airline data is git-ignored and mounted read-only.
 - **AI data sharing:** no names, booking references or contact details are sent to the AI service.
 - **Hardening:** security headers (CSP, nosniff, frame deny), non-root containers, input validation, consistent error responses.
 - **Scans:** Trivy found 0 HIGH or CRITICAL vulnerabilities. The secret-scanner hits in the Anthropic SDK's documentation text are false positives.
@@ -123,7 +130,7 @@ scripts/smoke.sh <base-url>     # post-deployment smoke test
 ## Test results (20 Nov 2026)
 | Test | Result |
 |---|---|
-| Backend unit and API tests (incl. PostgreSQL via Testcontainers) | 22 passed |
+| Backend unit and API tests (incl. PostgreSQL via Testcontainers) | 39 passed (21 Nov 2026) |
 | Frontend unit tests | 5 passed |
 | Playwright end-to-end, local and demo server | 3 passed on each |
 | Smoke test on the demo server | 11 of 11 passed |
@@ -132,9 +139,10 @@ scripts/smoke.sh <base-url>     # post-deployment smoke test
 
 ## Known limitations and open decisions
 - **Synthetic fields:** loyalty tier, fare family and most special-assistance codes are synthetic (labelled), because the extracts do not contain them.
-- **Assumed rules:** costs, the 40-minute turn time and the 45-minute default MCT are assumptions (configurable).
+- **Assumed rules:** costs and the 50-minute default MCT (lowest real SHJ rule) are assumptions; turn times are measured. All are configurable.
+- **Carriers:** G9 flights only; partner and other carriers in the extracts are excluded (future enhancement).
 - **Crew:** legality is not checked; no crew data was supplied.
-- **Capacity:** inferred for most flights; the inventory extract covers only 6 flights in the demo window.
+- **Capacity:** exact from the inventory extract for 1,727 of 2,614 window flights; inferred from the most passengers carried for 426, assumed A320 (174 seats) for 461.
 - **Approval:** only the recommended option can be approved (override is proposed).
 - **Connection:** HTTP only until phase 2.
 - **Open questions:** listed in the project's clarification register.
@@ -145,7 +153,7 @@ scripts/smoke.sh <base-url>     # post-deployment smoke test
 | 1 MVP | Scenarios A and B, explanations, approvals, hosting | Done |
 | 2 Predict | Delay-risk prediction with explanations (LightGBM, SHAP), 7-day watchlist, HTTPS, nightly backups | Not started (needs approval) |
 | 3 Agent and what-if | AI agent coordinating the steps; cancel or consolidate as recovery options; strategy comparison | Not started (needs approval) |
-| 4 Extend | Equipment change, bus legs, crew legality, real data feeds, CI/CD and monitoring | Not started (needs approval) |
+| 4 Extend | Partner and other carriers, unaccompanied minors, equipment change, bus legs, crew legality, real data feeds, CI/CD and monitoring | Not started (needs approval) |
 
 ## Contacts and ownership
 | Role | Name |

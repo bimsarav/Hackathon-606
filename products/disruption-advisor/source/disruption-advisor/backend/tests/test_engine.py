@@ -126,3 +126,27 @@ def test_store_loads_and_reports_ready(tmp_path: Path) -> None:
     assert store.ready()
     assert store.mct_minutes("KHI", "SHJ", "CAI", default=45) == 55
     assert store.mct_minutes("DOH", "SHJ", "BKK", default=45) == 45
+
+
+def test_explanations_are_short_and_plain(ctx: Context) -> None:
+    delay = analyse_delay(ctx, F1, 150, priority.DEFAULT_WEIGHTS)
+    cancel = analyse_cancellation(ctx, X1, priority.DEFAULT_WEIGHTS)
+    for text in (delay["explanation"]["text"], cancel["explanation"]["text"]):
+        assert len(text.split()) <= 70
+        assert " leg" not in text
+        assert "misconnect" not in text
+
+
+def test_missed_connection_message_names_the_late_inbound_flight(ctx: Context) -> None:
+    rows = analyse_delay(ctx, F1, 150, priority.DEFAULT_WEIGHTS)["passengers"]
+    assert rows
+    assert "G9001 arrived late, so you missed your connection G9301" in rows[0]["message"]
+
+
+def test_selected_option_drives_the_passenger_plan(ctx: Context) -> None:
+    base = analyse_delay(ctx, F1, 150, priority.DEFAULT_WEIGHTS)
+    other = next(o["key"] for o in base["options"] if o["key"] != base["recommended_key"])
+    chosen = analyse_delay(ctx, F1, 150, priority.DEFAULT_WEIGHTS, selected_key=other)
+    assert chosen["selected_key"] == other
+    assert chosen["recommended_key"] == base["recommended_key"]
+    assert "not the recommendation" in chosen["explanation"]["text"]

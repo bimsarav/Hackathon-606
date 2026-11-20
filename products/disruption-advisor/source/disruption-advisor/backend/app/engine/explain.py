@@ -19,8 +19,10 @@ from anthropic.types.beta import BetaOutputConfigParam, BetaUserMessageParam
 log = logging.getLogger(__name__)
 
 SYSTEM = (
-    "You write short, factual text for airline operations staff and passengers. Use only the facts in the JSON "
-    "you are given; never invent flights, times, amounts or policies. Plain English, no markdown headings, "
+    "You write very short, plain-English text for busy airline staff and passengers. Use only the facts in the JSON "
+    "you are given; never invent flights, times, amounts or policies. Write like a calm, clear colleague: short "
+    "sentences, everyday words, no jargon (say 'flights' not 'legs', 'missed connections' not 'misconnects', "
+    "'swap the aircraft' not 'rotation exchange'), no lists of every option, no cost breakdowns, no markdown, "
     "no emojis."
 )
 
@@ -71,50 +73,83 @@ class Explainer:
         text = "".join(block.text for block in response.content if block.type == "text").strip()
         return text or None
 
-    # --- recommendation narrative ------------------------------------------------------------------------
+    # --- explanations and messages ---------------------------------------------------------------------
     def recommendation(self, facts: dict[str, Any]) -> Text:
         ai = self._ask(
-            "Explain to an OCC duty manager, in at most 120 words, which recovery option is recommended and why, "
-            "and what the main trade-off against the other options is. Mention numbers from the facts.",
+            "Explain the decision to an operations duty manager in at most 3 short sentences (under 60 words in "
+            "total). Sentence 1: what happened. Sentence 2: what we do (the chosen option; if it is not the "
+            "recommendation, say so plainly). Sentence 3: why, compared with the next best choice. If no option can "
+            "save the missed connections, say that in a few words and say how many passengers are rebooked. Use at "
+            "most 3 numbers. Round money to the nearest thousand AED.",
             facts,
-            2000,
+            1500,
         )
         return Text(ai, f"ai:{self.model}") if ai else Text(template_recommendation(facts), "template")
 
-    def passenger_message(self, facts: dict[str, Any]) -> Text:
+    def cancellation(self, facts: dict[str, Any]) -> Text:
         ai = self._ask(
-            "Draft a passenger notification (SMS-length, at most 70 words, English) about this disruption and "
-            "the new arrangement. Address the passenger as 'Dear customer'. Include the care offered if any.",
+            "Explain the rebooking plan to an operations duty manager in at most 3 short sentences (under 60 words). "
+            "Say how many passengers must move, how many get a seat and how many do not, and who goes first. Use at "
+            "most 3 numbers.",
             facts,
             1500,
+        )
+        return Text(ai, f"ai:{self.model}") if ai else Text(template_cancellation(facts), "template")
+
+    def passenger_message(self, facts: dict[str, Any]) -> Text:
+        ai = self._ask(
+            "Write a text message to the passenger, at most 45 words, simple and friendly, starting 'Dear "
+            "customer'. Say what happened to their journey (if a late inbound flight made them miss their "
+            "connection, say exactly that), their new flight and time if they have one, the care while they wait "
+            "(hotel, transport, meals) and, if allowed, that they may choose a refund with a free return to origin or "
+            "a date change. Mention special assistance only if listed.",
+            facts,
+            1000,
         )
         return Text(ai, f"ai:{self.model}") if ai else Text(template_message(facts), "template")
 
 
+def _thousands(aed: float) -> str:
+    return f"AED {round(aed / 1000):,}k" if aed >= 1000 else f"AED {aed:,.0f}"
+
+
 def template_recommendation(f: dict[str, Any]) -> str:
-    best = f["recommended"]
-    others = "; ".join(
-        f"{o['label']}: {o['total_delay_minutes']} delay min, {o['misconnects']} misconnects, AED {o['cost_aed']:,.0f}"
-        for o in f["options"]
-        if o["key"] != best["key"]
-    )
+    c, alt = f["chosen_option"], f.get("next_best_alternative")
+    what = "We recommend" if f.get("chosen_is_the_recommendation", True) else "You chose (not the recommendation)"
+    text = f"{f['late_flight']} is {f['delay_minutes']} minutes late. {what}: {c['what']}."
+    if alt:
+        text += (
+            f" This delays {c['flights_delayed']} flight(s) and costs about {_thousands(c['estimated_cost_aed'])},"
+            f" against {_thousands(alt['estimated_cost_aed'])} for the next choice."
+        )
+    if c["passengers_missing_connections"]:
+        text += (
+            f" {c['passengers_missing_connections']} passengers still miss their connection:"
+            f" {f.get('passengers_rebooked', 0)} are rebooked, {f.get('passengers_without_seat', 0)} have no seat yet."
+        )
+    return text
+
+
+def template_cancellation(f: dict[str, Any]) -> str:
     return (
-        f"Recommended: {best['label']}. It gives {best['total_delay_minutes']} total delay minutes over "
-        f"{best['legs_delayed']} leg(s), {best['misconnects']} missed connections and an estimated cost of "
-        f"AED {best['cost_aed']:,.0f}, the lowest of the options compared. Alternatives: {others or 'none feasible'}."
+        f"{f['cancelled_flight']} is cancelled and {f['passengers_to_move']} passengers must move. "
+        f"{f['passengers_rebooked']} get a seat on another flight within 24 hours; "
+        f"{f['passengers_without_seat']} do not and are offered the next day with a hotel, or a refund. "
+        "Passengers needing special assistance and families with babies go first; staff travel goes last."
     )
 
 
 def template_message(f: dict[str, Any]) -> str:
-    if f.get("new_flight"):
-        body = (
-            f"your flight {f['flight']} from {f['origin']} to {f['destination']} is {f['event']}. "
-            f"We have rebooked you on {f['new_flight']} departing {f['new_departure']}."
+    if f.get("late_inbound_flight"):
+        what = (
+            f"your flight {f['late_inbound_flight']} arrived late, so you missed your connection {f['flight']} "
+            f"to {f['destination']}."
         )
     else:
-        body = (
-            f"your flight {f['flight']} from {f['origin']} to {f['destination']} is {f['event']}. "
-            "Our team will contact you with the next available option; you may also request a refund."
-        )
+        what = f"your flight {f['flight']} from {f['origin']} to {f['destination']} is {f['event']}."
+    if f.get("new_flight"):
+        plan = f" Your new flight is {f['new_flight']}, departing {f['new_departure']}."
+    else:
+        plan = " We will contact you with the next available flight, or you can ask for a refund."
     care = f" {f['care']}" if f.get("care") else ""
-    return f"Dear customer, {body}{care} We apologise for the disruption."
+    return f"Dear customer, {what}{plan}{care} We are sorry for the trouble."

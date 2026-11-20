@@ -5,6 +5,8 @@ import { utc } from "./format";
 interface Props {
   meta: Meta;
   busy: boolean;
+  /** The delay scenario on screen, if any: moving the slider re-runs it. */
+  active?: { flightId: string; flightNumber: string; delay: number } | null;
   onDelay: (flightId: string, delay: number) => void;
   onCancel: (flightId: string) => void;
 }
@@ -12,7 +14,7 @@ interface Props {
 type Tab = "DELAY" | "CANCEL";
 
 /** Scenario launcher: suggested flights from the data (UC5 example scenario) or any flight by search. */
-export function Launcher({ busy, onDelay, onCancel }: Props) {
+export function Launcher({ busy, active, onDelay, onCancel }: Props) {
   const [tab, setTab] = useState<Tab>("DELAY");
   const [presets, setPresets] = useState<{ delay: DelayPreset[]; cancel: CancelPreset[] } | null>(null);
   const [presetError, setPresetError] = useState<string | null>(null);
@@ -20,6 +22,16 @@ export function Launcher({ busy, onDelay, onCancel }: Props) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<FlightRow[] | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
+
+  // Keep the slider in step with the scenario on screen (e.g. one reopened from history).
+  useEffect(() => {
+    if (active) setDelay(active.delay);
+  }, [active?.flightId, active?.delay]);
+
+  /** On release, apply the new delay to the scenario on screen. */
+  function commitDelay() {
+    if (active && !busy && delay !== active.delay) onDelay(active.flightId, delay);
+  }
 
   useEffect(() => {
     api
@@ -60,7 +72,15 @@ export function Launcher({ busy, onDelay, onCancel }: Props) {
             Delay: <strong>{delay} min</strong>
           </label>
           <input id="delay" type="range" min={15} max={600} step={15} value={delay}
-            onChange={(e) => setDelay(Number(e.target.value))} />
+            onChange={(e) => setDelay(Number(e.target.value))}
+            onPointerUp={commitDelay} onKeyUp={commitDelay} onTouchEnd={commitDelay} />
+          <span className={active ? "small muted" : "small hint"}>
+            {active
+              ? delay === active.delay
+                ? `Applied to ${active.flightNumber}. Move and release to re-run.`
+                : `Release to re-run ${active.flightNumber} with ${delay} min…`
+              : `No delay scenario is open: pick a flight below to analyse it with ${delay} min.`}
+          </span>
         </div>
       )}
 

@@ -2,8 +2,12 @@
 
 Reads the airline extracts from INPUT_DIR (read-only) and writes Parquet to DATA_DIR/raw and DATA_DIR/ops.
 Stage 1 (extracts -> raw Parquet, minutes) runs only when the inputs changed since the last successful run
-(fingerprint of names, sizes and modification times). Stage 2 (raw -> ops, seconds) runs when the inputs or the
-options changed. DEMO_SCENARIO=true appends the labelled synthetic demo scenario (app/ingest/demo.py).
+(fingerprint of names, sizes and modification times) or the bookings are still in an older layout. Bookings
+supplied as name-free Parquet (INPUT_DIR/parquet/raw/bookings) are used instead of converting the zip.
+Stage 2 (raw -> ops, seconds) runs when the inputs, the
+options or the build code changed.
+OPERATING_CARRIERS (default G9) limits the picture to those carriers.
+DEMO_SCENARIO=true appends the labelled synthetic demo scenario (app/ingest/demo.py).
 """
 
 import argparse
@@ -20,10 +24,13 @@ log = logging.getLogger("ingest")
 
 
 def fingerprint(input_dir: Path) -> str:
+    """Names, sizes and modification times of the extracts and of any supplied name-free bookings Parquet."""
     h = hashlib.sha256()
-    for f in sorted(p for p in input_dir.iterdir() if p.is_file()):
+    supplied = convert.supplied_bookings(input_dir)
+    files = [p for p in input_dir.iterdir() if p.is_file()] + (list(supplied.rglob("*.parquet")) if supplied else [])
+    for f in sorted(files):
         st = f.stat()
-        h.update(f"{f.name}|{st.st_size}|{int(st.st_mtime)}".encode())
+        h.update(f"{f.relative_to(input_dir)}|{st.st_size}|{int(st.st_mtime)}".encode())
     return h.hexdigest()
 
 
@@ -36,11 +43,19 @@ def main() -> int:
     input_dir = Path(os.environ.get("INPUT_DIR", "/input"))
     data_dir = Path(os.environ.get("DATA_DIR", "/data"))
     with_demo = os.environ.get("DEMO_SCENARIO", "false").strip().lower() in {"1", "true", "yes"}
+    carriers = (
+        tuple(c.strip().upper() for c in os.environ.get("OPERATING_CARRIERS", "G9").split(",") if c.strip().isalnum())
+        or build.DEFAULT_CARRIERS
+    )
     raw_marker, ops_marker = data_dir / "ingest_fingerprint.txt", data_dir / "ops_fingerprint.txt"
     inputs = fingerprint(input_dir)
-    ops_key = f"{inputs}|demo={with_demo}"
+    # stage 2 also reruns when its code changes (build rules, synthetic data), so a deploy picks up new logic
+    code = hashlib.sha256(b"".join(Path(m.__file__ or "").read_bytes() for m in (build, demo))).hexdigest()[:16]
+    ops_key = f"{inputs}|demo={with_demo}|carriers={','.join(carriers)}|code={code}"
 
-    raw_current = raw_marker.exists() and raw_marker.read_text() == inputs and (data_dir / "raw" / "bookings").exists()
+    # bookings must be in the current layout: name-free, by departure month (an older dep_year layout is rebuilt)
+    bookings_current = any((data_dir / "raw" / "bookings").glob("dep_month=*"))
+    raw_current = raw_marker.exists() and raw_marker.read_text() == inputs and bookings_current
     if args.force or not raw_current:
         log.info("stage 1: converting extracts to Parquet")
         raw = convert.run(input_dir, data_dir, skip_bookings=args.skip_bookings)
@@ -49,11 +64,12 @@ def main() -> int:
     else:
         log.info("stage 1 skipped: extracts unchanged")
 
-    if not args.force and raw_current and ops_marker.exists() and ops_marker.read_text() == ops_key:
+    ops_present = (data_dir / "ops" / "flights.parquet").exists()
+    if not args.force and raw_current and ops_present and ops_marker.exists() and ops_marker.read_text() == ops_key:
         log.info("stage 2 skipped: operating picture is current")
         return 0
     log.info("stage 2: building the operating picture")
-    report = build.build(data_dir)
+    report = build.build(data_dir, carriers=carriers)
     log.info("stage 2 done: %s", json.dumps(report["counts"]))
     if with_demo:
         log.info("demo scenario added: %s", json.dumps(demo.add_demo_scenario(data_dir / "ops")))

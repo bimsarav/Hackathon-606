@@ -1,0 +1,9 @@
+moved existing .env to settings.env
+ok: settings.env (mode 600), .env -> settings.env
+lrwxrwxrwx. 1 opc opc  12 Nov 20 21:33 .env -> settings.env
+-rw-------. 1 opc opc 589 Nov 20 21:29 settings.env
+compose OK
+ Container disruption-advisor-api-1 Healthy 
+api Up 2 minutes (healthy)
+db Up 2 hours (healthy)
+web Up 18 minutes (healthy)

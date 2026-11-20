@@ -29,7 +29,8 @@ export function Explanation({ text, source }: { text: string; source: string }) 
 }
 
 /** Approve / reject with an audit trail (human in the loop). */
-export function DecisionBar({ scenario, target, label }: { scenario: Scenario; target: string; label: string }) {
+export function DecisionBar({ scenario, target, label, requireComment = false }:
+  { scenario: Scenario; target: string; label: string; requireComment?: boolean }) {
   const [decisions, setDecisions] = useState<Decision[]>([]);
   const [comment, setComment] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +44,7 @@ export function DecisionBar({ scenario, target, label }: { scenario: Scenario; t
     setBusy(true);
     setError(null);
     try {
-      const d = await api.decide(scenario.id, target, action, comment);
+      const d = await api.decide(scenario.id, target, action, requireComment ? `OVERRIDE: ${comment}` : comment);
       setDecisions((current) => [...current, d]);
       setComment("");
     } catch (e: unknown) {
@@ -60,9 +61,10 @@ export function DecisionBar({ scenario, target, label }: { scenario: Scenario; t
         <label htmlFor={`comment-${target}`} className="visually-hidden">
           Comment for {label}
         </label>
-        <input id={`comment-${target}`} placeholder="Comment (optional)" value={comment} maxLength={1000}
-          onChange={(e) => setComment(e.target.value)} />
-        <button type="button" className="approve" disabled={busy} onClick={() => decide("APPROVE")}>
+        <input id={`comment-${target}`} placeholder={requireComment ? "Reason for choosing this option (required)" : "Comment (optional)"}
+          value={comment} maxLength={980} onChange={(e) => setComment(e.target.value)} />
+        <button type="button" className="approve" disabled={busy || (requireComment && comment.trim() === "")}
+          onClick={() => decide("APPROVE")}>
           Approve {label}
         </button>
         <button type="button" className="reject" disabled={busy} onClick={() => decide("REJECT")}>
@@ -113,7 +115,7 @@ export function WeightsPanel({ meta, scenario, onUpdate }: { meta: Meta; scenari
     <section className="weights" aria-labelledby="weights-title">
       <h2 id="weights-title">Priority weights (what-if)</h2>
       <p className="small muted">
-        Weights only order passengers inside a tier. Mandated care (special assistance, unaccompanied minors, infants)
+        Weights only order passengers inside a tier. Mandated care (special assistance, infants)
         and urgency always come first, and non-revenue passengers always come last.
       </p>
       <div className="weight-grid">
@@ -221,13 +223,23 @@ export function PassengerTable({ scenario, rows, meta }: { scenario: Scenario; r
                     <>
                       <strong>{p.assigned_flight}</strong> {utc(p.new_departure)}
                       <span className="small muted block">
+                        {p.care?.wait_minutes != null ? `waits ${minutes(p.care.wait_minutes)} · ` : ""}
                         arrives {minutes(p.arrival_delay_minutes)} later
                         {p.onward_ok === false ? " · onward connection lost" : ""}
                         {p.split ? " · group split" : ""}
                       </span>
                     </>
                   ) : (
-                    <span className="unprotected-label">No seat within 24 h: next day + hotel, or refund</span>
+                    <span className="unprotected-label">No seat within 24 h: next day</span>
+                  )}
+                  {p.care && (
+                    <span className="care block">
+                      <span className="small">Care: <strong>{p.care.summary}</strong></span>
+                      {p.care.refund_option && <span className="small block muted">Option: refund + free return, or date change</span>}
+                      {p.care.flags.map((f) => (
+                        <span key={f} className="flag small block">⚑ {f}</span>
+                      ))}
+                    </span>
                   )}
                 </td>
                 <td>

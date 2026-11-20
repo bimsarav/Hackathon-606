@@ -17,9 +17,10 @@ from typing import Any
 
 from app.config import Settings
 from app.engine import priority, rebooking
+from app.engine.care import CareRules, care_for
 from app.engine.cost import CostModel, care_cost, eu261_compensation_eur, great_circle_km
 from app.engine.explain import Explainer, template_message
-from app.engine.network import RotationPlan, absorb_delay, swap_rotations
+from app.engine.network import RotationPlan, TurnTimes, absorb_delay, swap_rotations
 from app.engine.passengers import Connection, connections_at_risk
 from app.engine.store import Leg, OpsStore
 
@@ -45,8 +46,25 @@ class Context:
         )
 
     @property
-    def min_turn(self) -> timedelta:
-        return timedelta(minutes=self.settings.min_turn_minutes)
+    def care_rules(self) -> CareRules:
+        s = self.settings
+        return CareRules(
+            s.care_meal_after_minutes,
+            s.care_meal_every_minutes,
+            s.care_hotel_after_minutes,
+            s.care_refund_offer_after_minutes,
+            s.cost_meal_voucher,
+            s.cost_hotel_per_night,
+            s.cost_transport,
+        )
+
+    @property
+    def min_turn(self) -> TurnTimes:
+        s = self.settings
+        return TurnTimes(
+            timedelta(minutes=s.min_turn_minutes),
+            {k: timedelta(minutes=v) for k, v in s.min_turn_by_station.items()},
+        )
 
     @property
     def max_connection(self) -> timedelta:
@@ -143,7 +161,10 @@ def _option_kpis(ctx: Context, key: str, label: str, plan: RotationPlan, cancell
     }
 
 
-def analyse_delay(ctx: Context, flight_id: str, delay_minutes: int, weights: dict[str, float]) -> dict[str, Any]:
+def analyse_delay(
+    ctx: Context, flight_id: str, delay_minutes: int, weights: dict[str, float], selected_key: str | None = None
+) -> dict[str, Any]:
+    """``selected_key``: the option a controller picked; passengers and costs then follow that option."""
     leg = ctx.store.leg(flight_id)
     if leg is None:
         raise ScenarioError(f"Flight {flight_id} is not in the operating window")
@@ -173,18 +194,35 @@ def analyse_delay(ctx: Context, flight_id: str, delay_minutes: int, weights: dic
 
     options.sort(key=lambda o: (o["cost_aed"], o["misconnects"]))
     best = options[0]
-    missed: list[Connection] = best.pop("_missed")
-    for o in options[1:]:
+    chosen = next((o for o in options if o["key"] == selected_key), best)
+    missed: list[Connection] = chosen["_missed"]
+    for o in options:
         o.pop("_missed")
 
-    # Passengers who still miss a connection under the recommended option: rank and re-accommodate.
-    pax_plan = _reaccommodate_misconnects(ctx, missed, best, weights)
+    # Passengers who still miss a connection under the chosen option: rank and re-accommodate.
+    pax_plan = _reaccommodate_misconnects(ctx, missed, chosen, weights)
+    runner_up = next((o for o in options if o["key"] != chosen["key"]), None)
+
+    def brief(o: dict[str, Any]) -> dict[str, Any]:
+        return {
+            "what": o["label"],
+            "flights_delayed": o["legs_delayed"],
+            "extra_delay_minutes": o["total_delay_minutes"],
+            "passengers_missing_connections": o["misconnects"],
+            "estimated_cost_aed": round(o["cost_aed"]),
+        }
+
     facts = {
-        "disrupted_flight": leg.flight_number,
-        "route": f"{leg.origin}-{leg.destination}",
+        "late_flight": f"{leg.flight_number} from {leg.origin} to {leg.destination}",
         "delay_minutes": delay_minutes,
-        "recommended": {k: v for k, v in best.items() if k not in ("legs",)},
-        "options": [{k: v for k, v in o.items() if k not in ("legs",)} for o in options],
+        "chosen_option": brief(chosen),
+        "chosen_is_the_recommendation": chosen["key"] == best["key"],
+        "recommended_option": brief(best),
+        "next_best_alternative": brief(runner_up) if runner_up else None,
+        "connections_can_be_saved": chosen["misconnects"] < max(o["misconnects"] for o in options),
+        "passengers_rebooked": (pax_plan.get("rebooking") or {}).get("protected", 0),
+        "passengers_without_seat": (pax_plan.get("rebooking") or {}).get("unprotected", 0),
+        "hotel_rooms_needed": (pax_plan.get("rebooking") or {}).get("hotel_rooms", 0),
     }
     narrative = ctx.explainer.recommendation(facts)
     return {
@@ -193,6 +231,7 @@ def analyse_delay(ctx: Context, flight_id: str, delay_minutes: int, weights: dic
         "delay_minutes": delay_minutes,
         "options": options,
         "recommended_key": best["key"],
+        "selected_key": chosen["key"],
         "explanation": {"text": narrative.text, "source": narrative.source},
         "misconnections": [vars(c) for c in missed],
         **pax_plan,
@@ -232,7 +271,26 @@ def _reaccommodate_misconnects(
         all_ranked += ranked
         assignments += result.assignments
         alternatives += result.alternatives
-    return _passenger_payload(ctx, all_ranked, assignments, alternatives, event="delayed")
+    inbound = {(c.pnr, c.customer_key): c.inbound_flight_id.split("_")[0] for c in missed}
+    waiting_from: dict[tuple[str, str], datetime | None] = {}
+    for c in missed:
+        arrival = new_arrival.get(c.inbound_flight_id)
+        if arrival is None:
+            leg = ctx.store.leg(c.inbound_flight_id)
+            arrival = leg.sta if leg else None
+        waiting_from[(c.pnr, c.customer_key)] = arrival
+    hub = missed[0].hub
+    return _passenger_payload(
+        ctx,
+        all_ranked,
+        assignments,
+        alternatives,
+        event="missed_connection",
+        inbound=inbound,
+        waiting_from=waiting_from,
+        station=hub,
+        transfer=True,
+    )
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -280,7 +338,16 @@ def analyse_cancellation(ctx: Context, flight_id: str, weights: dict[str, float]
         [leg.flight_id],
     )
     result = rebooking.plan(ranked, alts, leg.sta, deadline)
-    payload = _passenger_payload(ctx, ranked, result.assignments, result.alternatives, event="cancelled")
+    payload = _passenger_payload(
+        ctx,
+        ranked,
+        result.assignments,
+        result.alternatives,
+        event="cancelled",
+        waiting_from={(r.passenger["pnr"], r.passenger["customer_key"]): leg.std for r in ranked},
+        station=leg.origin,
+        transfer=False,
+    )
 
     cm, eu = ctx.cost, _eu261(ctx, leg)
     free_seats = sum(int(str(a["available_seats"])) for a in result.alternatives)
@@ -288,8 +355,7 @@ def analyse_cancellation(ctx: Context, flight_id: str, weights: dict[str, float]
     unprotected = result.unprotected_passengers
     cost = {
         "eu261_compensation": round(eu * seated * cm.eur_to_aed),
-        "care_unprotected": round(unprotected * (cm.hotel_per_night + 2 * cm.meal_voucher)),
-        "care_protected": round(result.protected_passengers * cm.meal_voucher),
+        "passenger_care": round(payload["rebooking"]["care_cost_aed"]),
         "rebooking_handling": round(seated * cm.rebooking_handling),
     }
     nxt = next(
@@ -301,40 +367,20 @@ def analyse_cancellation(ctx: Context, flight_id: str, weights: dict[str, float]
         None,
     )
     facts = {
-        "cancelled_flight": leg.flight_number,
-        "route": f"{leg.origin}-{leg.destination}",
-        "affected_passengers": seated,
-        "seats_on_alternatives": free_seats,
-        "protected": result.protected_passengers,
-        "unprotected": unprotected,
-        "groups_split": sum(1 for a in result.assignments if a.split),
-        "recommended": {
-            "key": "rebook",
-            "label": "Rebook by priority within available seats",
-            "total_delay_minutes": 0,
-            "legs_delayed": 0,
-            "misconnects": len(onward),
-            "cost_aed": sum(cost.values()),
-        },
-        "options": [],
-        "tier_counts": payload["tier_counts"],
+        "cancelled_flight": f"{leg.flight_number} from {leg.origin} to {leg.destination}",
+        "passengers_to_move": seated,
+        "free_seats_on_other_flights_within_24h": free_seats,
+        "passengers_rebooked": result.protected_passengers,
+        "passengers_without_seat": unprotected,
+        "who_goes_first": "passengers needing special assistance and families with babies; "
+        "then passengers with onward connections; staff travel last",
+        "estimated_cost_aed": sum(cost.values()),
     }
-    narrative = ctx.explainer.recommendation(facts) if ctx.explainer.enabled else None
-    text = (
-        narrative.text
-        if narrative
-        else (
-            f"{leg.flight_number} {leg.origin}-{leg.destination} cancelled: {seated} passengers (plus lap infants) to "
-            f"re-accommodate, {free_seats} free seats on "
-            f"{len(result.alternatives)} alternatives within {ctx.settings.rebooking_window_hours} h. "
-            f"{result.protected_passengers} protected by priority tier and score; {unprotected} need next-day "
-            f"rebooking with hotel and meals, or a refund. Bookings are kept together unless no flight can seat them."
-        )
-    )
+    narrative = ctx.explainer.cancellation(facts)
     return {
         "type": "CANCEL",
         "flight": _leg_json(leg),
-        "explanation": {"text": text, "source": narrative.source if narrative else "template"},
+        "explanation": {"text": narrative.text, "source": narrative.source},
         "cost_aed": cost,
         "cost_total_aed": sum(cost.values()),
         "eu261_per_passenger_eur": eu,
@@ -353,21 +399,45 @@ def _passenger_payload(
     assignments: list[rebooking.Assignment],
     alternatives: list[dict[str, Any]],
     event: str,
+    inbound: dict[tuple[str, str], str] | None = None,
+    waiting_from: dict[tuple[str, str], datetime | None] | None = None,
+    station: str | None = None,
+    transfer: bool = False,
 ) -> dict[str, Any]:
     where: dict[tuple[str, str], rebooking.Assignment] = {}
     for assignment in assignments:
         for key in assignment.customer_keys:
             where[(assignment.pnr, key)] = assignment
+    rules = ctx.care_rules
+    station_tz = ctx.store.airport_tz().get(station or "")
+    care_total = 0.0
     rows = []
     for pos, r in enumerate(ranked, start=1):
         p = r.passenger
         a = where.get((p["pnr"], p["customer_key"]))
+        late_inbound = (inbound or {}).get((p["pnr"], p["customer_key"]))
+        care = care_for(
+            rules,
+            (waiting_from or {}).get((p["pnr"], p["customer_key"])),
+            a.new_std if a else None,
+            station_tz,
+            has_seat=bool(a and a.flight_id),
+            transfer=transfer,
+            ssr=p.get("ssr_code"),
+            infants=p["infants"],
+            new_flight=a.flight_number if a and a.flight_id else None,
+        )
+        care_total += care.cost(rules)
         rows.append(
             {
                 "rank": pos,
                 "pnr": p["pnr"],
                 "customer_key": p["customer_key"],
-                "name": f"{p['first_name']} {p['last_name']}",
+                # the bookings carry no names (name-free format, 2026-11-21): the synthetic passenger ID identifies
+                "name": p.get("passenger_id") or "-",
+                "passenger_id": p.get("passenger_id"),
+                "passport_number_synthetic": p.get("passport_number_synthetic"),
+                "national_id_synthetic": p.get("national_id_synthetic"),
                 "pax_type": p["pax_type"],
                 "route": f"{p['origin']}-{p['destination']}",
                 "flight_id": p["flight_id"],
@@ -394,17 +464,27 @@ def _passenger_payload(
                 "onward_ok": a.onward_ok if a else None,
                 "split": a.split if a else False,
                 "assignment_reason": a.reason if a else "",
+                "missed_inbound_flight": late_inbound,
+                "care": {
+                    "summary": care.summary,
+                    "wait_minutes": care.wait_minutes,
+                    "meals": care.meals,
+                    "hotel": care.hotel,
+                    "transport": care.transport,
+                    "refund_option": care.refund_option,
+                    "flags": care.flags,
+                    "cost_aed": round(care.cost(rules)),
+                },
                 "message": template_message(
                     {
                         "flight": p["flight_id"].split("_")[0],
+                        "late_inbound_flight": late_inbound,
                         "origin": p["origin"],
                         "destination": p["destination"],
                         "event": event,
                         "new_flight": a.flight_number if a and a.flight_id else None,
                         "new_departure": f"{a.new_std:%d %b %H:%M} UTC" if a and a.new_std else None,
-                        "care": "Meal vouchers are available at the airport."
-                        if a and a.flight_id
-                        else "Hotel accommodation and meals will be arranged.",
+                        "care": care.message_text(),
                     }
                 ),
             }
@@ -419,6 +499,8 @@ def _passenger_payload(
             "protected": sum(a.seats for a in assignments if a.flight_id),
             "unprotected": sum(a.seats for a in assignments if not a.flight_id),
             "groups_split": sum(1 for a in assignments if a.split),
+            "care_cost_aed": round(care_total),
+            "hotel_rooms": sum(1 for row in rows if row["care"]["hotel"]),
         },
     }
 
@@ -427,7 +509,8 @@ def _assumptions(ctx: Context) -> list[str]:
     s = ctx.settings
     return [
         f"Demo clock: {s.now_utc:%Y-%m-%d %H:%M} UTC; data window per ingest report.",
-        f"Minimum aircraft turn time {s.min_turn_minutes} min; block times as scheduled.",
+        f"Minimum aircraft turn time: {', '.join(f'{k} {v}' for k, v in s.min_turn_by_station.items())} min, "
+        f"elsewhere {s.min_turn_minutes} min (measured from 2026 actual turns); block times as scheduled.",
         f"Connections: same PNR, 15 min-{s.max_connection_minutes // 60} h; "
         f"hub MCT table, else {s.default_mct_minutes} min.",
         "Seat capacity: inventory allocation where available, otherwise aircraft layout inferred from the data; "

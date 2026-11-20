@@ -1,4 +1,5 @@
-# Full stack: docker compose up -d --build   (first: cp .env.example .env and fill it), then open http://localhost:${WEB_PORT}
+# Full stack: docker compose up -d --build   (first: scripts/init-settings.sh, then fill in settings.env), then open http://localhost:${WEB_PORT}
+# Settings live in settings.env; Docker Compose reads them through the link .env -> settings.env.
 # Start order: db (healthy) → migrate (done) and ingest (done) → api (healthy) → web. Every long-running service
 # restarts unless stopped, so the stack comes back by itself after a server reboot (engineering standards §14).
 name: disruption-advisor
@@ -13,8 +14,8 @@ x-api-env: &api-env
   LOG_JSON: ${LOG_JSON:-true}
   WORKERS: ${API_WORKERS:-2}
   DATA_DIR: /data
-  DEMO_USERS: ${DEMO_USERS:?set DEMO_USERS in .env}
-  TOKEN_SECRET: ${TOKEN_SECRET:?set TOKEN_SECRET in .env}
+  DEMO_USERS: ${DEMO_USERS:?set DEMO_USERS in settings.env}
+  TOKEN_SECRET: ${TOKEN_SECRET:?set TOKEN_SECRET in settings.env}
   ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
   AI_MODEL: ${AI_MODEL:-claude-opus-5-5}
 
@@ -58,9 +59,10 @@ services:
       DATA_DIR: /data
       INGEST_MEMORY_LIMIT: ${INGEST_MEMORY_LIMIT:-4GB}
       DEMO_SCENARIO: ${DEMO_SCENARIO:-false}
+      OPERATING_CARRIERS: ${OPERATING_CARRIERS:-G9}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
     volumes:
-      - ${INPUT_DIR:?set INPUT_DIR (folder with the airline extracts) in .env}:/input:ro
+      - ${INPUT_DIR:?set INPUT_DIR (folder with the airline extracts) in settings.env}:/input:ro
       - ops-data:/data
     depends_on:
       migrate: { condition: service_completed_successfully }

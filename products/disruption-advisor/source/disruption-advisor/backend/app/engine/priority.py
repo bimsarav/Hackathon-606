@@ -1,8 +1,8 @@
 """Passenger recovery priority: strict tiers first, then a configurable weighted score inside each tier.
 
 Tier order (Q12, UC5: rights and mandatory assistance are respected independently of commercial scores):
-  1 Mandated care: special assistance (WCHR/WCHS/WCHC, BLND, DEAF, MEDA, PREG), unaccompanied minors, and
-    PNRs travelling with an infant.
+  1 Mandated care: special assistance (WCHR/WCHS/WCHC, BLND, DEAF, MEDA, PREG) and PNRs travelling with an
+    infant. (Unaccompanied minors are out of scope; future enhancement.)
   2 Urgency: an onward connection, or a multi-sector journey.
   3 Everyone else.
 Non-revenue passengers come after all revenue passengers. The weighted score only orders passengers within the
@@ -14,7 +14,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-CARE_SSRS = frozenset({"WCHR", "WCHS", "WCHC", "BLND", "DEAF", "MEDA", "PREG", "UMNR"})
+# Unaccompanied minors (UMNR) are out of scope (user decision 2026-11-21; future enhancement).
+CARE_SSRS = frozenset({"WCHR", "WCHS", "WCHC", "BLND", "DEAF", "MEDA", "PREG"})
 TIER_VALUE = {None: 0.0, "Blue": 0.25, "Silver": 0.5, "Gold": 0.75, "Platinum": 1.0}
 FREQUENCY_VALUE = {"occasional": 0.2, "regular": 0.6, "frequent": 1.0, "unknown": 0.3}
 FAMILY_VALUE = {"Basic": 0.2, "Value": 0.5, "Ultimate": 1.0, "Other": 0.4, "Staff/ID": 0.0, "Bus": 0.2}

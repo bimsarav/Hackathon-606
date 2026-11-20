@@ -8,13 +8,13 @@ This guide covers the target host, how the MVP is deployed, how it survives a re
 | Host | OCI VM (eu-frankfurt-1), x86_64, 8 vCPU, 62 GiB, Oracle Linux 10, Docker 29 + Compose v5, firewalld |
 | URL | `http://<server>:8888`. HTTP only in the MVP; HTTPS is planned for phase 2 |
 | Published ports | 8888 (`web`) only. PostgreSQL and the API are reachable only on the Compose network |
-| Paths on the host | Code: `~/apps/disruption-advisor` · extracts (read-only mount): `~/disruption-advisor-input` (mode 700) · secrets: `~/apps/disruption-advisor/.env` (mode 600) |
+| Paths on the host | Code: `~/apps/disruption-advisor` · extracts (read-only mount): `~/disruption-advisor-input` (mode 700) · secrets: `~/apps/disruption-advisor/settings.env` (mode 600; `.env` is a link to it for Docker Compose) |
 | Data | Docker volumes `disruption-advisor_db-data` (PostgreSQL: scenarios, decisions) and `disruption-advisor_ops-data` (Parquet built by `ingest`) |
 
 ## First deployment
-1. **Copy the repository** to the host. Exclude `.env`, `node_modules`, `logs` and build output.
+1. **Copy the repository** to the host. Exclude `settings.env`, `.env`, `node_modules`, `logs` and build output.
 2. **Copy the extracts** to the input folder (`scp`).
-3. **Create `.env`** from `.env.example` with new random values: database password, `TOKEN_SECRET`, `DEMO_USERS` passwords, `ANTHROPIC_API_KEY`. Set `WEB_PORT=8888` and `INPUT_DIR` to the input folder, then `chmod 600 .env`.
+3. **Create `settings.env`** with `scripts/init-settings.sh` and fill it with new random values: database password, `TOKEN_SECRET`, `DEMO_USERS` passwords, `ANTHROPIC_API_KEY`. Set `WEB_PORT=8888` and `INPUT_DIR` to the input folder, (the script sets mode 600).
 4. **Build and start:** `docker compose build && docker compose up -d`. The first `ingest` takes about 4 minutes.
 5. **Verify** (engineering standards §13.9):
    - `scripts/smoke.sh http://<server>:8888`
@@ -52,7 +52,7 @@ This guide covers the target host, how the MVP is deployed, how it survives a re
 
 ## Known limitations (MVP)
 - **No HTTPS yet (phase 2).** Do not reuse the demo passwords anywhere else.
-- **Demo sign-in only:** two roles held in `.env`. Production would use the airline's identity provider (ADR 0004).
+- **Demo sign-in only:** two roles held in `settings.env`. Production would use the airline's identity provider (ADR 0004).
 - **Assumed data:** synthetic loyalty, fare-family and special-service data, and assumed costs, all labelled in the UI.
 - **Crew legality is not checked:** no crew data was supplied.
 - **Simulated clock:** the demo "now" is 2026-11-20 00:00 UTC (`NOW_UTC`).

@@ -28,6 +28,7 @@ from app.schemas import (
     ScenarioCreate,
     ScenarioRead,
     ScenarioSummary,
+    SelectOption,
 )
 
 router = APIRouter(prefix="/api/v1", tags=["advisor"])
@@ -53,12 +54,19 @@ def _read(s: Scenario) -> ScenarioRead:
     )
 
 
-def _analyse(ctx: Context, kind: str, flight_id: str, delay: int | None, weights: dict[str, float]) -> dict[str, Any]:
+def _analyse(
+    ctx: Context,
+    kind: str,
+    flight_id: str,
+    delay: int | None,
+    weights: dict[str, float],
+    selected_key: str | None = None,
+) -> dict[str, Any]:
     try:
         if kind == "DELAY":
             if delay is None:
                 raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "delay_minutes is required for a delay")
-            result = analyse_delay(ctx, flight_id, delay, weights)
+            result = analyse_delay(ctx, flight_id, delay, weights, selected_key)
         else:
             result = analyse_cancellation(ctx, flight_id, weights)
     except ScenarioError as exc:
@@ -166,8 +174,38 @@ def reprioritise(
     """What-if: re-run the analysis with new weights (the flight and delay stay the same)."""
     scenario = _get(session, scenario_id)
     weights = payload.weights.as_dict()
-    scenario.result = _analyse(_context(request), scenario.kind, scenario.flight_id, scenario.delay_minutes, weights)
+    scenario.result = _analyse(
+        _context(request),
+        scenario.kind,
+        scenario.flight_id,
+        scenario.delay_minutes,
+        weights,
+        scenario.result.get("selected_key"),
+    )
     scenario.weights = weights
+    session.commit()
+    session.refresh(scenario)
+    return _read(scenario)
+
+
+@router.post("/scenarios/{scenario_id}/select")
+def select_option(
+    scenario_id: uuid.UUID, payload: SelectOption, request: Request, session: SessionDep, _: CurrentUser
+) -> ScenarioRead:
+    """Choose a recovery option (delay scenarios). Passengers, costs and the explanation follow the chosen option."""
+    scenario = _get(session, scenario_id)
+    if scenario.kind != "DELAY":
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Only delay scenarios have recovery options")
+    if payload.option_key not in {o["key"] for o in scenario.result.get("options", [])}:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Option not found in this scenario")
+    scenario.result = _analyse(
+        _context(request),
+        scenario.kind,
+        scenario.flight_id,
+        scenario.delay_minutes,
+        scenario.weights,
+        payload.option_key,
+    )
     session.commit()
     session.refresh(scenario)
     return _read(scenario)
@@ -210,10 +248,13 @@ def draft_message(
         "flight": row["flight_id"].split("_")[0],
         "origin": origin,
         "destination": destination,
-        "event": "cancelled" if scenario.kind == "CANCEL" else "delayed, so the onward connection is missed",
+        "event": "cancelled" if scenario.kind == "CANCEL" else "missed connection",
+        "late_inbound_flight": row.get("missed_inbound_flight"),
         "new_flight": row["assigned_flight"],
         "new_departure": row["new_departure"],
-        "care": "meal vouchers" if row["assigned_flight"] else "hotel and meals until the next available flight",
+        "care_while_waiting": row["care"]["summary"],
+        "waiting_hours": round(row["care"]["wait_minutes"] / 60) if row["care"]["wait_minutes"] is not None else None,
+        "can_choose_refund_and_free_return_to_origin_or_date_change": row["care"]["refund_option"],
         "travelling_with_infant": row["infants"] > 0,
         "special_assistance": row["ssr"],
     }

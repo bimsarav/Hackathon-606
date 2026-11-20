@@ -28,9 +28,27 @@ test("scenario A: a delay is assessed, options compared, recommendation approved
   const recommended = page.locator("tr.recommended");
   await expect(recommended).toHaveCount(1);
   await expect(page.getByRole("heading", { name: /Why this recommendation/ })).toBeVisible();
-  await expect(page.getByRole("heading", { name: /Rotation impact/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Flights affected/ })).toBeVisible();
   await page.getByRole("button", { name: "Approve recommended option" }).click();
   await expect(page.locator(".audit").first()).toContainText("APPROVE");
+
+  // Choose another option: it becomes the selection, and approving it needs a reason (override).
+  const other = page.locator("tr.option-row:not(.recommended)").first();
+  if (await other.count()) {
+    await other.click();
+    await expect(page.locator("tr.option-row.selected")).not.toHaveClass(/recommended/);
+    const approve = page.getByRole("button", { name: "Approve selected option (override)" });
+    await expect(approve).toBeDisabled();
+    await page.getByPlaceholder("Reason for choosing this option (required)").fill("Crew for the recommended aircraft not legal");
+    await approve.click();
+    await expect(page.getByText(/OVERRIDE: Crew for the recommended aircraft not legal/)).toBeVisible();
+  }
+
+  // The delay slider re-runs the scenario on screen.
+  const slider = page.getByLabel(/Delay:/);
+  await slider.focus();
+  await slider.press("ArrowLeft");
+  await expect(page.locator("h1")).toContainText("+2 h 15 min");
 });
 
 test("scenario B: a cancellation ranks passengers by tier and re-runs with new weights", async ({ page }) => {

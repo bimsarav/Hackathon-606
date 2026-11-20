@@ -9,6 +9,8 @@ Disruption Advisor helps an airline's **Operations Control Centre (OCC)** and **
 
 It **recommends only**: a person approves or rejects every action (requirement UC5, decision Q21).
 
+**Carrier scope:** only the airline's own flights (G9). Partner and other carriers present in the extracts (3L, 3O, E5, 9P, 4P) are excluded from the operating data, the swap candidates and the rebooking alternatives (`OPERATING_CARRIERS=G9`). Including them is a future enhancement (delivery plan, phase 4).
+
 Requirement sources: the UC5 use-case document (`Disruption_Management_UC5.docx`), the briefing transcript, the product-owner Q&A of 2026-11-20 and the clarification register (Q1–Q30). Domain background comes from the team's airline knowledge base (disruption management topic), which is not part of this repository.
 
 ## 1. System context
@@ -82,7 +84,9 @@ flowchart TB
 ```mermaid
 flowchart LR
   B[Booking CSVs ×18<br/>27.9M rows] --> C1[clean: Latin-1 → UTF-8,<br/>reject malformed lines]
-  C1 --> C2[active segments<br/>CNF/CNF/ACT, window 19–30 Nov]
+  C1 --> NF[name-free bookings by month<br/>names → customer_key + synthetic ID]
+  BP[Name-free bookings Parquet<br/>supplied, by month] --> NF
+  NF --> C2[active segments<br/>CNF/CNF/ACT, window 19–30 Nov]
   R[Rotation .xls] --> L[flight legs + tails]
   I[Inventory CSV] --> S[seat capacity per flight<br/>adult_capacity ± curtail/oversell]
   M[Connection times] --> J
@@ -208,7 +212,7 @@ sequenceDiagram
 flowchart TB
   A[Affected passenger] --> F{Feasible alternative?<br/>seats, MCT, same PNR group}
   F -- no --> NX[Next day + hotel + meals<br/>EU261 care if departing EU]
-  F -- yes --> T1{Tier 1: mandated care<br/>WCHR/WCHS/WCHC, BLND, DEAF, MEDA,<br/>PREG, UMNR, infant in PNR}
+  F -- yes --> T1{Tier 1: mandated care<br/>WCHR/WCHS/WCHC, BLND, DEAF, MEDA,<br/>PREG, infant in PNR}
   T1 -- yes --> P1[Priority band 1]
   T1 -- no --> T2{Tier 2: urgency<br/>onward connection, last flight of day,<br/>long journey}
   T2 -- yes --> P2[Priority band 2]
@@ -218,7 +222,24 @@ flowchart TB
   NR -- yes --> L[After all revenue passengers]
   NR -- no --> O[Ordered list + reasons]
 ```
-The commercial score never moves a passenger across a legal or care tier (UC5: "respect passenger rights … independently of commercial scores").
+The commercial score never moves a passenger across a legal or care tier (UC5: "respect passenger rights … independently of commercial scores"). Unaccompanied minors are out of scope (decision 2026-11-21; future enhancement).
+
+**Care while waiting** (`app/engine/care.py`, configurable):
+
+| Wait for the new flight | Care offered |
+|---|---|
+| Under 2 h | None |
+| 2 h or more | Meal vouchers, one per 4 h (at most 4) |
+| 8 h or more, or overlapping the local night (01:00–05:00) by 2 h or more | Hotel room and airport↔hotel transport as well |
+| No seat within 24 h | Treated as next day: hotel, transport and meals |
+
+- **Refund option:** offered from 5 h of waiting, and to anyone without a seat (refund + free return to origin, or a free date change).
+- **Flags:**
+  - transfer passengers needing a hotel: transit visa or airside hotel;
+  - special assistance: re-book it on the new flight;
+  - pregnancy: fit-to-fly check;
+  - infants: supplies and a priority room.
+- **Where it shows:** care costs are included in the rebooking totals and the passenger message.
 
 ## 8. Deployment
 ```mermaid
@@ -252,4 +273,4 @@ flowchart LR
 - **Robustness:** booking vs inventory mismatches are flagged and the run continues (PO Q&A). Synthetic values are labelled in the UI.
 - **Observability:** JSON logs with request id; `/health/live` and `/health/ready` (PostgreSQL and ops store); container healthchecks.
 - **Time:** all logic runs in UTC; local times come from the airport time-zone table (Q9, Q22).
-- **Limits (MVP):** no crew legality (no crew data), no equipment change, no bus legs, simulated "now" = 2026-11-20 (Q2).
+- **Limits (MVP):** G9 flights only (no partner or other carriers), no crew legality (no crew data), no equipment change, no bus legs, simulated "now" = 2026-11-20 (Q2).

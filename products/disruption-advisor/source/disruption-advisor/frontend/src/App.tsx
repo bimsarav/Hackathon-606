@@ -6,6 +6,16 @@ import { Launcher } from "./Launcher";
 import { utc } from "./format";
 
 const STORAGE_KEY = "disruption-advisor-session";
+const OPEN_KEY = "disruption-advisor-open-scenario";
+
+function remember(key: string, value: string | null) {
+  try {
+    if (value) sessionStorage.setItem(key, value);
+    else sessionStorage.removeItem(key);
+  } catch {
+    /* storage unavailable: nothing is remembered across reloads */
+  }
+}
 
 function loadSession(): Session | null {
   try {
@@ -125,7 +135,19 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
         setMetaError(errorText(e, "Could not load the operating data."));
       });
     refreshHistory();
+    // Reopen the scenario that was on screen before a page reload, so the slider keeps working.
+    let openId: string | null = null;
+    try {
+      openId = sessionStorage.getItem(OPEN_KEY);
+    } catch {
+      openId = null;
+    }
+    if (openId) {
+      api.scenario(openId).then(setScenario).catch(() => remember(OPEN_KEY, null));
+    }
   }, [onSignOut, refreshHistory]);
+
+  useEffect(() => remember(OPEN_KEY, scenario?.id ?? null), [scenario?.id]);
 
   async function run(label: string, action: () => Promise<Scenario>) {
     setLoad({ kind: "busy", label });
@@ -172,6 +194,9 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
             <Launcher
               meta={meta}
               busy={load.kind === "busy"}
+              active={scenario && scenario.kind === "DELAY" && scenario.delay_minutes
+                ? { flightId: scenario.flight_id, flightNumber: scenario.result.flight.flight_number, delay: scenario.delay_minutes }
+                : null}
               onDelay={(flightId, delay) =>
                 run(`Analysing a ${delay}-minute delay…`, () =>
                   api.createScenario({ kind: "DELAY", flight_id: flightId, delay_minutes: delay, weights: meta.default_weights }),

@@ -3,6 +3,9 @@
 All later work reads these Parquet files, never the raw CSV/Excel. Nothing here edits the input files.
 
 Raw inputs (folder ``INPUT_DIR``):
+  parquet/raw/bookings/dep_month=YYYY-MM/*.parquet
+                                      bookings already in the name-free format below (supplied 2026-11-21); used
+                                      as they are when present, otherwise:
   Past & Future Booking Data.zip      18 monthly CSVs in nested zips, Latin-1, ~28M rows
   Flight Rotation.xls                 rotation / movement extract (UTC)
   Flight_Punctuality_Jan-Nov_2026_Combined.xlsx
@@ -11,7 +14,11 @@ Raw inputs (folder ``INPUT_DIR``):
   Connection Time.xlsx                hub MCT per origin/hub/destination
 
 Outputs (folder ``<DATA_DIR>/raw``):
-  bookings/dep_year=YYYY/*.parquet    partitioned by departure year, sorted by departure time, zstd
+  bookings/dep_month=YYYY-MM/*.parquet
+                                      one row per passenger per segment, all statuses, WITHOUT names: first and
+                                      last name are replaced by customer_key (hash of the name) and a synthetic
+                                      identity (passenger_id, passport_number_synthetic, national_id_synthetic,
+                                      identity_rule); partitioned by departure month, sorted, zstd
   rotation.parquet, punctuality.parquet, inventory.parquet, schedule.parquet, mct.parquet
   bookings_rejects.txt                malformed lines (wrong field count or unterminated quote)
 """
@@ -22,6 +29,7 @@ import csv
 import io
 import logging
 import os
+import shutil
 import tempfile
 import zipfile
 from collections.abc import Iterator
@@ -84,12 +92,11 @@ def convert_bookings(input_dir: Path, out_dir: Path, work_dir: Path) -> dict[str
                         stats["rejected"] += 1
                         rejects.write(f"{tag}\t{line[:300]}\n")
             log.info("bookings month cleaned", extra={"month": tag})
-    target = out_dir / "bookings"
-    con = duckdb.connect()
+    con = duckdb.connect(str(work_dir / "bookings.duckdb"))  # names stay in this temporary database only
     con.execute(f"SET temp_directory='{work_dir / 'duckdb_tmp'}'")
     con.execute(f"SET memory_limit='{os.environ.get('INGEST_MEMORY_LIMIT', '4GB')}'")  # spills to disk beyond this
     con.execute(f"""
-        COPY (
+        CREATE TABLE b AS
           SELECT
             PNR AS pnr,
             try_strptime(BOOKING_TIMESTAMP, '%Y-%m-%d %H:%M:%S') AS booking_ts,
@@ -120,15 +127,118 @@ def convert_bookings(input_dir: Path, out_dir: Path, work_dir: Path) -> dict[str
             {_YN.format(c="TNFSEG")} AS tnf_seg,
             {_YN.format(c="MODSEG")} AS mod_seg,
             {_YN.format(c="CNXSEG")} AS cnx_seg,
-            SRC_FILE AS src_file,
-            year(try_strptime(EST_TIME_DEPARTURE_ZULU, '%Y-%m-%d %H:%M:%S')) AS dep_year
-          FROM read_csv('{clean_dir}/*.csv', header = true, all_varchar = true)
-          ORDER BY dep_utc, flight_number
-        ) TO '{target}' (FORMAT parquet, COMPRESSION zstd, PARTITION_BY (dep_year), OVERWRITE_OR_IGNORE)
-    """)
+            SRC_FILE AS src_file
+          FROM read_csv('{clean_dir}/*.csv', header = true, all_varchar = true)""")
+    stats["persons"] = write_bookings_without_names(con, out_dir / "bookings")
     for f in clean_dir.glob("*.csv"):
         f.unlink()
     return stats
+
+
+# Synthetic identity (the extracts have no passenger ID or documents). A name is one person unless it is common
+# (more than COMMON_NAME_BOOKINGS bookings); then its bookings are split by home airport (origin of the booking's
+# first leg) and grouped about BOOKINGS_PER_PERSON per person, so repeat travellers keep one ID across bookings.
+# Documents are unique: the serial is a shuffled rank of the person.
+COMMON_NAME_BOOKINGS = 60
+BOOKINGS_PER_PERSON = 6
+BOOKING_COLUMNS = frozenset(
+    {
+        "pnr",
+        "booking_ts",
+        "res_status",
+        "is_lms_member",
+        "pax_type",
+        "flight_number",
+        "dep_utc",
+        "origin",
+        "destination",
+        "flight_status",
+        "seg_status",
+        "booking_code",
+        "total_fare",
+        "anci_charges",
+        "baggage_kg",
+        "meals",
+        "seat_code",
+        "sales_channel",
+        "customer_key",
+        "passenger_id",
+        "passport_number_synthetic",
+        "national_id_synthetic",
+        "identity_rule",
+        "dep_month",
+    }
+)
+
+
+def write_bookings_without_names(con: duckdb.DuckDBPyConnection, target: Path) -> int:
+    """Table ``b`` (typed bookings with names) -> name-free bookings by departure month. Returns persons."""
+    con.execute(f"""
+        CREATE TEMP TABLE ident AS
+        WITH n AS (SELECT pnr, lower(trim(first_name)) || '|' || lower(trim(last_name)) AS name_key, origin, dep_utc
+                   FROM b WHERE first_name IS NOT NULL AND last_name IS NOT NULL),
+             home AS (SELECT pnr, arg_min(origin, dep_utc) AS home FROM n GROUP BY 1),
+             people AS (SELECT DISTINCT pnr, name_key FROM n),
+             named AS (SELECT p.*, h.home, count(*) OVER (PARTITION BY p.name_key) AS n_name,
+                              count(*) OVER (PARTITION BY p.name_key, h.home) AS n_home
+                       FROM people p JOIN home h USING (pnr)),
+             seed AS (SELECT *, n_name > {COMMON_NAME_BOOKINGS} AS common,
+                             CASE WHEN n_name > {COMMON_NAME_BOOKINGS}
+                                  THEN substr(sha256(name_key), 1, 16) || '|' || home || '|' ||
+                                       ((('0x' || substr(md5('bk|' || pnr), 1, 8))::UBIGINT)
+                                        % greatest(ceil(n_home / {BOOKINGS_PER_PERSON})::UBIGINT, 1))::VARCHAR
+                                  ELSE substr(sha256(name_key), 1, 16) END AS person_seed
+                      FROM named),
+             k AS (SELECT person_seed, row_number() OVER (ORDER BY sha256('pp|' || person_seed)) AS k
+                   FROM (SELECT DISTINCT person_seed FROM seed))
+        SELECT s.pnr, s.name_key, substr(sha256(s.name_key), 1, 16) AS customer_key,
+               'PAX' || upper(substr(sha256('pid|' || s.person_seed), 1, 12)) AS passenger_id,
+               chr(65 + (('0x' || substr(sha256('pp|' || s.person_seed), 1, 4))::INTEGER % 26)::INTEGER)
+                   || lpad((10000000 + k.k)::VARCHAR, 8, '0') AS passport_number_synthetic,
+               -- Emirates ID layout 784-YYYY-NNNNNNN-C (birth year, serial, check digit); demo format for everyone
+               '784-' || (1955 + (('0x' || substr(sha256('ny|' || s.person_seed), 1, 4))::INTEGER % 50))::VARCHAR
+                   || '-' || lpad(k.k::VARCHAR, 7, '0') || '-'
+                   || ((('0x' || substr(sha256('nc|' || s.person_seed), 1, 2))::INTEGER % 10))::VARCHAR
+                   AS national_id_synthetic,
+               CASE WHEN s.common THEN 'common-name: split by home airport' ELSE 'one-person-per-name' END
+                   AS identity_rule
+        FROM seed s JOIN k USING (person_seed)""")
+    con.execute(f"""
+        COPY (
+            SELECT b.* EXCLUDE (first_name, last_name),
+                   strftime(b.dep_utc, '%Y-%m') AS dep_month,
+                   i.customer_key, i.passenger_id, i.passport_number_synthetic, i.national_id_synthetic,
+                   i.identity_rule
+            FROM b LEFT JOIN ident i
+              ON i.pnr = b.pnr AND i.name_key = lower(trim(b.first_name)) || '|' || lower(trim(b.last_name))
+            ORDER BY dep_month, b.dep_utc, b.flight_number, b.pnr
+        ) TO '{target}' (FORMAT parquet, COMPRESSION zstd, PARTITION_BY (dep_month), OVERWRITE_OR_IGNORE)""")
+    row = con.execute("SELECT count(DISTINCT passenger_id) FROM ident").fetchone()
+    return int(row[0]) if row else 0
+
+
+def supplied_bookings(input_dir: Path) -> Path | None:
+    """Bookings already in the name-free format (INPUT_DIR/parquet/raw/bookings/dep_month=*), if supplied."""
+    folder = input_dir / "parquet" / "raw" / "bookings"
+    return folder if any(folder.glob("dep_month=*/*.parquet")) else None
+
+
+def copy_supplied_bookings(source: Path, out_dir: Path) -> dict[str, int]:
+    """Check the supplied name-free bookings have every column the build needs, then copy them in."""
+    con = duckdb.connect()
+    glob = f"read_parquet('{source}/*/*.parquet', hive_partitioning = true)"
+    columns = {r[0] for r in con.execute(f"DESCRIBE SELECT * FROM {glob}").fetchall()}
+    missing = sorted(BOOKING_COLUMNS - columns)
+    if missing:
+        raise ValueError(f"supplied bookings in {source} lack the columns {missing}")
+    if {"first_name", "last_name"} & columns:
+        raise ValueError(f"supplied bookings in {source} still contain passenger names")
+    target = out_dir / "bookings"
+    if target.exists():
+        shutil.rmtree(target)
+    shutil.copytree(source, target)
+    row = con.execute(f"SELECT count(*), count(DISTINCT passenger_id) FROM {glob}").fetchone() or (0, 0)
+    return {"loaded": int(row[0]), "rejected": 0, "persons": int(row[1]), "supplied_parquet": 1}
 
 
 def _sheet_table(path: Path, sheet: str | None = None) -> pa.Table:
@@ -209,6 +319,12 @@ def run(input_dir: Path, data_dir: Path, skip_bookings: bool = False) -> dict[st
     result.update(convert_excel(input_dir, out_dir))
     result.update(convert_csvs(input_dir, out_dir))
     if not skip_bookings:
-        with tempfile.TemporaryDirectory(dir=data_dir) as work:
-            result["bookings"] = convert_bookings(input_dir, out_dir, Path(work))
+        supplied = supplied_bookings(input_dir)
+        if supplied is not None:
+            result["bookings"] = copy_supplied_bookings(supplied, out_dir)
+        else:
+            with tempfile.TemporaryDirectory(dir=data_dir) as work:
+                if (out_dir / "bookings").exists():
+                    shutil.rmtree(out_dir / "bookings")  # an older layout (dep_year) must not stay next to the new
+                result["bookings"] = convert_bookings(input_dir, out_dir, Path(work))
     return result

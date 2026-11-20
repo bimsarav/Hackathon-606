@@ -7,7 +7,7 @@ All results come from real runs on 2026-11-20. Commands are in the README. Logs 
 |---|---|
 | Backend lint (Ruff, incl. security rules `S`) | PASS. `S608` is excepted for `app/engine/store.py` and `app/ingest/*`, where SQL interpolates only constant names and configured paths; user values are bound parameters (see `pyproject.toml`) |
 | Backend format, mypy strict | PASS |
-| Backend tests (pytest + Testcontainers PostgreSQL 18, Alembic) | **22 passed**; coverage 78% (the ingest is exercised by the real-data run below, not by unit tests) |
+| Backend tests (pytest + Testcontainers PostgreSQL 18, Alembic) | **29 passed** (2026-11-21 bug-fix release); coverage 78% (the ingest is exercised by the real-data run below, not by unit tests) |
 | Frontend type check (`tsc` strict), unit tests (Vitest), production build | PASS: **5 tests** |
 
 The engine tests use a hand-made network (`backend/tests/ops_fixture.py`) and cover:

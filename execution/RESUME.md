@@ -1,4 +1,4 @@
-# RESUME (updated 2026-11-20T20:09Z) — UC5 disruption-advisor PHASE 1 (MVP) COMPLETE & VERIFIED; Phase 2 NOT started (user)
+# RESUME (updated 2026-11-21) — UC5 disruption-advisor PHASE 1 (MVP) DEPLOYED & VERIFIED; Phase 2 NOT started (user)
 Product: esm-hub (R = products/esm-hub/source/esm-hub) · Status: COMPLETED by user instruction, NOT deployed
 Verified locally: clean build 253 tests; frontend lint + 18 tests; compose stack healthy; API smoke (output/T-005.2-smoke.log); Playwright 6/6 (output/T-005.2-e2e-run3.log)
 Cloud: OCI VM discovered + read-only dry run passed (R/docs/deployment/CLOUD_ENVIRONMENT.md, execution/DEPLOYMENT_STATUS.md); nothing deployed
@@ -9,3 +9,5 @@ Workspace rules: MASTER_PROMPT §13 cloud, §14 server ops (D-014), §9.24 produ
 T-300 done: KB documentation/knowledge-base/airline/ (README, SOURCES 261, GLOSSARY 98, topics/disruption-management/00-OVERVIEW + 01..05). Next (user decides): T-300.3 close gaps (overview §13) or a new research topic
 UC5: R=products/disruption-advisor/source/disruption-advisor. Design done (artifact https://claude.ai/artifact/PTzSvCcSHABHNz7HYhxG2s; R/docs/architecture/SYSTEM_ARCHITECTURE.md; R/docs/delivery/MVP_AND_INCREMENTAL_PLAN.md). Ingest done: Parquet in input/data/disruption-uc5/parquet/{raw,ops} (run: backend/app/ingest convert.run + build.build with scratch venv). NEXT: engine modules, API, UI, tests, deploy OCI :8888. Key: input/secrets/AI_API_KEY
 DONE 1-6: reboot test PASSED, Phase 1 DEPLOYED (verified), arch docs + ADRs 0005-0007, CONFLUENCE_PAGE.md, DELIVERY_REPORT.md, packaging check PASS. WAITING for user: Phase 2 approval, option override decision, commit/log archive request, SSH key rotation.
+T-407 (2026-11-21): teammate data/format changes from origin/heshawa (b283970, 891de45, 71ad3a3, a7df83f, 6a1125e) merged into the working tree, NOT committed; gate 36+5, e2e 3/3 local+prod, prod smoke 11/11 (output/T-407-*.log). Rollback images: disruption-advisor-{api,web}:rollback on the server.
+WAITING for user: commit of merged tree; drop 934 MB zip from local commit e405c41 before push; branches diverged (local 849b715,e405c41 vs remote); airline data with names already on GitHub (72348be, 6a1125e); SSH key rotation; Phase 2 approval.

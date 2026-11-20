@@ -1,0 +1,7 @@
+ Image disruption-advisor-api:latest Built 
+ Container disruption-advisor-web-1 Started 
+api running Up 21 seconds (healthy)
+db running Up About an hour (healthy)
+ingest exited Exited (0) 21 seconds ago
+migrate exited Exited (0) 21 seconds ago
+web running Up 15 seconds (healthy)

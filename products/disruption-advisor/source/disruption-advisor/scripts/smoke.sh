@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Post-deployment smoke test against a RUNNING stack (local or server). Read-mostly: it signs in, reads reference
 # data and runs one cancellation analysis (stored as a normal scenario). It never builds, stops or deletes anything.
-#   scripts/smoke.sh                         → http://localhost:${WEB_PORT} (from .env)
+#   scripts/smoke.sh                         → http://localhost:${WEB_PORT} (from settings.env)
 #   scripts/smoke.sh http://92.5.154.198:8888
-# Credentials: the first DEMO_USERS entry in .env, or SMOKE_USER / SMOKE_PASSWORD.
+# Credentials: the first DEMO_USERS entry in settings.env, or SMOKE_USER / SMOKE_PASSWORD.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-set -a; [ -f .env ] && . ./.env; set +a
+set -a; if [ -f settings.env ]; then . ./settings.env; elif [ -f .env ]; then . ./.env; fi; set +a
 BASE="${1:-http://localhost:${WEB_PORT:-8080}}"
 FIRST="${DEMO_USERS:-}"; FIRST="${FIRST%%,*}"
 USER_NAME="${SMOKE_USER:-${FIRST%%:*}}"; REST="${FIRST#*:}"; PASSWORD="${SMOKE_PASSWORD:-${REST%%:*}}"

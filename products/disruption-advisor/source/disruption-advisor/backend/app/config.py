@@ -26,8 +26,10 @@ class Settings(BaseSettings):
     horizon_days: int = 7
 
     # Operational rule defaults (configurable; assumptions are labelled in the UI).
-    min_turn_minutes: int = 40  # minimum ground time between two legs of one aircraft
-    default_mct_minutes: int = 45  # connection time where the hub MCT table has no entry
+    # Minimum ground time between two legs of one aircraft: fastest 5% of G9 actual turns, Jan-Nov 2026.
+    min_turn_minutes: int = 36  # outstations (default)
+    min_turn_by_station: dict[str, int] = {"SHJ": 51}  # hub needs longer
+    default_mct_minutes: int = 50  # where the hub MCT table has no entry (lowest real SHJ rule)
     max_connection_minutes: int = 1200  # 20 h (decision Q8)
     rebooking_window_hours: int = 24  # alternatives considered within 24 h (Q14)
 
@@ -37,6 +39,13 @@ class Settings(BaseSettings):
     cost_meal_voucher: float = 50.0
     cost_rebooking_handling: float = 25.0
     eur_to_aed: float = 4.0
+    cost_transport: float = 60.0  # one way, airport <-> hotel
+
+    # Passenger care while waiting (app/engine/care.py; airline policy outside EU261).
+    care_meal_after_minutes: int = 120
+    care_meal_every_minutes: int = 240
+    care_hotel_after_minutes: int = 480
+    care_refund_offer_after_minutes: int = 300
 
     # Demo logins (Q19): "user:password:role" entries, comma separated; set only in the server .env.
     demo_users: SecretStr = SecretStr("")

@@ -8,6 +8,7 @@ node_modules/
 dist/
 coverage/
 .env
+settings.env
 logs/
 test-results/
 playwright-report/

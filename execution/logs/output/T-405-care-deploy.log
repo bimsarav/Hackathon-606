@@ -1,0 +1,9 @@
+ Image disruption-advisor-web:latest Built 
+ Container disruption-advisor-web-1 Started 
+api running Up 21 seconds (healthy)
+db running Up 2 hours (healthy)
+ingest exited Exited (0) 21 seconds ago
+migrate exited Exited (0) 27 seconds ago
+web running Up 15 seconds (healthy)
+ingest-1  | 2026-11-20 21:55:10,138 INFO stage 2 done: {"airports": 142, "aircraft": 81, "booking_classes": 388, "customers": 174723, "pax_segments": 299419, "flights": 2614, "mct": 39}
+ingest-1  | 2026-11-20 21:55:10,738 INFO demo scenario added: {"demo_flights": 9, "demo_pax_segments": 48, "demo_customers": 24}

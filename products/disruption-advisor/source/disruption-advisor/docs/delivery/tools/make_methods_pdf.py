@@ -133,7 +133,6 @@ story += [table([
      "1,024 non-revenue segments", "Data-derived pattern [ASSUMPTION on the code meaning]. Confirm with the airline."],
     ["Infant link (INFT)", "Each infant linked to an adult in the same booking", "3,344 (from data)", "Data-derived. Infants sit on "
      "an adult's lap: no seat, travel with that adult."],
-    ["Unaccompanied minor (UMNR)", "Child in a booking with no adult", "42 (from data)", "Data-derived."],
     ["Special assistance SSR", "Deterministic draw for adults: WCHR 0.60%, WCHS 0.15%, WCHC 0.05%, BLND 0.03%, DEAF 0.03%, MEDA "
      "0.05%, PREG 0.10%", "WCHR 1,709 · WCHS 396 · PREG 294 · WCHC 138 · MEDA 115 · DEAF 96 · BLND 74",
      "Rates are assumptions [ASSUMPTION] so that the care tier can be demonstrated. Replace with SSR data from the PSS/DCS."],
@@ -210,7 +209,8 @@ story += [PageBreak(), p("7. Passenger prioritisation and re-accommodation", H1)
     "for denied boarding [STD, R12]; Brazil's ANAC Res. 400 Art. 28 prioritises passengers needing assistance [STD, R13]. "
     "Commercial value must therefore never outrank these. The MVP orders passengers lexicographically:")]
 story += bullets([
-    "<b>Tier 1, mandated care:</b> WCHR/WCHS/WCHC, BLND, DEAF, MEDA, PREG, unaccompanied minors, bookings with an infant.",
+    "<b>Tier 1, mandated care:</b> WCHR/WCHS/WCHC, BLND, DEAF, MEDA, PREG, bookings with an infant. (Unaccompanied minors "
+    "are out of scope for the MVP; future enhancement.)",
     "<b>Tier 2, urgency:</b> an onward connection, or a multi-sector journey within 24 hours.",
     "<b>Tier 3:</b> everyone else. <b>Non-revenue</b> (staff/ID) passengers come after all revenue passengers.",
 ])
@@ -245,6 +245,16 @@ story += [p("The tier values are far apart, so the solver reproduces the lexicog
             "returns OPTIMAL in under a second. A group larger than any free block is split and reported as split. Passengers "
             "left without a seat are offered next day with hotel and meals, or a refund.")]
 
+story += [p("7.4 Care while waiting", H2), p(
+    "<b>Theory.</b> EU261 Art. 9 sets care 'in relation to the waiting time': meals and refreshments, and hotel accommodation "
+    "plus transport when a stay of one or more nights is needed [STD, R10]. It applies only to EU/EEA/CH departures, so for other "
+    "stations the same structure is used as configurable airline policy [ASSUMPTION]. Rules: under 2 h no care; 2 h or more one "
+    "meal voucher per 4 h (at most 4); 8 h or more, or a wait overlapping the local night (01:00-05:00) by 2 h, adds a hotel room "
+    "and transport; no seat within 24 h counts as next day. From 5 h of waiting, and for anyone without a seat, the passenger "
+    "may choose a refund with a free return to origin or a date change. Flags: transfer passengers who need a hotel (transit "
+    "visa or airside hotel), special assistance to re-book, pregnancy fit-to-fly, infant supplies. <b>Justification.</b> A "
+    "rebooking 18-19 h later is only acceptable with overnight care; costing it (hotel AED 350 + transport 2 x AED 60 + meals) "
+    "makes long waits visible in the plan instead of hiding them behind a single meal voucher.")]
 story += [p("8. Explainable AI (XAI): what is used", H1)]
 story += [p(
     "<b>Direct answer:</b> no post-hoc XAI library (SHAP, LIME) is used in the MVP, because no black-box model makes a decision. "
@@ -285,6 +295,7 @@ story += [p("10. Limitations and what must be validated", H1)]
 story += bullets([
     "Costs, the 40-minute turn time, the 45-minute default MCT and the SSR rates are assumptions (configurable) [ASSUMPTION].",
     "Crew duty limits are not checked (no crew data): crew control must confirm every swap.",
+    "Out of scope (future enhancements): unaccompanied minors, partner and other carriers.",
     "Only two recovery levers (absorb, same-type swap); cancellation/consolidation and equipment change come in phases 3-4.",
     "Seat capacity is inferred for most window flights because the inventory extract covers only 6 of them.",
     "Passenger identity is name-based; travel frequency for common names is unreliable and capped.",
