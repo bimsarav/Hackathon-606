@@ -118,7 +118,8 @@ class OpsStore:
         """Tails with the same seat count that depart ``station`` between earliest and latest (swap candidates)."""
         rows = self.query(
             """SELECT DISTINCT tail FROM flights
-               WHERE origin = ? AND std BETWEEN ? AND ? AND tail <> ? AND capacity = ? AND sta IS NOT NULL""",
+               WHERE origin = ? AND std BETWEEN ? AND ? AND tail <> ? AND capacity = ? AND sta IS NOT NULL
+               ORDER BY tail""",
             [station, earliest, latest, exclude, model_seats],
         )
         return [r["tail"] for r in rows]

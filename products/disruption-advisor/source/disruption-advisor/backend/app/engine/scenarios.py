@@ -190,9 +190,9 @@ def analyse_delay(
                 swaps.append(
                     _option_kpis(ctx, f"swap:{tail}", f"Swap: {tail} takes over {rest[0].flight_number}", plan, set())
                 )
-        options += sorted(swaps, key=lambda o: o["cost_aed"])[:MAX_SWAP_OPTIONS]
+        options += sorted(swaps, key=_rank)[:MAX_SWAP_OPTIONS]
 
-    options.sort(key=lambda o: (o["cost_aed"], o["misconnects"]))
+    options.sort(key=_rank)
     best = options[0]
     chosen = next((o for o in options if o["key"] == selected_key), best)
     missed: list[Connection] = chosen["_missed"]
@@ -563,3 +563,11 @@ def presets(ctx: Context) -> dict[str, list[dict[str, Any]]]:
         [now, now],
     )
     return {"delay": delay, "cancel": cancel}
+
+
+def _rank(option: dict[str, Any]) -> tuple[float, int, int, int, str]:
+    """Cheapest first. Ties (common when two swaps protect the same flights) are broken by fewer missed
+    connections, fewer delay minutes, fewer flights moved to another aircraft (simpler for OCC), then the option
+    key, so the recommendation never depends on the order the database returns candidate aircraft."""
+    moved = sum(1 for leg in option["legs"] if leg["operated_by"] != leg["scheduled_tail"])
+    return (option["cost_aed"], option["misconnects"], option["total_delay_minutes"], moved, option["key"])
