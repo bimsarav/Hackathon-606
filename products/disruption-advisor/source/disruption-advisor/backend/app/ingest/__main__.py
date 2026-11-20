@@ -2,8 +2,8 @@
 
 Reads the airline extracts from INPUT_DIR (read-only) and writes Parquet to DATA_DIR/raw and DATA_DIR/ops.
 Stage 1 (extracts -> raw Parquet, minutes) runs only when the inputs changed since the last successful run
-(fingerprint of names, sizes and modification times). Stage 2 (raw -> ops, seconds) runs when the inputs or the
-options changed. DEMO_SCENARIO=true appends the labelled synthetic demo scenario (app/ingest/demo.py).
+(fingerprint of names, sizes and modification times). Stage 2 (raw -> ops, seconds) runs when the inputs, the
+options or the build code changed. DEMO_SCENARIO=true appends the labelled synthetic demo scenario (app/ingest/demo.py).
 """
 
 import argparse
@@ -38,7 +38,9 @@ def main() -> int:
     with_demo = os.environ.get("DEMO_SCENARIO", "false").strip().lower() in {"1", "true", "yes"}
     raw_marker, ops_marker = data_dir / "ingest_fingerprint.txt", data_dir / "ops_fingerprint.txt"
     inputs = fingerprint(input_dir)
-    ops_key = f"{inputs}|demo={with_demo}"
+    # stage 2 also reruns when its code changes (build rules, synthetic data), so a deploy picks up new logic
+    code = hashlib.sha256(b"".join(Path(m.__file__).read_bytes() for m in (build, demo))).hexdigest()[:16]
+    ops_key = f"{inputs}|demo={with_demo}|code={code}"
 
     raw_current = raw_marker.exists() and raw_marker.read_text() == inputs and (data_dir / "raw" / "bookings").exists()
     if args.force or not raw_current:
@@ -49,7 +51,8 @@ def main() -> int:
     else:
         log.info("stage 1 skipped: extracts unchanged")
 
-    if not args.force and raw_current and ops_marker.exists() and ops_marker.read_text() == ops_key:
+    ops_present = (data_dir / "ops" / "flights.parquet").exists()
+    if not args.force and raw_current and ops_present and ops_marker.exists() and ops_marker.read_text() == ops_key:
         log.info("stage 2 skipped: operating picture is current")
         return 0
     log.info("stage 2: building the operating picture")

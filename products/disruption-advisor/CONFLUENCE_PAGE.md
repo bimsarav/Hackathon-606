@@ -29,6 +29,7 @@ Today OCC, crew control and the PCU each work with different information. The go
 | Recovery options: absorb the delay or swap with a same-type aircraft, with delay, missed connections, EU261 estimate and cost; recommendation | Done |
 | Scenario B: cancellation with limited seats; passengers ranked by tier and weighted score; rebooking with an optimiser that keeps bookings together | Done |
 | What-if: adjustable priority weights | Done |
+| Synthetic passenger ID, passport and national ID per person (same person keeps them across bookings); API shows initials only, never full names | Done |
 | Plain-English explanations and passenger message drafts (Claude AI, with template fallback) | Done |
 | Approve or reject with an audit trail; demo roles OCC and PCU | Done |
 | Approve a non-recommended option (override with reason) | Not done (proposed) |
@@ -73,7 +74,7 @@ Today OCC, crew control and the PCU each work with different information. The go
 | Quality | Ruff, mypy strict, pytest, Testcontainers, Vitest, Playwright 1.65, Trivy |
 
 ## Methods (summary)
-- **Delay propagation:** each later flight departs at the later of its scheduled time and the previous arrival plus a 40-minute minimum turn.
+- **Delay propagation:** each later flight departs at the later of its scheduled time and the previous arrival plus a minimum turn measured from G9 2026 actual turns (fastest 5%): 51 minutes at SHJ, 36 minutes at outstations.
 - **Recovery options:** absorb the delay, or swap the remaining rotations with a same-type aircraft on the ground at the hub. Each option is costed:
   - delay minutes x AED 400;
   - meal care for passengers delayed 2 hours or more;
@@ -132,7 +133,7 @@ scripts/smoke.sh <base-url>     # post-deployment smoke test
 
 ## Known limitations and open decisions
 - **Synthetic fields:** loyalty tier, fare family and most special-assistance codes are synthetic (labelled), because the extracts do not contain them.
-- **Assumed rules:** costs, the 40-minute turn time and the 45-minute default MCT are assumptions (configurable).
+- **Assumed rules:** costs and the 50-minute default MCT (lowest real SHJ rule) are assumptions; turn times are measured. All are configurable.
 - **Crew:** legality is not checked; no crew data was supplied.
 - **Capacity:** inferred for most flights; the inventory extract covers only 6 flights in the demo window.
 - **Approval:** only the recommended option can be approved (override is proposed).

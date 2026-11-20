@@ -26,8 +26,10 @@ class Settings(BaseSettings):
     horizon_days: int = 7
 
     # Operational rule defaults (configurable; assumptions are labelled in the UI).
-    min_turn_minutes: int = 40  # minimum ground time between two legs of one aircraft
-    default_mct_minutes: int = 45  # connection time where the hub MCT table has no entry
+    # Minimum ground time between two legs of one aircraft: fastest 5% of G9 actual turns, Jan-Nov 2026.
+    min_turn_minutes: int = 36  # outstations (default)
+    min_turn_by_station: dict[str, int] = {"SHJ": 51}  # hub needs longer
+    default_mct_minutes: int = 50  # where the hub MCT table has no entry (lowest real SHJ rule)
     max_connection_minutes: int = 1200  # 20 h (decision Q8)
     rebooking_window_hours: int = 24  # alternatives considered within 24 h (Q14)
 

@@ -19,7 +19,7 @@ from app.config import Settings
 from app.engine import priority, rebooking
 from app.engine.cost import CostModel, care_cost, eu261_compensation_eur, great_circle_km
 from app.engine.explain import Explainer, template_message
-from app.engine.network import RotationPlan, absorb_delay, swap_rotations
+from app.engine.network import RotationPlan, TurnTimes, absorb_delay, swap_rotations
 from app.engine.passengers import Connection, connections_at_risk
 from app.engine.store import Leg, OpsStore
 
@@ -45,8 +45,12 @@ class Context:
         )
 
     @property
-    def min_turn(self) -> timedelta:
-        return timedelta(minutes=self.settings.min_turn_minutes)
+    def min_turn(self) -> TurnTimes:
+        s = self.settings
+        return TurnTimes(
+            timedelta(minutes=s.min_turn_minutes),
+            {k: timedelta(minutes=v) for k, v in s.min_turn_by_station.items()},
+        )
 
     @property
     def max_connection(self) -> timedelta:
@@ -367,7 +371,11 @@ def _passenger_payload(
                 "rank": pos,
                 "pnr": p["pnr"],
                 "customer_key": p["customer_key"],
-                "name": f"{p['first_name']} {p['last_name']}",
+                # no full names in API output: initials + synthetic passenger ID
+                "name": _initials(p.get("first_name"), p.get("last_name")),
+                "passenger_id": p.get("passenger_id"),
+                "passport_number_synthetic": p.get("passport_number_synthetic"),
+                "national_id_synthetic": p.get("national_id_synthetic"),
                 "pax_type": p["pax_type"],
                 "route": f"{p['origin']}-{p['destination']}",
                 "flight_id": p["flight_id"],
@@ -427,7 +435,8 @@ def _assumptions(ctx: Context) -> list[str]:
     s = ctx.settings
     return [
         f"Demo clock: {s.now_utc:%Y-%m-%d %H:%M} UTC; data window per ingest report.",
-        f"Minimum aircraft turn time {s.min_turn_minutes} min; block times as scheduled.",
+        f"Minimum aircraft turn time: {', '.join(f'{k} {v}' for k, v in s.min_turn_by_station.items())} min, "
+        f"elsewhere {s.min_turn_minutes} min (measured from 2026 actual turns); block times as scheduled.",
         f"Connections: same PNR, 15 min-{s.max_connection_minutes // 60} h; "
         f"hub MCT table, else {s.default_mct_minutes} min.",
         "Seat capacity: inventory allocation where available, otherwise aircraft layout inferred from the data; "
@@ -480,3 +489,9 @@ def presets(ctx: Context) -> dict[str, list[dict[str, Any]]]:
         [now, now],
     )
     return {"delay": delay, "cancel": cancel}
+
+
+def _initials(first: str | None, last: str | None) -> str:
+    """Initials only, so real passenger names never leave the API (e.g. "L. H.")."""
+    parts = [f"{x.strip()[0].upper()}." for x in (first, last) if x and x.strip()]
+    return " ".join(parts) or "-"

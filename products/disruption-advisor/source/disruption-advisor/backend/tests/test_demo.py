@@ -16,7 +16,15 @@ def test_demo_scenario_protects_care_tier_when_next_flight_is_full(tmp_path: Pat
     added = add_demo_scenario(ops)
     assert added == {"demo_flights": 9, "demo_pax_segments": 50, "demo_customers": 25}
 
-    settings = Settings(database_url="postgresql+psycopg://unused", now_utc=t(0))
+    # The scripted demo is tuned for a flat 40-min turn and 45-min default MCT; pin them so this test checks the
+    # scenario mechanics, independent of the measured per-station defaults in Settings.
+    settings = Settings(
+        database_url="postgresql+psycopg://unused",
+        now_utc=t(0),
+        min_turn_minutes=40,
+        min_turn_by_station={},
+        default_mct_minutes=45,
+    )
     ctx = Context(OpsStore(ops), settings, Explainer("", settings.ai_model, "low", 1))
     result = analyse_delay(ctx, "G9901_202611220500", 150, priority.DEFAULT_WEIGHTS)
 

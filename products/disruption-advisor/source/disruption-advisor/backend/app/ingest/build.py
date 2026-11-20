@@ -28,6 +28,8 @@ import duckdb
 AIRPORTS_CSV = Path(__file__).resolve().parent.parent / "data" / "airports.csv"
 NONREV_CODES = ("VI", "DU", "DT", "Z", "DUMKT", "GD", "DUFAM")
 AMBIGUOUS_NAME_PNRS = 60
+BOOKINGS_PER_PERSON = 2  # common names: bookings per synthetic person in the 12-day window
+MAX_WINDOW_BOOKINGS_PER_NAME = 4  # more bookings than this in the window: treat the name as common too
 DEFAULT_MODEL, DEFAULT_SEATS = "A320 (assumed)", 174
 # Deterministic special-service rates for adults (synthetic, Q5): cumulative thresholds on a hash in [0, 1).
 SSR_RATES = (
@@ -179,7 +181,28 @@ def build(data_dir: Path, window: Window = DEFAULT_WINDOW) -> dict[str, Any]:
              inf AS (SELECT pnr, name_key, dense_rank() OVER (PARTITION BY pnr ORDER BY name_key) AS n
                      FROM (SELECT DISTINCT pnr, name_key FROM seg WHERE pax_type = 'IN')),
              ad AS (SELECT pnr, name_key, dense_rank() OVER (PARTITION BY pnr ORDER BY name_key) AS n
-                    FROM (SELECT DISTINCT pnr, name_key FROM seg WHERE pax_type = 'AD'))
+                    FROM (SELECT DISTINCT pnr, name_key FROM seg WHERE pax_type = 'AD')),
+             -- synthetic identity (Q-identity): the extract has no passenger ID. A name is one person unless it is
+             -- very common; then bookings are split by home airport (origin of the booking's first leg) and
+             -- grouped about BOOKINGS_PER_PERSON per person, so repeat travellers keep one ID across bookings.
+             home AS (SELECT pnr, arg_min(origin, dep_utc) AS home FROM seg GROUP BY 1),
+             named AS (SELECT DISTINCT s.pnr, s.name_key, substr(sha256(s.name_key), 1, 16) AS ck, h.home,
+                              coalesce(cu.ambiguous_common_name, FALSE) AS common
+                       FROM seg s JOIN home h USING (pnr)
+                       LEFT JOIN customers cu ON cu.customer_key = substr(sha256(s.name_key), 1, 16)),
+             grp AS (SELECT * REPLACE (common OR n_name > {MAX_WINDOW_BOOKINGS_PER_NAME} AS common)
+                     FROM (SELECT *, count(*) OVER (PARTITION BY name_key, home) AS n_home,
+                                  count(*) OVER (PARTITION BY name_key) AS n_name FROM named)),
+             seed AS (SELECT pnr, name_key,
+                             CASE WHEN common THEN ck || '|' || home || '|' ||
+                                  ((('0x' || substr(md5('bk|' || pnr), 1, 8))::UBIGINT)
+                                   % greatest(ceil(n_home / {BOOKINGS_PER_PERSON})::UBIGINT, 1))::VARCHAR
+                                  ELSE ck END AS person_seed,
+                             CASE WHEN common THEN 'common-name: split by home airport'
+                                  ELSE 'one-person-per-name' END AS identity_rule
+                      FROM grp),
+             -- unique documents per person: serial from a shuffled ranking of persons
+             ident AS (SELECT *, dense_rank() OVER (ORDER BY sha256('pp|' || person_seed)) AS k FROM seed)
         SELECT s.flight_number || '_' || strftime(s.dep_utc, '%Y%m%d%H%M') AS flight_id,
                s.pnr, substr(sha256(s.name_key), 1, 16) AS customer_key, s.first_name, s.last_name, s.pax_type,
                s.flight_number, s.dep_utc, s.origin, s.destination, s.booking_code,
@@ -195,9 +218,20 @@ def build(data_dir: Path, window: Window = DEFAULT_WINDOW) -> dict[str, Any]:
                END AS ssr_code,
                CASE WHEN s.pax_type IN ('IN') OR (s.pax_type = 'CH' AND p.adults = 0) THEN 'data'
                     ELSE 'synthetic' END AS ssr_source,
-               CASE WHEN s.pax_type = 'IN' THEN substr(sha256(a.name_key), 1, 16) END AS infant_with_customer_key
+               CASE WHEN s.pax_type = 'IN' THEN substr(sha256(a.name_key), 1, 16) END AS infant_with_customer_key,
+               -- synthetic identity (see the ident CTE above)
+               'PAX' || upper(substr(sha256('pid|' || id.person_seed), 1, 12)) AS passenger_id,
+               chr(65 + (('0x' || substr(sha256('pp|' || id.person_seed), 1, 4))::INTEGER % 26)::INTEGER)
+                   || lpad((10000000 + id.k)::VARCHAR, 8, '0') AS passport_number_synthetic,
+               -- Emirates ID layout 784-YYYY-NNNNNNN-C (birth year, serial, check digit); demo format for everyone
+               '784-' || (1955 + (('0x' || substr(sha256('ny|' || id.person_seed), 1, 4))::INTEGER % 50))::VARCHAR
+                   || '-' || lpad(id.k::VARCHAR, 7, '0') || '-'
+                   || ((('0x' || substr(sha256('nc|' || id.person_seed), 1, 2))::INTEGER % 10))::VARCHAR
+                   AS national_id_synthetic,
+               id.identity_rule
         FROM seg s
-        JOIN pnr p USING (pnr)
+        JOIN ident id ON id.pnr = s.pnr AND id.name_key = s.name_key
+        JOIN pnr p ON p.pnr = s.pnr
         LEFT JOIN booking_classes bc ON bc.booking_code = coalesce(s.booking_code, '(blank)')
         LEFT JOIN inf i ON i.pnr = s.pnr AND i.name_key = s.name_key
         LEFT JOIN ad a ON a.pnr = s.pnr AND a.n = ((i.n - 1) % greatest(p.adults, 1)) + 1
@@ -212,7 +246,8 @@ def build(data_dir: Path, window: Window = DEFAULT_WINDOW) -> dict[str, Any]:
             SELECT airline, reg AS tail, sai AS flight_number, dep AS origin, arr AS destination, std,
                    coalesce(try_strptime(sta, '%Y-%m-%d %H:%M:%S'), pta) AS sta, atd, ata, dep_dly, arr_dly,
                    op_type, status, try_cast(pax AS INTEGER) AS pax_reported
-            FROM '{raw}/rotation.parquet' WHERE std >= {w_start} AND std < {w_end}),
+            FROM '{raw}/rotation.parquet'
+            WHERE std >= {w_start} AND std < {w_end} AND airline = 'G9'),  -- partner carriers out of scope
         inv AS (
             SELECT flight_number, dep_utc, any_value(aircraft_model) AS model, max(adult_capacity) AS cap,
                    max(CASE curtail_oversell WHEN 'OVERSELL' THEN curtail_oversell_count
