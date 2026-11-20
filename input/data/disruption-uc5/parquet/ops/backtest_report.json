@@ -1,0 +1,306 @@
+{
+  "method": "Real primary delays >= 60 min (aircraft on the ground in time) are replayed through the engine's propagate(); the next 4 legs of the same aircraft within 24 h are compared with their actual departure delays. Delayed = 15+ min. Actual delays also include new, unrelated delays and recovery actions.",
+  "events": 1634,
+  "aircraft": 71,
+  "period": [
+    "2026-01-01 02:00:00",
+    "2026-11-18 18:55:00"
+  ],
+  "variants": {
+    "measured_turns": {
+      "all_next_legs": {
+        "legs": 5314,
+        "mean_abs_error_min": 25.2,
+        "within_15_min_share": 0.556,
+        "delayed_legs_actual": 3313,
+        "delayed_legs_predicted": 2129,
+        "precision": 0.977,
+        "recall": 0.628,
+        "knock_on_minutes_predicted": 179515,
+        "knock_on_minutes_actual": 303492
+      },
+      "by_position": {
+        "1": {
+          "legs": 1634,
+          "mean_abs_error_min": 22.2,
+          "within_15_min_share": 0.534,
+          "delayed_legs_actual": 1523,
+          "delayed_legs_predicted": 1476,
+          "precision": 0.997,
+          "recall": 0.967,
+          "knock_on_minutes_predicted": 137680,
+          "knock_on_minutes_actual": 169097
+        },
+        "2": {
+          "legs": 1503,
+          "mean_abs_error_min": 23.2,
+          "within_15_min_share": 0.609,
+          "delayed_legs_actual": 691,
+          "delayed_legs_predicted": 347,
+          "precision": 0.937,
+          "recall": 0.47,
+          "knock_on_minutes_predicted": 24156,
+          "knock_on_minutes_actual": 56594
+        },
+        "3": {
+          "legs": 1307,
+          "mean_abs_error_min": 28.7,
+          "within_15_min_share": 0.519,
+          "delayed_legs_actual": 688,
+          "delayed_legs_predicted": 220,
+          "precision": 0.941,
+          "recall": 0.301,
+          "knock_on_minutes_predicted": 12737,
+          "knock_on_minutes_actual": 48788
+        },
+        "4": {
+          "legs": 870,
+          "mean_abs_error_min": 28.9,
+          "within_15_min_share": 0.56,
+          "delayed_legs_actual": 411,
+          "delayed_legs_predicted": 86,
+          "precision": 0.884,
+          "recall": 0.185,
+          "knock_on_minutes_predicted": 4942,
+          "knock_on_minutes_actual": 29013
+        }
+      }
+    },
+    "flat_40_min_turn": {
+      "all_next_legs": {
+        "legs": 5314,
+        "mean_abs_error_min": 25.4,
+        "within_15_min_share": 0.559,
+        "delayed_legs_actual": 3313,
+        "delayed_legs_predicted": 2036,
+        "precision": 0.986,
+        "recall": 0.606,
+        "knock_on_minutes_predicted": 179003,
+        "knock_on_minutes_actual": 303492
+      },
+      "by_position": {
+        "1": {
+          "legs": 1634,
+          "mean_abs_error_min": 21.0,
+          "within_15_min_share": 0.569,
+          "delayed_legs_actual": 1523,
+          "delayed_legs_predicted": 1468,
+          "precision": 0.999,
+          "recall": 0.963,
+          "knock_on_minutes_predicted": 142139,
+          "knock_on_minutes_actual": 169097
+        },
+        "2": {
+          "legs": 1503,
+          "mean_abs_error_min": 24.3,
+          "within_15_min_share": 0.59,
+          "delayed_legs_actual": 691,
+          "delayed_legs_predicted": 308,
+          "precision": 0.964,
+          "recall": 0.43,
+          "knock_on_minutes_predicted": 21620,
+          "knock_on_minutes_actual": 56594
+        },
+        "3": {
+          "legs": 1307,
+          "mean_abs_error_min": 29.4,
+          "within_15_min_share": 0.515,
+          "delayed_legs_actual": 688,
+          "delayed_legs_predicted": 205,
+          "precision": 0.946,
+          "recall": 0.282,
+          "knock_on_minutes_predicted": 11574,
+          "knock_on_minutes_actual": 48788
+        },
+        "4": {
+          "legs": 870,
+          "mean_abs_error_min": 29.7,
+          "within_15_min_share": 0.553,
+          "delayed_legs_actual": 411,
+          "delayed_legs_predicted": 55,
+          "precision": 0.909,
+          "recall": 0.122,
+          "knock_on_minutes_predicted": 3670,
+          "knock_on_minutes_actual": 29013
+        }
+      }
+    },
+    "recovery_turns_p25_52_41": {
+      "all_next_legs": {
+        "legs": 5314,
+        "mean_abs_error_min": 23.7,
+        "within_15_min_share": 0.589,
+        "delayed_legs_actual": 3313,
+        "delayed_legs_predicted": 2233,
+        "precision": 0.968,
+        "recall": 0.652,
+        "knock_on_minutes_predicted": 194498,
+        "knock_on_minutes_actual": 303492
+      },
+      "by_position": {
+        "1": {
+          "legs": 1634,
+          "mean_abs_error_min": 20.0,
+          "within_15_min_share": 0.601,
+          "delayed_legs_actual": 1523,
+          "delayed_legs_predicted": 1477,
+          "precision": 0.997,
+          "recall": 0.967,
+          "knock_on_minutes_predicted": 144717,
+          "knock_on_minutes_actual": 169097
+        },
+        "2": {
+          "legs": 1503,
+          "mean_abs_error_min": 22.2,
+          "within_15_min_share": 0.626,
+          "delayed_legs_actual": 691,
+          "delayed_legs_predicted": 377,
+          "precision": 0.923,
+          "recall": 0.504,
+          "knock_on_minutes_predicted": 27026,
+          "knock_on_minutes_actual": 56594
+        },
+        "3": {
+          "legs": 1307,
+          "mean_abs_error_min": 27.2,
+          "within_15_min_share": 0.546,
+          "delayed_legs_actual": 688,
+          "delayed_legs_predicted": 273,
+          "precision": 0.916,
+          "recall": 0.363,
+          "knock_on_minutes_predicted": 16486,
+          "knock_on_minutes_actual": 48788
+        },
+        "4": {
+          "legs": 870,
+          "mean_abs_error_min": 28.1,
+          "within_15_min_share": 0.564,
+          "delayed_legs_actual": 411,
+          "delayed_legs_predicted": 106,
+          "precision": 0.849,
+          "recall": 0.219,
+          "knock_on_minutes_predicted": 6269,
+          "knock_on_minutes_actual": 29013
+        }
+      }
+    },
+    "recovery_turns_median_60_48": {
+      "all_next_legs": {
+        "legs": 5314,
+        "mean_abs_error_min": 22.2,
+        "within_15_min_share": 0.61,
+        "delayed_legs_actual": 3313,
+        "delayed_legs_predicted": 2627,
+        "precision": 0.912,
+        "recall": 0.723,
+        "knock_on_minutes_predicted": 231482,
+        "knock_on_minutes_actual": 303492
+      },
+      "by_position": {
+        "1": {
+          "legs": 1634,
+          "mean_abs_error_min": 18.4,
+          "within_15_min_share": 0.622,
+          "delayed_legs_actual": 1523,
+          "delayed_legs_predicted": 1485,
+          "precision": 0.995,
+          "recall": 0.97,
+          "knock_on_minutes_predicted": 155306,
+          "knock_on_minutes_actual": 169097
+        },
+        "2": {
+          "legs": 1503,
+          "mean_abs_error_min": 20.7,
+          "within_15_min_share": 0.649,
+          "delayed_legs_actual": 691,
+          "delayed_legs_predicted": 497,
+          "precision": 0.839,
+          "recall": 0.603,
+          "knock_on_minutes_predicted": 35776,
+          "knock_on_minutes_actual": 56594
+        },
+        "3": {
+          "legs": 1307,
+          "mean_abs_error_min": 25.1,
+          "within_15_min_share": 0.576,
+          "delayed_legs_actual": 688,
+          "delayed_legs_predicted": 432,
+          "precision": 0.812,
+          "recall": 0.51,
+          "knock_on_minutes_predicted": 28432,
+          "knock_on_minutes_actual": 48788
+        },
+        "4": {
+          "legs": 870,
+          "mean_abs_error_min": 27.2,
+          "within_15_min_share": 0.569,
+          "delayed_legs_actual": 411,
+          "delayed_legs_predicted": 213,
+          "precision": 0.709,
+          "recall": 0.367,
+          "knock_on_minutes_predicted": 11968,
+          "knock_on_minutes_actual": 29013
+        }
+      }
+    },
+    "no_knock_on_baseline": {
+      "all_next_legs": {
+        "legs": 5314,
+        "mean_abs_error_min": 57.1,
+        "within_15_min_share": 0.384,
+        "delayed_legs_actual": 3313,
+        "delayed_legs_predicted": 0,
+        "precision": null,
+        "recall": 0.0,
+        "knock_on_minutes_predicted": 0,
+        "knock_on_minutes_actual": 303492
+      },
+      "by_position": {
+        "1": {
+          "legs": 1634,
+          "mean_abs_error_min": 103.5,
+          "within_15_min_share": 0.069,
+          "delayed_legs_actual": 1523,
+          "delayed_legs_predicted": 0,
+          "precision": null,
+          "recall": 0.0,
+          "knock_on_minutes_predicted": 0,
+          "knock_on_minutes_actual": 169097
+        },
+        "2": {
+          "legs": 1503,
+          "mean_abs_error_min": 37.7,
+          "within_15_min_share": 0.548,
+          "delayed_legs_actual": 691,
+          "delayed_legs_predicted": 0,
+          "precision": null,
+          "recall": 0.0,
+          "knock_on_minutes_predicted": 0,
+          "knock_on_minutes_actual": 56594
+        },
+        "3": {
+          "legs": 1307,
+          "mean_abs_error_min": 37.3,
+          "within_15_min_share": 0.486,
+          "delayed_legs_actual": 688,
+          "delayed_legs_predicted": 0,
+          "precision": null,
+          "recall": 0.0,
+          "knock_on_minutes_predicted": 0,
+          "knock_on_minutes_actual": 48788
+        },
+        "4": {
+          "legs": 870,
+          "mean_abs_error_min": 33.3,
+          "within_15_min_share": 0.537,
+          "delayed_legs_actual": 411,
+          "delayed_legs_predicted": 0,
+          "precision": null,
+          "recall": 0.0,
+          "knock_on_minutes_predicted": 0,
+          "knock_on_minutes_actual": 29013
+        }
+      }
+    }
+  }
+}
