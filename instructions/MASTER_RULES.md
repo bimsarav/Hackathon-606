@@ -29,3 +29,4 @@ START, RESUME, STATUS, REVIEW, PLAN, IMPLEMENT, TEST, FIX, DEPLOY, DOCUMENT, AUD
 ## Session report
 At the end of each session, report: Completed, In Progress, Issues, Next Action, Files Updated.
 - Airline domain research (user instruction 2026-11-20, MASTER_PROMPT §15): a standing research role that builds a sourced airline knowledge base in `documentation/knowledge-base/airline/` before solutions are proposed. Summary: `instructions/DOMAIN_RESEARCH_RULES.md`.
+- Delivery cadence (user 2026-11-20, overrides the one-shot delivery flow): (1) prepare design diagrams first and tell the user where to view them; (2) define an MVP and build it first; (3) host the finished MVP and tell the user how to view it; (4) keep an incremental deployment plan (phases after the MVP) in the product's docs; each later phase starts only with the user's explicit approval. Record the phase gates in execution/DEPLOYMENT_STATUS.md.

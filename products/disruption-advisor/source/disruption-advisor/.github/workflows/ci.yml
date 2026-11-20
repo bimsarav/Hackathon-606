@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-scan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Quality gate (backend lint, types, tests; frontend type check, tests, build)
+        run: scripts/check.sh
+
+      - name: Deployment smoke test (Docker Compose)
+        run: scripts/smoke.sh
+
+      - name: Security scan (dependencies, secrets, misconfiguration)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: logs
+          path: logs/
+          if-no-files-found: ignore

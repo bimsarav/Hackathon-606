@@ -88,3 +88,7 @@
 2026-11-20T17:46Z | T-400.3 | DONE | synthetic data: customer_profile (174,723), booking_class_map (388), ssr (4,360), delay_code_groups (162), aircraft_registry (120) + README with assumptions and rule defaults; bookings loaded 27,879,509 rows (4 malformed lines rejected) into scratch DuckDB | input/data/disruption-uc5/synthetic/
 2026-11-20T17:46Z | T-400 | WAITING | solution plan presented; build waits for user approval | -
 2026-11-20T17:49Z | T-302 | DONE | airline research role re-supplied: identical to MASTER_PROMPT §15 (0-line diff), text unchanged; added fit notes (topic→product, KB feedback rule) to §15 preamble + DOMAIN_RESEARCH_RULES; KB overview §15 'UC5 airline-specific findings' (aggregates only) | MASTER_PROMPT, DOMAIN_RESEARCH_RULES, 00-OVERVIEW
+2026-11-20T17:52Z | T-400.4 | STARTED | behaviour rule D-018 saved; product disruption-advisor (D-019), stack (D-020); generating from python-fastapi | products/disruption-advisor
+2026-11-20T17:58Z | T-400.5 | DONE | 9 Mermaid diagrams (all render via mermaid-cli) in R/docs/architecture/SYSTEM_ARCHITECTURE.md; viewer page https://claude.ai/artifact/PTzSvCcSHABHNz7HYhxG2s
+2026-11-20T17:58Z | T-400.6 | DONE | R/docs/delivery/MVP_AND_INCREMENTAL_PLAN.md (MVP + phases 2-4, each needs approval)
+2026-11-20T17:58Z | T-400.7 | STARTED | add-on libs verified on PyPI (cp314 wheels): ortools 9.15, lightgbm 4.7.0, duckdb 2.0.1, polars 2.1.0, anthropic 2.12.0, python-calamine 0.9.1, numpy 2.5.5 | R/backend/pyproject.toml

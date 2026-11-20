@@ -25,3 +25,7 @@
 - Ongoing operations (§14.6): monitoring, patching, cert expiry, backup integrity, controlled updates with rollback; no unvalidated breaking updates.
 - Docs (§14.7) in the product's docs/deployment or docs/operations: SERVER_OPERATIONS, DOCKER_OPERATIONS, STARTUP_AND_RECOVERY, BACKUP_AND_RESTORE, MONITORING_AND_ALERTING, SERVER_RESTART_VERIFICATION, merged into OPERATIONS_RUNBOOK / ROLLBACK_AND_RECOVERY where they already cover the topic.
 - Status (§14.8): anything mandatory unverified → `DEPLOYED – OPERATIONAL VERIFICATION PENDING` or `BLOCKED` in execution/DEPLOYMENT_STATUS.md; never "production-ready".
+
+## Incremental delivery (user 2026-11-20)
+- Delivery cadence (user 2026-11-20, overrides the one-shot delivery flow): (1) prepare design diagrams first and tell the user where to view them; (2) define an MVP and build it first; (3) host the finished MVP and tell the user how to view it; (4) keep an incremental deployment plan (phases after the MVP) in the product's docs; each later phase starts only with the user's explicit approval. Record the phase gates in execution/DEPLOYMENT_STATUS.md.
+- Each phase: plan → user approval → build → test → deploy → verify (§13.9) → report URL → wait for approval of the next phase.

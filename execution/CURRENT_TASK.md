@@ -30,3 +30,12 @@
       files: [x] KB/topics/disruption-management/01-disruption-prediction.md [x] 02-network-impact-and-recovery.md [x] 03-passenger-impact.md [x] 04-passenger-prioritization-and-rights.md [x] 05-occ-pcu-workflows-and-systems.md
 - [x] T-300.2 Synthesis: 00-OVERVIEW.md (14 §15.8 sections), SOURCES.md (merged registry), GLOSSARY.md, README topic map
 - [ ] T-300.3 Next pass (on user direction): close overview §13 research gaps; validate airline-specific items with the target airline
+
+## T-400 UC5 disruption-advisor (user approved design → MVP → host, 2026-11-20). R = products/disruption-advisor/source/disruption-advisor
+- [x] T-400.0 Questions register (execution/QUESTIONS_UC5.md) · [x] T-400.1 inbox sort · [x] T-400.2 aircraft registry · [x] T-400.3 synthetic data
+- [x] T-400.4 Generate product from python-fastapi profile; D-018..D-020
+- [x] T-400.5 Design diagrams (artifact https://claude.ai/artifact/PTzSvCcSHABHNz7HYhxG2s) (R/docs/architecture/*.md, Mermaid) + view location to user
+- [x] T-400.6 MVP definition + incremental deployment plan (R/docs/delivery/) 
+- [~] T-400.7 Version verification of add-on libs (COMPATIBILITY_MATRIX)
+- [ ] T-400.8 MVP build: data prep → impact engine → recovery options → prioritisation/seat assignment → explanations → UI
+- [ ] T-400.9 Tests (pytest, vitest, Playwright) · [ ] T-400.10 Deploy MVP to OCI :8888 + verify + reboot resilience · [ ] T-400.11 Report URL; wait for phase-2 approval
