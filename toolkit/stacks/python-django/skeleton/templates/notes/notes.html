@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Notes · Sample App{% endblock %}
+{% block content %}
+<h1>Notes</h1>
+<div id="note-form">{% include "notes/_form.html" %}</div>
+<ul id="note-list" aria-live="polite">
+  {% for note in notes %}{% include "notes/_note_item.html" %}{% empty %}<li class="empty">No notes yet.</li>{% endfor %}
+</ul>
+{% endblock %}

@@ -1,5 +1,6 @@
 # RESUME (updated {{DATE}})
 Product: n/a (not named yet) · Phase: 1 Discovery · Task: T-001 Discovery intake
+Stack: not selected yet (Technology Selection Checkpoint, MASTER_PROMPT §4/§9.16)
 Last DONE: none (new product run; previous run archived to {{ARCHIVE}})
 In progress: none
 Next: 1) Wait for requirement data in input/ 2) Sort the inbox 3) Name the product and scaffold products/<name>/source/<name>/ (instructions/PRODUCT_RULES.md)

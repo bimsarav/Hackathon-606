@@ -1,0 +1,49 @@
+# Full local stack: docker compose up --build   (first: cp .env.example .env)
+name: sample-app
+
+x-app-env: &app-env
+  DATABASE_URL: postgres://${POSTGRES_USER:?}:${POSTGRES_PASSWORD:?}@db:5432/${POSTGRES_DB:?}
+  DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?}
+  DJANGO_DEBUG: ${DJANGO_DEBUG:-false}
+  DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+  DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-}
+  DJANGO_SECURE_COOKIES: ${DJANGO_SECURE_COOKIES:-true}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  LOG_JSON: ${LOG_JSON:-true}
+
+services:
+  db:
+    image: postgres:18.7-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?}
+      POSTGRES_USER: ${POSTGRES_USER:?}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+    volumes:
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    build: .
+    image: sample-app:latest
+    command: ["python", "manage.py", "migrate", "--noinput"]
+    environment: *app-env
+    depends_on:
+      db: { condition: service_healthy }
+    restart: "no"
+
+  web:
+    image: sample-app:latest
+    environment: *app-env
+    ports:
+      - "${WEB_PORT:-8000}:8000"
+    depends_on:
+      db: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
+    restart: unless-stopped
+
+volumes:
+  db-data:

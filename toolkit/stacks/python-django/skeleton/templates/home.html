@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Sample App</h1>
+<p>Generated from the <code>python-django</code> stack profile. Replace this page with the product's start page.</p>
+<ul>
+  <li><a href="{% url 'notes' %}">Notes</a> (server-rendered with htmx)</li>
+  <li><a href="{% url 'api-docs' %}">API documentation</a> (OpenAPI)</li>
+</ul>
+{% endblock %}

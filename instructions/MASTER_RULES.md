@@ -14,6 +14,7 @@ Source: master prompt supplied by the user on 2026-11-19 at project START.
 - Full rules: `instructions/PRODUCT_RULES.md`.
 - Every requirement becomes a named product in `products/<product-name>/`. The code base is the git-ready repo `products/<product-name>/source/<product-name>/`, and `products/<product-name>/CONFLUENCE_PAGE.md` is the Confluence-ready page.
 - Stack: latest stable OpenJDK, Spring Boot microservices, Kafka where it fits, React, JUnit 5 + Mockito (+ Testcontainers), Playwright, Docker.
+- Tech stack standards (user instruction 2026-11-20): `instructions/TECH_STACK_STANDARDS.md`. Full text: MASTER_PROMPT §9. New products choose their stack at the Technology Selection Checkpoint (a numbered menu of 2–5 stacks + a final "Let the AI Agent Decide" option, §9.16) and pass the Technology Selection Gate (MASTER_PROMPT §4) before planning and implementation; the chosen stack is recorded in persistent state; options come from the verified stack profiles in `toolkit/stacks/` (§9.16.0), and products are generated with `scripts/new-product.sh`; esm-hub keeps the stack above and adds the §9.16 documents.
 - At delivery the whole solution sits in the product folder, and builds, tests and deploys without AI.
 
 ## Resumability (mandatory)

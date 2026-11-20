@@ -1,0 +1,6 @@
+PASS generate product copy (scripts/new-product.sh)
+PASS quality gate (scripts/check.sh): 10 passed in 5.28s
+PASS deployment smoke test (scripts/smoke.sh): 9 checks
+PASS Trivy fs: dependencies, secrets, Dockerfile/compose misconfiguration (HIGH/CRITICAL)
+PASS Trivy image verify-python-django:latest: 0 fixable HIGH/CRITICAL
+PASS: wrote toolkit/stacks/python-django/VERIFIED.md (work copy: /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/f74ba682-c11d-402c-8799-42b49b2744b6/scratchpad/stack-verify/verify-python-django-20261119214301)

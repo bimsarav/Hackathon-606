@@ -1,0 +1,7 @@
+PASS generate product copy (scripts/new-product.sh)
+PASS quality gate (scripts/check.sh): 9 passed in 2.39s; Tests 5 passed (5)
+PASS deployment smoke test (scripts/smoke.sh): 12 checks
+PASS Trivy fs: dependencies, secrets, Dockerfile/compose misconfiguration (HIGH/CRITICAL)
+PASS Trivy image verify-python-fastapi-api:latest: 0 fixable HIGH/CRITICAL
+PASS Trivy image verify-python-fastapi-web:latest: 0 fixable HIGH/CRITICAL
+PASS: wrote toolkit/stacks/python-fastapi/VERIFIED.md (work copy: /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/f74ba682-c11d-402c-8799-42b49b2744b6/scratchpad/stack-verify/verify-python-fastapi-20261119214414)

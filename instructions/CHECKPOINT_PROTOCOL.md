@@ -45,6 +45,7 @@ Once the result is checked (file exists and is complete, build or test ran, outp
 ```
 # RESUME (updated <UTC timestamp>)
 Product: <name or n/a> · Phase: <n> · Task: <id + title>
+Stack: <selected stack, route (menu option n / user-specified / autonomous), link to TECH_STACK.md> or "not selected yet"
 Last DONE: <step-id> <one line>
 In progress: <step-id> <one line> · partial state: <files done / remaining>
 Next: 1) <exact action> 2) <...> 3) <...>

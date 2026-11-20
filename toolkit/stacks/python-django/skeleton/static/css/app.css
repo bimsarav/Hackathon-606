@@ -1,0 +1,16 @@
+:root { --fg: #1b1f24; --bg: #fff; --accent: #0b5cad; --error: #b42318; font-family: system-ui, sans-serif; }
+@media (prefers-color-scheme: dark) { :root { --fg: #e6e8eb; --bg: #15181c; --accent: #6cb2ff; --error: #ff8a80; } }
+body { margin: 0 auto; max-width: 48rem; padding: 0 1rem; color: var(--fg); background: var(--bg); line-height: 1.5; }
+a { color: var(--accent); }
+.skip-link { position: absolute; left: -999px; }
+.skip-link:focus { left: 1rem; top: 1rem; }
+.site-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 0; }
+.site-header nav { display: flex; gap: 1rem; align-items: center; }
+.inline { display: inline; }
+label { display: block; margin-top: .75rem; font-weight: 600; }
+input, textarea { width: 100%; padding: .5rem; font: inherit; box-sizing: border-box; }
+button { margin-top: .75rem; padding: .5rem 1rem; font: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.error { color: var(--error); }
+#note-list { padding-left: 1.2rem; }
+time { opacity: .7; font-size: .9em; margin-left: .5rem; }

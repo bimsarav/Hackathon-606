@@ -1,6 +1,6 @@
 # hack-isa: resumable autonomous engineering project
 
-This project runs under the user's master prompt, saved word for word in `instructions/MASTER_PROMPT.md`.
+This project runs under the user's master prompt, saved in `instructions/MASTER_PROMPT.md` (verbatim 2026-11-19; extended 2026-11-20 with §9 Technology Stack & Engineering Standards at the user's request).
 Progress lives ONLY in files. Never rely on conversation history or memory.
 
 ## On every session start, or when the user says RESUME, STATUS or anything else
@@ -21,4 +21,6 @@ Do not redo steps marked `[x]` unless the files contradict them.
 ## Delivery rules (user instruction 2026-11-19, they override the master prompt where they differ)
 - Every requirement becomes a named product: `products/<product-name>/` holds `CONFLUENCE_PAGE.md`, and `source/<product-name>/` is the git-ready code base.
 - Stack: latest stable OpenJDK · Spring Boot microservices · Kafka where it fits · React · JUnit 5 + Mockito (+ Testcontainers) · Playwright · Docker.
+- Tech stack standards (user instruction 2026-11-20): `instructions/TECH_STACK_STANDARDS.md`. They apply to new products; esm-hub keeps the stack above and adds the §9.16 documents (TECH_STACK, TECHNOLOGY_COMPARISON, COMPATIBILITY_MATRIX).
+- Stack profiles (user instruction 2026-11-20): new products pick from `toolkit/stacks/` (README + PROFILE.md only), run `scripts/check-stack-freshness.sh <profile>`, then `scripts/new-product.sh <profile> <name>`. Read `toolkit/KNOWN_FACTS.md` before researching. `toolkit/` and `scripts/` are never delivered.
 - At delivery, the whole solution is inside the product folder and builds, tests and deploys without AI. Details: `instructions/PRODUCT_RULES.md`.

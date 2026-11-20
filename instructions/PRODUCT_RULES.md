@@ -6,7 +6,7 @@ Where they conflict with the master prompt (folder structure, "avoid microservic
 ## 1. What is delivered
 - Each requirement placed in `input/` becomes a **product** delivered to the client.
 - Pick a fitting product name from the requirement: short, descriptive, kebab-case (e.g. `service-hub`). Record it and the rationale in `execution/DECISIONS.md` before creating folders.
-- When all changes and testing are finished, the **entire solution for that requirement lives in the product folder**. Nothing product-specific (code, tests, infrastructure, product docs) stays elsewhere in the workspace. Only `input/`, `instructions/`, `execution/` and `CLAUDE.md` stay at the project root; they are the AI working files and are never part of the delivery.
+- When all changes and testing are finished, the **entire solution for that requirement lives in the product folder**. Nothing product-specific (code, tests, infrastructure, product docs) stays elsewhere in the workspace. Only `input/`, `instructions/`, `execution/`, `toolkit/`, `scripts/` and `CLAUDE.md` stay at the project root; they are the AI working files and are never part of the delivery. Products receive a *copy* of a `toolkit/stacks/<profile>/` skeleton through `scripts/new-product.sh` (user instruction 2026-11-20).
 
 ## 2. Folder layout (approved by the user 2026-11-19)
 ```
@@ -30,7 +30,9 @@ products/
 - Do not run `git init` inside the workspace: it would create a nested repo in this project's git. The client initialises it, or the user asks for it explicitly.
 - The repository must build, test and run **without AI involvement**: plain Docker, Gradle wrapper and npm commands, all documented in its README.
 
-## 3. Technology stack (mandatory)
+## 3. Technology stack (mandatory for esm-hub; new products: see below)
+> **Update (user instruction 2026-11-20):** `instructions/TECH_STACK_STANDARDS.md` governs every **new** product: run its §9.16 selection workflow (full text MASTER_PROMPT §9): present the numbered stack menu with "Let the AI Agent Decide" as the last option, and wait for the user's choice unless told to proceed autonomously. Options come from the verified stack profiles in `toolkit/stacks/` where they fit (MASTER_PROMPT §9.16.0: freshness check → menu → `scripts/new-product.sh`) for that product's domain, and record the result in the product's ADRs. The "always microservices + Kafka" rule below then no longer applies by default; the table is a starting point only. **esm-hub keeps this table** and must still carry the §9.16 documents (`docs/architecture/TECH_STACK.md`, `TECHNOLOGY_COMPARISON.md`, `COMPATIBILITY_MATRIX.md`, ADRs in `docs/architecture/adr/`).
+
 | Concern | Technology |
 |---|---|
 | Language/runtime | **OpenJDK, latest stable GA release**. Check the actual latest GA at build start and record the version in DECISIONS.md. If a required framework does not support it yet, use the newest version it supports, and record why |
