@@ -1,4 +1,5 @@
 # Current Task
+> **CLOSED 2026-11-20: esm-hub marked COMPLETED by user instruction (D-013).** Open `[ ]`/`[~]` items below were not performed and are not done.
 - **ID:** T-100 esm-hub product build (user 2026-11-19: "create the solution product")
 - **Objective:** Deliver esm-hub (ESMP): Spring Boot microservices + Kafka + React, Gradle, JUnit/Mockito/Testcontainers/Playwright, Docker, git-ready, Confluence page
 - **Repo:** products/esm-hub/source/esm-hub/ (= `R/`)

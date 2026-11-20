@@ -1,5 +1,5 @@
 # Deployment Status — esm-hub (MASTER_PROMPT §13.12)
-Overall: **DEPLOYMENT PENDING** — environment discovered, dry run passed, decisions D-A/D-B taken (D-011, D-012); a production bootstrap must be built before deploying
+Overall: **NOT DEPLOYED — product closed by user decision 2026-11-20 (D-013)**. Discovery and dry run done; no deployment, no cloud verification, no application URL
 Updated: 2026-11-20T11:40Z
 
 | Area | Status | Evidence / notes |
