@@ -15,9 +15,10 @@
 - [x] T-002.4 ADRs
 - [x] T-002.5 Tech stack standards (user 2026-11-20): instructions saved; R/docs/architecture/TECH_STACK.md, TECHNOLOGY_COMPARISON.md, COMPATIBILITY_MATRIX.md
 - [x] T-002.6 MASTER_PROMPT consolidated with §9 tech stack standards (user 2026-11-20)
+- [x] T-201 MASTER_PROMPT §9.22 data engineering standards + esm-hub DE assessment (user 2026-11-20)
 - [x] T-200 Stack-profile toolkit (user 2026-11-20): python-django + python-fastapi VERIFIED (execution/logs/output/T-200-verify-*.log), scripts, rules
 - [x] T-002.7 MASTER_PROMPT: stack selection menu workflow merged into §9.16 (user 2026-11-20)
-- [x] T-004.1 directory-service (reference) · [ ] T-004.2 incident · [ ] T-004.3 request + change · [ ] T-004.4 asset + knowledge · [ ] T-004.5 notification + audit + reporting
-- [~] T-004.6 gateway, Dockerfile, compose · [ ] T-004.7 frontend
-- [ ] T-005.1 full build + scans · [ ] T-005.2 Playwright E2E · [ ] T-006.1 CI/scripts/runbooks · [ ] T-007.1 delivery, README, CONFLUENCE_PAGE.md, packaging check
+- [x] T-004.1 directory-service (reference) 
+- [x] T-004.2..5 services (agents; verified by T-005.1) · [x] T-004.6 gateway, Dockerfile, compose (stack healthy) · [x] T-004.7 frontend
+- [x] T-005.1 full build (253 tests green) · [~] T-005.2 package + stack + Playwright E2E (stack + smoke + E2E 6/6 done; package + Trivy pending) · [ ] T-006.1 CI/scripts/runbooks · [ ] T-007.1 delivery, README, CONFLUENCE_PAGE.md, packaging check
 - [x] T-900 (sub-task) token-reduction review delivered by the background agent

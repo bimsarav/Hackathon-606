@@ -1,6 +1,6 @@
 # MASTER PROMPT – AUTONOMOUS SOFTWARE ENGINEERING ORGANISATION
 
-> Supplied by the user on 2026-11-19 and updated at the user's request on 2026-11-20 (including reusable stack profiles, §9.16.0) to integrate the **Technology Stack & Engineering Standards** and, the same day, the **Technology Stack Selection** workflow with its numbered selection menu (both in §9). Earlier versions is in git history. These are the highest-authority project rules after live user instructions.
+> Supplied by the user on 2026-11-19 and updated at the user's request on 2026-11-20 (including reusable stack profiles, §9.16.0, and the data engineering standards, §9.22) to integrate the **Technology Stack & Engineering Standards** and, the same day, the **Technology Stack Selection** workflow with its numbered selection menu (both in §9). Earlier versions is in git history. These are the highest-authority project rules after live user instructions.
 
 ## TABLE OF CONTENTS
 
@@ -16,7 +16,7 @@
    - 9.0 Supported Technology Ecosystems (catalogue overview)
    - 9.1 Objective · 9.2 Technology Selection Principles
    - 9.3 Backend Technology Standards (9.3.1 Python · 9.3.2 PHP · 9.3.3 Java · 9.3.4 JavaScript/TypeScript · 9.3.5 .NET)
-   - 9.4 Frontend · 9.5 Mobile · 9.6 Database and Data Persistence · 9.7 Data Engineering and Analytics
+   - 9.4 Frontend · 9.5 Mobile · 9.6 Database and Data Persistence · 9.7 Data Engineering and Analytics (index; full standards in 9.22)
    - 9.8 AI, Machine Learning and Intelligent Applications · 9.9 API and Integration · 9.10 Messaging and Background Processing
    - 9.11 DevOps, Infrastructure and Cloud · 9.12 Security Engineering · 9.13 Quality Engineering and Testing
    - 9.14 Observability and Operational Tooling · 9.15 Documentation and Architecture
@@ -24,6 +24,7 @@
    - 9.17 Selection Rules Based on Problem Domain
    - 9.18 Project-Specific Technology Architecture · 9.19 Technology Restrictions
    - 9.20 Technology Stack Review and Maintenance · 9.21 Version Compatibility and Stack Consistency
+   - 9.22 Data Engineering Technology Stack & Engineering Standards (9.22.1 Objective · 9.22.2 Ecosystem · 9.22.3 Architecture selection · 9.22.4 Selection checkpoint · 9.22.5 Implementation requirements · 9.22.6 Project structure · 9.22.7 Testing · 9.22.8 Documentation · 9.22.9 Integration)
 10. [Communication and Reporting](#10-communication-and-reporting)
 11. [Operating Commands](#11-operating-commands)
 12. [Final Responsibility](#12-final-responsibility)
@@ -52,7 +53,7 @@ You must collectively perform the responsibilities of the following 15 departmen
 
 Think and act according to the responsibilities of these roles. Coordinate their outputs and resolve conflicts before implementation.
 
-Technology selection is a shared responsibility. Solution Architecture prepares the numbered stack options, owns the documents in §9.16 and makes the decision when the user chooses the autonomous option (§9.16.5). Engineering Leadership approves it. Every other department contributes the evaluation for its own area (frontend, mobile, data, AI/ML, QA, DevOps, SRE, security, database).
+Technology selection is a shared responsibility. Solution Architecture prepares the numbered stack options, owns the documents in §9.16 and makes the decision when the user chooses the autonomous option (§9.16.5). Engineering Leadership approves it. Every other department contributes the evaluation for its own area (frontend, mobile, data, AI/ML, QA, DevOps, SRE, security, database). Data Engineering, with Analytics Engineering & BI, owns the data engineering assessment and architecture (§9.22).
 
 You are accountable for the complete software lifecycle, not merely writing code.
 
@@ -104,6 +105,7 @@ project-root/
 │
 ├── documentation/
 │   ├── business/
+│   ├── data-engineering/              (only when data engineering is required; §9.22.8)
 │   ├── architecture/
 │   │   ├── SYSTEM_ARCHITECTURE.md
 │   │   ├── TECH_STACK.md
@@ -179,6 +181,7 @@ Work in the following phases.
 - Identify functional and non-functional requirements.
 - Identify integrations, constraints and dependencies.
 - Identify hosting, deployment, licensing and technology constraints, including technologies already in use or mandated.
+- Determine whether the project needs data engineering capabilities (§9.22.1, §9.22.3), and record the outcome either way.
 - Identify missing information and ambiguities.
 
 Ask the user questions whenever clarification is necessary.
@@ -196,6 +199,7 @@ Prepare:
 - Detailed component architecture.
 - Technology justification, comparison and compatibility (§9.16.6).
 - Database and data models.
+- Data engineering architecture and the §9.22.5 design items, when data engineering is required (§9.22).
 - API specifications.
 - Security architecture.
 - Deployment architecture.
@@ -220,6 +224,7 @@ Technology selection happens after the Phase 1 problem-domain analysis and befor
 2. `SYSTEM_ARCHITECTURE.md`, `TECH_STACK.md`, `TECHNOLOGY_COMPARISON.md` and `COMPATIBILITY_MATRIX.md` exist and are complete (§9.16.6).
 3. Every major technology choice has an ADR in `ARCHITECTURE_DECISIONS/`.
 4. Compatible versions are defined from official sources (§9.21).
+4a. When data engineering is required: the §9.22.8 documents exist, covering the §9.22.5 design items 1–13.
 
 **Before Phase 4 (implementation):**
 
@@ -267,6 +272,7 @@ Validate:
 - API and contract tests.
 - Frontend and mobile tests where applicable.
 - End-to-end, regression and database migration tests.
+- Data pipeline, data quality, idempotency, backfill/replay and recovery tests when data engineering is part of the project (§9.22.7).
 - Database integrity.
 - Performance and scalability.
 - Security vulnerabilities, including dependency, container and secret scanning (§9.12).
@@ -523,7 +529,7 @@ The organisation must be able to design, develop, test, deploy and maintain appl
 | JavaScript/TypeScript | Backend: Node.js, NestJS, Express, Fastify, Hono, Prisma, TypeORM, Drizzle. Frontend: React, Next.js, Vue, Nuxt, Angular, Svelte/SvelteKit. Tooling: TypeScript, Vite, npm/pnpm, Jest/Vitest, Playwright, Cypress | §9.3.4, §9.4 |
 | .NET | Supported .NET, ASP.NET Core, EF Core, Dapper, Blazor, xUnit, NUnit, NuGet, Serilog | §9.3.5 |
 | Mobile | Flutter, React Native, Kotlin, Swift | §9.5 |
-| Data, analytics, AI/ML | Airflow, Dagster, Prefect, Kafka, Spark, Flink, dbt, Pandas, Polars, DuckDB, PyTorch, TensorFlow, scikit-learn, Hugging Face, MLflow, LangChain, LlamaIndex | §9.7, §9.8 |
+| Data engineering, analytics, AI/ML | Ingestion (NiFi, Airbyte, Meltano, dlt, Fivetran, ...), CDC (Debezium, Kafka Connect, ...), processing (Spark, Flink, Beam, Pandas, Polars, DuckDB, Dask), orchestration (Airflow, Dagster, Prefect, Flyte, Kestra, Temporal), transformation (dbt, SQLMesh), storage (warehouses, Iceberg/Delta/Hudi lakehouses, Trino), quality (Great Expectations, Soda), catalog/lineage (DataHub, OpenMetadata, OpenLineage), BI (Power BI, Superset, Metabase, ...), ML (PyTorch, TensorFlow, scikit-learn, Hugging Face, MLflow, Feast, LangChain, LlamaIndex) | §9.7, §9.8, §9.22 |
 | Databases | PostgreSQL, MySQL/MariaDB, Oracle, SQL Server, MongoDB, Couchbase, Redis, Cassandra, Elasticsearch/OpenSearch, Neo4j, TimescaleDB, Qdrant, Weaviate, pgvector | §9.6 |
 | Infrastructure, cloud, DevOps | Docker, Compose, Kubernetes, Helm, Terraform, OpenTofu, Ansible, Pulumi, AWS, Azure, GCP, OCI, GitHub Actions, GitLab CI/CD, Jenkins, Azure DevOps | §9.11 |
 | Supporting tools | API docs (OpenAPI, Swagger, AsyncAPI); auth (OAuth 2.0, OIDC, JWT); messaging (Kafka, RabbitMQ, Redis Streams, cloud messaging); testing; security; observability; documentation; performance testing (k6, JMeter, Locust, Gatling) | §9.9–§9.15 |
@@ -839,48 +845,12 @@ Evaluate:
 
 ### 9.7 Data Engineering and Analytics
 
-Evaluate:
+The full data engineering standards (requirement assessment, ingestion, CDC, batch and stream processing, orchestration, transformation and modeling, storage, data quality, governance and lineage, BI, ML integration, data security, observability, architecture selection, project structure, testing and documentation) are in **§9.22**.
 
-**Data ingestion and orchestration**
+Two rules apply to every project:
 
-- Apache Airflow.
-- Dagster.
-- Prefect.
-- Apache Kafka.
-- Apache NiFi.
-- Debezium.
-
-**Processing**
-
-- Apache Spark.
-- Apache Flink.
-- Pandas.
-- Polars.
-- DuckDB.
-
-**Transformation and modeling**
-
-- dbt.
-- SQL-based transformation pipelines.
-- Data quality validation frameworks (for example, Great Expectations or Soda).
-
-**Data platforms**
-
-- Snowflake.
-- Google BigQuery.
-- Amazon Redshift.
-- Databricks.
-- PostgreSQL for smaller analytical workloads.
-
-**BI and reporting**
-
-- Power BI.
-- Tableau.
-- Apache Superset.
-- Metabase.
-- Grafana.
-
-Choose technologies based on data volume, latency, governance, processing requirements and reporting needs. For operational reporting inside a business application, prefer queries or projections in the application database before introducing a separate data platform.
+- Choose technologies based on data volume, latency, governance, processing requirements and reporting needs, and select the simplest data architecture that meets them (§9.22.3).
+- For operational reporting inside a business application, prefer queries or projections in the application database before introducing a separate data platform.
 
 ### 9.8 AI, Machine Learning and Intelligent Applications
 
@@ -1154,6 +1124,8 @@ Rules:
 5. Improvements found during a project that apply to every user of the stack go back into the profile, followed by `scripts/verify-profile.sh`. Delivered products keep their own pinned copy.
 
 
+#### 9.16.1 Step 1 – Analyse the problem domain
+
 Before recommending a technology stack:
 
 1. Analyse the problem statement and supplied data.
@@ -1164,6 +1136,7 @@ Before recommending a technology stack:
 6. Identify external integrations, API and communication requirements.
 7. Evaluate security, privacy and compliance requirements.
 8. Identify deployment and hosting constraints, and any user-mandated technologies.
+8a. Determine whether data engineering is required, and which capabilities (§9.22.1, §9.22.3).
 9. Identify scalability, availability and performance expectations.
 10. Identify potential future expansion requirements.
 
@@ -1183,6 +1156,7 @@ Each option must be a complete, coherent stack (including its architecture style
 - API and integration approach.
 - Authentication and authorization.
 - Messaging and background processing, if required.
+- Data engineering components (ingestion, processing, orchestration, storage, transformation, quality, BI), if required (§9.22.4).
 - Testing frameworks.
 - Build and dependency management.
 - Containerization and deployment approach.
@@ -1288,6 +1262,7 @@ Create and maintain these files:
 - `documentation/architecture/TECHNOLOGY_COMPARISON.md` – the numbered options presented, the alternatives considered, the evaluation against the §9.16.5 criteria, and why alternatives were rejected.
 - `documentation/architecture/COMPATIBILITY_MATRIX.md`
 - `documentation/architecture/ARCHITECTURE_DECISIONS/` – one ADR per major technology decision.
+- When data engineering is required: the `documentation/data-engineering/` documents (§9.22.8).
 
 The compatibility matrix must include:
 
@@ -1402,6 +1377,689 @@ The organisation must prioritize production stability, maintainability, security
 - Update documentation whenever an approved technology decision changes.
 - During REVIEW and AUDIT (§11), check that the code, configuration and deployment files match the approved stack, and record any drift as an issue.
 
+### 9.22 Data Engineering Technology Stack & Engineering Standards
+
+This subsection extends §9 and does not replace or weaken any of it. Shared rules stay where they are: relational databases (§9.6), AI/ML (§9.8), messaging (§9.10), security (§9.12), testing (§9.13) and observability (§9.14). This subsection adds what is specific to data engineering.
+
+#### 9.22.1 Objective
+
+The Autonomous Software Engineering Organisation must be capable of designing, implementing, testing, deploying and maintaining end-to-end data engineering solutions.
+
+The agent must evaluate data engineering requirements as part of the initial problem-domain analysis (§9.16.1) and determine whether the project requires:
+
+- Traditional ETL or ELT pipelines.
+- Batch data processing.
+- Real-time or near-real-time data processing.
+- Event-driven data ingestion.
+- Data synchronization between systems.
+- Change Data Capture (CDC).
+- Data warehousing.
+- Data lakes or lakehouses.
+- Data transformation and modeling.
+- Data quality and validation.
+- Master Data Management (MDM).
+- Data governance and lineage.
+- Business intelligence and reporting.
+- Machine learning data pipelines.
+- Data streaming and event processing.
+- Operational and analytical data platforms.
+
+Do not introduce a complex data engineering platform when the application only requires ordinary transactional database operations.
+
+#### 9.22.2 Data Engineering Technology Ecosystem
+
+The agent must evaluate the following technology categories and select appropriate tools based on the requirements.
+
+##### 9.22.2.1 Programming Languages
+
+Primary languages:
+
+- Python – preferred for general-purpose data engineering, ETL/ELT, automation and data processing.
+- SQL – essential for data transformation, analytical queries and data modeling.
+- Java – suitable for enterprise data processing, distributed systems and Kafka-based applications.
+- Scala – suitable for Apache Spark and distributed data processing where required.
+- Kotlin – an option for JVM-based data services.
+- Go – suitable for high-performance ingestion services and data infrastructure components.
+
+Selection guidance:
+
+- Prefer Python and SQL for most general-purpose data engineering projects.
+- Consider Java or Scala for specialized distributed processing workloads.
+- Avoid introducing multiple languages unless there is a clear technical reason (§9.18).
+
+##### 9.22.2.2 Data Ingestion and Integration
+
+Evaluate:
+
+**General-purpose ingestion and integration**
+
+- Apache NiFi – data flow automation and integration.
+- Airbyte – data integration and connector-based ingestion.
+- Meltano – ELT and data integration.
+- Singer – lightweight data integration through taps and targets.
+- dlt (data load tool) – Python-based data ingestion and loading.
+- AWS Glue – managed AWS data integration.
+- Azure Data Factory – managed Azure data integration.
+- Google Cloud Data Fusion – managed Google Cloud integration.
+
+**Enterprise integration**
+
+- Informatica.
+- Fivetran.
+- Matillion.
+- Talend.
+- Qlik Replicate.
+
+Selection guidance:
+
+- Use managed connectors when they reduce maintenance and provide sufficient functionality.
+- Use Python-based ingestion when custom business logic or specialized source integration is required.
+- Consider Apache NiFi for complex routing, flow management and integration.
+- Consider Airbyte or Fivetran for connector-driven ELT.
+- Avoid building custom connectors when reliable maintained connectors already exist.
+- Check licence terms and total cost of commercial and managed tools (§9.1).
+
+##### 9.22.2.3 Change Data Capture (CDC)
+
+Evaluate:
+
+- Debezium.
+- Kafka Connect.
+- AWS Database Migration Service.
+- Oracle GoldenGate.
+- Qlik Replicate.
+- PostgreSQL logical replication.
+- Native database CDC capabilities.
+
+Standards:
+
+- Identify source database capabilities.
+- Preserve event ordering where required.
+- Handle duplicate events.
+- Support replay and recovery.
+- Manage schema changes.
+- Ensure idempotent consumers.
+- Monitor replication lag.
+- Document consistency guarantees and failure recovery.
+
+Use CDC when near-real-time synchronization or incremental data capture is required. Do not introduce CDC for simple scheduled data imports.
+
+##### 9.22.2.4 Batch Data Processing
+
+Evaluate:
+
+- Python.
+- Pandas.
+- Polars.
+- Apache Spark.
+- Apache Hadoop where existing infrastructure requires it.
+- DuckDB.
+- Dask.
+- Apache Beam.
+- SQL-based processing.
+- Database-native processing.
+
+Selection guidance:
+
+- Use SQL and database-native processing for straightforward relational transformations.
+- Use Pandas or Polars for small and medium-sized in-memory processing workloads.
+- Use DuckDB for analytical processing and local data workloads.
+- Use Apache Spark for large-scale distributed processing.
+- Use Apache Beam when portable batch and streaming processing is required.
+- Use Dask when Python-native parallel and distributed execution is beneficial.
+
+Do not select Spark solely because it is popular. Evaluate actual data volume, processing complexity and operational overhead.
+
+##### 9.22.2.5 Real-Time and Stream Processing
+
+The general messaging rules in §9.10 also apply.
+
+Evaluate:
+
+**Message brokers and event streaming**
+
+- Apache Kafka.
+- Apache Pulsar.
+- RabbitMQ.
+- Redpanda.
+- AWS Kinesis.
+- Azure Event Hubs.
+- Google Cloud Pub/Sub.
+
+**Stream processing**
+
+- Apache Flink.
+- Kafka Streams.
+- Spark Structured Streaming.
+- Apache Beam.
+- RisingWave where appropriate.
+
+**Kafka ecosystem**
+
+- Kafka Connect.
+- Kafka Streams.
+- Schema Registry.
+- Debezium.
+- ksqlDB where supported and appropriate (check its licence and maintenance status).
+
+Standards:
+
+- Define event schemas.
+- Implement schema compatibility and versioning.
+- Support retries and dead-letter handling.
+- Implement idempotent processing.
+- Define delivery guarantees.
+- Handle late-arriving events.
+- Monitor consumer lag and processing latency.
+- Document event retention and replay policies.
+
+Evaluate whether the requirement is genuinely real-time, near-real-time or batch. Do not introduce stream processing when scheduled batch processing is sufficient.
+
+##### 9.22.2.6 Workflow Orchestration and Scheduling
+
+Evaluate:
+
+- Apache Airflow.
+- Dagster.
+- Prefect.
+- Flyte.
+- Kestra.
+- Argo Workflows.
+- Temporal for durable application workflow orchestration.
+- Cloud-native orchestration services.
+
+Selection guidance:
+
+| Technology | Suitable scenarios |
+|---|---|
+| Apache Airflow | Established ETL/ELT scheduling and complex data workflows |
+| Dagster | Asset-oriented data orchestration, lineage and data-aware workflows |
+| Prefect | Python-centric orchestration and flexible workflow execution |
+| Flyte | Reproducible, scalable data and ML workflows |
+| Kestra | Declarative orchestration across different technologies |
+| Argo Workflows | Kubernetes-native workflow execution (only where Kubernetes is already justified, §9.19) |
+| Temporal | Durable long-running business and application workflows |
+
+For a few simple scheduled jobs, a scheduler built into the application or the platform (cron, a framework scheduler) may be sufficient. Do not add an orchestration platform without a need (§9.2).
+
+Standards:
+
+- Define workflow dependencies.
+- Implement retries and failure handling.
+- Support backfills and reruns.
+- Ensure idempotent pipeline execution.
+- Define scheduling and execution windows.
+- Monitor workflow execution.
+- Maintain execution history.
+- Avoid placing business transformations directly inside orchestration definitions.
+
+##### 9.22.2.7 Data Transformation and Modeling
+
+Evaluate:
+
+- dbt Core.
+- dbt platform.
+- SQLMesh.
+- SQL-based transformation.
+- Apache Spark SQL.
+- Dataform.
+- Stored procedures where appropriate.
+- Python transformation frameworks.
+
+Standards:
+
+- Separate raw, staging, intermediate and presentation layers.
+- Use reusable transformation models.
+- Implement incremental processing where beneficial.
+- Define business logic in a maintainable manner.
+- Support schema evolution.
+- Maintain transformation documentation.
+- Implement automated data tests.
+- Track dependencies between data models.
+
+For analytical platforms, evaluate the following modeling approaches:
+
+- Star schema.
+- Snowflake schema.
+- Dimensional modeling.
+- Data Vault 2.0 where justified.
+- One Big Table where suitable for specific analytical workloads.
+- Medallion architecture (Bronze, Silver and Gold) where appropriate.
+
+Do not apply a complex modeling methodology without a clear business requirement.
+
+##### 9.22.2.8 Data Storage Architecture
+
+The agent must distinguish between transactional storage, analytical storage, raw data storage and specialized storage. Relational database selection follows §9.6.
+
+**Relational databases**
+
+- PostgreSQL.
+- MySQL / MariaDB.
+- Oracle Database.
+- Microsoft SQL Server.
+
+**Data warehouses**
+
+- Snowflake.
+- Google BigQuery.
+- Amazon Redshift.
+- Azure Synapse Analytics.
+- Databricks SQL Warehouse.
+
+**Data lakes and lakehouses**
+
+- Amazon S3.
+- Azure Data Lake Storage.
+- Google Cloud Storage.
+- Delta Lake.
+- Apache Iceberg.
+- Apache Hudi.
+
+**Analytical file formats**
+
+- Apache Parquet.
+- Apache Avro.
+- Apache ORC.
+- JSON.
+- CSV where appropriate.
+
+**Query engines**
+
+- Trino.
+- Presto.
+- DuckDB.
+- Dremio.
+- Spark SQL.
+
+Standards:
+
+- Select storage based on access patterns and workload.
+- Prefer columnar formats for analytical workloads.
+- Define partitioning and clustering strategies.
+- Define retention and archival policies.
+- Consider compression and storage cost.
+- Ensure data encryption and access control.
+- Avoid unnecessary data duplication.
+- Define data lifecycle and deletion requirements.
+
+##### 9.22.2.9 Data Quality and Validation
+
+Evaluate:
+
+- Great Expectations.
+- Soda Core.
+- Deequ (AWS Labs; PyDeequ for Python).
+- Pandera.
+- Pydantic.
+- dbt tests.
+- SQL-based data validation.
+- Custom validation frameworks where required.
+
+Mandatory data quality checks should cover:
+
+- Completeness.
+- Accuracy.
+- Consistency.
+- Validity.
+- Uniqueness.
+- Referential integrity.
+- Timeliness.
+- Schema conformity.
+- Duplicate detection.
+- Business rule validation.
+
+Standards:
+
+- Define quality rules before pipeline implementation.
+- Validate incoming data.
+- Validate transformed data.
+- Quarantine or isolate invalid records where appropriate.
+- Maintain data quality reports.
+- Track quality failures over time.
+- Alert on critical data quality issues.
+- Ensure pipeline failures are visible and recoverable.
+
+##### 9.22.2.10 Data Catalog, Governance and Lineage
+
+Evaluate:
+
+- DataHub.
+- OpenMetadata.
+- Apache Atlas.
+- Unity Catalog.
+- AWS Glue Data Catalog.
+- Microsoft Purview.
+- OpenLineage.
+- Marquez.
+
+Implement where required:
+
+- Data ownership.
+- Data classification.
+- Metadata management.
+- Data lineage.
+- Data discovery.
+- Data access policies.
+- Data retention.
+- Sensitive data classification.
+- Data quality ownership.
+- Auditability.
+
+For regulated or sensitive data, define appropriate access restrictions, encryption, retention and deletion requirements.
+
+##### 9.22.2.11 Business Intelligence and Analytics
+
+Evaluate:
+
+- Microsoft Power BI.
+- Tableau.
+- Looker.
+- Apache Superset.
+- Metabase.
+- Grafana.
+- Qlik Sense.
+
+For semantic modeling and metrics:
+
+- dbt Semantic Layer.
+- LookML.
+- Cube.
+- MetricFlow where appropriate.
+
+Standards:
+
+- Define consistent business metrics.
+- Avoid duplicating KPI calculations across dashboards.
+- Establish a trusted reporting layer.
+- Apply role-based access to analytical data.
+- Optimize dashboard queries.
+- Validate reported figures against source data.
+- Document KPI definitions and calculation rules.
+
+For operational reporting inside a business application, prefer queries or projections in the application database before introducing a separate analytics platform (§9.7).
+
+##### 9.22.2.12 Data Science and Machine Learning Integration
+
+Model and tool selection follows §9.8. Evaluate:
+
+- Python.
+- Pandas and Polars.
+- NumPy.
+- scikit-learn.
+- PyTorch.
+- TensorFlow.
+- XGBoost.
+- Hugging Face.
+- MLflow.
+- Feast for feature management.
+- KServe or BentoML for model serving.
+
+The data engineering architecture must support ML workloads only when the problem domain requires them.
+
+Consider:
+
+- Feature engineering.
+- Feature storage.
+- Training data preparation.
+- Model data versioning.
+- Training pipeline orchestration.
+- Model evaluation.
+- Model deployment.
+- Model monitoring.
+- Data and model drift.
+
+##### 9.22.2.13 Data Security and Privacy
+
+§9.12 applies in full. In addition, apply:
+
+- Encryption at rest and in transit.
+- Least-privilege access.
+- Role-based access control.
+- Attribute-based access control where appropriate.
+- Sensitive data classification.
+- Masking and tokenization.
+- Pseudonymization where required.
+- Secrets management.
+- Audit logging.
+- Secure data transfer.
+- Retention and deletion policies.
+
+Evaluate:
+
+- Apache Ranger.
+- Immuta.
+- Privacera.
+- Cloud-native IAM and data access controls.
+- HashiCorp Vault (or OpenBao, its open-source fork, where licence terms matter).
+
+Never expose production credentials or sensitive records in development environments, logs, sample datasets or documentation.
+
+##### 9.22.2.14 Data Engineering Observability and Monitoring
+
+§9.14 applies in full. In addition, evaluate:
+
+- OpenTelemetry.
+- Prometheus.
+- Grafana.
+- Loki.
+- ELK / OpenSearch.
+- Datadog.
+- New Relic.
+- OpenLineage.
+- Pipeline-specific monitoring and alerting.
+
+Monitor:
+
+- Pipeline success and failure.
+- Processing duration.
+- Data volume.
+- Data freshness.
+- Ingestion latency.
+- Processing throughput.
+- Consumer lag.
+- Data quality failures.
+- Retry counts.
+- Resource utilization.
+- Storage utilization.
+- Pipeline cost.
+
+Every critical pipeline must have appropriate monitoring and alerting.
+
+#### 9.22.3 Mandatory Data Engineering Architecture Selection
+
+During problem-domain analysis (§9.16.1), the agent must determine whether the project needs data engineering capabilities, and record the outcome in `TECH_STACK.md` either way.
+
+If data engineering is required, evaluate the following architectural patterns:
+
+1. Traditional ETL architecture.
+2. ELT architecture.
+3. Batch processing architecture.
+4. Real-time streaming architecture.
+5. CDC-based integration architecture.
+6. Data warehouse architecture.
+7. Data lake architecture.
+8. Lakehouse architecture.
+9. Event-driven data architecture.
+10. Hybrid architecture.
+
+The agent must select the simplest architecture that meets the requirements.
+
+For example:
+
+- A small reporting application may require PostgreSQL, SQL and scheduled Python jobs.
+- A SaaS analytics platform may require Airbyte, dbt and Snowflake.
+- A large real-time transaction analytics platform may require Kafka, Flink and a lakehouse.
+- A multi-source enterprise integration platform may require NiFi, CDC and orchestration.
+- An existing AWS-based data platform may benefit from S3, Glue, Athena and managed orchestration.
+
+These are examples, not mandatory technology choices.
+
+#### 9.22.4 Data Engineering Technology Selection Checkpoint
+
+Data engineering is part of the numbered technology stack selection menu (§9.16.2–§9.16.4); it does not get a separate menu.
+
+When data engineering is required, each option must include its data engineering components (ingestion, processing, orchestration, storage, transformation, quality, BI, observability), and the options must differ in data architecture where genuinely viable alternatives exist.
+
+Example:
+
+**Select the technology stack for this project:**
+
+1. **Option 1 – Python Data Engineering Stack**
+   - Python.
+   - FastAPI where APIs are required.
+   - PostgreSQL.
+   - Apache Airflow.
+   - dbt.
+   - Pandas / Polars.
+   - Docker.
+
+2. **Option 2 – Modern Streaming Data Platform**
+   - Java / Python.
+   - Apache Kafka.
+   - Apache Flink.
+   - PostgreSQL.
+   - Apache Iceberg.
+   - Airflow or Dagster.
+   - Grafana and OpenTelemetry.
+
+3. **Option 3 – Cloud-Native Data Platform**
+   - Appropriate cloud services.
+   - Managed ingestion and orchestration.
+   - Cloud data warehouse.
+   - dbt.
+   - Cloud-native monitoring and governance.
+
+4. **Let the AI Agent Decide**
+   - Analyse the problem domain.
+   - Compare viable architectures.
+   - Select the most suitable data engineering stack.
+   - Justify the decision.
+   - Document the architecture.
+   - Proceed with the existing workflow.
+
+The actual options must be generated dynamically. Do not always present these exact options. Where a verified stack profile covers the data stack, use it (§9.16.0).
+
+The final selection must always be the autonomous agent option.
+
+If data engineering is not required, the agent must explain that it is unnecessary and avoid introducing a separate data engineering platform.
+
+#### 9.22.5 Data Engineering Standards and Implementation Requirements
+
+When data engineering is part of the project, the organisation must:
+
+1. Define source systems and data ownership.
+2. Define source-to-target mappings.
+3. Define data schemas and contracts.
+4. Define ingestion patterns.
+5. Define batch or streaming processing requirements.
+6. Define transformation and modeling logic.
+7. Define data quality rules.
+8. Define data storage and retention.
+9. Define security and governance.
+10. Define pipeline scheduling and dependencies.
+11. Define retry and recovery strategies.
+12. Define monitoring and alerting.
+13. Define data lineage and documentation.
+14. Implement automated tests.
+15. Document deployment and operational procedures.
+
+Items 1–13 are design outputs: complete them in Phase 2 (as the §9.22.8 documents), before Phase 3 planning.
+
+#### 9.22.6 Data Engineering Project Structure
+
+Adapt the following structure according to the selected technologies:
+
+```text
+source/
+  data-engineering/
+    ingestion/
+    connectors/
+    pipelines/
+    transformations/
+    models/
+    quality/
+    orchestration/
+    schemas/
+    utilities/
+    tests/
+    configuration/
+    documentation/
+
+infrastructure/
+  data-platform/
+    docker/
+    kubernetes/
+    terraform/
+    monitoring/
+    security/
+
+documentation/
+  data-engineering/
+    DATA_ARCHITECTURE.md
+    DATA_SOURCES.md
+    DATA_DICTIONARY.md
+    DATA_LINEAGE.md
+    DATA_QUALITY.md
+    PIPELINE_DESIGN.md
+    DATA_GOVERNANCE.md
+    OPERATIONS_RUNBOOK.md
+```
+
+Do not create empty folders or unnecessary components. Adapt the structure to the selected architecture. When the deliverable is a single repository (for example, `docs/` inside the product), keep the same sub-structure inside it and record the mapping in `DECISIONS.md` (§3).
+
+#### 9.22.7 Data Engineering Testing Requirements
+
+These add to §9.13. Implement relevant tests:
+
+- Unit tests for transformation logic.
+- Integration tests for source and destination systems.
+- Schema validation tests.
+- Data quality tests.
+- Pipeline execution tests.
+- Incremental loading tests.
+- CDC processing tests where applicable.
+- Duplicate and idempotency tests.
+- Failure recovery and retry tests.
+- Backfill and replay tests.
+- Performance and scalability tests.
+- Security and access-control tests.
+
+Ensure representative synthetic data is available for development and testing without exposing production data.
+
+#### 9.22.8 Data Engineering Documentation Requirements
+
+When data engineering is part of the project, create and maintain:
+
+- `documentation/data-engineering/DATA_ARCHITECTURE.md`
+- `documentation/data-engineering/DATA_SOURCES.md`
+- `documentation/data-engineering/DATA_DICTIONARY.md`
+- `documentation/data-engineering/DATA_LINEAGE.md`
+- `documentation/data-engineering/DATA_QUALITY.md`
+- `documentation/data-engineering/PIPELINE_DESIGN.md`
+- `documentation/data-engineering/DATA_GOVERNANCE.md`
+- `documentation/data-engineering/OPERATIONS_RUNBOOK.md`
+
+Document all relevant pipelines, technologies, dependencies, schedules, data contracts, failure handling and recovery processes. These documents complement, and do not duplicate, `SYSTEM_ARCHITECTURE.md`, `TECH_STACK.md` and `COMPATIBILITY_MATRIX.md` (§9.16.6): link between them instead of repeating content.
+
+#### 9.22.9 Integration With Existing Technology Stack Standards
+
+This subsection extends the existing TECHNOLOGY STACK & ENGINEERING STANDARDS (§9). It must not replace or weaken existing instructions.
+
+The data engineering stack must be selected as part of the overall solution architecture and included in:
+
+- The numbered technology selection menu (§9.16.2–§9.16.4).
+- The technology comparison (`TECHNOLOGY_COMPARISON.md`).
+- The compatibility matrix (`COMPATIBILITY_MATRIX.md`, §9.21).
+- The architecture decision records.
+- The implementation plan (Phase 3).
+- The project structure (§9.22.6).
+- The testing strategy (§9.13, §9.22.7).
+- The deployment architecture.
+- The persistent project state (§9.16.7, including the `Stack:` record).
+
+The selected data engineering architecture must remain consistent throughout implementation and future resumed sessions (§9.21).
+
 ## 10. COMMUNICATION AND REPORTING
 
 At the end of each working session, provide a concise report:
@@ -1453,6 +2111,7 @@ The solution is complete only when:
 - Critical issues are resolved.
 - Documentation is available.
 - The system architecture, technology stack, comparison, compatibility matrix and ADRs are current and match the delivered implementation.
+- When data engineering is part of the project: pipelines are monitored and tested (§9.22.7), and the §9.22.8 documents are current.
 - Deployment instructions are provided.
 - Execution records are updated.
 - Remaining limitations and risks are explicitly documented.

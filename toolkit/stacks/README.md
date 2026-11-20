@@ -7,7 +7,9 @@ Source of options for the Technology Selection Checkpoint (MASTER_PROMPT §9.16.
 | [python-django](python-django/PROFILE.md) | Django 5.2 LTS modular monolith, DRF API, server-rendered htmx UI, PostgreSQL 18 | Enterprise/business management, internal tools, admin-heavy portals, CRUD-rich apps, fast MVPs | Low | [VERIFIED.md](python-django/VERIFIED.md) |
 | [python-fastapi](python-fastapi/PROFILE.md) | FastAPI + SQLAlchemy 2 + Alembic API, React 19 + TypeScript SPA behind nginx, PostgreSQL 18 | API-first/SaaS, rich interactive UIs, integration hubs, AI/data-adjacent services, mobile backends | Medium | [VERIFIED.md](python-fastapi/VERIFIED.md) |
 
-Not yet built (build when a product first selects one, then add it here): Java Spring (modular monolith or microservices; esm-hub's stack, extract after its delivery), PHP Laravel, PHP Symfony, Node NestJS, .NET ASP.NET Core.
+Data engineering (MASTER_PROMPT §9.22): **no profile yet**. Candidates: `data-batch-elt` (Dagster or Airflow + dbt + DuckDB/PostgreSQL + data-quality tests + Metabase/Superset), `data-streaming-cdc` (Kafka + Debezium + Flink or Python consumers + PostgreSQL/TimescaleDB), `data-lakehouse-spark` (Spark + Iceberg/Delta + Airflow + object storage). Each profile's skeleton must include the 8 `docs/data-engineering/` templates and the §9.22.7 tests.
+
+Application stacks not yet built (build when a product first selects one, then add it here): Java Spring (modular monolith or microservices; esm-hub's stack, extract after its delivery), PHP Laravel, PHP Symfony, Node NestJS, .NET ASP.NET Core.
 
 ## Using a profile for a product
 1. `scripts/check-stack-freshness.sh <profile>`: if it reports ACTION NEEDED, bump the versions (ADR in the profile's `docs/architecture/adr/`, plus `pyproject.toml`/`package.json`, Dockerfiles, `COMPATIBILITY_MATRIX.md` and `freshness.conf`), then run `scripts/verify-profile.sh <profile>`.
