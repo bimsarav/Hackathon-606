@@ -1,0 +1,58 @@
+Warning: Permanently added '92.5.154.198' (ED25519) to the list of known hosts.
+== host
+hackathon22
+VERSION_ID="10.2"
+PRETTY_NAME="Oracle Linux Server 10.2"
+6.12.0-207.111.5.1.el10uek.x86_64
+x86_64
+== cpu/mem/disk
+8
+               total        used        free      shared  buff/cache   available
+Mem:            62Gi       1.4Gi        60Gi       8.8Mi       1.4Gi        60Gi
+Swap:          5.1Gi          0B       5.1Gi
+Filesystem                  Size  Used Avail Use% Mounted on
+/dev/mapper/ocivolume-root   78G   12G   67G  15% /
+== sudo
+passwordless sudo: yes
+== docker
+/usr/bin/docker
+Docker version 29.10.0, build fdd4b8e
+Docker Compose version v5.8.0
+enabled
+active
+opc adm systemd-journal docker
+== firewall
+active
+  services: dhcpv6-client ssh
+  ports: 22/tcp 80/tcp 443/tcp 8080/tcp 8888/tcp 5432/tcp
+  forward-ports: 
+  source-ports: 
+-P INPUT ACCEPT
+== selinux
+Enforcing
+== listening
+0.0.0.0:44321 "pmcd",pid=2888,fd=0))
+0.0.0.0:22 "sshd",pid=2510,fd=7))
+0.0.0.0:111 "rpcbind",pid=1804,fd=5),("systemd",pid=1,fd=203
+0.0.0.0:4330 "pmlogger",pid=4437,fd=7))
+[::]:44321 "pmcd",pid=2888,fd=3))
+[::]:22 "sshd",pid=2510,fd=8))
+[::]:111 "rpcbind",pid=1804,fd=7),("systemd",pid=1,fd=205))
+[::]:4330 "pmlogger",pid=4437,fd=8))
+== outbound
+docker hub registry: 401
+github: 200
+== cloud metadata
+OCI VM.Standard.E4.Flex eu-frankfurt-1 eu-frankfurt-1 QQvv:EU-FRANKFURT-1-AD-1
+== time
+Fri Nov 20 11:38:27 AM UTC 2026
+                Time zone: GMT (GMT, +0000)
+System clock synchronized: yes
+== uptime
+ 11:38:28 up  3:22,  3 users,  load average: 0.02, 0.01, 0.00
+EXIT 0
+selinux=[name=seccomp,profile=builtin name=cgroupns] storage=overlayfs root=/var/lib/docker cgroup=2
+0
+0
+drwx------. 3 opc opc 74 Nov 18 12:18 /home/opc
+/dev/mapper/ocivolume-root   78G   12G   67G  15% /

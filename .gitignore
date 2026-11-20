@@ -32,3 +32,6 @@ input/**/*.tfvars
 input/**/*.tfstate*
 input/**/service-account*.json
 input/**/*sa-key*.json
+# Any file in input/cloud-environment/ except Markdown notes (e.g. SSH keys named after a host)
+input/cloud-environment/*
+!input/cloud-environment/*.md
