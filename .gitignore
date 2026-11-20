@@ -35,3 +35,10 @@ input/**/*sa-key*.json
 # Any file in input/cloud-environment/ except Markdown notes (e.g. SSH keys named after a host)
 input/cloud-environment/*
 !input/cloud-environment/*.md
+# Inbox data files (user 2026-11-20): bookings contain passenger names (PII) and are ~1 GB. Keep the README only.
+input/inbox/*
+!input/inbox/README.md
+# Disruption-management (UC5) datasets: treated as real passenger data (user 2026-11-20), ~1 GB. Never commit.
+input/data/disruption-uc5/
+# Secrets supplied by the user (e.g. AI_API_KEY, user 2026-11-20). Never commit, print or log.
+input/secrets/

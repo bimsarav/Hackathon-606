@@ -1,4 +1,4 @@
-# RESUME (updated 2026-11-20T15:38Z) — T-300 airline domain research: first pass DONE; esm-hub CLOSED (D-013)
+# RESUME (updated 2026-11-20T17:46Z) — UC5 disruption management: questions closed, synthetic data ready, WAITING for user approval to build
 Product: esm-hub (R = products/esm-hub/source/esm-hub) · Status: COMPLETED by user instruction, NOT deployed
 Verified locally: clean build 253 tests; frontend lint + 18 tests; compose stack healthy; API smoke (output/T-005.2-smoke.log); Playwright 6/6 (output/T-005.2-e2e-run3.log)
 Cloud: OCI VM discovered + read-only dry run passed (R/docs/deployment/CLOUD_ENVIRONMENT.md, execution/DEPLOYMENT_STATUS.md); nothing deployed
@@ -7,3 +7,4 @@ Running: local docker compose stack (R) still up
 Pending housekeeping (needs user go-ahead): final commit of the product, then scripts/archive-product-logs.sh esm-hub --status delivered --yes (moves logs to execution/archive/, resets tracking files)
 Workspace rules: MASTER_PROMPT §13 cloud, §14 server ops (D-014), §9.24 product vs AI agent stack (D-015, instructions/AGENT_TECH_STACK.md) merged 2026-11-20
 T-300 done: KB documentation/knowledge-base/airline/ (README, SOURCES 261, GLOSSARY 98, topics/disruption-management/00-OVERVIEW + 01..05). Next (user decides): T-300.3 close gaps (overview §13) or a new research topic
+UC5: register execution/QUESTIONS_UC5.md; data input/data/disruption-uc5/ (+synthetic/, git-ignored); key input/secrets/AI_API_KEY. Scratch DuckDB (rebuildable via synthetic/load_bookings.py). NEXT: user approval of the solution plan, then Phase 2 (stack: python-fastapi profile FRESH 2026-11-20)

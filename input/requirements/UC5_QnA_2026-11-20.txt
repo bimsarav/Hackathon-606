@@ -1,0 +1,40 @@
+Shaharsad Salam(Sheru)
+9:21 PM
+No, just go with the flight first, but we will handle it later.
+Bimsara Vikum Bandara
+9:21 PM
+Okay.
+Alright, and then...
+Aircraft is is there a list mapping each registration to aircraft type and seat counts.
+Shaharsad Salam(Sheru)
+9:21 PM
+Yeah, yeah, seat counts, so that that you can take from inventory allocation. Why are you because there for this one you should be going with inventory locations. I might not be selling the whole seat, I might be having a curtail and oversell. You have to consider all those. A CV to aircraft model, if you want, I can we can get it. We have.
+The file, we will try to upload it.
+Bimsara Vikum Bandara
+9:22 PM
+So, we have to check even the after after as swap is also possible, right, as the recommendation.
+Shaharsad Salam(Sheru)
+9:22 PM
+Yeah, yeah, aircraft, yeah, aircraft swap is also possible. Equipment can be changed, the time can be delayed, or the flight can be cancelled. My recommendation is it's a very vast the use case, so rather than trying to do everything, try to two of this and then see whether you can.
+show the recommendations according to that because if you try everything, it might not have. If you finish the two options in the beginning, then you can include the third one also.
+Bimsara Vikum Bandara
+9:22 PM
+Nope.
+Other than that, so given this flight inventory details, those are not matching the booking details.
+Shaharsad Salam(Sheru)
+9:22 PM
+Now that's for future. There might be some differences because the booking data getting generated takes time. Inventory can be generated faster. So there can be some differences. Just consider like it's booking is there and then continue.
+If you want to fill those bookings, you just add some synthetic data or remove something and then you can do it. That's mark some of the bookings as cancelled and then go ahead. If your solution will work only with accurate data. But always think that this process, usually if we have a lot of flights, that takes time and the sales will also be happening in parallel.
+Bimsara Vikum Bandara
+9:23 PM
+Thank you.
+Shaharsad Salam(Sheru)
+9:23 PM
+So there can be a mismatch at any point of time in Saarrah.
+Bimsara Vikum Bandara
+9:23 PM
+Okay.
+Shaharsad Salam(Sheru)
+9:23 PM
+And we also in Aeromart, we have inventory mismatch scenarios. So this process should not be breaking because of that.
+

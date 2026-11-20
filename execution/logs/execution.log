@@ -69,3 +69,21 @@
 2026-11-20T15:36Z | T-300.1 | DONE | all 5 notes written (04: 53 sources, S-R) | KB/topics/disruption-management/01..05
 2026-11-20T15:36Z | T-300.2 | STARTED | synthesis: SOURCES.md, GLOSSARY.md, 00-OVERVIEW.md, README | KB
 2026-11-20T15:38Z | T-300.2 | DONE | 00-OVERVIEW.md (14 §15.8 sections), SOURCES.md (261 rows, 20 shared URLs), GLOSSARY.md (98 terms), README, note cross-links | KB
+2026-11-20T16:28Z | T-301.0 | DONE | new requirement 'Flight & Passenger Disruption Management' (UC5) + 7 inbox files profiled read-only; inbox data git-ignored (PII); clarification questions sent to user | .gitignore
+2026-11-20T16:28Z | SECURITY | FINDING | SSH private key input/cloud-environment/hackathon22_172.31.76.23 is tracked in commit 6abb41c and present on origin/heshawa (GitHub); reported to user, rotation recommended; history not rewritten (needs user approval) | -
+2026-11-20T16:52Z | T-400.1 | PROGRESS | inbox sort: input/inbox/Connection Time.xlsx -> input/data/disruption-uc5/ | -
+2026-11-20T16:52Z | T-400.1 | PROGRESS | inbox sort: input/inbox/Flight Inventory.csv -> input/data/disruption-uc5/ | -
+2026-11-20T16:52Z | T-400.1 | PROGRESS | inbox sort: input/inbox/Flight_Punctuality_Jan-Nov_2026_Combined.xlsx -> input/data/disruption-uc5/ | -
+2026-11-20T16:52Z | T-400.1 | PROGRESS | inbox sort: input/inbox/Flight Rotation.xls -> input/data/disruption-uc5/ | -
+2026-11-20T16:52Z | T-400.1 | PROGRESS | inbox sort: input/inbox/Flight Schedule.csv -> input/data/disruption-uc5/ | -
+2026-11-20T16:52Z | T-400.1 | PROGRESS | inbox sort: input/inbox/Past & Future Booking Data.zip -> input/data/disruption-uc5/ | -
+2026-11-20T16:52Z | T-400.1 | PROGRESS | inbox sort: Disruption_Management_UC5.docx -> input/requirements/ | -
+2026-11-20T16:52Z | T-400.1 | PROGRESS | inbox sort: transcript_description -> input/requirements/UC5_briefing_transcript.txt (scope: 1-2 scenarios, agent explains) | -
+2026-11-20T16:53Z | T-400.0 | WAITING | UC5 answers recorded in execution/QUESTIONS_UC5.md; user: do not continue with open questions; follow-up questions sent | -
+2026-11-20T16:58Z | T-400.0 | WAITING | answers 20-24 recorded; open: 4,5,6,7,8(fare families),10(capture date),11,12,13,14,15,23,25,26 | execution/QUESTIONS_UC5.md
+2026-11-20T17:27Z | T-400.1 | PROGRESS | inbox sort: Q_n_A -> input/requirements/UC5_QnA_2026-11-20.txt (PO answers: levers, seats from inventory, mismatch tolerance); transcript already at input/requirements/UC5_briefing_transcript.txt | execution/QUESTIONS_UC5.md
+2026-11-20T17:33Z | T-400.0 | PROGRESS | answers 27-30 recorded; T-400.2 synthetic aircraft registry started | execution/QUESTIONS_UC5.md
+2026-11-20T17:34Z | T-400.2 | DONE | synthetic aircraft registry: input/data/disruption-uc5/synthetic/aircraft_registry_synthetic.csv (110 regs: 51 inventory-exact, 69 assumed) + README; git-ignored with the dataset | -
+2026-11-20T17:38Z | T-400.0 | PROGRESS | Q26: Anthropic API key received; moved inbox -> input/secrets/AI_API_KEY (chmod 600, git-ignored, never printed). Rules 12-15: agent defaults approved. Data 4-11: synthesize from given data + knowledge. Solution build needs explicit user approval | execution/QUESTIONS_UC5.md
+2026-11-20T17:46Z | T-400.3 | DONE | synthetic data: customer_profile (174,723), booking_class_map (388), ssr (4,360), delay_code_groups (162), aircraft_registry (120) + README with assumptions and rule defaults; bookings loaded 27,879,509 rows (4 malformed lines rejected) into scratch DuckDB | input/data/disruption-uc5/synthetic/
+2026-11-20T17:46Z | T-400 | WAITING | solution plan presented; build waits for user approval | -
