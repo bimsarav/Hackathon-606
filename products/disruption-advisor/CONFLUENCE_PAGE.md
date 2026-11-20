@@ -29,6 +29,7 @@ Today OCC, crew control and the PCU each work with different information. The go
 | Recovery options: absorb the delay or swap with a same-type aircraft, with delay, missed connections, EU261 estimate and cost; recommendation | Done |
 | Scenario B: cancellation with limited seats; passengers ranked by tier and weighted score; rebooking with an optimiser that keeps bookings together | Done |
 | What-if: adjustable priority weights | Done |
+| History data: G9 flights 1 Jan to 18 Nov 2026 with actual times, aircraft chains (actual order), delay codes, diversions and bookings (`history_flights.parquet`), for backtests and prediction | Done (data; not yet used in the UI) |
 | Synthetic passenger ID, passport and national ID per person (same person keeps them across bookings); API shows initials only, never full names | Done |
 | Plain-English explanations and passenger message drafts (Claude AI, with template fallback) | Done |
 | Approve or reject with an audit trail; demo roles OCC and PCU | Done |

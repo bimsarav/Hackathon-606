@@ -12,6 +12,7 @@ Outputs:
   customers.parquet       one row per passenger key: 12-month travel history (real) and loyalty tier (synthetic)
   pax_segments.parquet    active passenger-segments in the window with enrichment and SSRs
   mct.parquet             hub connection times
+  history_flights.parquet G9 flights 1 Jan 2026 to the window start with actual times, aircraft chain, bookings
   ingest_report.json      counts, mismatches and data-quality notes (shown in the UI)
 """
 
@@ -268,6 +269,52 @@ def build(data_dir: Path, window: Window = DEFAULT_WINDOW) -> dict[str, Any]:
         ORDER BY r.tail, r.std""",
     )
 
+    # History (G9, 1 Jan 2026 up to the window start): real flights with actual times, from the punctuality
+    # extract. Used to measure rules (turn times), replay real disruptions (backtest) and for prediction.
+    # Each aircraft's legs are ordered by actual departure: delays and tail swaps make scheduled times overlap.
+    counts["history_flights"] = out(
+        "history_flights",
+        f"""
+        WITH p AS (
+            SELECT airline, reg AS tail, sai AS flight_number, dep AS origin, arr AS destination,
+                   try_cast(std AS TIMESTAMP) AS std, try_cast(sta AS TIMESTAMP) AS sta,
+                   try_cast(atd AS TIMESTAMP) AS atd, try_cast(ata AS TIMESTAMP) AS ata,
+                   dep_dly, arr_dly, op_type,
+                   trim(regexp_replace(coalesce(dlycode, ''), '\\s+', ' ', 'g')) AS dep_delay_codes,
+                   trim(regexp_replace(coalesce(dcode, ''), '\\s+', ' ', 'g')) AS arr_delay_codes,
+                   try_cast(pax AS INTEGER) AS pax_reported, trim(diversion) = 'Yes' AS diverted
+            FROM '{raw}/punctuality.parquet'
+            WHERE airline = 'G9' AND try_cast(std AS TIMESTAMP) < {w_start}),
+        f AS (
+            SELECT flight_number || '_' || strftime(std, '%Y%m%d%H%M') AS flight_id, *, atd IS NOT NULL AS operated
+            FROM p
+            -- one row per flight: if a planned flight was replaced (e.g. new destination), keep the one that flew
+            QUALIFY row_number() OVER (PARTITION BY flight_number, std ORDER BY atd IS NOT NULL DESC, tail) = 1),
+        booked AS (
+            SELECT flight_number, dep_utc, count(*) FILTER (WHERE pax_type <> 'IN') AS booked_seats,
+                   count(*) AS booked_pax
+            FROM {bookings}
+            WHERE dep_year = 2026 AND dep_utc < {w_start} AND {active}
+            GROUP BY 1, 2),
+        chain AS (
+            SELECT flight_id,
+                   row_number() OVER w AS leg_no,
+                   lead(flight_id) OVER w AS next_flight_id,
+                   lead(origin) OVER w = destination AS next_from_same_station,
+                   date_diff('minute', ata, lead(atd) OVER w) AS actual_turn_minutes,
+                   date_diff('minute', sta, lead(std) OVER w) AS scheduled_turn_minutes
+            FROM f WHERE operated AND tail IS NOT NULL
+            WINDOW w AS (PARTITION BY tail ORDER BY atd))
+        SELECT f.*, ac.aircraft_model, coalesce(ac.seats, {DEFAULT_SEATS})::INTEGER AS capacity,
+               coalesce(b.booked_seats, 0) AS booked_seats, coalesce(b.booked_pax, 0) AS booked_pax,
+               c.leg_no, c.next_flight_id, c.next_from_same_station, c.actual_turn_minutes, c.scheduled_turn_minutes
+        FROM f
+        LEFT JOIN aircraft ac ON ac.registration = f.tail
+        LEFT JOIN booked b ON b.flight_number = f.flight_number AND b.dep_utc = f.std
+        LEFT JOIN chain c USING (flight_id)
+        ORDER BY f.tail, coalesce(f.atd, f.std)""",
+    )
+
     counts["mct"] = out(
         "mct",
         f"""
@@ -284,6 +331,19 @@ def build(data_dir: Path, window: Window = DEFAULT_WINDOW) -> dict[str, Any]:
         "overbooked_flights": c.execute("SELECT count(*) FROM flights WHERE available_seats < 0").fetchone()[0],  # type: ignore[index]
         "capacity_sources": dict(c.execute("SELECT capacity_source, count(*) FROM flights GROUP BY 1").fetchall()),
         "flights_without_sta": c.execute("SELECT count(*) FROM flights WHERE sta IS NULL").fetchone()[0],  # type: ignore[index]
+        "history": dict(
+            zip(
+                ["flights", "not_operated", "diverted", "with_bookings", "chain_same_station_share"],
+                c.execute(
+                    """SELECT count(*), count(*) FILTER (WHERE NOT operated), count(*) FILTER (WHERE diverted),
+                              count(*) FILTER (WHERE booked_pax > 0),
+                              round(avg(next_from_same_station::INTEGER) FILTER (WHERE next_flight_id IS NOT NULL), 4)
+                       FROM history_flights"""
+                ).fetchone()  # type: ignore[arg-type]
+                or (),
+                strict=False,
+            )
+        ),
     }
     report = {
         "window": {k: str(v) for k, v in vars(window).items()},
