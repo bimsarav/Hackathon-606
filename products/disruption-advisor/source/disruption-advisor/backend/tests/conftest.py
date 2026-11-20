@@ -1,16 +1,20 @@
-"""Test database: a throw-away PostgreSQL container (Testcontainers), migrated with Alembic exactly as in production."""
+"""Test database: a throw-away PostgreSQL container (Testcontainers), migrated with Alembic exactly as in production.
+Operating data: the hand-made Parquet network in tests/ops_fixture.py."""
 
 from collections.abc import Iterator
+from pathlib import Path
 
 import pytest
 from alembic import command
 from alembic.config import Config
 from fastapi.testclient import TestClient
+from pydantic import SecretStr
 from sqlalchemy import text
 from testcontainers.community.postgres import PostgresContainer
 
 from app.config import Settings
 from app.main import create_app
+from tests.ops_fixture import t, write_ops
 
 POSTGRES_IMAGE = "postgres:18.7-alpine"
 
@@ -24,12 +28,33 @@ def alembic_config() -> Iterator[Config]:
         yield config
 
 
+@pytest.fixture(scope="session")
+def data_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    path = tmp_path_factory.mktemp("data")
+    write_ops(path)
+    return path
+
+
 @pytest.fixture
-def client(alembic_config: Config) -> Iterator[TestClient]:
+def client(alembic_config: Config, data_dir: Path) -> Iterator[TestClient]:
     url = alembic_config.get_main_option("sqlalchemy.url")
     assert url
-    app = create_app(Settings(database_url=url, log_json=False))
+    settings = Settings(
+        database_url=url,
+        log_json=False,
+        data_dir=data_dir,
+        now_utc=t(0),
+        demo_users=SecretStr("occ:occ-pass:OCC,pcu:pcu-pass:PCU"),
+        token_secret=SecretStr("test-secret-0123456789"),
+    )
+    app = create_app(settings)
     with TestClient(app) as test_client:
         yield test_client
     with app.state.engine.begin() as connection:
-        connection.execute(text("TRUNCATE notes RESTART IDENTITY"))
+        connection.execute(text("TRUNCATE scenarios, decisions RESTART IDENTITY CASCADE"))
+
+
+@pytest.fixture
+def auth(client: TestClient) -> dict[str, str]:
+    token = client.post("/api/v1/auth/login", json={"username": "pcu", "password": "pcu-pass"}).json()["token"]
+    return {"Authorization": f"Bearer {token}"}

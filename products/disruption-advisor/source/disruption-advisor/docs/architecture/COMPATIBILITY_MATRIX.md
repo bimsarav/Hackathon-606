@@ -1,6 +1,6 @@
 # Disruption Advisor Compatibility Matrix
 
-From stack profile `python-fastapi` (toolkit). Every version below was resolved from official registries (PyPI, npm, Docker Hub) and proven together by `scripts/verify-profile.sh python-fastapi`: quality gate, Compose smoke test and Trivy. Support dates are from endoflife.date and the projects' own policies. Keep this file in step with `backend/pyproject.toml`, `backend/uv.lock`, `frontend/package.json`, `frontend/package-lock.json`, the Dockerfiles and `compose.yml` (MASTER_PROMPT §9.21).
+From the organisation's stack profile `python-fastapi`. Every version below was resolved from official registries (PyPI, npm, Docker Hub) and proven together by `scripts/verify-profile.sh python-fastapi`: quality gate, Compose smoke test and Trivy. Support dates are from endoflife.date and the projects' own policies. Keep this file in step with `backend/pyproject.toml`, `backend/uv.lock`, `frontend/package.json`, `frontend/package-lock.json`, the Dockerfiles and `compose.yml` (engineering standards §9.21).
 
 | Technology | Selected version | Runtime it needs | Dependency compatibility | Database compatibility | Build / deploy requirements | Support lifecycle | Known limitations |
 |---|---|---|---|---|---|---|---|
@@ -23,5 +23,11 @@ From stack profile `python-fastapi` (toolkit). Every version below was resolved 
 | pytest / pytest-cov / httpx2 | 9.2.0 / 7.1.0 / 2.16.2 | Python 3.10+ | Starlette 1.x TestClient needs httpx2 (httpx is deprecated there) | — | Run in Docker | Active | — |
 | Testcontainers (Python) | 4.15.0 | Docker socket | `testcontainers.community.postgres` | `postgres:18.7-alpine` | Docker 20.10+ host | Active | Needs Docker in CI |
 | Ruff / mypy | 0.17.6 / 2.4.1 | — | `known-third-party = ["alembic"]` (local `alembic/` folder) | — | Ruff pinned exactly | Active | — |
+| DuckDB (Python) | 2.0.1 | Python 3.11+ (cp314 wheel) | pyarrow 26 (Parquet) | Reads Parquet; independent of PostgreSQL | In the API and ingest images | Active (2.x) | Released 2026-11-20 (patch of 2.0); pinned `>=2.0.1,<2.1` |
+| pyarrow | 26.0.1 | Python 3.11+ | DuckDB 2.0, Parquet zstd | — | API image | Active | No type stubs (mypy override) |
+| python-calamine | 0.9.1 | Python 3.11+ | Reads .xls (BIFF) and .xlsx | — | API image | Active | — |
+| OR-Tools (CP-SAT) | 9.15.6755 | Python 3.9+ (cp314 manylinux wheel) | — | — | API image | Active | Wheel is large (part of the 1 GB API image) |
+| Anthropic Python SDK | 2.12.0 | Python 3.10+ | httpx2 (SDK 1.x+) | — | API image; `ANTHROPIC_API_KEY` secret | Active | Model `claude-opus-5-5`; beta `server-side-fallback-2026-07-01` |
+| Playwright | 1.65.1 (`mcr.microsoft.com/playwright:v1.65.1`) | Node (in image) | Chromium bundled | — | `scripts/e2e.sh`, Docker | Active | Test-only |
 | Trivy | 0.76.2 (`aquasec/trivy`), trivy-action v0.36.0 in CI | — | — | — | CI and `scripts/verify-profile.sh` | Active | — |
 | Docker / Compose | Engine 20.10+, Compose v2.21+ | — | — | — | `depends_on: service_completed_successfully` / `service_healthy` | — | — |

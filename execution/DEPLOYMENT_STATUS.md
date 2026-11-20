@@ -1,4 +1,27 @@
-# Deployment Status — esm-hub (MASTER_PROMPT §13.12)
+# Deployment Status — disruption-advisor (MASTER_PROMPT §13.12, §14; phase gates per D-018)
+Overall: **PHASE 1 (MVP) DEPLOYED (verified incl. reboot test)** · Updated: 2026-11-20T19:58Z · Phase 2 NOT started (user: do not proceed) · URL: http://92.5.154.198:8888
+Target: OCI VM 92.5.154.198 (same host as the esm-hub discovery below), port 8888, code ~/apps/disruption-advisor, extracts ~/disruption-advisor-input (700 + ACL for container uid 999), secrets ~/apps/disruption-advisor/.env (600). Demo logins: workspace input/secrets/disruption-advisor-demo-logins.txt (git-ignored).
+
+| Phase | Status | Approval |
+|---|---|---|
+| 0 Design | DONE (artifact https://claude.ai/artifact/PTzSvCcSHABHNz7HYhxG2s) | user 2026-11-20 |
+| 1 MVP | DEPLOYED (verified) | user 2026-11-20 ("define MVP … host it") |
+| 2 Predict + HTTPS | NOT STARTED | needs approval |
+| 3 Agent + what-if | NOT STARTED | needs approval |
+| 4 Extend | NOT STARTED | needs approval |
+
+| Area | Status | Evidence |
+|---|---|---|
+| Build (local) | DONE | check.sh PASS; Playwright 3/3 local; Trivy clean (SDK docstring false positive) — R/docs/testing/test-report.md |
+| Images on server | DONE | built on server (api 1 GB, web 102 MB) — output/T-400.10-server-build.log |
+| Data upload | DONE | 6 extracts, sha256 verified |
+| Ingest on server | DONE | 15 min first run, same counts as local (27,879,509 bookings; 4,646 flights; 299,419 pax segments); fixed: input folder permission (ACL uid 999) |
+| Packaging check | DONE | clean copy (git-ignore rules): no-cache build OK, README start-up OK on :18888, smoke 11/11, check.sh PASS (22+5), Trivy secret scan 0, no workspace references; temp stack removed |
+| Health / smoke / E2E on server | DONE | api+web healthy; smoke 11/11 (output/T-400.10-smoke-server.log); Playwright 3/3 against http://92.5.154.198:8888 (output/T-400.10-e2e-server.log) |
+| Reboot test (§14.5) | PASSED 2026-11-20 (user-authorised) | reboot 19:55:41Z, SSH back ~50 s, docker active, db/api/web healthy 30 s after boot unattended; 4 scenarios + 2 decisions intact; smoke 11/11 + Playwright 3/3 post-reboot (output/T-400.10-reboot-test.log, -smoke-post-reboot.log, -e2e-post-reboot.log) |
+
+---
+# (archived) esm-hub record
 Overall: **NOT DEPLOYED — product closed by user decision 2026-11-20 (D-013)**. Discovery and dry run done; no deployment, no cloud verification, no application URL
 Updated: 2026-11-20T11:40Z
 

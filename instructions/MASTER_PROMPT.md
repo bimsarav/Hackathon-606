@@ -27,6 +27,7 @@
    - 9.22 Data Engineering Technology Stack & Engineering Standards (9.22.1 Objective · 9.22.2 Ecosystem · 9.22.3 Architecture selection · 9.22.4 Selection checkpoint · 9.22.5 Implementation requirements · 9.22.6 Project structure · 9.22.7 Testing · 9.22.8 Documentation · 9.22.9 Integration)
    - 9.23 Specialised Data Engineering & Machine Learning Workflow: database dump → data preparation → classification → recommendation (9.23.1 Applicability · 9.23.2 Technology selection · 9.23.3 Dump restoration and extraction · 9.23.4 Cleaning · 9.23.5 EDA · 9.23.6 Features and leakage · 9.23.7 Classification · 9.23.8 Recommendation · 9.23.9 Experiment tracking · 9.23.10 Serving · 9.23.11 Structure · 9.23.12 Documents · 9.23.13 Quality gates · 9.23.14 Precedence · 9.23.15 Completion)
    - 9.24 Product and AI Agent Technology Stacks (revision 2026-11-20: 9.24.1 Two stacks · 9.24.2 Product catalogue · 9.24.3 AI Agent stack · 9.24.4 Numbered selection (product stack only) · 9.24.5 Principles · 9.24.6 Versions · 9.24.7 Engineering practices · 9.24.8 Documentation and agent records · 9.24.9 Integration)
+   - 9.25 Data Storage and Processing: Parquet (user 2026-11-20: CSV/JSON → Parquet first, column/filter pushdown, DuckDB/Polars, explicit types, snappy/zstd, partitioning, 100 MB–1 GB files)
 10. [Communication and Reporting](#10-communication-and-reporting)
 11. [Operating Commands](#11-operating-commands)
 12. [Final Responsibility](#12-final-responsibility)
@@ -3524,6 +3525,29 @@ Apply only the technologies and engineering processes relevant to the actual pro
 The Agent must maintain a clear distinction between the technologies used to build the product and the technologies used to build and operate the Agent itself.
 
 A project is not complete simply because its code has been generated. It must pass the existing build, testing, security, deployment, operational verification and completion gates.
+
+### 9.25 Data Storage and Processing: Parquet
+
+> User instruction 2026-11-20 ("Adding parquet to your abilities"), saved verbatim (heading renumbered). It applies to every product and to the agent's own data work, and complements §9.22 (data engineering) and §9.23 (dump workflow). Where an operational store is needed for transactions (e.g. PostgreSQL for user-created records), that store stays; Parquet is the storage and processing format for tabular datasets.
+
+When working with tabular data (anything larger than a few thousand rows, or any dataset that will be read more than once), store and process it as Apache Parquet rather than CSV or JSON.
+
+Reading data:
+- Read only the columns you need (e.g. `pd.read_parquet(path, columns=[...])` or `SELECT col_a, col_b` in DuckDB). Never load all columns by default.
+- Push filters down to the read step instead of filtering after loading (e.g. `filters=[("year", "=", 2025)]` in pyarrow/pandas, or a `WHERE` clause in DuckDB).
+- For large files or folders of Parquet files, prefer DuckDB or Polars over pandas, and query the files directly without loading everything into memory.
+
+Writing data:
+- Convert incoming CSV/JSON to Parquet as the first step, then do all further work on the Parquet version.
+- Set explicit data types before writing (dates as datetime, IDs as strings if they have leading zeros, categories as category/dictionary types).
+- Use snappy compression by default; use zstd when file size matters more than write speed.
+- For large datasets, partition by a column that queries commonly filter on (e.g. `partition_cols=["year", "month"]`). Avoid partitioning on high-cardinality columns like user IDs, which creates thousands of tiny files.
+- Aim for files of roughly 100 MB–1 GB; avoid producing many small files.
+
+Constraints:
+- Parquet files are immutable. To update records, rewrite the affected file or partition rather than trying to edit rows in place.
+- When showing data to the user, convert a small sample to a readable table; never print raw Parquet bytes.
+- If a required library (pyarrow, duckdb, polars) is missing, install it before proceeding and tell the user.
 
 ## 10. COMMUNICATION AND REPORTING
 

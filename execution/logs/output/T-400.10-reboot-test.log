@@ -1,0 +1,29 @@
+pre-reboot state 2026-11-20T19:29:59Z, booted since 2026-11-20 08:15:58
+api Up About a minute (healthy)
+db Up 16 minutes (healthy)
+web Up About a minute (healthy)
+docker at boot: enabled
+scenarios: 3
+decisions: 2
+reboot issued 2026-11-20T19:55:41Z (user-authorised: resume 1-6)
+post-reboot 2026-11-20T19:56:55Z, booted since 2026-11-20 19:56:10
+docker: active
+api running Up 30 seconds (healthy)
+db running Up 30 seconds (healthy)
+ingest exited Exited (0) 27 minutes ago
+migrate exited Exited (0) 27 minutes ago
+web running Up 30 seconds (healthy)
+scenarios after reboot: 4
+decisions after reboot: 2
+smoke PASS count: 11
+  ✓  1 [chromium] › tests/advisor.spec.ts:14:1 › wrong password is rejected and the API needs a token (1.3s)
+  ✓  2 [chromium] › tests/advisor.spec.ts:23:1 › scenario A: a delay is assessed, options compared, recommendation approved (7.1s)
+  ✓  3 [chromium] › tests/advisor.spec.ts:36:1 › scenario B: a cancellation ranks passengers by tier and re-runs with new weights (7.9s)
+  3 passed (16.8s)
+CANCEL|occ|19:29:17
+DELAY|pcu|19:29:33
+CANCEL|pcu|19:29:39
+DELAY|occ|19:33:26
+CANCEL|occ|19:57:16
+DELAY|pcu|19:57:26
+CANCEL|pcu|19:57:33

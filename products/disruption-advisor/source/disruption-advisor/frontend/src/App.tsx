@@ -1,38 +1,48 @@
-import { type FormEvent, useEffect, useState } from "react";
-import { ApiError, createNote, listNotes, type Note } from "./api";
+import { type FormEvent, useCallback, useEffect, useState } from "react";
+import { api, errorText, type Meta, type Scenario, type ScenarioSummary, type Session, setToken } from "./api";
+import { CancelView } from "./CancelView";
+import { DelayView } from "./DelayView";
+import { Launcher } from "./Launcher";
+import { utc } from "./format";
 
-type LoadState = { kind: "loading" } | { kind: "error"; message: string } | { kind: "ready"; notes: Note[] };
+const STORAGE_KEY = "disruption-advisor-session";
 
-/** Example screen with loading, empty, error and success states. Replace with the product's own UI. */
+function loadSession(): Session | null {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const session = JSON.parse(raw) as Session;
+    return new Date(session.expires_at) > new Date() ? session : null;
+  } catch {
+    return null;
+  }
+}
+
 export function App() {
-  const [state, setState] = useState<LoadState>({ kind: "loading" });
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [formError, setFormError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [session, setSession] = useState<Session | null>(() => {
+    const s = loadSession();
+    setToken(s?.token ?? null);
+    return s;
+  });
 
-  useEffect(() => {
-    listNotes()
-      .then((page) => setState({ kind: "ready", notes: page.items }))
-      .catch((error: unknown) =>
-        setState({ kind: "error", message: error instanceof Error ? error.message : "Could not load notes" }),
-      );
-  }, []);
-
-  async function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSaving(true);
-    setFormError(null);
+  function signIn(s: Session) {
+    setToken(s.token);
     try {
-      const note = await createNote(title, body);
-      setState((current) => (current.kind === "ready" ? { kind: "ready", notes: [note, ...current.notes] } : current));
-      setTitle("");
-      setBody("");
-    } catch (error: unknown) {
-      setFormError(error instanceof ApiError ? (error.problem.errors?.[0]?.msg ?? error.message) : "Could not save");
-    } finally {
-      setSaving(false);
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+    } catch {
+      /* storage unavailable: session lasts for this page only */
     }
+    setSession(s);
+  }
+
+  function signOut() {
+    setToken(null);
+    try {
+      sessionStorage.removeItem(STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+    setSession(null);
   }
 
   return (
@@ -40,46 +50,187 @@ export function App() {
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <header className="site-header">
-        <span className="brand">Disruption Advisor</span>
-        <a href="/api/docs">API documentation</a>
-      </header>
-      <main id="main">
-        <h1>Notes</h1>
-        <form onSubmit={onSubmit} aria-describedby={formError ? "form-error" : undefined}>
-          <label htmlFor="title">Title</label>
-          <input id="title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={200} required />
-          <label htmlFor="body">Body</label>
-          <textarea id="body" value={body} onChange={(e) => setBody(e.target.value)} rows={3} />
-          {formError && (
-            <p id="form-error" className="error" role="alert">
-              {formError}
+      {session ? <Console session={session} onSignOut={signOut} /> : <Login onSignIn={signIn} />}
+    </>
+  );
+}
+
+function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      onSignIn(await api.login(username, password));
+    } catch (e: unknown) {
+      setError(errorText(e, "Sign-in failed. Check your connection and try again."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <main id="main" className="login">
+      <div className="login-card">
+        <p className="eyebrow">Operations Control · Passenger Control Unit</p>
+        <h1>Disruption Advisor</h1>
+        <p className="muted">Assess a disruption, compare recovery options and protect passengers before the impact spreads.</p>
+        <form onSubmit={onSubmit} aria-describedby={error ? "login-error" : undefined}>
+          <label htmlFor="username">User name</label>
+          <input id="username" autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} required />
+          <label htmlFor="password">Password</label>
+          <input id="password" type="password" autoComplete="current-password" value={password}
+            onChange={(e) => setPassword(e.target.value)} required />
+          {error && (
+            <p id="login-error" className="error" role="alert">
+              {error}
             </p>
           )}
-          <button type="submit" disabled={saving}>
-            {saving ? "Saving…" : "Add note"}
+          <button type="submit" className="primary" disabled={busy}>
+            {busy ? "Signing in…" : "Sign in"}
           </button>
         </form>
-        <section aria-live="polite" aria-busy={state.kind === "loading"}>
-          {state.kind === "loading" && <p>Loading notes…</p>}
-          {state.kind === "error" && (
+      </div>
+    </main>
+  );
+}
+
+type Load = { kind: "idle" } | { kind: "busy"; label: string } | { kind: "error"; message: string };
+
+function Console({ session, onSignOut }: { session: Session; onSignOut: () => void }) {
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [metaError, setMetaError] = useState<string | null>(null);
+  const [scenario, setScenario] = useState<Scenario | null>(null);
+  const [history, setHistory] = useState<ScenarioSummary[]>([]);
+  const [load, setLoad] = useState<Load>({ kind: "idle" });
+
+  const refreshHistory = useCallback(() => {
+    api.scenarios().then(setHistory).catch(() => setHistory([]));
+  }, []);
+
+  useEffect(() => {
+    api
+      .meta()
+      .then(setMeta)
+      .catch((e: unknown) => {
+        if (e instanceof Error && "problem" in e && (e as { problem: { status: number } }).problem.status === 401) {
+          onSignOut();
+          return;
+        }
+        setMetaError(errorText(e, "Could not load the operating data."));
+      });
+    refreshHistory();
+  }, [onSignOut, refreshHistory]);
+
+  async function run(label: string, action: () => Promise<Scenario>) {
+    setLoad({ kind: "busy", label });
+    try {
+      const s = await action();
+      setScenario(s);
+      setLoad({ kind: "idle" });
+      refreshHistory();
+    } catch (e: unknown) {
+      setLoad({ kind: "error", message: errorText(e, "The analysis failed. Try again.") });
+    }
+  }
+
+  return (
+    <>
+      <header className="site-header">
+        <span className="brand">Disruption Advisor</span>
+        {meta && (
+          <span className="header-meta">
+            <span className="chip">Ops clock {utc(meta.now_utc)}</span>
+            <span className={`chip ${meta.ai_enabled ? "chip-ok" : "chip-warn"}`}>
+              {meta.ai_enabled ? `AI explanations: ${meta.ai_model}` : "AI off: template explanations"}
+            </span>
+            <span className="chip chip-synthetic" title="Loyalty tier, fare family and most special-service codes are synthetic">
+              Synthetic fields labelled
+            </span>
+          </span>
+        )}
+        <span className="header-user">
+          {session.username} · <strong>{session.role}</strong>
+          <button type="button" className="link" onClick={onSignOut}>
+            Sign out
+          </button>
+        </span>
+      </header>
+      <div className="layout">
+        <aside aria-label="Start a scenario">
+          {metaError && (
             <p className="error" role="alert">
-              {state.message}
+              {metaError}
             </p>
           )}
-          {state.kind === "ready" && state.notes.length === 0 && <p>No notes yet.</p>}
-          {state.kind === "ready" && state.notes.length > 0 && (
-            <ul className="notes">
-              {state.notes.map((note) => (
-                <li key={note.id}>
-                  <strong>{note.title}</strong> {note.body && <span>{note.body}</span>}
-                  <time dateTime={note.created_at}>{new Date(note.created_at).toLocaleString()}</time>
-                </li>
-              ))}
-            </ul>
+          {meta && (
+            <Launcher
+              meta={meta}
+              busy={load.kind === "busy"}
+              onDelay={(flightId, delay) =>
+                run(`Analysing a ${delay}-minute delay…`, () =>
+                  api.createScenario({ kind: "DELAY", flight_id: flightId, delay_minutes: delay, weights: meta.default_weights }),
+                )
+              }
+              onCancel={(flightId) =>
+                run("Ranking passengers and rebooking…", () =>
+                  api.createScenario({ kind: "CANCEL", flight_id: flightId, weights: meta.default_weights }),
+                )
+              }
+            />
           )}
-        </section>
-      </main>
+          <section className="history" aria-labelledby="history-title">
+            <h2 id="history-title">Recent scenarios</h2>
+            {history.length === 0 ? (
+              <p className="muted">None yet.</p>
+            ) : (
+              <ul>
+                {history.map((h) => (
+                  <li key={h.id}>
+                    <button type="button" className="link" onClick={() => run("Opening scenario…", () => api.scenario(h.id))}>
+                      {h.kind === "DELAY" ? `Delay +${h.delay_minutes} min` : "Cancellation"} · {h.flight_id.split("_")[0]}
+                    </button>
+                    <span className="muted small">
+                      {" "}
+                      {h.created_by}, {utc(h.created_at)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </aside>
+        <main id="main" aria-live="polite" aria-busy={load.kind === "busy"}>
+          {load.kind === "busy" && <p className="status">{load.label}</p>}
+          {load.kind === "error" && (
+            <p className="error" role="alert">
+              {load.message}
+            </p>
+          )}
+          {!scenario && load.kind !== "busy" && (
+            <section className="empty">
+              <h1>Start with a disruption</h1>
+              <p>
+                Pick a suggested flight on the left, or search for any flight. <strong>Delay</strong> shows the knock-on
+                effect along the aircraft rotation and compares recovery options. <strong>Cancellation</strong> ranks the
+                affected passengers and rebooks them within the seats that are actually available.
+              </p>
+              <p className="muted">Every recommendation needs a person to approve it. Nothing is changed in airline systems.</p>
+            </section>
+          )}
+          {scenario && meta && scenario.result.type === "DELAY" && (
+            <DelayView scenario={scenario} result={scenario.result} meta={meta} onUpdate={setScenario} />
+          )}
+          {scenario && meta && scenario.result.type === "CANCEL" && (
+            <CancelView scenario={scenario} result={scenario.result} meta={meta} onUpdate={setScenario} />
+          )}
+        </main>
+      </div>
     </>
   );
 }

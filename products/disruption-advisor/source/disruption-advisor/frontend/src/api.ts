@@ -1,17 +1,4 @@
-// API client. Types mirror the backend schemas (app/schemas.py); the contract is published at /api/openapi.json.
-
-export interface Note {
-  id: number;
-  title: string;
-  body: string;
-  created_at: string;
-}
-
-export interface NotePage {
-  items: Note[];
-  limit: number;
-  offset: number;
-}
+// API client. Types mirror the backend (app/schemas.py, app/engine/scenarios.py); contract at /api/openapi.json.
 
 /** RFC 9457 problem details, as returned by the backend for every error. */
 export interface Problem {
@@ -30,10 +17,219 @@ export class ApiError extends Error {
   }
 }
 
+export type Role = "OCC" | "PCU";
+export interface Session {
+  token: string;
+  username: string;
+  role: Role;
+  expires_at: string;
+}
+
+export type WeightKey = "loyalty" | "frequency" | "fare_value" | "ancillaries" | "journey" | "booking";
+export type Weights = Record<WeightKey, number>;
+export const WEIGHT_KEYS: WeightKey[] = ["loyalty", "frequency", "fare_value", "ancillaries", "journey", "booking"];
+
+export interface Meta {
+  user: { username: string; role: Role };
+  now_utc: string;
+  horizon_days: number;
+  ai_enabled: boolean;
+  ai_model: string;
+  default_weights: Weights;
+  weight_labels: Record<WeightKey, string>;
+  ingest: { counts?: Record<string, number>; quality?: Record<string, unknown>; window?: Record<string, string> };
+}
+
+export interface FlightRow {
+  flight_id: string;
+  flight_number: string;
+  airline: string;
+  tail: string;
+  origin: string;
+  destination: string;
+  std: string;
+  sta: string;
+  capacity: number;
+  booked_seats: number;
+  booked_pax: number;
+  aircraft_model: string;
+  capacity_source: string;
+}
+
+export interface DelayPreset {
+  flight_id: string;
+  flight_number: string;
+  origin: string;
+  destination: string;
+  std: string;
+  tail: string;
+  is_demo: boolean;
+  turn_minutes: number;
+  connecting_pax: number;
+}
+
+export interface CancelPreset {
+  flight_id: string;
+  flight_number: string;
+  origin: string;
+  destination: string;
+  std: string;
+  tail: string;
+  booked_seats: number;
+  free_seats: number;
+  care_pax: number;
+}
+
+export interface OptionLeg {
+  flight_id: string;
+  flight_number: string;
+  origin: string;
+  destination: string;
+  std: string;
+  new_std: string;
+  new_sta: string;
+  delay_minutes: number;
+  operated_by: string;
+  scheduled_tail: string;
+  booked_pax: number;
+}
+
+export interface RecoveryOption {
+  key: string;
+  label: string;
+  total_delay_minutes: number;
+  legs_delayed: number;
+  delayed_passengers: number;
+  misconnects: number;
+  connections_checked: number;
+  eu261_compensation_eur: number;
+  cost_aed: number;
+  cost_breakdown: Record<string, number>;
+  legs: OptionLeg[];
+}
+
+export interface PassengerRow {
+  rank: number;
+  pnr: string;
+  customer_key: string;
+  name: string;
+  pax_type: string;
+  route: string;
+  flight_id: string;
+  tier: number;
+  tier_reason: string;
+  score: number;
+  contributions: Record<WeightKey, number>;
+  non_revenue: boolean;
+  reason: string;
+  loyalty_tier: string | null;
+  frequency: string | null;
+  fare: number;
+  fare_family: string | null;
+  ancillaries: number;
+  ssr: string | null;
+  ssr_source: string | null;
+  pnr_size: number;
+  infants: number;
+  children: number;
+  assigned_flight: string | null;
+  assigned_flight_id: string | null;
+  new_departure: string | null;
+  arrival_delay_minutes: number | null;
+  onward_ok: boolean | null;
+  split: boolean;
+  assignment_reason: string;
+  message: string;
+}
+
+export interface Alternative {
+  flight_id: string;
+  flight_number: string;
+  std: string;
+  sta: string;
+  available_seats: number;
+  capacity_source: string;
+  assigned: number;
+}
+
+export interface Rebooking {
+  alternatives: Alternative[];
+  protected: number;
+  unprotected: number;
+  groups_split: number;
+}
+
+interface ResultBase {
+  flight: FlightRow;
+  explanation: { text: string; source: string };
+  passengers: PassengerRow[];
+  rebooking: Rebooking | null;
+  tier_counts?: Record<string, number>;
+  assumptions: string[];
+}
+
+export interface DelayResult extends ResultBase {
+  type: "DELAY";
+  delay_minutes: number;
+  options: RecoveryOption[];
+  recommended_key: string;
+  misconnections: { pnr: string; customer_key: string; outbound_flight_number: string; final_destination: string;
+    planned_minutes: number; new_minutes: number | null; mct_minutes: number }[];
+}
+
+export interface CancelResult extends ResultBase {
+  type: "CANCEL";
+  cost_aed: Record<string, number>;
+  cost_total_aed: number;
+  eu261_per_passenger_eur: number;
+  onward_connections: number;
+  solver_status: string;
+  aircraft_follow_on: FlightRow | null;
+}
+
+export interface Scenario {
+  id: string;
+  kind: "DELAY" | "CANCEL";
+  flight_id: string;
+  delay_minutes: number | null;
+  weights: Weights;
+  result: DelayResult | CancelResult;
+  created_by: string;
+  created_at: string;
+}
+
+export interface ScenarioSummary {
+  id: string;
+  kind: "DELAY" | "CANCEL";
+  flight_id: string;
+  delay_minutes: number | null;
+  created_by: string;
+  created_at: string;
+}
+
+export interface Decision {
+  id: number;
+  target: string;
+  action: "APPROVE" | "REJECT";
+  comment: string;
+  decided_by: string;
+  decided_at: string;
+}
+
+let token: string | null = null;
+export const setToken = (value: string | null): void => {
+  token = value;
+};
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
     ...init,
-    headers: { Accept: "application/json", "Content-Type": "application/json", ...init?.headers },
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...init?.headers,
+    },
   });
   if (!response.ok) {
     const problem = (await response.json().catch(() => null)) as Problem | null;
@@ -42,7 +238,26 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return (await response.json()) as T;
 }
 
-export const listNotes = (): Promise<NotePage> => request<NotePage>("/api/v1/notes");
+const post = <T>(path: string, body: unknown): Promise<T> =>
+  request<T>(path, { method: "POST", body: JSON.stringify(body) });
 
-export const createNote = (title: string, body: string): Promise<Note> =>
-  request<Note>("/api/v1/notes", { method: "POST", body: JSON.stringify({ title, body }) });
+export const api = {
+  login: (username: string, password: string) => post<Session>("/api/v1/auth/login", { username, password }),
+  meta: () => request<Meta>("/api/v1/meta"),
+  presets: () => request<{ delay: DelayPreset[]; cancel: CancelPreset[] }>("/api/v1/presets"),
+  flights: (q: string, day?: string) =>
+    request<FlightRow[]>(`/api/v1/flights?q=${encodeURIComponent(q)}${day ? `&day=${day}` : ""}&limit=30`),
+  createScenario: (body: { kind: "DELAY" | "CANCEL"; flight_id: string; delay_minutes?: number; weights: Weights }) =>
+    post<Scenario>("/api/v1/scenarios", body),
+  scenarios: () => request<ScenarioSummary[]>("/api/v1/scenarios"),
+  scenario: (id: string) => request<Scenario>(`/api/v1/scenarios/${id}`),
+  reprioritise: (id: string, weights: Weights) => post<Scenario>(`/api/v1/scenarios/${id}/reprioritise`, { weights }),
+  decisions: (id: string) => request<Decision[]>(`/api/v1/scenarios/${id}/decisions`),
+  decide: (id: string, target: string, action: "APPROVE" | "REJECT", comment = "") =>
+    post<Decision>(`/api/v1/scenarios/${id}/decisions`, { target, action, comment }),
+  message: (id: string, customerKey: string) =>
+    post<{ text: string; source: string }>(`/api/v1/scenarios/${id}/messages`, { customer_key: customerKey }),
+};
+
+export const errorText = (error: unknown, fallback: string): string =>
+  error instanceof ApiError ? (error.problem.errors?.[0]?.msg ?? error.message) : fallback;

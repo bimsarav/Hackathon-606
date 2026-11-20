@@ -1,0 +1,19 @@
+ Container disruption-advisor-web-1 not started: condition "service_completed_successfully" of service "ingest" not met 
+ Container disruption-advisor-api-1 not started: condition "service_completed_successfully" of service "ingest" not met 
+service "ingest" didn't complete successfully: exit 1
+api created Created
+db running Up 7 seconds (healthy)
+ingest exited Exited (1) Less than a second ago
+migrate exited Exited (0) Less than a second ago
+web created Created
+ Container disruption-advisor-web-1 Starting 
+ Container disruption-advisor-web-1 Started 
+api running Up 6 seconds (healthy)
+db running Up 15 minutes (healthy)
+ingest exited Exited (0) 6 seconds ago
+migrate exited Exited (0) 14 minutes ago
+web running Up Less than a second (health: starting)
+ingest-1  | 2026-11-20 19:13:56,603 INFO stage 1: converting extracts to Parquet
+ingest-1  | 2026-11-20 19:28:37,273 INFO stage 1 done: {"rotation": 4646, "punctuality": 65943, "mct": 39, "inventory": 368873, "inventory_rejected": 1, "schedule": 6143, "schedule_rejected": 0, "bookings": {"loaded": 27879509, "rejected": 2}}
+ingest-1  | 2026-11-20 19:28:37,357 INFO stage 2: building the operating picture
+ingest-1  | 2026-11-20 19:28:44,691 INFO stage 2 done: {"airports": 142, "aircraft": 110, "booking_classes": 388, "customers": 174723, "pax_segments": 299419, "flights": 4646, "mct": 39}

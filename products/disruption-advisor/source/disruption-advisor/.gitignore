@@ -9,3 +9,5 @@ dist/
 coverage/
 .env
 logs/
+test-results/
+playwright-report/

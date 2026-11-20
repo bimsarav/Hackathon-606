@@ -1,49 +1,80 @@
 # Disruption Advisor
 
-TODO-PRODUCT: one paragraph on what Disruption Advisor does.
+Disruption Advisor helps an airline's Operations Control Centre (OCC) and Passenger Control Unit (PCU) handle a flight disruption before it cascades.
+- **Scenario A, delay:** for a delayed flight it shows every later flight on the same aircraft rotation and every passenger connection that breaks over the next 7 days. It compares recovery options (absorb the delay, or swap in a same-type aircraft) on delay, missed connections and cost, and recommends one.
+- **Scenario B, cancellation:** for a cancelled flight it ranks the affected passengers. Strict tiers come first (mandated care, then urgency); configurable weights order passengers inside a tier (loyalty, travel frequency, fare, ancillaries, journey, family/group). It then assigns passengers to alternative flights within the seats actually available, keeping bookings together.
+- **Explanations:** every recommendation is explained in plain English, written by Claude when an API key is configured, otherwise by templates, and passenger messages are drafted.
+- **Human approval:** the tool **only recommends**. A person approves or rejects every action, and each decision is audited.
 
-Stack: Python 3.14 · FastAPI · SQLAlchemy 2 · Alembic · PostgreSQL 18 · React 19 + TypeScript + Vite · nginx · Docker. Details and versions: [docs/architecture/](docs/architecture/).
+Stack: Python 3.14 · FastAPI · DuckDB over Parquet · Google OR-Tools (CP-SAT) · Anthropic Claude API · SQLAlchemy 2 · Alembic · PostgreSQL 18 · React 19 + TypeScript + Vite · nginx · Docker Compose · Playwright.
+Details: [docs/architecture/SYSTEM_ARCHITECTURE.md](docs/architecture/SYSTEM_ARCHITECTURE.md) (diagrams) · [docs/delivery/MVP_AND_INCREMENTAL_PLAN.md](docs/delivery/MVP_AND_INCREMENTAL_PLAN.md) · [docs/deployment/DEPLOYMENT_GUIDE.md](docs/deployment/DEPLOYMENT_GUIDE.md).
 
 ## Prerequisites
-Docker Engine 20.10+ with Compose v2.21+. Nothing else: Python, uv, Node and all tools run inside containers.
+- Docker Engine 20.10+ with Compose v2.21+. Python, uv, Node and every other tool runs inside containers.
+- The airline extracts in one folder:
+  - `Flight Rotation.xls`
+  - `Flight Inventory.csv`
+  - `Flight Schedule.csv`
+  - `Connection Time.xlsx`
+  - `Flight_Punctuality_Jan-Nov_2026_Combined.xlsx`
+  - `Past & Future Booking Data.zip`
 
-## Run locally
+  They are mounted read-only and never committed.
+
+## Run
 ```bash
-cp .env.example .env                 # adjust values; never commit .env
-docker compose up --build            # http://localhost:8080  (API docs: http://localhost:8080/api/docs)
+cp .env.example .env      # set INPUT_DIR, passwords, DEMO_USERS, TOKEN_SECRET (and optionally ANTHROPIC_API_KEY)
+chmod 600 .env
+docker compose up -d --build
 ```
+Then open `http://localhost:${WEB_PORT}`. The API docs are at `/api/docs`.
 
-## Quality gate and tests
+Start-up runs in this order:
+1. `db`
+2. `migrate` (Alembic)
+3. `ingest`: converts the extracts to typed Parquet. It takes about 4 minutes the first time, and skips the work when the inputs are unchanged.
+4. `api`
+5. `web`
+
+Every long-running service restarts by itself, including after a server reboot.
+
+## How the data is used
+- **Stage 1 (`app/ingest/convert.py`):** converts every extract to typed Parquet (bookings: 27.9M rows, partitioned by year, zstd). Malformed rows are counted and skipped.
+- **Stage 2 (`app/ingest/build.py`):** builds the operating picture for 19–30 Nov 2026:
+  - flights with tail, times and capacity;
+  - passenger segments;
+  - customer profiles.
+
+  Capacity comes from the inventory allocation (curtail/oversell) where available, otherwise from the aircraft layout inferred from the data.
+- **Synthetic fields:** the extracts have no loyalty tier, fare family or special-service codes, so these are synthetic, deterministic and labelled in the UI. The data quality report is in `<data>/ops/ingest_report.json`.
+
+## Tests
 ```bash
-scripts/check.sh            # backend: lint, format, strict types, tests (PostgreSQL via Testcontainers, Alembic)
-                            # frontend: npm ci, type check, unit tests, production build
-scripts/smoke.sh            # builds the images, starts the stack, exercises nginx → API → database, tears it down
-scripts/check.sh lock       # after editing dependencies: refresh backend/uv.lock and frontend/package-lock.json
-scripts/check.sh outdated   # dependencies with newer releases
+scripts/check.sh                 # backend lint, format, strict types, 22 tests (Testcontainers PostgreSQL); frontend type check, tests, build
+scripts/e2e.sh                   # Playwright end-to-end tests against the running stack (E2E_BASE_URL to target a server)
+scripts/smoke.sh [base-url]      # post-deployment smoke test against a running stack (read-mostly)
+scripts/check.sh lock            # after editing dependencies: refresh uv.lock / package-lock.json
 ```
-Full logs are written to `logs/`.
-
-Migrations after model changes (inside the backend dev image or any environment with the backend installed):
-`alembic revision --autogenerate -m "<change>"`. Review the generated file; the test suite fails while models and migrations differ.
+Logs are written to `logs/`.
 
 ## Endpoints (through the web container)
 | Path | Purpose |
 |---|---|
-| `/` | React SPA |
-| `/api/v1/notes` | Example feature (REST) |
+| `/` | React app (sign in with a `DEMO_USERS` account) |
+| `/api/v1/auth/login` | Sign in (rate limited: 10 per minute per address) |
+| `/api/v1/meta`, `/api/v1/presets`, `/api/v1/flights` | Context, suggested scenarios, flight search |
+| `/api/v1/scenarios` (+ `/{id}`, `/reprioritise`, `/decisions`, `/messages`) | Run and store analyses, what-if, approvals, message drafts |
 | `/api/openapi.json`, `/api/docs` | OpenAPI schema and Swagger UI |
-| `/healthz` | nginx health |
-| API container: `/health/live`, `/health/ready` | Liveness; readiness (database) |
+| `/healthz`; API `/health/live`, `/health/ready` | Health (readiness = database + operating data loaded) |
 
 ## Configuration
-Environment variables (see `.env.example`): `DATABASE_URL` (`postgresql+psycopg://...`), `LOG_LEVEL`, `LOG_JSON`, `WORKERS` (`API_WORKERS` in Compose), `DB_POOL_SIZE`.
+Everything is set through environment variables; see `.env.example`.
+- **Data and access:** `INPUT_DIR`, `DEMO_USERS`, `TOKEN_SECRET`, `ANTHROPIC_API_KEY`, `AI_MODEL`.
+- **Rule and cost defaults:** `MIN_TURN_MINUTES`, `DEFAULT_MCT_MINUTES`, `REBOOKING_WINDOW_HOURS`, `COST_DELAY_PER_MINUTE`, `COST_HOTEL_PER_NIGHT`, `COST_MEAL_VOUCHER`, `COST_REBOOKING_HANDLING`, `NOW_UTC` (demo clock).
 
-## Deploy
-1. Build both images: `docker build -t <registry>/disruption-advisor-api:<version> backend` and `docker build -t <registry>/disruption-advisor-web:<version> frontend`.
-2. Provision PostgreSQL 18 (managed service recommended) with backups and point-in-time recovery.
-3. Before each release, run migrations: `docker run --rm -e DATABASE_URL=... <api image> alembic upgrade head`.
-4. Run `api` (internal only) and `web` (port 8080) behind a TLS-terminating reverse proxy. `web` must reach `api` at `http://api:8000` (or change `proxy_pass` in `frontend/nginx.conf`).
-5. Health checks: web `/healthz`; API `/health/live` (liveness), `/health/ready` (readiness).
-6. Roll back by redeploying the previous image tags. Write migrations to be backward-compatible (expand, then contract).
-
-CI: `.github/workflows/ci.yml` runs the quality gate, the smoke test and a Trivy scan on every push and pull request.
+## Push to your own git repository
+```bash
+git init && git add . && git commit -m "Disruption Advisor MVP"
+git remote add origin <your-repo-url> && git push -u origin main
+```
+`.env`, data and build output are git-ignored. Check `git status` before the first push.

@@ -1,11 +1,11 @@
 # MVP and Incremental Deployment Plan
 
-Delivery cadence (user instruction 2026-11-20): design first, MVP first, host the MVP, then incremental phases. **Each phase after the MVP starts only with explicit user approval.** Phase status is tracked in the workspace file `execution/DEPLOYMENT_STATUS.md`.
+Delivery cadence (user instruction 2026-11-20): design first, MVP first, host the MVP, then incremental phases. **Each phase after the MVP starts only with explicit user approval.** Phase status is tracked in the table below.
 
 | Phase | Content | Status |
 |---|---|---|
 | 0 Design | Architecture and diagrams ([SYSTEM_ARCHITECTURE.md](../architecture/SYSTEM_ARCHITECTURE.md)) | Done 2026-11-20 |
-| 1 MVP | Scenarios A and B end to end, hosted | Approved by user 2026-11-20, in progress |
+| 1 MVP | Scenarios A and B end to end, hosted | Done 2026-11-20: deployed and verified, incl. reboot test |
 | 2 Predict | Delay-risk prediction and a 7-day watchlist; HTTPS | Needs approval |
 | 3 Agent and what-if | Agentic orchestration; cancellation and consolidation as recovery options; strategy comparison | Needs approval |
 | 4 Extend | Equipment change, bus legs, crew, real data feeds, production hardening | Needs approval |
@@ -40,7 +40,7 @@ Delivery cadence (user instruction 2026-11-20): design first, MVP first, host th
    - OCI server, `http://92.5.154.198:8888`.
    - Docker Compose with `restart: unless-stopped`, Docker enabled at boot.
    - Health checks, log rotation, memory limits.
-   - A reboot test is performed and recorded (MASTER_PROMPT §14).
+   - A reboot test is performed and recorded (engineering standards §14).
 10. **Tests:** pytest (engine rules, API, Testcontainers PostgreSQL), Vitest (UI), Playwright (both scenarios against the composed stack), Trivy scans.
 
 **Out of scope for the MVP** (later phases):
@@ -83,6 +83,6 @@ Delivery cadence (user instruction 2026-11-20): design first, MVP first, host th
 3. Run Playwright locally.
 4. Run the Trivy scans.
 5. Tag the images, deploy with `scripts/deploy.sh` (back up the database first from Phase 2 on), and run migrations.
-6. Verify (MASTER_PROMPT §13.9): health checks, Playwright against the server URL, and the logs.
+6. Verify (engineering standards §13.9): health checks, Playwright against the server URL, and the logs.
 7. Rollback = redeploy the previous image tag. The rollback steps are in the runbook.
-8. Report the URL and results, update `execution/DEPLOYMENT_STATUS.md`, and wait for approval of the next phase.
+8. Report the URL and results, update the phase status table above, and wait for approval of the next phase.

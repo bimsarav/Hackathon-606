@@ -1,0 +1,3 @@
+# airports.csv source
+Subset (only the stations in the airline extracts) of the public dataset https://github.com/mwgg/Airports (`airports.json`, MIT License, Copyright (c) 2014 mwgg), fetched 2026-11-20. Columns: IATA, ICAO, name, ISO country, IANA time zone, latitude, longitude (for great-circle distances, EU261 bands). DBS/RYD coordinates are city centres (assumed bus points); DMF has none. Local times are derived with Python `zoneinfo` (DST-aware). Decision Q22 (use a public time-zone dataset).
+Rows FRU/DBS/RYD/DMF were added by hand: FRU (Manas, Bishkek) lacks an IATA code in the source; DBS/RYD/DMF are not in the source and appear on bus (02xxxx) legs; their time zones are assumptions [VALIDATE].

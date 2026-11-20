@@ -1,0 +1,32 @@
+ Image disruption-advisor-api:latest Built 
+ Image disruption-advisor-web:latest Built 
+ Container disruption-advisor-api-1 not started: condition "service_completed_successfully" of service "ingest" not met 
+service "ingest" didn't complete successfully: exit 1
+api created Created
+db running Up 21 minutes (healthy)
+ingest exited Exited (1) Less than a second ago
+migrate exited Exited (0) 12 seconds ago
+web created Created
+ingest-1  |   File "/app/app/ingest/demo.py", line 175, in add_demo_scenario
+ingest-1  |     "demo_flights": _append(ops / "flights.parquet", flights),
+ingest-1  |   File "/app/app/ingest/demo.py", line 89, in _append
+ingest-1  |     pq.write_table(pa.concat_tables([existing, demo]), path, compression="zstd")
+time="2026-11-20T20:18:15Z" level=warning msg="No services to build"
+service "ingest" didn't complete successfully: exit 1
+api created Created
+db running Up 21 minutes (healthy)
+ingest exited Exited (1) Less than a second ago
+migrate exited Exited (0) 5 seconds ago
+web created Created
+ingest-1  | 2026-11-20 20:18:17,068 INFO stage 2: building the operating picture
+ingest-1  | 2026-11-20 20:18:21,641 INFO stage 2 done: {"airports": 142, "aircraft": 110, "booking_classes": 388, "customers": 174723, "pax_segments": 299419, "flights": 4646, "mct": 39}
+ingest-1  |     log.info("demo scenario added: %s", json.dumps(demo.add_demo_scenario(data_dir / "ops")))
+ Image disruption-advisor-api:latest Built 
+ Container disruption-advisor-web-1 Started 
+api running Up 5 seconds (healthy)
+db running Up 23 minutes (healthy)
+ingest exited Exited (0) 6 seconds ago
+migrate exited Exited (0) 12 seconds ago
+web running Up Less than a second (health: starting)
+ingest-1  | 2026-11-20 20:19:27,703 INFO stage 2 done: {"airports": 142, "aircraft": 110, "booking_classes": 388, "customers": 174723, "pax_segments": 299419, "flights": 4646, "mct": 39}
+ingest-1  | 2026-11-20 20:19:28,299 INFO demo scenario added: {"demo_flights": 9, "demo_pax_segments": 50, "demo_customers": 25}

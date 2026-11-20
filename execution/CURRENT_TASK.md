@@ -36,6 +36,11 @@
 - [x] T-400.4 Generate product from python-fastapi profile; D-018..D-020
 - [x] T-400.5 Design diagrams (artifact https://claude.ai/artifact/PTzSvCcSHABHNz7HYhxG2s) (R/docs/architecture/*.md, Mermaid) + view location to user
 - [x] T-400.6 MVP definition + incremental deployment plan (R/docs/delivery/) 
-- [~] T-400.7 Version verification of add-on libs (COMPATIBILITY_MATRIX)
-- [ ] T-400.8 MVP build: data prep → impact engine → recovery options → prioritisation/seat assignment → explanations → UI
-- [ ] T-400.9 Tests (pytest, vitest, Playwright) · [ ] T-400.10 Deploy MVP to OCI :8888 + verify + reboot resilience · [ ] T-400.11 Report URL; wait for phase-2 approval
+- [x] T-400.7 Version verification of add-on libs (COMPATIBILITY_MATRIX)
+- [x] T-400.8 MVP build
+      files: [x] backend/app/ingest/convert.py (raw → typed Parquet) [x] backend/app/ingest/build.py (ops Parquet + synthetic enrichment) [x] app/data/airports.csv
+             [x] app/engine/* [x] app/advisor.py + auth + models + alembic 0001 [x] backend tests (22 pass) [x] frontend [x] e2e (Playwright 3/3) [x] compose ingest service + limits + log rotation
+- [x] T-400.9 Tests (pytest 22, vitest 5, Playwright 3; Trivy clean exc. SDK docstring false positive) · [x] T-400.10 Deploy MVP to OCI :8888 + verify + reboot test PASSED · [x] T-400.11 Close-out: arch docs (TECH_STACK, comparison, matrix, ADR 0001/0004-0007), CONFLUENCE_PAGE.md, DELIVERY_REPORT.md, packaging check PASS; Phase 2 NOT started (user)
+> **PAUSED 2026-11-20T19:31Z by user** ("pause remaining steps until further notice"): T-400.10 reboot test and T-400.11 hand-over on hold.
+
+> 2026-11-20T20:09Z: MVP close-out steps 1-6 DONE (user 'resume 1-6, do not proceed to phase 2'). Open: option override (not approved), commit + log archive (on user request), SSH key rotation (user).

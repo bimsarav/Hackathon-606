@@ -23,7 +23,8 @@ FROM ${PYTHON_IMAGE} AS runtime
 # whose vendored libraries otherwise show up in vulnerability scans.
 RUN apt-get update && apt-get upgrade -y --no-install-recommends && rm -rf /var/lib/apt/lists/* \
  && python -m pip uninstall -y pip && rm -rf /usr/local/lib/python3.14/ensurepip/_bundled \
- && groupadd --system app && useradd --system --gid app --home-dir /app --shell /usr/sbin/nologin app
+ && groupadd --system app && useradd --system --gid app --home-dir /app --shell /usr/sbin/nologin app \
+ && mkdir -p /data && chown app:app /data
 WORKDIR /app
 ENV PATH="/app/.venv/bin:$PATH" PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 COPY --from=build /app /app

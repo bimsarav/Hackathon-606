@@ -9,7 +9,7 @@ Disruption Advisor helps an airline's **Operations Control Centre (OCC)** and **
 
 It **recommends only**: a person approves or rejects every action (requirement UC5, decision Q21).
 
-Requirement sources (workspace `input/requirements/`): `Disruption_Management_UC5.docx`, `UC5_briefing_transcript.txt`, `UC5_QnA_2026-11-20.txt`, and the clarification register `execution/QUESTIONS_UC5.md`. The domain background is in the workspace knowledge base `documentation/knowledge-base/airline/topics/disruption-management/`, which is not part of this repository. Diagrams use Mermaid and render on GitHub, GitLab and in VS Code.
+Requirement sources: the UC5 use-case document (`Disruption_Management_UC5.docx`), the briefing transcript, the product-owner Q&A of 2026-11-20 and the clarification register (Q1–Q30). Domain background comes from the team's airline knowledge base (disruption management topic), which is not part of this repository.
 
 ## 1. System context
 ```mermaid

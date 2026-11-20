@@ -1,8 +1,10 @@
 """Settings from environment variables (see ../.env.example). Never hard-code environment-specific values."""
 
+from datetime import datetime
 from functools import lru_cache
+from pathlib import Path
 
-from pydantic import Field
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -16,6 +18,36 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_json: bool = True
     workers: int = 2
+
+    # Operating data (Parquet built by `python -m app.ingest`); the API only reads <data_dir>/ops.
+    data_dir: Path = Path("/data")
+    # Demo "now" (decision Q2): the extracts are a snapshot, so the clock is simulated.
+    now_utc: datetime = datetime(2026, 11, 20, 0, 0)
+    horizon_days: int = 7
+
+    # Operational rule defaults (configurable; assumptions are labelled in the UI).
+    min_turn_minutes: int = 40  # minimum ground time between two legs of one aircraft
+    default_mct_minutes: int = 45  # connection time where the hub MCT table has no entry
+    max_connection_minutes: int = 1200  # 20 h (decision Q8)
+    rebooking_window_hours: int = 24  # alternatives considered within 24 h (Q14)
+
+    # Cost model (Q15): assumed defaults, AED.
+    cost_delay_per_minute: float = 400.0
+    cost_hotel_per_night: float = 350.0
+    cost_meal_voucher: float = 50.0
+    cost_rebooking_handling: float = 25.0
+    eur_to_aed: float = 4.0
+
+    # Demo logins (Q19): "user:password:role" entries, comma separated; set only in the server .env.
+    demo_users: SecretStr = SecretStr("")
+    token_secret: SecretStr = SecretStr("")
+    token_ttl_hours: int = 12
+
+    # Generative AI (Q26): explanations and message drafts; templates are used when no key is set.
+    anthropic_api_key: SecretStr = SecretStr("")
+    ai_model: str = "claude-opus-5-5"
+    ai_effort: str = "low"  # short texts; thinking cannot be disabled on Opus 5.5, effort controls depth
+    ai_timeout_seconds: float = 25.0
 
 
 @lru_cache

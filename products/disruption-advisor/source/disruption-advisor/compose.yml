@@ -1,11 +1,22 @@
-# Full local stack: docker compose up --build   (first: cp .env.example .env), then open http://localhost:8080
+# Full stack: docker compose up -d --build   (first: cp .env.example .env and fill it), then open http://localhost:${WEB_PORT}
+# Start order: db (healthy) → migrate (done) and ingest (done) → api (healthy) → web. Every long-running service
+# restarts unless stopped, so the stack comes back by itself after a server reboot (engineering standards §14).
 name: disruption-advisor
+
+x-logging: &logging
+  driver: json-file
+  options: { max-size: "10m", max-file: "5" }
 
 x-api-env: &api-env
   DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:?}:${POSTGRES_PASSWORD:?}@db:5432/${POSTGRES_DB:?}
   LOG_LEVEL: ${LOG_LEVEL:-INFO}
   LOG_JSON: ${LOG_JSON:-true}
   WORKERS: ${API_WORKERS:-2}
+  DATA_DIR: /data
+  DEMO_USERS: ${DEMO_USERS:?set DEMO_USERS in .env}
+  TOKEN_SECRET: ${TOKEN_SECRET:?set TOKEN_SECRET in .env}
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+  AI_MODEL: ${AI_MODEL:-claude-opus-5-5}
 
 services:
   db:
@@ -21,23 +32,54 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+    restart: unless-stopped
+    mem_limit: 1g
+    logging: *logging
 
   migrate:
     build: ./backend
     image: disruption-advisor-api:latest
     command: ["alembic", "upgrade", "head"]
+    healthcheck: { disable: true }  # one-shot job: the image's HTTP health check applies to the api only
     environment: *api-env
     depends_on:
       db: { condition: service_healthy }
     restart: "no"
+    logging: *logging
+
+  # One-shot: airline extracts (read-only) → typed Parquet in the ops-data volume. Skips quickly when the inputs
+  # are unchanged since the last run.
+  ingest:
+    image: disruption-advisor-api:latest
+    command: ["python", "-m", "app.ingest"]
+    healthcheck: { disable: true }
+    environment:
+      INPUT_DIR: /input
+      DATA_DIR: /data
+      INGEST_MEMORY_LIMIT: ${INGEST_MEMORY_LIMIT:-4GB}
+      DEMO_SCENARIO: ${DEMO_SCENARIO:-false}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - ${INPUT_DIR:?set INPUT_DIR (folder with the airline extracts) in .env}:/input:ro
+      - ops-data:/data
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    restart: "no"
+    mem_limit: 8g
+    logging: *logging
 
   api:
     image: disruption-advisor-api:latest
     environment: *api-env
+    volumes:
+      - ops-data:/data:ro
     depends_on:
       db: { condition: service_healthy }
       migrate: { condition: service_completed_successfully }
+      ingest: { condition: service_completed_successfully }
     restart: unless-stopped
+    mem_limit: 3g
+    logging: *logging
 
   web:
     build: ./frontend
@@ -47,6 +89,9 @@ services:
     depends_on:
       api: { condition: service_healthy }
     restart: unless-stopped
+    mem_limit: 256m
+    logging: *logging
 
 volumes:
   db-data:
+  ops-data:
