@@ -1,5 +1,5 @@
 # Deployment Status (this product run; MASTER_PROMPT §13.12)
-Overall: NOT STARTED   <!-- NOT STARTED | BLOCKED | DEPLOYMENT PENDING | DEPLOYED (verified) -->
+Overall: NOT STARTED   <!-- NOT STARTED | BLOCKED | DEPLOYMENT PENDING | DEPLOYED – OPERATIONAL VERIFICATION PENDING | DEPLOYED (verified, §14.8) -->
 Updated: -
 
 | Area | Status | Evidence / notes |
@@ -16,6 +16,13 @@ Updated: -
 | End-to-end tests on the deployed app (§13.9) | NOT STARTED | |
 | CI/CD (§13.8) | NOT STARTED | |
 | Deployment docs + handover (§13.11) | NOT STARTED | |
+| Server baseline (§14.2) | NOT STARTED | |
+| Docker restart resilience: auto-start, health checks, log rotation, limits (§14.3) | NOT STARTED | |
+| Startup dependencies + recovery (§14.4) | NOT STARTED | |
+| Server restart test (§14.5) | NOT STARTED | |
+| Backups + restore test (§14.6) | NOT STARTED | |
+| Monitoring + alerting (§14.6) | NOT STARTED | |
+| Operations docs (§14.7) | NOT STARTED | |
 
 Deployed version: - · Application URL: - · API docs URL: -
 

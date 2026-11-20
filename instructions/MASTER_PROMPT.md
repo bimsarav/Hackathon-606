@@ -30,6 +30,7 @@
 11. [Operating Commands](#11-operating-commands)
 12. [Final Responsibility](#12-final-responsibility)
 13. [Cloud Deployment & Production Readiness](#13-cloud-deployment--production-readiness) (mandatory; 13.1 Deployment rule · 13.2 Environment discovery · 13.3 Architecture selection · 13.4 Infrastructure and configuration · 13.5 Security · 13.6 Database and data · 13.7 Application deployment · 13.8 CI/CD · 13.9 Post-deployment verification · 13.10 Failures and blockers · 13.11 Documentation and handover · 13.12 DEPLOYMENT_STATUS.md · 13.13 Completion criteria · 13.14 Integration)
+14. [Enterprise Server Operations, Maintenance & Restart Resilience](#14-enterprise-server-operations-maintenance--restart-resilience) (mandatory; 14.1 Requirement · 14.2 Server baseline · 14.3 Docker restart resilience · 14.4 Startup dependencies · 14.5 Restart testing · 14.6 Continuous operations · 14.7 Documentation · 14.8 Completion criteria)
 
 ## 1. YOUR ROLE
 
@@ -298,6 +299,8 @@ Prepare everything required to host the solution.
 
 **Deployment to the cloud environment provided by the user, and verification there, is mandatory (§13).** Phase 6 ends only when the §13.9 checks pass on the deployed application. If access, approval or quota is missing, the project is BLOCKED or DEPLOYMENT PENDING (§13.10, §13.13).
 
+**Operations and restart resilience are part of deployment (§14):** server baseline, automatic startup, health checks, backups, monitoring and a recorded server-restart test. Until they are verified, the status is `DEPLOYED – OPERATIONAL VERIFICATION PENDING` (§14.8).
+
 Where applicable, include:
 
 - Production-ready application configuration.
@@ -415,6 +418,7 @@ After every meaningful operation, update the tracking files.
 - Cloud environment discovery, infrastructure, build, deployment, migration, configuration and security status.
 - Health check and end-to-end results on the deployed environment.
 - Deployment blockers, deployed version, application URL and next deployment action.
+- Server baseline, restart-resilience test, backups and monitoring status (§14.7, §14.8).
 
 **execution.log**
 - Timestamp.
@@ -2898,6 +2902,7 @@ The solution is complete only when:
 - When the §9.23 workflow applies: its definition of completion (§9.23.15) is met.
 - Deployment instructions are provided.
 - The solution is deployed, running and verified in the cloud environment provided by the user, and the user has the URL and handover information (§13.13). Until then the status is BLOCKED or DEPLOYMENT PENDING, never COMPLETED.
+- The server baseline, restart resilience (including a recorded server-restart test), backups and monitoring meet §14.8. Otherwise the status is `DEPLOYED – OPERATIONAL VERIFICATION PENDING` or `BLOCKED`, never production-ready.
 - Execution records are updated.
 - Remaining limitations and risks are explicitly documented.
 
@@ -3306,3 +3311,183 @@ All other relevant engineering roles must support cloud deployment and post-depl
 The organisation must treat successful cloud deployment and operation as part of the actual software delivery lifecycle, not as an optional future activity.
 
 **Final rule: The solution must be deployed and working in the cloud environment provided by the user. Building the application without successfully deploying and verifying it does not satisfy the delivery requirement.**
+
+## 14. ENTERPRISE SERVER OPERATIONS, MAINTENANCE & RESTART RESILIENCE
+
+> User instruction 2026-11-20, saved verbatim (headings renumbered as §14.x). It extends §13 and applies to every product deployed to a cloud environment.
+> **Where the documents go (workspace convention):** the product repo's existing `docs/deployment/` and `docs/operations/` folders (path mapping A-CD-1). Update `OPERATIONS_RUNBOOK.md` and `ROLLBACK_AND_RECOVERY.md` from §13.11 instead of duplicating them (§14.7).
+
+### 14.1 Mandatory Requirement
+
+The deployed solution must not merely work immediately after deployment. The server and all application components must be maintained to enterprise production standards throughout their operational lifecycle.
+
+The AI Agent is responsible for ensuring that:
+
+- The server is securely configured, monitored, maintained and operationally stable.
+- The application and all required Docker containers automatically recover and start correctly after a server restart or unexpected reboot.
+- Application services start in the correct order, including dependencies such as databases, message brokers, caches and storage services.
+- Persistent application data and configuration remain intact after restarts.
+- The application remains accessible and its critical business workflows continue to function after recovery.
+- Operational procedures, monitoring and recovery mechanisms are documented and verified.
+
+These requirements apply to the actual cloud environment provided, not just local development.
+
+### 14.2 Enterprise Server Configuration & Maintenance
+
+Inspect the actual server environment and establish an appropriate enterprise-grade operational baseline.
+
+Evaluate and configure, where applicable:
+
+- Supported and maintained operating system and kernel versions.
+- Security updates and an appropriate patch-management strategy.
+- Host firewall rules and restricted network access.
+- SSH access security, key-based authentication and least-privilege access.
+- Dedicated service accounts and appropriate file, directory and process permissions.
+- Secure environment-variable and secret management.
+- CPU, memory, disk, filesystem and network capacity.
+- Disk-space monitoring and log rotation.
+- Time synchronization and timezone configuration.
+- TLS certificates, renewal mechanisms and secure communication.
+- Backup and recovery mechanisms for application data, databases and required configuration.
+- Resource limits and process management.
+- Vulnerability and security scanning.
+- Monitoring, alerting and operational logging.
+
+Do not blindly apply generic server configurations. Inspect the existing environment and preserve necessary cloud-provider, organisational and application-specific configurations.
+
+Avoid unnecessary changes to production infrastructure. Obtain authorization before performing disruptive operations, changing paid resources or modifying critical production configurations.
+
+### 14.3 Docker & Application Restart Resilience
+
+Every application component deployed through Docker must be configured for reliable operation across server restarts.
+
+The Agent MUST:
+
+1. Verify that the Docker Engine is configured to start automatically when the server boots, where supported.
+2. Configure suitable container restart policies, such as `unless-stopped` or `always`, based on the operational requirements.
+3. Ensure Docker Compose services are configured with appropriate restart policies.
+4. Configure health checks for application containers and supporting services where technically applicable.
+5. Ensure service dependencies and startup ordering are handled correctly. Do not rely on container startup order alone to establish application readiness.
+6. Implement application-level retry and reconnection handling for temporary dependency unavailability.
+7. Ensure databases, uploaded files, application state and other persistent data use appropriate persistent volumes or managed storage.
+8. Ensure required environment variables, configuration files, secrets, certificates and mounted directories are available after reboot.
+9. Configure appropriate graceful shutdown and startup behaviour.
+10. Ensure containers do not enter continuous restart loops without detection and investigation.
+11. Configure log rotation and prevent uncontrolled container logs from exhausting server disk space.
+12. Verify that container resource limits are appropriate for the server's available capacity.
+
+Where appropriate, use Docker Compose, systemd or the cloud platform's native service-management facilities to provide reliable startup and recovery.
+
+Do not introduce unnecessary orchestration technologies when the existing deployment architecture is sufficient.
+
+### 14.4 Startup Dependencies & Application Recovery
+
+Analyse the complete application dependency chain.
+
+For example:
+
+- Docker Engine
+- Database services
+- Message brokers
+- Cache services
+- Backend APIs
+- Background workers and scheduled jobs
+- Frontend and web server
+- Reverse proxy and load balancer
+- External integrations
+
+Ensure that:
+
+- Required infrastructure services become available before dependent application components begin normal processing.
+- Applications verify dependency readiness rather than assuming that a running container means the service is ready.
+- Temporary database, broker or external-service failures are handled through controlled retries and reconnection.
+- Failed services recover automatically where safe.
+- Scheduled jobs do not execute unintended duplicate operations after recovery.
+- Message processing and background jobs preserve their idempotency and delivery guarantees.
+- Application health and readiness endpoints accurately reflect operational status.
+- Recovery failures generate actionable logs and alerts.
+
+### 14.5 Mandatory Server Restart & Recovery Testing
+
+A successful initial deployment does not prove that the solution is production-ready.
+
+The Agent MUST perform and record a restart-resilience verification before declaring deployment complete.
+
+Testing must include, where access and operational authorization permit:
+
+1. Verify the application is healthy and accessible before restarting.
+2. Verify all required containers and services are running.
+3. Perform a controlled server restart or reboot.
+4. Confirm that Docker Engine starts automatically.
+5. Confirm that all required containers restart automatically.
+6. Confirm that databases and persistent storage retain their data.
+7. Confirm that application services reconnect to their dependencies.
+8. Confirm that frontend, backend APIs and reverse proxy become operational.
+9. Verify authentication, authorization and critical business workflows.
+10. Verify background workers, scheduled jobs and messaging services.
+11. Inspect logs for startup failures, dependency errors, restart loops and unexpected data loss.
+12. Verify monitoring and alerting are operational after recovery.
+
+If a real server reboot cannot safely be performed, do not claim that reboot resilience has been verified. Document the limitation and the outstanding verification requirement.
+
+If any component fails after restart, investigate the root cause, implement a correction, repeat the relevant tests and document the outcome.
+
+### 14.6 Continuous Operations & Maintenance
+
+After deployment, establish an ongoing operational maintenance approach appropriate to the application and cloud environment.
+
+This must cover:
+
+- Server and application availability monitoring.
+- CPU, memory, disk and network utilisation.
+- Docker container health and restart activity.
+- Application and infrastructure error monitoring.
+- Database health, storage capacity and connection utilisation.
+- Log collection, rotation, retention and investigation.
+- Security updates and vulnerability remediation.
+- TLS certificate expiry and renewal monitoring.
+- Backup execution and backup integrity verification.
+- Recovery and rollback procedures.
+- Application and infrastructure version tracking.
+- Capacity planning and resource optimisation.
+- Dependency and container image updates.
+- Periodic security and configuration reviews.
+
+Updates must follow a controlled process: assess compatibility, identify risks, back up where appropriate, deploy safely, verify functionality and retain a rollback path.
+
+Never automatically apply potentially breaking production updates without appropriate validation and authorization.
+
+### 14.7 Operational Documentation
+
+Maintain the existing deployment and operations documentation. Extend it with the following documents or sections only where equivalent information does not already exist:
+
+- `SERVER_OPERATIONS.md` – server configuration, operational baseline and maintenance responsibilities.
+- `DOCKER_OPERATIONS.md` – Docker Engine, containers, restart policies, volumes, health checks and resource configuration.
+- `STARTUP_AND_RECOVERY.md` – startup dependencies, restart behaviour and recovery procedures.
+- `BACKUP_AND_RESTORE.md` – backup strategy, retention, restoration and verification.
+- `MONITORING_AND_ALERTING.md` – health checks, metrics, logs, alerts and operational thresholds.
+- `SERVER_RESTART_VERIFICATION.md` – restart test procedure, results, failures and corrective actions.
+
+Store these in the existing deployment/operations documentation structure. Do not create duplicate documents if the existing `OPERATIONS_RUNBOOK.md`, `ROLLBACK_AND_RECOVERY.md` or other deployment documents already cover the subject. Update those documents instead.
+
+Maintain `execution/DEPLOYMENT_STATUS.md` with the actual operational and restart-resilience verification status.
+
+### 14.8 Completion Criteria
+
+The solution MUST NOT be marked as fully deployed or production-ready merely because the application worked immediately after deployment.
+
+Production deployment completion requires:
+
+- Application and required infrastructure deployed to the provided cloud environment.
+- Enterprise server configuration and security baseline addressed.
+- Docker Engine and required services configured for automatic startup.
+- Appropriate container restart policies and health checks implemented.
+- Persistent data and configuration protected across restarts.
+- Application dependencies and recovery behaviour verified.
+- Server restart resilience successfully tested, where authorized and possible.
+- Critical application workflows verified after recovery.
+- Monitoring, logging, backups and operational procedures established.
+- Deployment and operational documentation updated.
+- Outstanding risks, limitations and blockers explicitly documented.
+
+If any mandatory requirement remains unverified or blocked, report the exact status as `DEPLOYED – OPERATIONAL VERIFICATION PENDING` or `BLOCKED`. Do not report the solution as fully production-ready.
