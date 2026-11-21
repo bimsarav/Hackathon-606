@@ -23,14 +23,18 @@ interface Props {
   onCancel: (flightId: string) => void;
   /** Phase 3: hands the flight to the agent (it recommends; a person approves). */
   onAgent?: (request: AgentRunRequest) => void;
+  /** Pre-select a tab (Launcher remounts when view changes via key prop). */
+  defaultTab?: Tab;
+  /** Hide the tab switcher — when the caller's nav already sets the mode. */
+  hideTabNav?: boolean;
 }
 
 type Tab = "DELAY" | "CANCEL" | "AGENT";
 const AGENT_DELAYS = [30, 60, 90, 120, 150, 180, 240, 300, 360, 480];
 
 /** Scenario launcher: suggested flights from the data (UC5 example scenario) or any flight by search. */
-export function Launcher({ busy, active, onDelay, onCancel, onAgent }: Props) {
-  const [tab, setTab] = useState<Tab>("DELAY");
+export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab, hideTabNav }: Props) {
+  const [tab, setTab] = useState<Tab>(defaultTab ?? "DELAY");
   const [presets, setPresets] = useState<{ delay: DelayPreset[]; cancel: CancelPreset[] } | null>(null);
   const [presetError, setPresetError] = useState<string | null>(null);
   const [delay, setDelay] = useState(150);
@@ -77,22 +81,24 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent }: Props) {
   return (
     <section className="launcher" aria-labelledby="launcher-title">
       <h2 id="launcher-title">New scenario</h2>
-      <div className="tabs" role="tablist" aria-label="Disruption type">
-        <button type="button" role="tab" aria-selected={tab === "DELAY"} className={tab === "DELAY" ? "tab active" : "tab"}
-          onClick={() => setTab("DELAY")}>
-          A · Delay
-        </button>
-        <button type="button" role="tab" aria-selected={tab === "CANCEL"} className={tab === "CANCEL" ? "tab active" : "tab"}
-          onClick={() => setTab("CANCEL")}>
-          B · Cancellation
-        </button>
-        {onAgent && (
-          <button type="button" role="tab" aria-selected={tab === "AGENT"} className={tab === "AGENT" ? "tab active" : "tab"}
-            onClick={() => setTab("AGENT")}>
-            Ask the agent
+      {!hideTabNav && (
+        <div className="tabs" role="tablist" aria-label="Disruption type">
+          <button type="button" role="tab" aria-selected={tab === "DELAY"} className={tab === "DELAY" ? "tab active" : "tab"}
+            onClick={() => setTab("DELAY")}>
+            A · Delay
           </button>
-        )}
-      </div>
+          <button type="button" role="tab" aria-selected={tab === "CANCEL"} className={tab === "CANCEL" ? "tab active" : "tab"}
+            onClick={() => setTab("CANCEL")}>
+            B · Cancellation
+          </button>
+          {onAgent && (
+            <button type="button" role="tab" aria-selected={tab === "AGENT"} className={tab === "AGENT" ? "tab active" : "tab"}
+              onClick={() => setTab("AGENT")}>
+              Ask the agent
+            </button>
+          )}
+        </div>
+      )}
 
       {tab === "DELAY" && (
         <div className="field">

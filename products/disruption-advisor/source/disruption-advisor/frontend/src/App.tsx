@@ -22,8 +22,8 @@ const STORAGE_KEY = "disruption-advisor-session";
 const OPEN_KEY = "disruption-advisor-open-scenario";
 const VIEW_KEY = "disruption-advisor-view";
 const AGENT_KEY = "disruption-advisor-agent-run";
-type View = "scenario" | "watchlist" | "agent" | "model";
-const VIEWS: View[] = ["scenario", "watchlist", "agent", "model"];
+type View = "delay" | "cancel" | "agent" | "watchlist" | "model";
+const VIEWS: View[] = ["delay", "cancel", "agent", "watchlist", "model"];
 
 function recall(key: string): string | null {
   try {
@@ -38,7 +38,7 @@ function remember(key: string, value: string | null) {
     if (value) sessionStorage.setItem(key, value);
     else sessionStorage.removeItem(key);
   } catch {
-    /* storage unavailable: nothing is remembered across reloads */
+    /* storage unavailable */
   }
 }
 
@@ -65,7 +65,7 @@ export function App() {
     try {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(s));
     } catch {
-      /* storage unavailable: session lasts for this page only */
+      /* ignore */
     }
     setSession(s);
   }
@@ -141,6 +141,15 @@ function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
 
 type Load = { kind: "idle" } | { kind: "busy"; label: string } | { kind: "error"; message: string };
 
+function NavItem({ label, icon, active, onClick }: { label: string; icon: string; active: boolean; onClick: () => void }) {
+  return (
+    <button type="button" className={`nav-item${active ? " active" : ""}`} onClick={onClick} aria-current={active ? "page" : undefined}>
+      <span className="nav-icon" aria-hidden="true">{icon}</span>
+      {label}
+    </button>
+  );
+}
+
 function Console({ session, onSignOut }: { session: Session; onSignOut: () => void }) {
   const [meta, setMeta] = useState<Meta | null>(null);
   const [metaError, setMetaError] = useState<string | null>(null);
@@ -149,10 +158,9 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
   const [load, setLoad] = useState<Load>({ kind: "idle" });
   const [view, setView] = useState<View>(() => {
     const saved = recall(VIEW_KEY) as View | null;
-    return saved && VIEWS.includes(saved) ? saved : "scenario";
+    return saved && VIEWS.includes(saved) ? saved : "delay";
   });
   useEffect(() => remember(VIEW_KEY, view), [view]);
-  // Phase 3: the agent run on screen survives a reload, like the open scenario.
   const [agentRunId, setAgentRunId] = useState<string | null>(() => recall(AGENT_KEY));
   const [agentStart, setAgentStart] = useState<Load>({ kind: "idle" });
   const [agentStatus, setAgentStatus] = useState<string | null>(null);
@@ -174,7 +182,6 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
         setMetaError(errorText(e, "Could not load the operating data."));
       });
     refreshHistory();
-    // Reopen the scenario that was on screen before a page reload, so the slider keeps working.
     let openId: string | null = null;
     try {
       openId = sessionStorage.getItem(OPEN_KEY);
@@ -188,8 +195,8 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
 
   useEffect(() => remember(OPEN_KEY, scenario?.id ?? null), [scenario?.id]);
 
-  async function run(label: string, action: () => Promise<Scenario>) {
-    setView("scenario");
+  async function run(targetView: "delay" | "cancel", label: string, action: () => Promise<Scenario>) {
+    setView(targetView);
     setLoad({ kind: "busy", label });
     try {
       const s = await action();
@@ -215,6 +222,10 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
 
   const busy = load.kind === "busy" || agentStart.kind === "busy";
 
+  const delayActive = scenario && scenario.kind === "DELAY" && scenario.delay_minutes
+    ? { flightId: scenario.flight_id, flightNumber: scenario.result.flight.flight_number, delay: scenario.delay_minutes }
+    : null;
+
   return (
     <>
       <header className="site-header">
@@ -228,10 +239,7 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
           <span className="header-meta">
             <span className="chip">Ops clock {utc(meta.now_utc)}</span>
             <span className={`chip ${meta.ai_enabled ? "chip-ok" : "chip-warn"}`}>
-              {meta.ai_enabled ? `AI explanations: ${meta.ai_model}` : "AI off: template explanations"}
-            </span>
-            <span className="chip chip-synthetic" title="Loyalty tier, fare family and most special-service codes are synthetic">
-              Synthetic fields labelled
+              {meta.ai_enabled ? `AI: ${meta.ai_model}` : "AI off"}
             </span>
           </span>
         )}
@@ -242,138 +250,204 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
           </button>
         </span>
       </header>
+
       <div className="layout">
-        <aside aria-label="Start a scenario">
-          {metaError && (
-            <p className="error" role="alert">
-              {metaError}
-            </p>
-          )}
-          {view === "watchlist" && <CascadePanel />}
-          {/* Hidden, not unmounted, on the 7-day view: the slider and suggestions keep their state. */}
-          <div hidden={view === "watchlist"}>
-            {meta && (
-              <Launcher
-                meta={meta}
-                busy={busy}
-                active={scenario && scenario.kind === "DELAY" && scenario.delay_minutes
-                  ? { flightId: scenario.flight_id, flightNumber: scenario.result.flight.flight_number, delay: scenario.delay_minutes }
-                  : null}
-                onDelay={(flightId, delay) =>
-                  run(`Analysing a ${delay}-minute delay…`, () =>
-                    api.createScenario({ kind: "DELAY", flight_id: flightId, delay_minutes: delay, weights: meta.default_weights }),
-                  )
-                }
-                onCancel={(flightId) =>
-                  run("Ranking passengers and rebooking…", () =>
-                    api.createScenario({ kind: "CANCEL", flight_id: flightId, weights: meta.default_weights }),
-                  )
-                }
-                onAgent={askAgent}
-              />
-            )}
-            <section className="history" aria-labelledby="history-title">
-              <h2 id="history-title">Recent scenarios</h2>
-              {history.length === 0 ? (
-                <p className="muted">None yet.</p>
-              ) : (
-                <ul>
-                  {history.map((h) => (
-                    <li key={h.id}>
-                      <button type="button" className="link" onClick={() => run("Opening scenario…", () => api.scenario(h.id))}>
-                        {h.kind === "DELAY" ? `Delay +${h.delay_minutes} min` : "Cancellation"} · {h.flight_id.split("_")[0]}
-                      </button>
-                      <span className="muted small">
-                        {" "}
-                        {h.created_by}, {utc(h.created_at)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          </div>
-        </aside>
-        <main id="main" aria-live="polite" aria-busy={load.kind === "busy"}>
-          <nav className="tabs view-tabs" aria-label="Views">
-            <button type="button" className={`tab ${view === "scenario" ? "active" : ""}`} aria-pressed={view === "scenario"}
-              onClick={() => setView("scenario")}>
-              Scenario
-            </button>
-            <button type="button" className={`tab ${view === "watchlist" ? "active" : ""}`} aria-pressed={view === "watchlist"}
-              onClick={() => setView("watchlist")}>
-              Delay watchlist (7 days)
-            </button>
-            <button type="button" className={`tab ${view === "agent" ? "active" : ""}`} aria-pressed={view === "agent"}
-              onClick={() => setView("agent")}>
-              Agent
-            </button>
-            <button type="button" className={`tab ${view === "model" ? "active" : ""}`} aria-pressed={view === "model"}
-              onClick={() => setView("model")}>
-              Model
-            </button>
+        <aside className="nav-sidebar" aria-label="Navigation">
+          {metaError && <p className="error small" role="alert">{metaError}</p>}
+
+          <nav>
+            <div className="nav-section">
+              <p className="nav-section-label">Analyze</p>
+              <NavItem label="Flight Delay" icon="↑" active={view === "delay"} onClick={() => setView("delay")} />
+              <NavItem label="Cancellation" icon="✕" active={view === "cancel"} onClick={() => setView("cancel")} />
+              <NavItem label="Ask the Agent" icon="◎" active={view === "agent"} onClick={() => setView("agent")} />
+            </div>
+            <div className="nav-section">
+              <p className="nav-section-label">Monitor</p>
+              <NavItem label="Delay Watchlist" icon="◉" active={view === "watchlist"} onClick={() => setView("watchlist")} />
+            </div>
+            <div className="nav-section">
+              <p className="nav-section-label">Reference</p>
+              <NavItem label="Model Card" icon="☰" active={view === "model"} onClick={() => setView("model")} />
+            </div>
           </nav>
-          {view === "watchlist" && meta && (
-            <WatchlistView
-              busy={busy}
-              onAnalyse={(flightId, delay) =>
-                run(`Analysing a ${delay}-minute delay…`, () =>
-                  api.createScenario({ kind: "DELAY", flight_id: flightId, delay_minutes: delay, weights: meta.default_weights }),
-                )
-              }
-              onAgent={(flightId, delay) => askAgent({ flight_id: flightId, delay_minutes: delay })}
-            />
+
+          {history.length > 0 && (
+            <div className="nav-section nav-recent">
+              <p className="nav-section-label">Recent</p>
+              <ul className="nav-history-list">
+                {history.slice(0, 6).map((h) => (
+                  <li key={h.id}>
+                    <button
+                      type="button"
+                      className="nav-item nav-history-item"
+                      onClick={() => run(
+                        h.kind === "DELAY" ? "delay" : "cancel",
+                        "Opening scenario…",
+                        () => api.scenario(h.id)
+                      )}
+                    >
+                      <span className="nav-history-badge">
+                        {h.kind === "DELAY" ? `+${h.delay_minutes}m` : "Canc"}
+                      </span>
+                      <span className="nav-history-flight">{h.flight_id.split("_")[0]}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
+        </aside>
+
+        <main id="main" aria-live="polite" aria-busy={load.kind === "busy"}>
+
+          {/* ── Flight Delay ─────────────────────────────── */}
+          {view === "delay" && (
+            <>
+              {load.kind === "busy" && <p className="status">{load.label}</p>}
+              {load.kind === "error" && <p className="error" role="alert">{load.message}</p>}
+              {meta && (
+                <Launcher
+                  key="delay"
+                  meta={meta}
+                  busy={busy}
+                  defaultTab="DELAY"
+                  hideTabNav
+                  active={delayActive}
+                  onDelay={(flightId, delay) =>
+                    run("delay", `Analysing a ${delay}-minute delay…`, () =>
+                      api.createScenario({ kind: "DELAY", flight_id: flightId, delay_minutes: delay, weights: meta.default_weights })
+                    )
+                  }
+                  onCancel={(flightId) =>
+                    run("cancel", "Ranking passengers and rebooking…", () =>
+                      api.createScenario({ kind: "CANCEL", flight_id: flightId, weights: meta.default_weights })
+                    )
+                  }
+                  onAgent={askAgent}
+                />
+              )}
+              {!scenario && load.kind !== "busy" && (
+                <section className="empty">
+                  <h1>Flight Delay Analysis</h1>
+                  <p>Select a suggested flight above, or search by flight number, airport or aircraft tail. The engine maps the knock-on effect along the full rotation and compares every recovery option by cost.</p>
+                  <p className="muted">Every recommendation needs a person to approve it before anything changes in airline systems.</p>
+                </section>
+              )}
+              {scenario && meta && scenario.result.type === "DELAY" && (
+                <DelayView scenario={scenario} result={scenario.result} meta={meta} onUpdate={setScenario} />
+              )}
+            </>
+          )}
+
+          {/* ── Cancellation ─────────────────────────────── */}
+          {view === "cancel" && (
+            <>
+              {load.kind === "busy" && <p className="status">{load.label}</p>}
+              {load.kind === "error" && <p className="error" role="alert">{load.message}</p>}
+              {meta && (
+                <Launcher
+                  key="cancel"
+                  meta={meta}
+                  busy={busy}
+                  defaultTab="CANCEL"
+                  hideTabNav
+                  active={null}
+                  onDelay={(flightId, delay) =>
+                    run("delay", `Analysing a ${delay}-minute delay…`, () =>
+                      api.createScenario({ kind: "DELAY", flight_id: flightId, delay_minutes: delay, weights: meta.default_weights })
+                    )
+                  }
+                  onCancel={(flightId) =>
+                    run("cancel", "Ranking passengers and rebooking…", () =>
+                      api.createScenario({ kind: "CANCEL", flight_id: flightId, weights: meta.default_weights })
+                    )
+                  }
+                  onAgent={askAgent}
+                />
+              )}
+              {!scenario && load.kind !== "busy" && (
+                <section className="empty">
+                  <h1>Cancellation Analysis</h1>
+                  <p>Select a flight to cancel. The engine ranks all affected passengers by tier and urgency, then rebooks them against available seats on alternative flights.</p>
+                  <p className="muted">Every recommendation needs a person to approve it before anything changes in airline systems.</p>
+                </section>
+              )}
+              {scenario && meta && scenario.result.type === "CANCEL" && (
+                <CancelView scenario={scenario} result={scenario.result} meta={meta} onUpdate={setScenario} />
+              )}
+            </>
+          )}
+
+          {/* ── Agent ─────────────────────────────────────── */}
           {view === "agent" && (
             <>
               {agentStart.kind === "busy" && <p className="status">{agentStart.label}</p>}
-              {agentStart.kind === "error" && (
-                <p className="error" role="alert">
-                  {agentStart.message}
-                </p>
+              {agentStart.kind === "error" && <p className="error" role="alert">{agentStart.message}</p>}
+              {meta && (
+                <Launcher
+                  key="agent"
+                  meta={meta}
+                  busy={busy}
+                  defaultTab="AGENT"
+                  hideTabNav
+                  active={null}
+                  onDelay={(flightId, delay) =>
+                    run("delay", `Analysing a ${delay}-minute delay…`, () =>
+                      api.createScenario({ kind: "DELAY", flight_id: flightId, delay_minutes: delay, weights: meta.default_weights })
+                    )
+                  }
+                  onCancel={(flightId) =>
+                    run("cancel", "Ranking passengers and rebooking…", () =>
+                      api.createScenario({ kind: "CANCEL", flight_id: flightId, weights: meta.default_weights })
+                    )
+                  }
+                  onAgent={askAgent}
+                />
               )}
               {agentRunId ? (
-                <AgentRunView runId={agentRunId} onRetry={askAgent} onStatus={setAgentStatus}
-                  onOpenScenario={(id) => run("Opening the agent's scenario…", () => api.scenario(id))} />
+                <AgentRunView
+                  runId={agentRunId}
+                  onRetry={askAgent}
+                  onStatus={setAgentStatus}
+                  onOpenScenario={(id) => run("delay", "Opening the agent's scenario…", () => api.scenario(id))}
+                />
               ) : (
                 agentStart.kind === "idle" && (
                   <section className="empty">
-                    <h1>Ask the agent</h1>
-                    <p>
-                      Choose <strong>Ask the agent</strong> in the launcher on the left, or on a flight in the delay
-                      watchlist. The agent investigates the flight with the recovery engine, shows each step and recommends
-                      one option. You review it and approve or override it.
-                    </p>
+                    <h1>Agent Console</h1>
+                    <p>Select a flight above and ask the agent to investigate it. The agent uses the recovery engine, shows each reasoning step and recommends one option — you review and approve or override it.</p>
                   </section>
                 )
               )}
-              <AgentRunsList refreshKey={`${agentRunId}:${agentStatus}`} onOpen={(id) => { setAgentStart({ kind: "idle" }); setAgentRunId(id); }} />
+              <AgentRunsList
+                refreshKey={`${agentRunId}:${agentStatus}`}
+                onOpen={(id) => { setAgentStart({ kind: "idle" }); setAgentRunId(id); }}
+              />
             </>
           )}
-          {view === "scenario" && load.kind === "busy" && <p className="status">{load.label}</p>}
-          {view === "scenario" && load.kind === "error" && (
-            <p className="error" role="alert">
-              {load.message}
-            </p>
+
+          {/* ── Delay Watchlist ───────────────────────────── */}
+          {view === "watchlist" && (
+            <>
+              <LastWeekPanel />
+              {meta && (
+                <WatchlistView
+                  busy={busy}
+                  onAnalyse={(flightId, delay) =>
+                    run("delay", `Analysing a ${delay}-minute delay…`, () =>
+                      api.createScenario({ kind: "DELAY", flight_id: flightId, delay_minutes: delay, weights: meta.default_weights })
+                    )
+                  }
+                  onAgent={(flightId, delay) => askAgent({ flight_id: flightId, delay_minutes: delay })}
+                />
+              )}
+            </>
           )}
-          {view === "scenario" && !scenario && load.kind !== "busy" && (
-            <section className="empty">
-              <h1>Start with a disruption</h1>
-              <p>
-                Pick a suggested flight on the left, or search for any flight. <strong>Delay</strong> shows the knock-on
-                effect along the aircraft rotation and compares recovery options. <strong>Cancellation</strong> ranks the
-                affected passengers and rebooks them within the seats that are actually available.
-              </p>
-              <p className="muted">Every recommendation needs a person to approve it. Nothing is changed in airline systems.</p>
-            </section>
-          )}
-          {view === "scenario" && scenario && meta && scenario.result.type === "DELAY" && (
-            <DelayView scenario={scenario} result={scenario.result} meta={meta} onUpdate={setScenario} />
-          )}
-          {view === "scenario" && scenario && meta && scenario.result.type === "CANCEL" && (
-            <CancelView scenario={scenario} result={scenario.result} meta={meta} onUpdate={setScenario} />
-          )}
+
+          {/* ── Model Card ────────────────────────────────── */}
           {view === "model" && <ModelCardView />}
+
         </main>
       </div>
     </>

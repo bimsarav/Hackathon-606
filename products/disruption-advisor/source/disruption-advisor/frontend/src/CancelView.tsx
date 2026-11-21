@@ -21,7 +21,7 @@ export function CancelView({ scenario, result, meta, onUpdate }: Props) {
   return (
     <article className="result">
       <header className="result-head">
-        <p className="eyebrow">Scenario B · Cancellation</p>
+        <p className="eyebrow">Flight Cancellation</p>
         <h1>
           {f.flight_number} {f.origin}→{f.destination} cancelled
         </h1>

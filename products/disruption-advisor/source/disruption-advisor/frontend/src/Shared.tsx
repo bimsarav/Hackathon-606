@@ -174,106 +174,121 @@ export function PassengerTable({ scenario, rows, meta }: { scenario: Scenario; r
           <tr>
             <th scope="col">#</th>
             <th scope="col">Passenger</th>
-            <th scope="col">Tier</th>
-            <th scope="col">Score</th>
-            <th scope="col">Profile</th>
-            <th scope="col">Recommended</th>
-            <th scope="col">
-              <span className="visually-hidden">Details</span>
-            </th>
+            <th scope="col">Recommendation</th>
+            <th scope="col"><span className="visually-hidden">Details</span></th>
           </tr>
         </thead>
         <tbody>
           {visible.map((p) => {
             const key = `${p.pnr}:${p.customer_key}`;
             const d = drafts[p.customer_key];
+            const isOpen = open === key;
             return [
               <tr key={key} className={p.assigned_flight_id ? "" : "unprotected"}>
-                <td className="num">{p.rank}</td>
+                <td className="num pax-rank">{p.rank}</td>
                 <td>
-                  <strong>{p.name}</strong>
-                  {p.group && (
-                    <span className={`chip small ${p.group === "cancelled" ? "chip-bad" : "chip-warn"}`}>
-                      {p.group === "cancelled" ? "Flight cancelled" : "Missed connection"}
-                    </span>
-                  )}
-                  <span className="small muted block">
+                  <div className="pax-name-row">
+                    <strong>{p.name}</strong>
+                    <span className={`tier tier-${p.tier}`}>{p.non_revenue ? "Non-rev" : TIER_LABEL[p.tier]}</span>
+                    {p.group && (
+                      <span className={`chip small ${p.group === "cancelled" ? "chip-bad" : "chip-warn"}`}>
+                        {p.group === "cancelled" ? "Cancelled" : "Missed connection"}
+                      </span>
+                    )}
+                  </div>
+                  <span className="small muted">
                     {p.pnr} · {p.route}
                     {p.pnr_size > 1 ? ` · party of ${p.pnr_size}` : ""}
                   </span>
                 </td>
-                <td>
-                  <span className={`tier tier-${p.tier}`}>{p.non_revenue ? "Non-rev" : TIER_LABEL[p.tier]}</span>
-                  {p.ssr && (
-                    <span className="chip small" title={p.ssr_source === "synthetic" ? "Synthetic special-service code" : "From the booking data"}>
-                      {p.ssr}
-                      {p.ssr_source === "synthetic" ? "*" : ""}
-                    </span>
-                  )}
-                </td>
-                <td>
-                  <span className="score">
-                    <span className="score-bar" style={{ width: `${Math.min(p.score, 100)}%` }} />
-                    <span className="score-num">{p.score}</span>
-                  </span>
-                </td>
-                <td className="small">
-                  <LoyaltyCell p={p} /> · {p.frequency ?? "—"}
-                  <span className="block muted">
-                    {p.fare_family ?? "—"}* · fare {num(Math.round(p.fare))} · extras {num(Math.round(p.ancillaries))}
-                  </span>
-                </td>
-                <td>
+                <td className="pax-reco">
                   {p.assigned_flight_id ? (
                     <>
-                      <strong>{p.assigned_flight}</strong> {utc(p.new_departure)}
+                      <span className="pax-reco-flight">
+                        <strong>{p.assigned_flight}</strong>
+                        {p.new_departure && <span className="muted"> {utc(p.new_departure)}</span>}
+                      </span>
                       <span className="small muted block">
                         {p.care?.wait_minutes != null ? `waits ${minutes(p.care.wait_minutes)} · ` : ""}
                         arrives {minutes(p.arrival_delay_minutes)} later
-                        {p.onward_ok === false ? " · onward connection lost" : ""}
+                        {p.onward_ok === false ? " · ⚠ onward lost" : ""}
                         {p.split ? " · group split" : ""}
                       </span>
                     </>
                   ) : (
-                    <span className="unprotected-label">No seat within 24 h: next day</span>
+                    <span className="unprotected-label">No seat within 24 h</span>
                   )}
                   {p.care && (
-                    <span className="care block">
-                      <span className="small">Care: <strong>{p.care.summary}</strong></span>
-                      {p.care.refund_option && <span className="small block muted">Option: refund + free return, or date change</span>}
-                      {p.care.flags.map((f) => (
-                        <span key={f} className="flag small block">⚑ {f}</span>
-                      ))}
+                    <span className="care block small">
+                      Care: <strong>{p.care.summary}</strong>
+                      {p.care.refund_option && <span className="muted"> · refund option</span>}
                     </span>
                   )}
                 </td>
-                <td>
-                  <button type="button" className="link" aria-expanded={open === key} onClick={() => setOpen(open === key ? null : key)}>
-                    {open === key ? "Hide" : "Why & message"}
+                <td className="pax-actions">
+                  <button type="button" className="link" aria-expanded={isOpen}
+                    onClick={() => setOpen(isOpen ? null : key)}>
+                    {isOpen ? "▴ Less" : "▾ Details"}
                   </button>
                 </td>
               </tr>,
-              open === key && (
+              isOpen && (
                 <tr key={`${key}-detail`} className="detail">
-                  <td colSpan={7}>
-                    <p>{p.reason}</p>
-                    <ul className="contrib">
-                      {Object.entries(p.contributions).map(([k, v]) => (
-                        <li key={k}>
-                          {meta.weight_labels[k as WeightKey]}: <strong>+{v}</strong>
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="small muted">{p.assignment_reason}</p>
-                    <div className="message">
-                      <p className="small">
-                        <strong>Message draft</strong>
-                        {typeof d === "object" ? ` (${d.source.startsWith("ai:") ? `written by ${d.source.slice(3)}` : "template"})` : " (template)"}
-                      </p>
-                      <p>{typeof d === "object" ? d.text : typeof d === "string" ? d : p.message}</p>
-                      <button type="button" onClick={() => draft(p.customer_key)}>
-                        Personalise with AI
-                      </button>
+                  <td colSpan={4}>
+                    <div className="pax-detail-grid">
+                      <div className="pax-detail-col">
+                        <p className="pax-detail-label">Priority score</p>
+                        <div className="pax-detail-score">
+                          <span className="score">
+                            <span className="score-bar" style={{ width: `${Math.min(p.score, 100)}%` }} />
+                            <span className="score-num">{p.score}</span>
+                          </span>
+                          <ul className="contrib">
+                            {Object.entries(p.contributions).map(([k, v]) => (
+                              <li key={k}>{meta.weight_labels[k as WeightKey]}: <strong>+{v}</strong></li>
+                            ))}
+                          </ul>
+                        </div>
+                        <p className="pax-detail-label" style={{ marginTop: "0.75rem" }}>Profile</p>
+                        <p className="small">
+                          <LoyaltyCell p={p} />
+                          {p.ssr && (
+                            <span className="chip small" title={p.ssr_source === "synthetic" ? "Synthetic SSR" : "From booking"}>
+                              {p.ssr}{p.ssr_source === "synthetic" ? "*" : ""}
+                            </span>
+                          )}
+                          <span className="muted"> · {p.frequency ?? "—"}</span>
+                        </p>
+                        <p className="small muted">
+                          {p.fare_family ?? "—"}* · fare {num(Math.round(p.fare))} · extras {num(Math.round(p.ancillaries))}
+                        </p>
+                        {p.care?.flags && p.care.flags.length > 0 && (
+                          <p className="small">
+                            {p.care.flags.map((f) => (
+                              <span key={f} className="flag block">⚑ {f}</span>
+                            ))}
+                          </p>
+                        )}
+                      </div>
+                      <div className="pax-detail-col">
+                        <p className="pax-detail-label">Reason</p>
+                        <p className="small">{p.reason}</p>
+                        {p.assignment_reason && (
+                          <p className="small muted">{p.assignment_reason}</p>
+                        )}
+                        <p className="pax-detail-label" style={{ marginTop: "0.75rem" }}>Message</p>
+                        <div className="message">
+                          <p className="small muted">
+                            {typeof d === "object"
+                              ? d.source.startsWith("ai:") ? `Written by ${d.source.slice(3)}` : "Template"
+                              : "Template"}
+                          </p>
+                          <p className="small">{typeof d === "object" ? d.text : typeof d === "string" ? d : p.message}</p>
+                          <button type="button" onClick={() => draft(p.customer_key)}>
+                            Personalise with AI
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -283,8 +298,9 @@ export function PassengerTable({ scenario, rows, meta }: { scenario: Scenario; r
         </tbody>
       </table>
       {rows.length > PAGE && (
-        <button type="button" className="link" onClick={() => setShowAll(!showAll)}>
-          {showAll ? `Show the first ${PAGE} only` : `Show all ${rows.length} passengers`}
+        <button type="button" className="link" style={{ marginTop: "0.5rem", display: "inline-block" }}
+          onClick={() => setShowAll(!showAll)}>
+          {showAll ? `Show first ${PAGE} only` : `Show all ${rows.length} passengers`}
         </button>
       )}
       <p className="small muted">* synthetic value (not supplied in the airline extracts)</p>
