@@ -84,6 +84,7 @@ describe("strategy comparison", () => {
     const onUpdate = vi.fn();
     const scenario = delayScenario();
     render(<DelayView scenario={scenario} result={scenario.result as DelayResult} meta={meta} onUpdate={onUpdate} />);
+    await userEvent.click(screen.getByRole("button", { name: /Strategies compared/ })); // folded until opened
 
     const cards = Array.from(document.querySelectorAll<HTMLElement>(".strategy-card"));
     expect(cards.map((c) => c.dataset.strategy)).toEqual(["lowest_cost", "protect_passengers", "least_delay"]);
@@ -109,12 +110,29 @@ describe("strategy comparison", () => {
     expect(onUpdate).toHaveBeenCalledWith(switched);
   });
 
-  it("marks the new strategy's pick as recommended after switching", () => {
+  it("marks the new strategy's pick as recommended after switching", async () => {
     stubFetch(() => []);
     const scenario = delayScenario({ strategy: "least_delay", recommended_key: "cancel:G9521", selected_key: "cancel:G9521" });
     render(<DelayView scenario={scenario} result={scenario.result as DelayResult} meta={meta} onUpdate={() => {}} />);
+    await userEvent.click(screen.getByRole("button", { name: /Strategies compared/ }));
     expect(document.querySelector(".strategy-card.active")).toHaveAttribute("data-strategy", "least_delay");
     expect(document.querySelector("tr.recommended th")).toHaveTextContent("Cancel G9521/G9522 round trip");
+  });
+
+  it("shows the page at a glance and opens a folded section from its tile", async () => {
+    stubFetch(() => []);
+    const scenario = delayScenario();
+    render(<DelayView scenario={scenario} result={scenario.result as DelayResult} meta={meta} onUpdate={() => {}} />);
+    const glance = screen.getByRole("navigation", { name: "On this page" });
+    const labels = within(glance).getAllByRole("button").map((b) => b.querySelector(".glance-label")?.textContent);
+    expect(labels).toEqual(["Strategy", "Why?", "Recovery options", "Crew duty (FDP)", "Flight Board", "Flights affected",
+      "Connections at risk", "Passengers & rewards", "Assumptions"]);
+    expect(screen.getByRole("heading", { name: "Recovery options" })).toBeInTheDocument(); // the decision stays open
+    expect(screen.queryByText(/Click a card to apply that strategy/)).not.toBeInTheDocument(); // strategies folded
+    await userEvent.click(within(glance).getByRole("button", { name: /^Strategy/ }));
+    expect(screen.getByText(/Click a card to apply that strategy/)).toBeInTheDocument();
+    await userEvent.click(screen.getAllByRole("button", { name: "▴ Collapse" })[0] as HTMLElement);
+    expect(screen.queryByText(/Click a card to apply that strategy/)).not.toBeInTheDocument();
   });
 
   it("labels passengers by why they need a new flight", async () => {

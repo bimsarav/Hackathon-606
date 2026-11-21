@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { api, type ConnectionRisk, type DelayResult, errorText, type Meta, type PassengerRow, type RecoveryOption, type Scenario } from "./api";
+import { type ReactNode, useState } from "react";
+import { api, type ConnectionRisk, type DelayResult, errorText, type Meta, type PassengerRow, type RecoveryOption, type Scenario, STRATEGY_LABEL } from "./api";
 import { aed, hhmm, minutes, num, utc } from "./format";
 import { AgentRecommendationPanel } from "./AgentRunView";
 import { CrewFdpAlerts } from "./CrewFdpAlerts";
@@ -20,6 +20,22 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
   const [allLegs, setAllLegs] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [selectError, setSelectError] = useState<string | null>(null);
+  // Sections fold away; the "at a glance" tiles open one and scroll to it. The decision itself stays open.
+  const [openSecs, setOpenSecs] = useState<Set<Section>>(() => new Set<Section>(["why", "options"]));
+  const toggle = (id: Section) => setOpenSecs((s) => {
+    const next = new Set(s);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+  const reveal = (id: Section) => {
+    setOpenSecs((s) => new Set(s).add(id));
+    window.setTimeout(() => {
+      const el = document.getElementById(`sec-${id}`);
+      const details = el?.querySelector("details");
+      if (details) details.open = true;
+      el?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+    }, 0);
+  };
   const best = result.options.find((o) => o.key === result.recommended_key) ?? result.options[0];
   if (!best) return <p className="error">No recovery option could be computed for this flight.</p>;
   const selectedKey = result.selected_key ?? result.recommended_key;
@@ -69,12 +85,38 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
             : worst.key !== best.key ? `saves ${aed(worst.cost_aed - best.cost_aed)} vs worst option` : "only feasible option"} />
       </section>
 
+      <nav className="glance" aria-label="On this page">
+        {result.strategies && result.strategy && (
+          <Tile label="Strategy" value={STRATEGY_LABEL[result.strategy]} sub={`picks ${best.label}`} onClick={() => reveal("strategies")} />
+        )}
+        <Tile label="Why?" value={result.explanation.source.startsWith("ai:") ? "AI-worded" : "Template"} sub={firstSentence(result.explanation.text)} onClick={() => reveal("why")} />
+        <Tile label="Recovery options" value={num(result.options.length)} sub={`recommended: ${best.label}`} onClick={() => reveal("options")} />
+        <Tile label="Crew duty (FDP)" value={crewLabel(shown)} sub={shown.crew ? `${num(shown.crew.flights_checked)} flights checked` : "no roster data"}
+          tone={shown.crew?.status === "over" ? "bad" : shown.crew?.status === "tight" ? "warn" : undefined} onClick={() => reveal("options")} />
+        <Tile label="Flight Board" value={`${num(new Set(shown.legs.map((l) => l.operated_by)).size)} aircraft`} sub={`${num(shown.legs.length)} flights in the rotation`} onClick={() => reveal("board")} />
+        <Tile label="Flights affected" value={num(shown.legs_delayed)} sub={`delayed of ${num(shown.legs.length)}`} onClick={() => reveal("legs")} />
+        <Tile label="Connections at risk" value={num(result.misconnections.length)} sub={`of ${num(shown.connections_checked)} checked`}
+          tone={result.misconnections.length > 0 ? "warn" : undefined} onClick={() => reveal("conn")} />
+        <Tile label="Passengers & rewards" value={num(result.passengers.length)}
+          sub={result.rebooking ? `${num(result.rebooking.protected)} rebooked · ${num(result.rebooking.unprotected)} without a seat` : "rebooking and goodwill"} onClick={() => reveal("pax")} />
+        <Tile label="Assumptions" value={num(result.assumptions.length)} sub="data notes" onClick={() => reveal("assumptions")} />
+      </nav>
+
       {result.agent && <AgentRecommendationPanel agent={result.agent} optionLabel={agentOption?.label ?? result.agent.option_key} />}
 
-      <StrategyPanel scenario={scenario} result={result} onUpdate={onUpdate} />
+      {result.strategies && result.strategies.length > 0 && (
+        <Fold id="strategies" title="Strategies compared" summary={result.strategy ? `active: ${STRATEGY_LABEL[result.strategy]}` : ""}
+          open={openSecs.has("strategies")} onToggle={() => toggle("strategies")}>
+          <StrategyPanel scenario={scenario} result={result} onUpdate={onUpdate} />
+        </Fold>
+      )}
 
-      <Explanation text={result.explanation.text} source={result.explanation.source} />
+      <Fold id="why" title="Why?" summary={firstSentence(result.explanation.text)} open={openSecs.has("why")} onToggle={() => toggle("why")}>
+        <Explanation text={result.explanation.text} source={result.explanation.source} />
+      </Fold>
 
+      <Fold id="options" title="Recovery options" summary={`${num(result.options.length)} options · recommended: ${best.label}`}
+        open={openSecs.has("options")} onToggle={() => toggle("options")}>
       <section aria-labelledby="options-title">
         <h2 id="options-title">Recovery options</h2>
         <p className="small muted">Click an option to see its flights, passengers and cost. {result.strategies
@@ -136,11 +178,17 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
         <DecisionBar scenario={scenario} target={`option:${shown.key}`}
           label={override ? "selected option (override)" : "recommended option"} requireComment={override} />
       </section>
+      </Fold>
 
       <CrewFdpAlerts options={result.options} selectedKey={shown.key} />
 
-      <RotationBoard option={shown} disruptedId={result.flight.flight_id} meta={meta} />
+      <Fold id="board" title={`Flight Board: ${shown.label}`} summary={`${num(shown.legs.length)} flights of the affected aircraft`}
+        open={openSecs.has("board")} onToggle={() => toggle("board")}>
+        <RotationBoard option={shown} disruptedId={result.flight.flight_id} meta={meta} />
+      </Fold>
 
+      <Fold id="legs" title={`Flights affected: ${shown.label}`} summary={`${num(shown.legs_delayed)} delayed of ${num(shown.legs.length)}`}
+        open={openSecs.has("legs")} onToggle={() => toggle("legs")}>
       <section aria-labelledby="legs-title">
         <h2 id="legs-title">Flights affected: {shown.label}</h2>
         <p className="small muted">Every flight this option touches over the next {meta.horizon_days} days, new times in UTC.</p>
@@ -185,13 +233,18 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
           </button>
         )}
       </section>
+      </Fold>
 
-      <ConnectionDrillDown
-        misconnections={result.misconnections}
-        passengers={result.passengers}
-        flightId={result.flight.flight_id}
-      />
+      <Fold id="conn" title={`Connecting passengers at risk (${num(result.misconnections.length)})`} summary={`of ${num(shown.connections_checked)} connections checked`}
+        open={openSecs.has("conn")} onToggle={() => toggle("conn")}>
+        <ConnectionDrillDown
+          misconnections={result.misconnections}
+          passengers={result.passengers}
+          flightId={result.flight.flight_id}
+        />
+      </Fold>
 
+      <div id="sec-pax">
       <PassengerTabs
         scenario={scenario}
         passengersLabel={cancelledPax ? `Passengers to rebook (${num(result.passengers.length)})` : `Connection passengers (${num(result.misconnections.length)})`}
@@ -215,8 +268,9 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
           {result.passengers.length > 0 && <DecisionBar scenario={scenario} target="rebooking" label="rebooking plan" />}
         </section>
       </PassengerTabs>
+      </div>
 
-      <Assumptions items={result.assumptions} />
+      <div id="sec-assumptions"><Assumptions items={result.assumptions} /></div>
     </article>
   );
 }
@@ -374,6 +428,53 @@ function ConnectionDrillDown({
           </div>
         </>
       )}
+    </section>
+  );
+}
+
+type Section = "strategies" | "why" | "options" | "board" | "legs" | "conn" | "pax" | "assumptions";
+
+function firstSentence(text: string): string {
+  const one = text.split(/(?<=[.!?])\s/)[0] ?? text;
+  return one.length > 90 ? `${one.slice(0, 89)}…` : one;
+}
+
+function crewLabel(o: RecoveryOption): string {
+  if (!o.crew) return "—";
+  return { ok: "within limits", tight: "tight", over: "breach", unknown: "unknown" }[o.crew.status];
+}
+
+/** One "at a glance" tile: what a section shows, in a number; a click opens that section. */
+function Tile({ label, value, sub, tone, onClick }: { label: string; value: string; sub: string; tone?: "bad" | "warn"; onClick: () => void }) {
+  return (
+    <button type="button" className={`glance-tile${tone ? ` ${tone}` : ""}`} onClick={onClick}>
+      <span className="glance-label">{label}</span>
+      <span className="glance-value">{value}</span>
+      <span className="glance-sub">{sub}</span>
+    </button>
+  );
+}
+
+/** A section that folds to one line (title + summary); open, it shows its full content with a collapse link. */
+function Fold({ id, title, summary, open, onToggle, children }: {
+  id: Section; title: string; summary: string; open: boolean; onToggle: () => void; children: ReactNode;
+}) {
+  if (open) {
+    return (
+      <div id={`sec-${id}`} className="fold open">
+        <button type="button" className="link fold-close small" aria-expanded="true" onClick={onToggle}>▴ Collapse</button>
+        {children}
+      </div>
+    );
+  }
+  return (
+    <section id={`sec-${id}`} className="fold closed">
+      <h2>
+        <button type="button" className="fold-head" aria-expanded="false" onClick={onToggle}>
+          <span aria-hidden="true">▸ </span>{title}
+        </button>
+      </h2>
+      <span className="small muted fold-summary">{summary}</span>
     </section>
   );
 }

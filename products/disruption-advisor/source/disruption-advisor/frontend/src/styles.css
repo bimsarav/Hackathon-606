@@ -1701,3 +1701,21 @@ tr.clickable.selected {
 .filter-row-advanced { border-top: 1px solid var(--line); margin-top: 0.6rem; padding-top: 0.6rem; }
 .filter-row-advanced .row { margin-top: 0.4rem; gap: 1.5rem; flex-wrap: wrap; }
 .row-predict { margin-top: 2px; font-weight: 600; }
+
+/* Flight Delay page: "at a glance" tiles and folding sections */
+.glance { display: grid; gap: 0.5rem; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)); margin: 0 0 1rem; }
+.glance-tile { display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 0.6rem 0.75rem; border: 1px solid var(--line);
+  border-radius: var(--radius); background: var(--panel); color: var(--ink); cursor: pointer; font: inherit; min-height: 4.6rem; }
+.glance-tile:hover, .glance-tile:focus-visible { border-color: var(--accent); box-shadow: var(--shadow-sm); }
+.glance-tile.warn { border-left: 3px solid var(--warn); }
+.glance-tile.bad { border-left: 3px solid var(--bad); }
+.glance-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.glance-value { font-size: 1.05rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.glance-sub { font-size: 0.75rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.fold.closed { display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; padding: 0.6rem 0.9rem; margin: 0.5rem 0;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); }
+.fold.closed h2 { margin: 0; font-size: 1rem; }
+.fold-head { background: none; border: 0; padding: 0; font: inherit; font-weight: 600; color: var(--ink); cursor: pointer; }
+.fold-head:hover { color: var(--accent); }
+.fold.open { position: relative; }
+.fold-close { position: absolute; right: 0.75rem; top: 0.6rem; z-index: 1; }
