@@ -146,6 +146,40 @@ function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
 
 type Load = { kind: "idle" } | { kind: "busy"; label: string } | { kind: "error"; message: string };
 
+const VIEW_LABEL: Record<View, string> = {
+  delay: "Flight Delay",
+  cancel: "Cancellation",
+  agent: "Predict the Flight Delay",
+  watchlist: "Delay Watchlist",
+  model: "Model Card",
+  testdata: "Test Data",
+  recent: "Recent Searches",
+};
+const VIEW_SECTION: Partial<Record<View, string>> = {
+  delay: "Analyze", cancel: "Analyze", agent: "Analyze",
+  watchlist: "Monitor",
+  model: "Reference", testdata: "Reference",
+};
+
+function Breadcrumb({ view, scenario, onView }: { view: View; scenario: Scenario | null; onView: (v: View) => void }) {
+  const section = VIEW_SECTION[view];
+  const viewLabel = VIEW_LABEL[view];
+  const flightLabel = scenario
+    ? scenario.result.type === "DELAY"
+      ? `${scenario.result.flight.flight_number} · +${scenario.delay_minutes}m`
+      : `${scenario.result.flight.flight_number} · Cancellation`
+    : null;
+  return (
+    <nav className="breadcrumb" aria-label="Breadcrumb">
+      <span className="bc-item bc-home" onClick={() => onView(view)}>aeroRecovery</span>
+      {section && <><span className="bc-sep">›</span><span className="bc-item bc-section">{section}</span></>}
+      <span className="bc-sep">›</span>
+      <span className="bc-item bc-view">{viewLabel}</span>
+      {flightLabel && <><span className="bc-sep">›</span><span className="bc-item bc-flight">{flightLabel}</span></>}
+    </nav>
+  );
+}
+
 function NavItem({ label, icon, active, onClick }: { label: string; icon: string; active: boolean; onClick: () => void }) {
   return (
     <button type="button" className={`nav-item${active ? " active" : ""}`} onClick={onClick} aria-current={active ? "page" : undefined}>
@@ -284,6 +318,7 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
         </aside>
 
         <main id="main" aria-live="polite" aria-busy={load.kind === "busy"}>
+          <Breadcrumb view={view} scenario={scenario} onView={setView} />
 
           {/* ── Flight Delay ─────────────────────────────── */}
           {view === "delay" && (

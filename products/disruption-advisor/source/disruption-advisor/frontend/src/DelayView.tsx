@@ -267,8 +267,6 @@ function ConnectionDrillDown({
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  if (misconnections.length === 0) return null;
-
   async function expand() {
     setOpen(true);
     if (Object.keys(riskMap).length > 0) return;

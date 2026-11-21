@@ -831,18 +831,18 @@ def presets(ctx: Context) -> dict[str, list[dict[str, Any]]]:
         [now, now],
     )
     cancel = ctx.store.query(
-        """SELECT * FROM (
-             SELECT f.flight_id, f.flight_number, f.origin, f.destination, f.std, f.tail, f.booked_seats,
-                    (SELECT coalesce(sum(greatest(g.capacity - g.booked_seats, 0)), 0) FROM flights g
-                      WHERE g.origin = f.origin AND g.destination = f.destination AND g.flight_id <> f.flight_id
-                        AND g.std > f.std - INTERVAL 3 HOUR AND g.std <= f.std + INTERVAL 24 HOUR) AS free_seats,
-                    (SELECT count(*) FROM pax_segments p WHERE p.flight_id = f.flight_id
-                        AND (p.ssr_code IS NOT NULL OR p.infants > 0)) AS care_pax
-             FROM flights f
-             WHERE f.airline = 'G9' AND f.origin = 'SHJ' AND f.std >= ? AND f.std < ? + INTERVAL 4 DAY
-               AND f.booked_seats > 120 AND f.capacity_source <> 'synthetic-demo')
-           WHERE free_seats BETWEEN 20 AND booked_seats - 20 AND care_pax > 0
-           ORDER BY care_pax DESC, abs(free_seats - booked_seats / 2) LIMIT 5""",
+        """SELECT f.flight_id, f.flight_number, f.origin, f.destination, f.std, f.tail,
+                  greatest(f.booked_seats, 0) AS booked_seats,
+                  (SELECT coalesce(sum(greatest(g.capacity - greatest(g.booked_seats, 0), 0)), 0) FROM flights g
+                    WHERE g.origin = f.origin AND g.destination = f.destination AND g.flight_id <> f.flight_id
+                      AND g.std > f.std - INTERVAL 3 HOUR AND g.std <= f.std + INTERVAL 24 HOUR) AS free_seats,
+                  (SELECT count(*) FROM pax_segments p WHERE p.flight_id = f.flight_id
+                      AND (p.ssr_code IS NOT NULL OR p.infants > 0)) AS care_pax
+           FROM flights f
+           WHERE f.airline = 'G9' AND f.origin = 'SHJ' AND f.std >= ? AND f.std < ? + INTERVAL 4 DAY
+             AND f.capacity > 100 AND f.capacity_source <> 'synthetic-demo'
+           ORDER BY care_pax DESC, f.capacity DESC
+           LIMIT 5""",
         [now, now],
     )
     return {"delay": delay, "cancel": cancel}

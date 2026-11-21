@@ -449,6 +449,9 @@ def load_passengers(ops: Path) -> list[dict[str, Any]]:
 def run(ops: Path) -> dict[str, Any]:
     """Ingest stage 4: simulate the history for the real passenger profiles, train, write the outputs."""
     passengers = load_passengers(ops)
+    if not passengers:
+        log.warning("stage 4 skipped: no passengers loaded (no bookings data)")
+        return {"skipped": True, "reason": "no passengers"}
     history = generate_history(passengers)
     booster, card = train(history)
     booster.save_model(str(ops / "reward_model.txt"))

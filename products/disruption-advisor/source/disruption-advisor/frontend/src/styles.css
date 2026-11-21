@@ -652,6 +652,23 @@ main {
   margin-top: 0.6rem;
 }
 
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 1.1rem;
+  flex-wrap: wrap;
+}
+.bc-sep { opacity: 0.5; }
+.bc-home { cursor: pointer; }
+.bc-home:hover { color: var(--accent); }
+.bc-section { color: var(--muted); }
+.bc-view { color: var(--ink); font-weight: 500; }
+.bc-flight { color: var(--accent); font-weight: 600; }
+
 /* Launcher — now lives in main content, styled as a card */
 .launcher {
   background: var(--panel);

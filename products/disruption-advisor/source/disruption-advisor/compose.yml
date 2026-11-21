@@ -56,7 +56,7 @@ services:
   # are unchanged since the last run.
   ingest:
     image: disruption-advisor-api:latest
-    command: ["python", "-m", "app.ingest"]
+    command: ["python", "-m", "app.ingest", "--skip-bookings"]
     healthcheck: { disable: true }
     environment:
       INPUT_DIR: /input
