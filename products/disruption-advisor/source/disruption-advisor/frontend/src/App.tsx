@@ -92,6 +92,45 @@ export function App() {
   );
 }
 
+/** Default login look until one is chosen ("split" | "ops" | "board" | "photo" | "minimal"). */
+const LOGIN_VARIANT = "split";
+const BOARD_ROWS: [string, string, string][] = [
+  ["G9519", "Dhaka", "Delayed"], ["G9148", "Jeddah", "Recovered"], ["G9502", "Colombo", "On time"],
+  ["G9449", "Trivandrum", "Boarding"], ["G9283", "Istanbul", "On time"], ["G9251", "Almaty", "Recovered"],
+];
+// Sharjah hub and a few G9 stations, roughly placed (x, y in a 1000 x 600 map).
+const OPS_HUB: [number, number] = [520, 330];
+const OPS_STATIONS: [string, number, number][] = [
+  ["KHI", 700, 300], ["DAC", 900, 330], ["CMB", 800, 520], ["JED", 330, 380], ["CAI", 230, 260],
+  ["IST", 260, 120], ["ALA", 760, 110], ["TRV", 720, 470],
+];
+
+/** Faint route map with planes moving between the hub and the stations (static when reduced motion is set). */
+function OpsMap() {
+  const [hx, hy] = OPS_HUB;
+  return (
+    <svg className="login-ops-map" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+      {OPS_STATIONS.map(([code, x, y], i) => {
+        const mx = (hx + x) / 2;
+        const my = Math.min(hy, y) - 80;
+        const d = `M${hx},${hy} Q${mx},${my} ${x},${y}`;
+        return (
+          <g key={code}>
+            <path d={d} className="ops-route" />
+            <circle cx={x} cy={y} r={4} className="ops-station" />
+            <text x={x} y={y - 10} textAnchor="middle" className="ops-label">{code}</text>
+            <circle r={3.5} className="ops-plane">
+              <animateMotion dur={`${9 + i * 1.7}s`} repeatCount="indefinite" path={d} begin={`${i * -1.3}s`} />
+            </circle>
+          </g>
+        );
+      })}
+      <circle cx={hx} cy={hy} r={7} className="ops-hub" />
+      <text x={hx} y={hy + 24} textAnchor="middle" className="ops-label ops-hub-label">SHJ</text>
+    </svg>
+  );
+}
+
 function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -112,6 +151,101 @@ function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
   }
 
   const [reveal, setReveal] = useState(false);
+  // Login look (user 2026-11-21: compare four styles): ?login=ops | board | photo | minimal; default = split.
+  const variant = new URLSearchParams(window.location.search).get("login") ?? LOGIN_VARIANT;
+  const form = (
+    <form onSubmit={onSubmit} aria-describedby={error ? "login-error" : undefined}>
+      <label htmlFor="username">User name</label>
+      <input id="username" autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} required autoFocus />
+      <label htmlFor="password">Password</label>
+      <div className="login-secret">
+        <input id="password" type={reveal ? "text" : "password"} autoComplete="current-password" value={password}
+          onChange={(e) => setPassword(e.target.value)} required />
+        <button type="button" className="login-reveal" aria-label={reveal ? "Hide what is typed" : "Show what is typed"}
+          aria-pressed={reveal} onClick={() => setReveal((v) => !v)}>{reveal ? "Hide" : "Show"}</button>
+      </div>
+      {error && (
+        <p id="login-error" className="error" role="alert">
+          {error}
+        </p>
+      )}
+      <button type="submit" className="primary login-submit" disabled={busy}>
+        {busy ? "Signing in…" : "Sign in"}
+      </button>
+    </form>
+  );
+  const logo = (
+    <span className="login-hero-logo"><img src="/brand/air-arabia-tail.svg" alt="Air Arabia" /></span>
+  );
+
+  if (variant === "ops") {
+    return (
+      <main id="main" className="login login-ops">
+        <OpsMap />
+        <section className="login-glass" aria-labelledby="login-title">
+          <div className="login-glass-brand">{logo}<span>aeroRecovery</span></div>
+          <h1 id="login-title">Sign in</h1>
+          <p className="login-glass-line">Disruption recovery for OCC and PCU</p>
+          {form}
+        </section>
+      </main>
+    );
+  }
+  if (variant === "board") {
+    return (
+      <main id="main" className="login login-split login-board">
+        <section className="login-board-panel" aria-label="aeroRecovery">
+          <div className="login-hero-brand">{logo}<span className="login-hero-name">aeroRecovery</span></div>
+          <div className="login-board-table" aria-hidden="true">
+            <div className="login-board-head"><span>Flight</span><span>Destination</span><span>Status</span></div>
+            {BOARD_ROWS.map(([flight, dest, status], i) => (
+              <div key={flight} className="login-board-row" style={{ animationDelay: `${i * 0.12}s` }}>
+                <span>{flight}</span><span>{dest}</span><span className={`login-board-status s-${status.toLowerCase().replace(" ", "-")}`}>{status}</span>
+              </div>
+            ))}
+          </div>
+          <p className="login-hero-lead">Recover the day before the delay spreads.</p>
+        </section>
+        <section className="login-panel" aria-labelledby="login-title">
+          <div className="login-form-card"><h1 id="login-title">Sign in</h1>{form}</div>
+        </section>
+      </main>
+    );
+  }
+  if (variant === "photo") {
+    return (
+      <main id="main" className="login login-photo">
+        <div className="login-sky" aria-hidden="true">
+          <div className="login-sun" />
+          <svg className="login-wing" viewBox="0 0 1200 400" preserveAspectRatio="none" focusable="false">
+            <path d="M0 360 L1080 300 L1100 312 L0 400 Z" />
+            <path className="login-wing-tip" d="M1072 302 L1112 250 L1124 252 L1096 314 Z" />
+          </svg>
+        </div>
+        <div className="login-photo-copy">
+          <div className="login-hero-brand">{logo}<span className="login-hero-name">aeroRecovery</span></div>
+          <h2 className="login-hero-title">Recover the day.</h2>
+          <p className="login-hero-lead">Disruption recovery for OCC and PCU.</p>
+        </div>
+        <section className="login-photo-card" aria-labelledby="login-title">
+          <h1 id="login-title">Sign in</h1>
+          {form}
+        </section>
+      </main>
+    );
+  }
+  if (variant === "minimal") {
+    return (
+      <main id="main" className="login login-minimal">
+        <section className="login-minimal-card" aria-labelledby="login-title">
+          <span className="login-minimal-logo"><img src="/brand/air-arabia-tail.svg" alt="Air Arabia" /></span>
+          <h1 id="login-title">aeroRecovery</h1>
+          <p className="muted">Disruption recovery for OCC and PCU</p>
+          {form}
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main id="main" className="login login-split">
@@ -139,25 +273,7 @@ function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
       <section className="login-panel" aria-labelledby="login-title">
         <div className="login-form-card">
           <h1 id="login-title">Sign in</h1>
-          <form onSubmit={onSubmit} aria-describedby={error ? "login-error" : undefined}>
-            <label htmlFor="username">User name</label>
-            <input id="username" autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} required autoFocus />
-            <label htmlFor="password">Password</label>
-            <div className="login-secret">
-              <input id="password" type={reveal ? "text" : "password"} autoComplete="current-password" value={password}
-                onChange={(e) => setPassword(e.target.value)} required />
-              <button type="button" className="login-reveal" aria-label={reveal ? "Hide what is typed" : "Show what is typed"}
-                aria-pressed={reveal} onClick={() => setReveal((v) => !v)}>{reveal ? "Hide" : "Show"}</button>
-            </div>
-            {error && (
-              <p id="login-error" className="error" role="alert">
-                {error}
-              </p>
-            )}
-            <button type="submit" className="primary login-submit" disabled={busy}>
-              {busy ? "Signing in…" : "Sign in"}
-            </button>
-          </form>
+          {form}
         </div>
       </section>
     </main>
