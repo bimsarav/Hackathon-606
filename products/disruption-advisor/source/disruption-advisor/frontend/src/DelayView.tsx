@@ -98,7 +98,7 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
         <Tile label="Why?" value={result.explanation.source.startsWith("ai:") ? "AI-worded" : "Template"} sub={firstSentence(result.explanation.text)} onClick={() => reveal("why")} />
         <Tile label="Recovery options" value={num(result.options.length)} sub={`recommended: ${best.label}`} onClick={() => reveal("options")} />
         <Tile label="Crew duty (FDP)" value={crewLabel(shown)} sub={shown.crew ? `${num(shown.crew.flights_checked)} flights checked` : "no roster data"}
-          tone={shown.crew?.status === "over" ? "bad" : shown.crew?.status === "tight" ? "warn" : undefined} onClick={() => reveal("options")} />
+          tone={shown.crew?.status === "over" ? "bad" : shown.crew?.status === "tight" ? "warn" : undefined} onClick={() => reveal("crew")} />
         <Tile label="Flight Board" value={`${num(new Set(shown.legs.map((l) => l.operated_by)).size)} aircraft`} sub={`${num(shown.legs.length)} flights in the rotation`} onClick={() => reveal("board")} />
         <Tile label="Flights affected" value={num(shown.legs_delayed)} sub={`delayed of ${num(shown.legs.length)}`} onClick={() => reveal("legs")} />
         <Tile label="Connections at risk" value={num(result.misconnections.length)} sub={`of ${num(shown.connections_checked)} checked`}
@@ -187,6 +187,12 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
       </Fold>
 
       <CrewFdpAlerts options={result.options} selectedKey={shown.key} />
+
+      <Fold id="crew" title={`Crew duty (FDP): ${shown.label}`}
+        summary={shown.crew ? `${crewLabel(shown)} · ${num(shown.crew.flights_checked)} flights checked${shown.crew.worst ? ` · tightest ${num(shown.crew.worst.minutes_left)} min left` : ""}` : "no roster data"}
+        open={openSecs.has("crew")} onToggle={() => toggle("crew")}>
+        <CrewSection option={shown} />
+      </Fold>
 
       <Fold id="board" title={`Flight Board: ${shown.label}`} summary={`${num(shown.legs.length)} flights of the affected aircraft`}
         open={openSecs.has("board")} onToggle={() => toggle("board")}>
@@ -450,7 +456,7 @@ function ConnectionDrillDown({
   );
 }
 
-type Section = "strategies" | "why" | "options" | "board" | "legs" | "assumptions";
+type Section = "strategies" | "why" | "options" | "crew" | "board" | "legs" | "assumptions";
 type People = "conn" | "pax" | "rewards";
 
 function firstSentence(text: string): string {
@@ -517,5 +523,58 @@ function PeopleBox({ kind, title, stats, active, onOpen }: {
       </span>
       <span className="model-box-open small">{active ? "Hide details ▴" : "Open details →"}</span>
     </button>
+  );
+}
+
+const CREW_TYPE: Record<string, string> = {
+  CP: "Captain", FO: "First officer", SO: "Second officer", CS: "Senior cabin crew", CC: "Cabin crew",
+};
+const CREW_STATUS: Record<string, { label: string; chip: string }> = {
+  ok: { label: "within limits", chip: "chip-ok" }, tight: { label: "tight", chip: "chip-warn" }, over: { label: "breach", chip: "chip-bad" },
+};
+
+/** The selected option's crew check: for each flight, the tightest crew member's duty headroom after the new delay. */
+function CrewSection({ option }: { option: RecoveryOption }) {
+  const crew = option.crew;
+  return (
+    <section aria-labelledby="crew-title">
+      <h2 id="crew-title">Crew duty (FDP): {option.label}</h2>
+      {!crew || crew.flights.length === 0 ? (
+        <p className="muted">No crew roster data for the flights of this option, so their duty time cannot be checked.</p>
+      ) : (
+        <>
+          <p className="small muted">
+            Minutes left = maximum flight duty period − duty with the new delay, for the tightest crew member on each flight.
+            Breach: past the maximum; tight: under the configured margin. Alert only: no crew change is planned.
+            {crew.estimated > 0 && ` ${num(crew.estimated)} flight(s) use an estimated duty (no roster match).`}
+          </p>
+          <div className="table-wrap">
+            <table aria-label="Crew duty by flight">
+              <thead>
+                <tr>
+                  <th scope="col">Flight</th><th scope="col">Route</th><th scope="col">New departure</th>
+                  <th scope="col" className="num">Delay</th><th scope="col" className="num">Headroom before</th>
+                  <th scope="col" className="num">Minutes left</th><th scope="col">Tightest crew</th><th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {crew.flights.map((f) => (
+                  <tr key={f.flight_id}>
+                    <th scope="row">{f.flight_number}</th>
+                    <td>{f.origin && f.destination ? `${f.origin}→${f.destination}` : "—"}</td>
+                    <td>{f.new_std ? utc(f.new_std) : "—"}</td>
+                    <td className="num">{minutes(f.delay_minutes)}</td>
+                    <td className="num">{num(f.headroom_minutes)} min</td>
+                    <td className="num">{num(f.minutes_left)} min</td>
+                    <td>{f.crew_type ? (CREW_TYPE[f.crew_type] ?? f.crew_type) : "—"}{f.source === "estimated" ? " (estimated)" : ""}</td>
+                    <td><span className={`chip ${CREW_STATUS[f.status]?.chip ?? ""}`}>{CREW_STATUS[f.status]?.label ?? f.status}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+    </section>
   );
 }

@@ -133,6 +133,28 @@ describe("strategy comparison", () => {
     expect(screen.getByText(/Click a card to apply that strategy/)).toBeInTheDocument();
     await userEvent.click(screen.getAllByRole("button", { name: "▴ Collapse" })[0] as HTMLElement);
     expect(screen.queryByText(/Click a card to apply that strategy/)).not.toBeInTheDocument();
+    await userEvent.click(within(glance).getByRole("button", { name: /^Crew duty/ }));
+    expect(screen.getByRole("heading", { name: /^Crew duty \(FDP\): / })).toBeInTheDocument();
+    expect(screen.getByText(/No crew roster data for the flights of this option/)).toBeInTheDocument();
+  });
+
+  it("lists each flight's crew headroom for the selected option", async () => {
+    stubFetch(() => []);
+    const crew = { status: "tight" as const, flights_checked: 2, flights_over: 0, flights_tight: 1, flights_unknown: 0, estimated: 0,
+      worst: null, flights: [
+        { flight_id: "G9520_202611210400", flight_number: "G9520", origin: "SHJ", destination: "MCT", new_std: "2026-11-21T06:30:00",
+          delay_minutes: 150, headroom_minutes: 170, minutes_left: 20, crew_type: "CP", source: "roster" as const, status: "tight" as const },
+      ] };
+    const base = delayScenario();
+    const res = base.result as DelayResult;
+    const scenario = delayScenario({ options: res.options.map((o) => (o.key === res.recommended_key ? { ...o, crew } : o)) });
+    render(<DelayView scenario={scenario} result={scenario.result as DelayResult} meta={meta} onUpdate={() => {}} />);
+    await userEvent.click(screen.getByRole("button", { name: /^Crew duty \(FDP\): / }));
+    const table = screen.getByRole("table", { name: "Crew duty by flight" });
+    expect(within(table).getByText("G9520")).toBeInTheDocument();
+    expect(within(table).getByText("20 min")).toBeInTheDocument();
+    expect(within(table).getByText("Captain")).toBeInTheDocument();
+    expect(within(table).getByText("tight")).toBeInTheDocument();
   });
 
   it("labels passengers by why they need a new flight", async () => {
