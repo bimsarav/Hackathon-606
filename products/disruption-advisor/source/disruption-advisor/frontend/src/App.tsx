@@ -345,6 +345,8 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
                 <Launcher
                   key="delay"
                   meta={meta}
+                  recent={history.filter((h) => h.kind === "DELAY")}
+                  onOpenRecent={(id) => run("delay", "Opening scenario…", () => api.scenario(id))}
                   busy={busy}
                   defaultTab="DELAY"
                   hideTabNav
@@ -365,7 +367,7 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
               {!delaySubmitted && load.kind !== "busy" && (
                 <section className="empty">
                   <h1>Flight Delay Analysis</h1>
-                  <p>Select a suggested flight above, or search by flight number, airport or aircraft tail. The engine maps the knock-on effect along the full rotation and compares every recovery option by cost.</p>
+                  <p>Pick a suggested flight above, or search by flight number (airport and aircraft are under More filters). The engine maps the knock-on effect along the full rotation and compares every recovery option by cost.</p>
                   <p className="muted">Every recommendation needs a person to approve it before anything changes in airline systems.</p>
                 </section>
               )}
@@ -384,6 +386,8 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
                 <Launcher
                   key="cancel"
                   meta={meta}
+                  recent={history.filter((h) => h.kind === "CANCEL")}
+                  onOpenRecent={(id) => run("cancel", "Opening scenario…", () => api.scenario(id))}
                   busy={busy}
                   defaultTab="CANCEL"
                   hideTabNav

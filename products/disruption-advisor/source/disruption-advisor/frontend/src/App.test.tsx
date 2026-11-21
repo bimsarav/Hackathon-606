@@ -93,7 +93,7 @@ describe("App", () => {
     await userEvent.type(screen.getByLabelText("Password"), "pw");
     await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
     expect(await screen.findByRole("region", { name: "New scenario" })).toBeInTheDocument();
-    expect(await screen.findByText(/142 connecting/)).toBeInTheDocument();
+    expect(await screen.findByText(/142 conn/)).toBeInTheDocument();
   });
 });
 

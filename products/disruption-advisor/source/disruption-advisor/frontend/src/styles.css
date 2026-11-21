@@ -1754,3 +1754,11 @@ tr.clickable.selected {
 .search-hint { margin: 0; }
 .list-head { display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
 .list-head h3 { margin: 0.75rem 0 0.5rem; }
+.search-chips { display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center; }
+.preset-list.preset-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; padding: 0; margin: 0.25rem 0 0.75rem; }
+.preset-list.preset-chips li { margin: 0; }
+.preset.preset-chip { display: inline-flex; align-items: center; gap: 0.25rem; width: auto; padding: 0.3rem 0.75rem; border-radius: 999px;
+  font-size: 0.85rem; min-height: 0; }
+.preset-list.preset-chips { flex-direction: row; }
+.preset-list.preset-chips li { display: inline-flex; }
+.preset-list.preset-chips li .preset.preset-chip { flex: 0 0 auto; width: auto; flex-direction: row; text-align: left; white-space: nowrap; }

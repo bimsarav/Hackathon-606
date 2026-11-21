@@ -9,6 +9,7 @@ import {
   type Meta,
   STRATEGY_KEYS,
   STRATEGY_LABEL,
+  type ScenarioSummary,
   type StrategyKey,
 } from "./api";
 import { DelaySlider, RowPredict } from "./PredictPanel";
@@ -28,7 +29,16 @@ interface Props {
   defaultTab?: Tab;
   /** Hide the tab switcher — when the caller's nav already sets the mode. */
   hideTabNav?: boolean;
+  /** Recent scenarios of this kind, shown as chips; a click reopens one. */
+  recent?: ScenarioSummary[];
+  onOpenRecent?: (scenarioId: string) => void;
 }
+
+/** Advanced search (inbound / departure "known today") is hidden for now (user 2026-11-21); the code stays. */
+const SHOW_ADVANCED = false;
+const RECENT_CHIPS = 6;
+const SUGGESTION_CHIPS = 8;
+const dayLabel = (iso: string) => new Date(iso.endsWith("Z") ? iso : `${iso}Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
 
 type Tab = "DELAY" | "CANCEL" | "AGENT";
 const AGENT_DELAYS = [30, 60, 90, 120, 150, 180, 240, 300, 360, 480];
@@ -55,7 +65,7 @@ function Paginator({
   );
 }
 
-export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defaultTab, hideTabNav }: Props) {
+export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defaultTab, hideTabNav, recent, onOpenRecent }: Props) {
   const [tab, setTab] = useState<Tab>(defaultTab ?? "DELAY");
   const [presets, setPresets] = useState<{ delay: DelayPreset[]; cancel: CancelPreset[] } | null>(null);
   const [presetError, setPresetError] = useState<string | null>(null);
@@ -82,6 +92,7 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
   const [listHidden, setListHidden] = useState(Boolean(active));
   const [chosen, setChosen] = useState<string | null>(active?.flightNumber ?? null);
   const [moreFilters, setMoreFilters] = useState(false);
+  const [suggestionList, setSuggestionList] = useState(false); // chips by default; the full cards on request
   // The day before "now" too: the operating data starts a day early (and has the crew roster).
   const days = Array.from({ length: (meta?.horizon_days ?? 7) + 2 }, (_, i) => {
     const d = new Date(`${(meta?.now_utc ?? "2026-11-20T00:00:00").slice(0, 10)}T00:00:00Z`);
@@ -274,7 +285,7 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
                 </div>
               </div>
               {/* Advanced search - what is known today; applies to every listed flight, replaces the Delay slider */}
-              {tab !== "CANCEL" && (
+              {SHOW_ADVANCED && tab !== "CANCEL" && (
                 <div className="filter-row-advanced">
                   <label className="small">
                     <input type="checkbox" checked={advanced} onChange={(e) => setAdvanced(e.target.checked)} /> Advanced search
@@ -294,6 +305,17 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
                   )}
                 </div>
               )}
+            </div>
+          )}
+          {recent && recent.length > 0 && onOpenRecent && (
+            <div className="search-chips" role="group" aria-label="Recent scenarios">
+              <span className="small muted">Recent</span>
+              {recent.slice(0, RECENT_CHIPS).map((h) => (
+                <button key={h.id} type="button" className="chip-btn" disabled={busy} onClick={() => onOpenRecent(h.id)}
+                  title={`${h.flight_id.split("_")[0]} on ${dayLabel(h.created_at)}, by ${h.created_by}`}>
+                  {h.flight_id.split("_")[0]} · {h.kind === "DELAY" ? `+${h.delay_minutes}m` : "Canc"}
+                </button>
+              ))}
             </div>
           )}
           {tab === "DELAY" && !active && <p className="small muted search-hint">Pick a flight below to analyse it with {delay} min.</p>}
@@ -375,10 +397,40 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
 
         {!results && (
         <>
-        <h3>Suggested flights</h3>
+        <div className="list-head">
+          <h3>Suggested flights</h3>
+          <button type="button" className="link small" onClick={() => setSuggestionList((v) => !v)}>
+            {suggestionList ? "Show as chips" : "Show as list"}
+          </button>
+        </div>
         {presetError && <p className="error">{presetError}</p>}
         {!presets && !presetError && <p className="muted small">Finding suitable flights…</p>}
-        {presets && tab !== "CANCEL" && (() => {
+        {presets && !suggestionList && (() => {
+          const items = (tab === "CANCEL" ? presets.cancel : presets.delay)
+            .filter((p) => inRange(p.std, p.origin, p.destination, p.tail, p.flight_number)).slice(0, SUGGESTION_CHIPS);
+          return (
+            <ul className="preset-list preset-chips" aria-label="Suggested flights">
+              {items.map((p) => {
+                const extra = "connecting_pax" in p
+                  ? `${p.connecting_pax} conn`
+                  : `${(p as { free_seats: number }).free_seats} free seats`;
+                const tip = "turn_minutes" in p
+                  ? `${p.flight_number} ${p.origin}→${p.destination} · ${utc(p.std)} · ${p.tail} · turn ${p.turn_minutes} min · ${p.connecting_pax} connecting`
+                  : `${p.flight_number} ${p.origin}→${p.destination} · ${utc(p.std)} · ${p.tail}`;
+                return (
+                  <li key={p.flight_id}>
+                    <button type="button" className="preset preset-chip" disabled={busy} title={tip} onClick={() => start(p.flight_id)}>
+                      <strong>{p.flight_number}</strong> {p.origin}→{p.destination}
+                      <span className="muted"> · {dayLabel(p.std)} · {extra}</span>
+                      {"is_demo" in p && p.is_demo && <span className="chip chip-synthetic">demo</span>}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          );
+        })()}
+        {presets && suggestionList && tab !== "CANCEL" && (() => {
           const items = presets.delay.filter((p) => inRange(p.std, p.origin, p.destination, p.tail, p.flight_number));
           const page = presetPage;
           const ps = presetPageSize;
@@ -406,7 +458,7 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
             </>
           );
         })()}
-        {presets && tab === "CANCEL" && (() => {
+        {presets && suggestionList && tab === "CANCEL" && (() => {
           const items = presets.cancel.filter((p) => inRange(p.std, p.origin, p.destination, p.tail, p.flight_number));
           const page = presetPage;
           const ps = presetPageSize;

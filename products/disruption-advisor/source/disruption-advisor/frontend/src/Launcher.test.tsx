@@ -28,17 +28,31 @@ describe("launcher flight lists", () => {
     stub();
     const onDelay = vi.fn();
     render(<Launcher meta={meta} busy={false} onDelay={onDelay} onCancel={() => {}} defaultTab="DELAY" hideTabNav />);
-    expect(await screen.findByText(/142 connecting/)).toBeInTheDocument();
+    expect(await screen.findByText(/142 conn/)).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Suggested flights" })).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Suggested flights" })).toHaveClass("preset-chips"); // chips by default
+    expect(screen.queryByLabelText(/Advanced search/)).not.toBeInTheDocument(); // hidden for now
 
     await userEvent.click(screen.getByRole("button", { name: /G9519/ }));
     expect(onDelay).toHaveBeenCalledWith("G9519_202611210200", 150);
     expect(screen.queryByRole("heading", { name: "Suggested flights" })).not.toBeInTheDocument();
-    expect(screen.queryByText(/142 connecting/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/142 conn/)).not.toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: "Change flight or search" }));
     expect(screen.getByRole("heading", { name: "Suggested flights" })).toBeInTheDocument();
-    expect(screen.getByText(/142 connecting/)).toBeInTheDocument();
+    expect(screen.getByText(/142 conn/)).toBeInTheDocument();
+  });
+
+  it("shows recent scenarios as chips that reopen them, and the suggestions as a list on request", async () => {
+    stub();
+    const onOpenRecent = vi.fn();
+    const recent = [{ id: "s9", kind: "DELAY" as const, flight_id: "G9502_202611201835", delay_minutes: 60, created_by: "occ", created_at: "2026-11-21T10:00:00" }];
+    render(<Launcher meta={meta} busy={false} onDelay={() => {}} onCancel={() => {}} defaultTab="DELAY" hideTabNav recent={recent} onOpenRecent={onOpenRecent} />);
+    await userEvent.click(within(screen.getByRole("group", { name: "Recent scenarios" })).getByRole("button", { name: "G9502 · +60m" }));
+    expect(onOpenRecent).toHaveBeenCalledWith("s9");
+    await screen.findByText(/142 conn/);
+    await userEvent.click(screen.getByRole("button", { name: "Show as list" }));
+    expect(await screen.findByText(/turn 55 min · 142 connecting/)).toBeInTheDocument(); // the full card
   });
 
   it("searches as you type, shows one list (results or suggestions) and filters by day", async () => {
