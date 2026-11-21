@@ -1,0 +1,50 @@
+== backup 03:29:20
+-rw-r--r--. 1 opc opc 1257472986 Nov 21 03:32 /home/opc/backups/disruption-advisor/pre-202611210329.dump
+disruption-advisor-api:pre-202611210329
+disruption-advisor-web:pre-202611210329
+== ship 03:32:19
+extracted
+advisor.py agent agent_api.py auth.py backtest.py config.py data db.py engine errors.py health.py ingest __init__.py logging.py main.py middleware.py ml models.py risk.py schemas.py serve.py == build 03:32:28
+#37 exporting layers
+#37 exporting layers 35.7s done
+#37 exporting manifest sha256:3ecbad243c1e9e67ee5838ff4104eb52299b245ea23a558b83c8827efc0c4498 done
+#37 exporting config sha256:a274cef6ccf57f98d6e4326090b7afe76e241e5905229029f9b5ac2f2baedd18 done
+#37 exporting attestation manifest sha256:c437dd3620ba8a8c0a67ff63bfad32475aa9d1e61f1570aba477a02391e089db 0.0s done
+#37 exporting manifest list sha256:afc4b36190deec606cf8b328149acbdb729c77556d545166dbd9a80d3fa53825 0.0s done
+#37 naming to docker.io/library/disruption-advisor-api:latest done
+#37 unpacking to docker.io/library/disruption-advisor-api:latest
+#37 unpacking to docker.io/library/disruption-advisor-api:latest 5.5s done
+#37 DONE 41.3s
+
+#38 [migrate] resolving provenance for metadata file
+#38 DONE 0.0s
+ Image disruption-advisor-api:latest Built 
+ Image disruption-advisor-web:latest Built 
+== built 03:33:19
+== up 03:33:26
+ Container disruption-advisor-migrate-1 Started 
+ Container disruption-advisor-migrate-1 Waiting 
+ Container disruption-advisor-migrate-1 Exited 
+ Container disruption-advisor-ingest-1 Starting 
+ Container disruption-advisor-ingest-1 Started 
+ Container disruption-advisor-ingest-1 Waiting 
+ Container disruption-advisor-ingest-1 Exited 
+ Container disruption-advisor-extracts-db-1 Starting 
+ Container disruption-advisor-api-1 Starting 
+ Container disruption-advisor-extracts-db-1 Started 
+ Container disruption-advisor-api-1 Started 
+ Container disruption-advisor-api-1 Waiting 
+ Container disruption-advisor-api-1 Healthy 
+ Container disruption-advisor-web-1 Starting 
+ Container disruption-advisor-web-1 Started 
+
+disruption-advisor-api-1 Up 6 seconds (healthy)
+disruption-advisor-db-1 Up 8 hours (healthy)
+disruption-advisor-web-1 Up Less than a second (health: starting)
+
+ingest-1  | 2026-11-21 03:33:46,261 INFO stage 1 skipped: extracts unchanged
+ingest-1  | 2026-11-21 03:33:46,261 INFO stage 2: building the operating picture
+ingest-1  | 2026-11-21 03:33:49,766 INFO stage 2 done: {"airports": 142, "aircraft": 81, "booking_classes": 388, "customers": 174723, "pax_segments": 299417, "flights": 2614, "history_flights": 63322, "mct": 39}
+ingest-1  | 2026-11-21 03:34:12,729 INFO stage 3 done: {"scored": 2623, "connections": 88434, "auc_60": 0.7596}
+ingest-1  | 2026-11-21 03:34:16,971 INFO stage 4 done: {"offers": 300000, "auc": 0.7008}
+== up done 03:34:23

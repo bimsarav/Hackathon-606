@@ -1,0 +1,30 @@
+    Call log:
+      - Expect "toBeVisible" getByText(/Approved/).first() with timeout 30000ms
+      - waiting for getByText(/Approved/).first()
+
+
+      145 |   await expect(page.getByRole("columnheader", { name: /Recommended reward/ })).toBeVisible();
+      146 |   await page.getByRole("button", { name: /Approve reward plan/ }).click();
+    > 147 |   await expect(page.getByText(/Approved/).first()).toBeVisible();
+          |                                                    ^
+      148 | });
+      149 |
+        at /e2e/tests/advisor.spec.ts:147:52
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/advisor-phase-5-a-budget-g-9c2ee-nd-the-plan-can-be-approved-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/advisor-phase-5-a-budget-g-9c2ee-nd-the-plan-can-be-approved-chromium-retry1/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/advisor-phase-5-a-budget-g-9c2ee-nd-the-plan-can-be-approved-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/advisor-phase-5-a-budget-g-9c2ee-nd-the-plan-can-be-approved-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/advisor.spec.ts:136:1 › phase 5: a budget gives a reward plan from the preference model, and the plan can be approved 
+  7 passed (2.6m)

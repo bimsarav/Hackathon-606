@@ -1,0 +1,14 @@
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/advisor-phase-5-a-budget-g-9c2ee-nd-the-plan-can-be-approved-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/advisor-phase-5-a-budget-g-9c2ee-nd-the-plan-can-be-approved-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium] › tests/advisor.spec.ts:74:1 › phase 2: delay watchlist ranks flights, shows reasons and opens a delay scenario 
+    [chromium] › tests/advisor.spec.ts:122:1 › phase 2: the 7-day tab shows last week's predictions against what happened, instead of the scenario launcher 
+    [chromium] › tests/advisor.spec.ts:136:1 › phase 5: a budget gives a reward plan from the preference model, and the plan can be approved 
+  5 passed (4.1m)

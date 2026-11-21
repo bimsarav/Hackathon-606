@@ -1,0 +1,22 @@
+      79 |   const table = page.getByRole("table", { name: "Flights at risk" });
+      80 |   await expect(table).toBeVisible();
+      81 |   await table.locator("tbody tr.clickable").first().locator("button.link").click();
+        at /e2e/tests/advisor.spec.ts:78:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/advisor-phase-2-delay-watc-02588--and-opens-a-delay-scenario-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/advisor-phase-2-delay-watc-02588--and-opens-a-delay-scenario-chromium-retry1/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/advisor-phase-2-delay-watc-02588--and-opens-a-delay-scenario-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/advisor-phase-2-delay-watc-02588--and-opens-a-delay-scenario-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/advisor.spec.ts:74:1 › phase 2: delay watchlist ranks flights, shows reasons and opens a delay scenario 
+  5 passed (1.1m)

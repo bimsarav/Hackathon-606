@@ -1,0 +1,9 @@
+model card        200
+watchlist         200
+last-week         200
+  last week 2026-11-11 2026-11-18 1456 flights, accuracy 0.7768 AUC60 0.757
+delay scenario    created
+  rewards trained model synthetic= True spend 4950.0 rewarded 62 / 225
+rewards bad budget 422
+agent runs list   200
+unauth last-week  401
