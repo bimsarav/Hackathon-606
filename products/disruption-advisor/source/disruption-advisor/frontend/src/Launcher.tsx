@@ -63,6 +63,7 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
   const [query, setQuery] = useState("");
   const [originFilter, setOriginFilter] = useState("");
   const [destFilter, setDestFilter] = useState("");
+  const [tailFilter, setTailFilter] = useState("");
   const [results, setResults] = useState<FlightRow[] | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [agentDelay, setAgentDelay] = useState<number | null>(null);
@@ -92,8 +93,11 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
     setFromDate(value); setToDate(value); setSearchPage(0); setPresetPage(0);
   }
 
-  function inRange(std: string, origin?: string, destination?: string): boolean {
+  function inRange(std: string, origin?: string, destination?: string, tail?: string, flightNumber?: string): boolean {
     const day = std.slice(0, 10);
+    const q = query.trim().toUpperCase();
+    if (q && flightNumber && !flightNumber.toUpperCase().includes(q)) return false; // main box: flight number only
+    if (tailFilter && tail && !tail.toUpperCase().includes(tailFilter)) return false;
     if (fromDate && day < fromDate) return false;
     if (toDate && day > toDate) return false;
     if (originFilter && origin && !origin.includes(originFilter)) return false;
@@ -105,7 +109,7 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
   function handleToDate(v: string)   { setToDate(v);   setSearchPage(0); setPresetPage(0); }
 
   function resetFilters() {
-    setQuery(""); setOriginFilter(""); setDestFilter("");
+    setQuery(""); setOriginFilter(""); setDestFilter(""); setTailFilter("");
     setFromDate(""); setToDate("");
     setSearchPage(0); setPresetPage(0);
     setResults(null); setSearchError(null); setListHidden(false);
@@ -148,18 +152,18 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
 
   async function search(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    await runSearch(query.trim());
+    await runSearch(query.trim() || tailFilter.trim()); // an empty search lists the next flights
   }
 
   // Search as you type (2+ characters, after a short pause); an empty box goes back to the suggestions.
   useEffect(() => {
-    const text = query.trim();
+    const text = query.trim() || tailFilter.trim();
     if (text.length === 0) { setResults(null); return; }
     if (text.length < 2) return;
     const timer = window.setTimeout(() => void runSearch(text), 350);
     return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
+  }, [query, tailFilter]);
 
   function start(flightId: string) {
     setListHidden(true);
@@ -198,11 +202,11 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
           {/* One line: search box, (scenario type,) delay */}
           <div className="search-row">
             <div className="search-box">
-              <label htmlFor="ff-flight" className="visually-hidden">Flight / Tail</label>
+              <label htmlFor="ff-flight" className="visually-hidden">Flight number</label>
               <span className="search-icon" aria-hidden="true">⌕</span>
-              <input id="ff-flight" placeholder="Flight, airport or tail (e.g. G9519, SHJ, A6-ARI)" autoComplete="off"
-                value={query} maxLength={10}
-                onChange={(e) => setQuery(e.target.value.replace(/[^A-Za-z0-9-]/g, ""))} />
+              <input id="ff-flight" placeholder="Flight number (e.g. G9519)" autoComplete="off"
+                value={query} maxLength={8}
+                onChange={(e) => setQuery(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} />
               <button type="submit" className="search-go">Search</button>
             </div>
             {!hideTabNav && (
@@ -242,6 +246,11 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
           {moreFilters && (
             <div className="search-filters">
               <div className="filter-row">
+                <div className="filter-field">
+                  <label htmlFor="ff-tail">Aircraft (tail)</label>
+                  <input id="ff-tail" placeholder="e.g. A6-ARI" value={tailFilter} maxLength={10}
+                    onChange={(e) => setTailFilter(e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, ""))} />
+                </div>
                 <div className="filter-field">
                   <label htmlFor="ff-origin">Origin</label>
                   <input id="ff-origin" placeholder="e.g. SHJ" value={originFilter} maxLength={4}
@@ -331,12 +340,14 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
         {searchError && <p className="error">{searchError}</p>}
         {results && (
           <div className="list-head">
-            <h3>{results.length === 0 ? `No flights match “${query.trim()}”` : `${results.filter((f) => inRange(f.std, f.origin, f.destination)).length} flights match “${query.trim()}”`}</h3>
-            <button type="button" className="link small" onClick={() => { setQuery(""); setResults(null); }}>Clear search · back to suggestions</button>
+            <h3>{(query.trim() || tailFilter.trim())
+              ? `${results.filter((f) => inRange(f.std, f.origin, f.destination, f.tail, f.flight_number)).length} flights match “${query.trim() || tailFilter.trim()}”`
+              : `Next ${results.filter((f) => inRange(f.std, f.origin, f.destination, f.tail, f.flight_number)).length} flights`}</h3>
+            <button type="button" className="link small" onClick={() => { setQuery(""); setTailFilter(""); setResults(null); }}>Clear search · back to suggestions</button>
           </div>
         )}
         {results && results.length > 0 && (() => {
-          const filtered = results.filter((f) => inRange(f.std, f.origin, f.destination));
+          const filtered = results.filter((f) => inRange(f.std, f.origin, f.destination, f.tail, f.flight_number));
           return (
             <>
               <ul className="preset-list">
@@ -368,7 +379,7 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
         {presetError && <p className="error">{presetError}</p>}
         {!presets && !presetError && <p className="muted small">Finding suitable flights…</p>}
         {presets && tab !== "CANCEL" && (() => {
-          const items = presets.delay.filter((p) => inRange(p.std, p.origin, p.destination));
+          const items = presets.delay.filter((p) => inRange(p.std, p.origin, p.destination, p.tail, p.flight_number));
           const page = presetPage;
           const ps = presetPageSize;
           return (
@@ -396,7 +407,7 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
           );
         })()}
         {presets && tab === "CANCEL" && (() => {
-          const items = presets.cancel.filter((p) => inRange(p.std, p.origin, p.destination));
+          const items = presets.cancel.filter((p) => inRange(p.std, p.origin, p.destination, p.tail, p.flight_number));
           const page = presetPage;
           const ps = presetPageSize;
           return (

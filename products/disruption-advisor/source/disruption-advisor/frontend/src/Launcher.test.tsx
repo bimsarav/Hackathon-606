@@ -47,7 +47,7 @@ describe("launcher flight lists", () => {
     expect(await screen.findByRole("heading", { name: "Suggested flights" })).toBeInTheDocument();
     const days = screen.getByRole("group", { name: "Departure day (UTC)" });
     expect(within(days).getAllByRole("button").filter((b) => b.classList.contains("chip-btn")).map((b) => b.textContent)).toEqual(["All", "Thu 19", "Fri 20", "Sat 21", "Sun 22", "Mon 23", "Tue 24", "Wed 25", "Thu 26", "Fri 27"]);
-    await userEvent.type(screen.getByLabelText("Flight / Tail"), "G95");
+    await userEvent.type(screen.getByLabelText("Flight number"), "G95");
     expect(await screen.findByRole("heading", { name: /1 flights match “G95”/ }, { timeout: 2000 })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Suggested flights" })).not.toBeInTheDocument(); // one list at a time
     await userEvent.click(within(days).getByRole("button", { name: "Fri 20" }));
@@ -57,12 +57,19 @@ describe("launcher flight lists", () => {
     expect(screen.queryByLabelText("Origin")).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: /More filters/ }));
     expect(screen.getByLabelText("Origin")).toBeInTheDocument();
+    await userEvent.click(within(days).getByRole("button", { name: "All" }));
+    // the main box matches flight numbers only; airports and tails are filters
+    await userEvent.type(screen.getByLabelText("Flight number"), "SHJ");
+    expect(await screen.findByRole("heading", { name: /0 flights match “SHJ”/ }, { timeout: 2000 })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /Clear search/ }));
+    await userEvent.type(screen.getByLabelText("Aircraft (tail)"), "A6-ARI");
+    expect(await screen.findByRole("heading", { name: /1 flights match “A6-ARI”/ }, { timeout: 2000 })).toBeInTheDocument();
   });
 
   it("shows the search results again after a new search, and starts folded when a scenario is already on screen", async () => {
     stub();
     const { unmount } = render(<Launcher meta={meta} busy={false} onDelay={() => {}} onCancel={() => {}} defaultTab="DELAY" hideTabNav />);
-    await userEvent.type(await screen.findByLabelText("Flight / Tail"), "G9520");
+    await userEvent.type(await screen.findByLabelText("Flight number"), "G9520");
     await userEvent.click(screen.getByRole("button", { name: "Search" }));
     await userEvent.click(await screen.findByRole("button", { name: /G9520 SHJ→DXB/ }));
     expect(screen.queryByRole("button", { name: /G9520 SHJ→DXB/ })).not.toBeInTheDocument();
