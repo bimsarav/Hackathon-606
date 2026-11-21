@@ -5,7 +5,7 @@ recorded with who and when (human in the loop, Q21).
 """
 
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Annotated, Any
 
 from fastapi import APIRouter, HTTPException, Query, Request, status
@@ -304,13 +304,25 @@ def recommend_rewards(
     Computed on request and not stored; a person approves it through the decisions endpoint."""
     scenario = _get(session, scenario_id)
     ctx = _context(request)
+    leg = ctx.store.leg(scenario.flight_id)
+    passengers = ctx.store.passengers_on([scenario.flight_id])
+    upcoming: dict[tuple[str, str], dict[str, Any]] = {}
+    if leg is not None:  # what each passenger has booked after this flight: connection, return, later flights
+        later: dict[tuple[str, str], list[dict[str, Any]]] = {}
+        for seg in ctx.store.onward_segments(
+            sorted({p["pnr"] for p in passengers}), leg.std, leg.std + timedelta(days=60)
+        ):
+            if seg["flight_id"] != scenario.flight_id:
+                later.setdefault((seg["pnr"], seg["customer_key"]), []).append(seg)
+        upcoming = {k: rewards.upcoming_summary(v, leg.origin, leg.destination, leg.std) for k, v in later.items()}
     people = rewards.people_for(
-        ctx.store.passengers_on([scenario.flight_id]),
+        passengers,
         scenario.result,
         scenario.kind,
         scenario.delay_minutes,
         scenario.weights,
         ctx.store.reward_model,
+        upcoming,
     )
     plan = rewards.recommend(people, payload.budget_aed)
     model = ctx.store.reward_model

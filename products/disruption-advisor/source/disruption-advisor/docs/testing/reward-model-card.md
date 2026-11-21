@@ -10,6 +10,7 @@ Estimate P(accept) for a given passenger, reward type, amount and disruption sev
 ## Data
 - Real passenger profiles (the operating window's bookings and customer table, revenue passengers only, infants excluded): 111,503 passengers.
 - 300,000 simulated offers (two per passenger), with a simulated accepted/declined outcome. Whole passengers are held out together: 238,836 offers train, 61,164 test.
+- Each passenger also carries what else is booked after the flight (later segments, a connection, a return), computed from the real bookings: 35% of the profiles have a later flight, 30% a connection and 6% a return.
 - Reward types and amounts (AED): meal 50, gift voucher 100/200/400, lounge 120, miles worth 100/200/400 (members only), free ticket 600 (severe disruptions only).
 
 ## Assumed behaviour used to simulate outcomes

@@ -16,6 +16,7 @@ budget. The plan only recommends: a person approves it, and nothing is sent to p
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime
 from math import sqrt
 from typing import Any
 
@@ -79,13 +80,23 @@ class Person:
     non_revenue: bool
     care_meals: int = 0  # meal vouchers the care plan already gives this passenger (statutory/policy, not goodwill)
     care_hotel: bool = False  # the care plan already gives a hotel room
+    upcoming_count: int = 0  # later segments of this passenger (connection, return, onward)
+    has_connection: bool = False  # the next segment leaves from where this flight lands, within 24 h
+    has_return: bool = False  # a later segment comes back to this flight's origin
+    next_upcoming: dict[str, Any] | None = None
     prefs: dict[str, float] = field(default_factory=dict)
     pref_reasons: dict[str, list[str]] = field(default_factory=dict)
     accept: dict[tuple[str, float], float] = field(default_factory=dict)  # trained model: P(accept) per option
 
 
 def severity(
-    delay_minutes: int | None, cancelled: bool, missed: bool, wait_minutes: int | None, vulnerable: bool
+    delay_minutes: int | None,
+    cancelled: bool,
+    missed: bool,
+    wait_minutes: int | None,
+    vulnerable: bool,
+    connection: bool = False,
+    returning: bool = False,
 ) -> tuple[float, list[str]]:
     """0-100 and the reasons behind it."""
     reasons: list[str] = []
@@ -102,6 +113,12 @@ def severity(
         extra = min(wait_minutes / 480.0, 1.0) * 15.0
         score += extra
         reasons.append(f"waits {round(wait_minutes / 60, 1)} h for the next flight (+{extra:.0f})")
+    if cancelled and connection:  # the rest of the journey breaks with the cancelled leg
+        score += 12.0
+        reasons.append("cancelled with an onward connection booked (+12)")
+    if cancelled and returning:
+        score += 6.0
+        reasons.append("cancelled with a return flight booked (+6)")
     if vulnerable:
         score += 10.0
         reasons.append("special assistance, infant or children (+10)")
@@ -115,14 +132,60 @@ def flight_severity(delay_minutes: int | None, cancelled: bool) -> dict[str, Any
     return {"score": score, "label": label}
 
 
+CONNECTION_WINDOW_HOURS = 24
+
+
+def upcoming_summary(segments: list[dict[str, Any]], origin: str, destination: str, std: datetime) -> dict[str, Any]:
+    """What else the passenger has booked after this flight (same booking, same person).
+
+    connection: the NEXT segment leaves from where this flight lands, within 24 h of this departure;
+    return: any later segment comes back to this flight's origin. The same rules are used for the training data."""
+    later = sorted((x for x in segments if x["std"] > std), key=lambda x: x["std"])
+    first = later[0] if later else None
+    connection = bool(
+        first
+        and first["origin"] == destination
+        and (first["std"] - std).total_seconds() <= CONNECTION_WINDOW_HOURS * 3600
+    )
+    nxt = (
+        {
+            "flight_number": first["flight_number"],
+            "route": f"{first['origin']}-{first['destination']}",
+            "std": first["std"].isoformat(),
+        }
+        if first
+        else None
+    )
+    return {
+        "count": len(later),
+        "connection": connection,
+        "return": any(x["destination"] == origin for x in later),
+        "next": nxt,
+    }
+
+
+def effective_tier(p: dict[str, Any]) -> str | None:
+    """The better of the passenger's own loyalty tier and the family account's (same rule as the priority score)."""
+    if p.get("loyalty_effective_tier"):  # already worked out by priority.rank
+        return str(p["loyalty_effective_tier"])
+    own = p.get("loyalty_tier_synthetic")
+    family = p.get("family_tier_synthetic") if p.get("family_account_synthetic") else None
+    return max(
+        (x for x in (own, family) if x in priority.LOYALTY_PRIORITY), key=priority.TIER_VALUE.__getitem__, default=None
+    )
+
+
 def preferences(p: dict[str, Any]) -> tuple[dict[str, float], dict[str, list[str]]]:
     """Proxy preference per reward type (0-1) and the clues that fired. Assumptions, not stated preferences."""
-    tier = p.get("loyalty_tier_synthetic")
+    tier = effective_tier(p)  # a family account lifts the tier, as in the priority score
     freq = str(p.get("travel_frequency_band") or "occasional")
     family = str(p.get("fare_family_synthetic") or "")
     digital = p.get("sales_channel") in DIGITAL_CHANNELS
     has_children = (p.get("children") or 0) + (p.get("infants") or 0) > 0
     member = bool(p.get("is_loyalty_member"))
+    upcoming = (p.get("upcoming_segments") or 0) > 0  # a later flight to spend a voucher, miles or ticket on
+    connecting = bool(p.get("has_connection"))
+    returning = bool(p.get("has_return"))
     prefs: dict[str, float] = {}
     why: dict[str, list[str]] = {k: [] for k in TYPE_LABEL}
 
@@ -142,6 +205,9 @@ def preferences(p: dict[str, Any]) -> tuple[dict[str, float], dict[str, list[str
     if family in PRICE_SENSITIVE_FAMILIES:
         s += 0.15
         why[VOUCHER].append(f"{family} fare (price conscious)")
+    if upcoming:
+        s += 0.10
+        why[VOUCHER].append("has a flight coming up to use it on")
     prefs[VOUCHER] = min(s, 1.0)
 
     s = 0.15
@@ -154,6 +220,9 @@ def preferences(p: dict[str, Any]) -> tuple[dict[str, float], dict[str, list[str
     if freq in HIGH_FREQUENCY:
         s += 0.2
         why[LOUNGE].append("frequent traveller")
+    if connecting:
+        s += 0.10
+        why[LOUNGE].append("connecting through the hub")
     prefs[LOUNGE] = min(s, 1.0)
 
     if member:
@@ -165,6 +234,9 @@ def preferences(p: dict[str, Any]) -> tuple[dict[str, float], dict[str, list[str
         if tier:
             s += 0.2
             why[MILES].append(f"{tier} tier")
+        if upcoming:
+            s += 0.10
+            why[MILES].append("has a flight coming up")
         prefs[MILES] = min(s, 1.0)
     else:
         prefs[MILES] = 0.0
@@ -179,6 +251,9 @@ def preferences(p: dict[str, Any]) -> tuple[dict[str, float], dict[str, list[str
     if (p.get("pnr_size") or 1) >= 2:
         s += 0.2
         why[TICKET].append("travels with others")
+    if returning or upcoming:
+        s += 0.15
+        why[TICKET].append("has a return flight booked" if returning else "has a flight coming up")
     prefs[TICKET] = min(s, 1.0)
     return prefs, why
 
@@ -321,6 +396,12 @@ def recommend(people: list[Person], budget_aed: float, rules: RewardRules | None
                 },
                 "preferred": [{"type": k, "label": TYPE_LABEL[k], "score": round(v, 2)} for v, k in ranked_prefs[:3]],
                 "why": _why(p, chosen),
+                "upcoming": {
+                    "count": p.upcoming_count,
+                    "connection": p.has_connection,
+                    "return": p.has_return,
+                    "next": p.next_upcoming,
+                },
                 "downgraded_for_budget": i in downgraded and chosen is not None,
                 "note": note,
             }
@@ -348,13 +429,19 @@ def people_for(
     delay_minutes: int | None,
     weights: dict[str, float],
     model: Any | None = None,
+    upcoming: dict[tuple[str, str], dict[str, Any]] | None = None,
 ) -> list[Person]:
-    """Build the inputs from the flight's passengers and the scenario result (missed connections, waits)."""
+    """Build the inputs from the flight's passengers and the scenario result (missed connections, waits).
+
+    `upcoming` maps (PNR, customer key) to upcoming_summary(): the passenger's connection, return and later flights."""
+    upcoming = upcoming or {}
     cancelled = kind == "CANCEL"
     missed = {(c["pnr"], c["customer_key"]) for c in scenario.get("misconnections", [])}
     cares = {(r["pnr"], r["customer_key"]): (r.get("care") or {}) for r in scenario.get("passengers", [])}
     waits = {key: c.get("wait_minutes") for key, c in cares.items()}
-    ranked = priority.rank(passengers, weights, missed, {})
+    onward = missed | {key for key, u in upcoming.items() if u["connection"]}
+    journey = {key: 1 + min(u["count"], 3) for key, u in upcoming.items()}  # segments of the journey, for the score
+    ranked = priority.rank(passengers, weights, onward, journey)
     scores = sorted(x.score for x in ranked)
 
     def value_of(score: float) -> float:
@@ -370,8 +457,12 @@ def people_for(
         key = (p["pnr"], p["customer_key"])
         wait = waits.get(key)
         vulnerable = p.get("ssr_code") in priority.CARE_SSRS or (p.get("children") or 0) + (p.get("infants") or 0) > 0
-        sev, reasons = severity(delay_minutes, cancelled, key in missed, wait, vulnerable)
+        up = upcoming.get(key) or {"count": 0, "connection": False, "return": False, "next": None}
+        sev, reasons = severity(
+            delay_minutes, cancelled, key in missed, wait, vulnerable, bool(up["connection"]), bool(up["return"])
+        )
         disrupted = int(wait) if wait else (delay_minutes or 240)
+        p = {**p, "upcoming_segments": up["count"], "has_connection": up["connection"], "has_return": up["return"]}
         prefs, why = preferences(p)
         rows.append(p)
         people.append(
@@ -389,6 +480,10 @@ def people_for(
                 non_revenue=r.non_revenue,
                 care_meals=int(cares.get(key, {}).get("meals") or 0),
                 care_hotel=bool(cares.get(key, {}).get("hotel")),
+                upcoming_count=int(up["count"]),
+                has_connection=bool(up["connection"]),
+                has_return=bool(up["return"]),
+                next_upcoming=up["next"],
                 prefs=prefs,
                 pref_reasons=why,
             )

@@ -1,6 +1,6 @@
 import { type FormEvent, useState } from "react";
 import { api, errorText, type RewardPlan, type Scenario } from "./api";
-import { aed, num } from "./format";
+import { aed, num, utc } from "./format";
 import { DecisionBar, TIER_LABEL } from "./Shared";
 
 const TYPE_ICON: Record<string, string> = { MEAL: "Meal", VOUCHER: "Voucher", LOUNGE: "Lounge", MILES: "Miles", TICKET: "Ticket" };
@@ -148,6 +148,20 @@ export function RewardPanel({ scenario }: { scenario: Scenario }) {
                                 <li key={x}>{x}</li>
                               ))}
                             </ul>
+                            <p className="small">
+                              <strong>Upcoming:</strong>{" "}
+                              {r.upcoming && r.upcoming.count > 0
+                                ? [
+                                    r.upcoming.connection ? "a connecting flight" : null,
+                                    r.upcoming.return ? "a return flight booked" : null,
+                                    `${r.upcoming.count} later flight${r.upcoming.count > 1 ? "s" : ""}`,
+                                  ]
+                                    .filter(Boolean)
+                                    .join(", ") +
+                                  (r.upcoming.next ? `. Next: ${r.upcoming.next.flight_number} ${r.upcoming.next.route}, ${utc(r.upcoming.next.std)}` : "")
+                                : "no later flights on this booking"}
+                              .
+                            </p>
                             <p className="small muted">
                               Why this reward: {r.why.length ? r.why.join(", ") : "best fit for the amount"}.
                               {r.preferred.length > 0 && ` Likeliest to take: ${r.preferred.map((x) => `${x.label} ${Math.round(x.score * 100)}%`).join(", ")}.`}

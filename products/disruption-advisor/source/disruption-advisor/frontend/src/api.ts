@@ -387,6 +387,7 @@ export interface RewardRow {
   reward: { type: string; label: string; detail: string; cost_aed: number; acceptance?: number } | null;
   preferred: { type: string; label: string; score: number }[];
   why: string[];
+  upcoming?: { count: number; connection: boolean; return: boolean; next: { flight_number: string; route: string; std: string } | null };
   downgraded_for_budget: boolean;
   note: string;
 }

@@ -957,7 +957,7 @@ tr.clickable.selected {
 .cascade-kpis-wide {
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }
-.overlay {
+.cascade-overlay {
   position: fixed;
   inset: 0;
   background: rgba(20, 22, 26, 0.55);
@@ -968,7 +968,7 @@ tr.clickable.selected {
   padding: 2rem 1rem;
   z-index: 50;
 }
-.dialog {
+.cascade-dialog {
   background: var(--panel);
   color: var(--ink);
   border: 1px solid var(--line);
@@ -976,13 +976,13 @@ tr.clickable.selected {
   width: min(1200px, 100%);
   padding: 1.25rem;
 }
-.dialog-head {
+.cascade-dialog-head {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
   align-items: flex-start;
 }
-.dialog-head h2 {
+.cascade-dialog-head h2 {
   margin: 0.15rem 0 0.35rem;
 }
 .cascade-charts {
@@ -991,38 +991,38 @@ tr.clickable.selected {
   gap: 1rem;
   margin: 1rem 0;
 }
-.chart {
+.cascade-chart {
   margin: 0;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 0.75rem;
 }
-.chart figcaption {
+.cascade-chart figcaption {
   font-weight: 600;
   margin-bottom: 0.25rem;
 }
-.chart svg {
+.cascade-chart svg {
   width: 100%;
   height: auto;
 }
-.chart .grid {
+.cascade-chart .grid {
   stroke: var(--line);
 }
-.chart .diag {
+.cascade-chart .diag {
   stroke: var(--muted);
   stroke-dasharray: 4 4;
 }
-.chart .axis {
+.cascade-chart .axis {
   fill: var(--muted);
   font-size: 11px;
 }
-.legend {
+.cascade-legend {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-top: 0.25rem;
 }
-.legend i {
+.cascade-legend i {
   display: inline-block;
   width: 0.7rem;
   height: 0.7rem;
@@ -1039,7 +1039,7 @@ tr.clickable.selected {
 .cascade-table-head h3 {
   margin: 0;
 }
-.note {
+.cascade-note {
   background: var(--warn-bg);
   border: 1px solid var(--line);
   border-radius: 6px;

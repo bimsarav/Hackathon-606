@@ -181,7 +181,8 @@ describe("WatchlistView", () => {
       disruption: { score: 38, label: "moderate" }, assumptions: ["Preferences are proxy rules."],
       rows: [{ pnr: "ABC123", customer_key: "1b6e33fd55c8236f", passenger_id: "PAX1", route: "SHJ-CAI", tier: 2, severity: 63, severity_reasons: [],
         value: 80, target_aed: 300, reward: { type: "VOUCHER", label: "Gift voucher", detail: "AED 200 gift voucher", cost_aed: 200 },
-        preferred: [], why: ["books online or in the app"], downgraded_for_budget: false, note: "" }] }));
+        preferred: [], why: ["books online or in the app"], downgraded_for_budget: false, note: "",
+        upcoming: { count: 2, connection: true, return: true, next: { flight_number: "G9201", route: "SHJ-CAI", std: "2026-11-21T12:00:00" } } }] }));
     render(<RewardPanel scenario={{ id: "s1", flight_id: "G9519_202611210200", kind: "DELAY", delay_minutes: 120, weights: {}, result: {}, created_by: "x", created_at: "" } as unknown as Scenario} />);
     await userEvent.click(screen.getByRole("button", { name: "Recommend rewards" }));
     expect(await screen.findByText("AED 200 gift voucher")).toBeInTheDocument();
@@ -191,6 +192,8 @@ describe("WatchlistView", () => {
     await userEvent.click(screen.getByRole("button", { name: "More data" }));
     expect(screen.getByText(/books online or in the app/)).toBeInTheDocument();
     expect(screen.getByText(/passenger value/)).toBeInTheDocument();
+    expect(screen.getByText(/a connecting flight, a return flight booked, 2 later flights/)).toBeInTheDocument();
+    expect(screen.getByText(/Next: G9201 SHJ-CAI/)).toBeInTheDocument();
   });
 
   it("switches one panel between the connection passengers and the rewards", async () => {

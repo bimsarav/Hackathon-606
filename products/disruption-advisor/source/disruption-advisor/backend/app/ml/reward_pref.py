@@ -76,6 +76,9 @@ NUMERIC = (
     "infants",
     "flown_12m",
     "is_member",
+    "upcoming_segments",
+    "has_connection",
+    "has_return",
     "amount_aed",
     "severity",
 )
@@ -95,6 +98,9 @@ BEHAVIOUR = [
     "families are less likely.",
     "Miles are accepted almost only by loyalty members, more by frequent travellers and Silver tier or above.",
     "Free tickets are accepted more by frequent travellers, Gold or Platinum members, Ultimate fares and groups.",
+    "Passengers with a flight coming up take gift vouchers, miles and tickets more readily (they can use them), "
+    "those with a return flight booked take free tickets most, and those connecting through the hub take lounge passes "
+    "more readily.",
     "Everyone accepts more after a more severe disruption; each passenger also has a personal taste (random effect), "
     "and acceptance of an amount peaks when it matches the severity.",
 ]
@@ -110,9 +116,12 @@ def _code(kind: str, value: Any) -> float:
     return float(options.index(str(value))) if str(value) in options else float(len(options))
 
 
+effective_tier = rw.effective_tier  # the better of the own and the family-account tier (priority rule)
+
+
 def features_of(p: dict[str, Any]) -> dict[str, float]:
     """One passenger row (as from OpsStore.passengers_on) -> the model's passenger features."""
-    tier = p.get("loyalty_tier_synthetic")
+    tier = effective_tier(p)
     return {
         "fare_family": _code("fare_family", p.get("fare_family_synthetic")),
         "sales_channel": _code("sales_channel", p.get("sales_channel")),
@@ -128,6 +137,9 @@ def features_of(p: dict[str, Any]) -> dict[str, float]:
         "infants": float(p.get("infants") or 0),
         "flown_12m": float(p.get("flown_segments_12m") or 0),
         "is_member": float(bool(p.get("is_loyalty_member"))),
+        "upcoming_segments": float(p.get("upcoming_segments") or 0),
+        "has_connection": float(bool(p.get("has_connection"))),
+        "has_return": float(bool(p.get("has_return"))),
     }
 
 
@@ -155,6 +167,9 @@ def _logit(m: dict[str, np.ndarray], taste: np.ndarray) -> np.ndarray:
     frequent = freq == CATEGORIES["frequency"].index("frequent")
     family = (m["children"] + m["infants"]) > 0
     member = m["is_member"] > 0
+    upcoming = m["upcoming_segments"] > 0
+    connecting = m["has_connection"] > 0
+    returning = m["has_return"] > 0
     silver_up = tier >= CATEGORIES["loyalty_tier"].index("Silver")
     gold_up = tier >= CATEGORIES["loyalty_tier"].index("Gold")
     meal, voucher, lounge, miles, ticket = (CATEGORIES["reward_type"].index(k) for k in CATEGORIES["reward_type"])
@@ -167,22 +182,33 @@ def _logit(m: dict[str, np.ndarray], taste: np.ndarray) -> np.ndarray:
     )
     z += np.where(
         kind == voucher,
-        -0.1 + 0.8 * digital + 0.6 * price + 0.4 * np.log1p(amount / 100.0) * (1 - sev) - 0.3 * ultimate,
+        -0.1
+        + 0.8 * digital
+        + 0.6 * price
+        + 0.4 * np.log1p(amount / 100.0) * (1 - sev)
+        - 0.3 * ultimate
+        + 0.35 * upcoming,
         0.0,
     )
     z += np.where(
         kind == lounge,
-        -0.7 + 1.1 * m["has_seat"] + 0.8 * ultimate + 0.6 * frequent - 0.7 * family,
+        -0.7 + 1.1 * m["has_seat"] + 0.8 * ultimate + 0.6 * frequent - 0.7 * family + 0.3 * connecting,
         0.0,
     )
     z += np.where(
         kind == miles,
-        -1.8 + 3.0 * member + 0.9 * frequent * member + 0.6 * silver_up,
+        -1.8 + 3.0 * member + 0.9 * frequent * member + 0.6 * silver_up + 0.4 * upcoming * member,
         0.0,
     )
     z += np.where(
         kind == ticket,
-        -1.0 + 0.9 * frequent + 0.8 * gold_up + 0.6 * ultimate + 0.5 * (m["pnr_size"] >= 2),
+        -1.0
+        + 0.9 * frequent
+        + 0.8 * gold_up
+        + 0.6 * ultimate
+        + 0.5 * (m["pnr_size"] >= 2)
+        + 0.5 * returning
+        + 0.3 * upcoming,
         0.0,
     )
     z -= 0.25 * ((amount / 100.0) - 6.0 * sev) ** 2 / 4.0  # an amount that matches the severity is preferred
@@ -329,6 +355,9 @@ def _proxy_scores(history: dict[str, np.ndarray], rows: np.ndarray) -> np.ndarra
             "children": history["children"][i],
             "infants": history["infants"][i],
             "pnr_size": history["pnr_size"][i],
+            "upcoming_segments": history["upcoming_segments"][i],
+            "has_connection": history["has_connection"][i] > 0,
+            "has_return": history["has_return"][i] > 0,
             "is_loyalty_member": history["is_member"][i] > 0,
         }
         out.append(rw.preferences(p)[0][names[int(history["reward_type"][i])]])
@@ -369,11 +398,26 @@ class RewardModel:
 def load_passengers(ops: Path) -> list[dict[str, Any]]:
     """Real passenger profiles of the operating window: revenue passengers, infants excluded."""
     con = duckdb.connect()
+    have = {r[0] for r in con.execute(f"DESCRIBE SELECT * FROM '{ops}/pax_segments.parquet'").fetchall()}
+    family = ", ".join(
+        f"p.{c}" if c in have else f"NULL AS {c}" for c in ("family_account_synthetic", "family_tier_synthetic")
+    )  # data built before the family-account rule has no such columns
+    later = "ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING"
+    person = "PARTITION BY pnr, customer_key ORDER BY dep_utc"
     rows = con.execute(
-        f"""SELECT p.customer_key, p.fare_family_synthetic, p.sales_channel, p.has_meal, p.has_seat, p.ancillaries,
+        f"""WITH s AS (
+              SELECT *, count(*) OVER ({person} {later}) AS upcoming_segments,
+                     lead(origin) OVER ({person}) AS next_origin, lead(dep_utc) OVER ({person}) AS next_dep,
+                     list(destination) OVER ({person} {later}) AS later_destinations
+              FROM '{ops}/pax_segments.parquet')
+            SELECT p.customer_key, p.fare_family_synthetic, p.sales_channel, p.has_meal, p.has_seat, p.ancillaries,
                    p.fare, p.baggage_kg, p.pnr_size, p.children, p.infants,
-                   c.is_loyalty_member, c.loyalty_tier_synthetic, c.travel_frequency_band, c.flown_segments_12m
-            FROM '{ops}/pax_segments.parquet' p LEFT JOIN '{ops}/customers.parquet' c USING (customer_key)
+                   c.is_loyalty_member, c.loyalty_tier_synthetic, c.travel_frequency_band, c.flown_segments_12m,
+                   {family}, p.upcoming_segments,
+                   coalesce(p.next_origin = p.destination
+                            AND date_diff('hour', p.dep_utc, p.next_dep) <= {rw.CONNECTION_WINDOW_HOURS}, FALSE),
+                   coalesce(list_contains(p.later_destinations, p.origin), FALSE)
+            FROM s p LEFT JOIN '{ops}/customers.parquet' c USING (customer_key)
             WHERE p.pax_type <> 'IN' AND p.revenue_type <> 'NON_REV'
             ORDER BY hash(p.pnr, p.customer_key, p.flight_id) LIMIT {MAX_PASSENGERS}"""
     ).fetchall()
@@ -393,6 +437,11 @@ def load_passengers(ops: Path) -> list[dict[str, Any]]:
         "loyalty_tier_synthetic",
         "travel_frequency_band",
         "flown_segments_12m",
+        "family_account_synthetic",
+        "family_tier_synthetic",
+        "upcoming_segments",
+        "has_connection",
+        "has_return",
     )
     return [dict(zip(cols, r, strict=True)) for r in rows]
 

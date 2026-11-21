@@ -57,8 +57,12 @@ Code: `backend/app/engine/rewards.py` (rules, plan) and `backend/app/ml/reward_p
 | Flight cancelled | 60 instead of the delay points |
 | Missed an onward connection | +25 |
 | Wait for the next flight (from the care plan) | wait minutes / 480, at most 1, times 15 |
+| Cancelled **and** an onward connection is booked | +12 (the rest of the journey breaks with the cancelled leg) |
+| Cancelled **and** a return flight is booked | +6 (the return has to be re-planned) |
 | Special assistance, infant or children on the booking | +10 |
 The total is capped at 100 and the reasons are kept for the "More data" view. The flight-level label is minor (below 25), moderate (below 50), major (below 75) or severe, from the delay or cancellation alone.
+
+**2b. Upcoming flights (connection, return, later flights).** For every passenger the plan looks at what else is booked after this flight on the same booking (`store.onward_segments`, next 60 days): the *next* segment is a **connection** when it leaves from where this flight lands within 24 h of this departure; a **return** is any later segment that comes back to this flight's origin; the count of later segments is kept too. They are used three ways: (a) in a cancellation they raise severity (above); (b) the journey component of the passenger-value score now sees the real connection and number of segments; (c) they make the rewards usable on a later flight more likely to be taken: gift voucher +0.10, miles +0.10 (members), free ticket +0.15 (return flight booked first), lounge pass +0.10 when connecting. The same three signals are inputs of the preference model. "More data" shows the connection, return, the number of later flights and the next one.
 
 **3. Passenger value, 0-100.** The recovery-priority score of the passenger (loyalty tier, travel frequency, fare value, ancillaries, journey complexity, family booking; weights as in the priority module) turned into a rank among the passengers of the flight: the share of the other passengers who score lower.
 

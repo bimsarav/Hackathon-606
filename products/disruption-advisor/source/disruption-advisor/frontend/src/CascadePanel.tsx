@@ -65,9 +65,9 @@ function CascadeDialog({ data, onClose }: { data: CascadeCheck; onClose: () => v
   }, [onClose]);
   const k = data.kpis;
   return (
-    <div className="overlay" role="presentation" onClick={onClose}>
-      <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="cascade-dialog-title" onClick={(e) => e.stopPropagation()}>
-        <div className="dialog-head">
+    <div className="cascade-overlay" role="presentation" onClick={onClose}>
+      <div className="cascade-dialog" role="dialog" aria-modal="true" aria-labelledby="cascade-dialog-title" onClick={(e) => e.stopPropagation()}>
+        <div className="cascade-dialog-head">
           <div>
             <p className="small muted">Disruption Advisor · formula validation</p>
             <h2 id="cascade-dialog-title">Cascade prediction vs actual</h2>
@@ -93,7 +93,7 @@ function CascadeDialog({ data, onClose }: { data: CascadeCheck; onClose: () => v
           <Histogram bins={data.histogram} />
         </div>
         {data.excluded.length > 0 && (
-          <p className="small note">
+          <p className="small cascade-note">
             {data.excluded.length} extreme outlier{data.excluded.length > 1 ? "s" : ""} left out of the figures and charts (
             {data.excluded_rule}):{" "}
             {data.excluded.map((e) => `${e.flight} ${e.route} ${e.date}: formula ${e.formula_ko} min, actual ${e.actual_ko} min`).join("; ")}.
@@ -115,7 +115,7 @@ function Scatter({ rows }: { rows: CascadeRow[] }) {
   const ticks = [0, 40, 80, 120, 160];
   const capped = rows.filter((r) => r.formula_ko > CAP || r.actual_ko > CAP).length;
   return (
-    <figure className="chart">
+    <figure className="cascade-chart">
       <figcaption>Formula vs actual knock-on delay (min)</figcaption>
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Scatter of ${rows.length} pairs: formula knock-on against actual knock-on`}>
         {ticks.map((t) => (
@@ -132,7 +132,7 @@ function Scatter({ rows }: { rows: CascadeRow[] }) {
         <text x={(pad.l + W - pad.r) / 2} y={H - 4} textAnchor="middle" className="axis">Formula knock-on (min)</text>
         <text transform={`translate(12 ${H / 2}) rotate(-90)`} textAnchor="middle" className="axis">Actual knock-on (min)</text>
       </svg>
-      <div className="legend small">
+      <div className="cascade-legend small">
         {["±15 min", "15–30 min", "30–60 min", "over 60 min"].map((l, i) => (
           <span key={l}><i style={{ background: BAND_COLOUR[i] }} /> {l}</span>
         ))}
@@ -150,7 +150,7 @@ function Histogram({ bins }: { bins: { label: string; count: number }[] }) {
   const bw = (W - pad.l - pad.r) / bins.length;
   const colour = ["#2b6cb0", "var(--ok)", "var(--ok)", "var(--warn)", "#c2570c", "var(--bad)"];
   return (
-    <figure className="chart">
+    <figure className="cascade-chart">
       <figcaption>Delta distribution (actual − formula, min)</figcaption>
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Number of pairs by delta range">
         <line x1={pad.l} x2={W - pad.r} y1={H - pad.b} y2={H - pad.b} className="grid" />
@@ -166,7 +166,7 @@ function Histogram({ bins }: { bins: { label: string; count: number }[] }) {
         })}
         <text x={(pad.l + W - pad.r) / 2} y={H - 4} textAnchor="middle" className="axis">Delta (min)</text>
       </svg>
-      <div className="legend small">
+      <div className="cascade-legend small">
         <span><i style={{ background: "#2b6cb0" }} /> Over-estimated</span>
         <span><i style={{ background: "var(--ok)" }} /> ±15 min</span>
         <span><i style={{ background: "var(--warn)" }} /> 15–30 min</span>

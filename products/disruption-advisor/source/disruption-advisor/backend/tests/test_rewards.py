@@ -1,6 +1,7 @@
 """Phase 5 reward recommendation (ADR 0012): severity, proxy preferences, eligibility and the budget fit."""
 
 import json
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -339,3 +340,123 @@ def test_stage_four_writes_a_labelled_model_and_the_history(tmp_path: Path) -> N
     assert len(probs) == 3
     assert all(0.0 < float(p) < 1.0 for p in probs)
     assert rp.RewardModel.load(tmp_path / "nowhere") is None  # no model file: the plan falls back to the proxy rules
+
+
+def test_a_family_account_lifts_the_loyalty_tier_the_reward_models_see() -> None:
+    from app.ml import reward_pref as rp
+
+    child = {"loyalty_tier_synthetic": None, "family_account_synthetic": True, "family_tier_synthetic": "Gold"}
+    assert rp.effective_tier(child) == "Gold"  # a child on a Gold family account is not ranked below the head
+    own_better = {
+        "loyalty_tier_synthetic": "Platinum",
+        "family_account_synthetic": True,
+        "family_tier_synthetic": "Basic",
+    }
+    assert rp.effective_tier(own_better) == "Platinum"  # the better of the two
+    no_account = {
+        "loyalty_tier_synthetic": "Silver",
+        "family_account_synthetic": False,
+        "family_tier_synthetic": "Gold",
+    }
+    assert rp.effective_tier(no_account) == "Silver"
+    assert rp.effective_tier({}) is None
+    assert rp.features_of(child)["loyalty_tier"] > rp.features_of({})["loyalty_tier"]
+    lifted, _ = rw.preferences({**child, "is_loyalty_member": False})
+    plain, _ = rw.preferences({"is_loyalty_member": False})
+    assert lifted[rw.TICKET] > plain[rw.TICKET]  # the proxy rules see the lifted tier too
+    assert lifted[rw.MILES] == 0.0  # miles stay for members in their own right
+
+
+# ------------------------------------------------------------------------------ upcoming segments (connection, return)
+def _seg(flight: str, origin: str, dest: str, std: datetime) -> dict[str, Any]:
+    return {"flight_number": flight, "origin": origin, "destination": dest, "std": std}
+
+
+T0 = datetime(2026, 11, 21, 6, 0)
+
+
+def test_upcoming_summary_tells_a_connection_from_a_return() -> None:
+    connection = _seg("G9201", "SHJ", "CAI", T0 + timedelta(hours=5))
+    ret = _seg("G9150", "CAI", "KHI", T0 + timedelta(days=7))
+    later = rw.upcoming_summary([ret, connection], "KHI", "SHJ", T0)
+    assert later["count"] == 2
+    assert later["connection"] is True  # the NEXT segment leaves from where this flight lands, within 24 h
+    assert later["return"] is True  # a later segment comes back to this flight's origin
+    assert later["next"] == {"flight_number": "G9201", "route": "SHJ-CAI", "std": connection["std"].isoformat()}
+    # a flight three days later from the arrival station is later travel, not a connection
+    far = rw.upcoming_summary([_seg("G9300", "SHJ", "DEL", T0 + timedelta(days=3))], "KHI", "SHJ", T0)
+    assert far["count"] == 1
+    assert far["connection"] is False
+    assert far["return"] is False
+    # earlier segments and this flight itself do not count; nothing booked after
+    assert rw.upcoming_summary([_seg("G9001", "SHJ", "KHI", T0 - timedelta(days=1))], "KHI", "SHJ", T0) == {
+        "count": 0,
+        "connection": False,
+        "return": False,
+        "next": None,
+    }
+
+
+def test_a_cancellation_hurts_more_when_the_journey_continues() -> None:
+    plain, _ = rw.severity(None, True, False, None, False)
+    with_connection, reasons = rw.severity(None, True, False, None, False, connection=True)
+    with_both, more = rw.severity(None, True, False, None, False, connection=True, returning=True)
+    assert plain < with_connection < with_both <= 100
+    assert any("onward connection" in r for r in reasons)
+    assert any("return flight" in r for r in more)
+    # in a delay the connection is judged by the missed-connection rule, so the booking alone adds nothing
+    assert (
+        rw.severity(150, False, False, None, False, connection=True, returning=True)[0]
+        == rw.severity(150, False, False, None, False)[0]
+    )
+
+
+def test_flights_coming_up_make_vouchers_miles_tickets_and_lounges_more_likely() -> None:
+    member = {"is_loyalty_member": True, "travel_frequency_band": "regular"}
+    plain, _ = rw.preferences(member)
+    coming, why = rw.preferences({**member, "upcoming_segments": 2, "has_connection": True, "has_return": True})
+    for kind in (rw.VOUCHER, rw.MILES, rw.TICKET, rw.LOUNGE):
+        assert coming[kind] > plain[kind]
+    assert "has a flight coming up to use it on" in why[rw.VOUCHER]
+    assert "has a return flight booked" in why[rw.TICKET]
+    assert "connecting through the hub" in why[rw.LOUNGE]
+    assert coming[rw.MEAL] == plain[rw.MEAL]
+
+
+def test_cancelled_passengers_with_a_connection_or_return_get_a_higher_severity_in_the_plan() -> None:
+    def pax(i: int) -> dict[str, Any]:
+        return {
+            "pnr": f"P{i}", "customer_key": f"{i:016x}", "pax_type": "AD", "origin": "KHI", "destination": "SHJ",
+            "fare": 400.0, "revenue_type": "REV", "passenger_id": f"PAX{i}", "ssr_code": None, "infants": 0,
+            "children": 0, "ancillaries": 20.0, "pnr_size": 1, "fare_family_synthetic": "Value",
+            "is_loyalty_member": False,
+        }  # fmt: skip
+
+    people = [pax(1), pax(2), pax(3)]
+    keys = [(p["pnr"], p["customer_key"]) for p in people]
+    up = {
+        keys[0]: rw.upcoming_summary([_seg("G9201", "SHJ", "CAI", T0 + timedelta(hours=5))], "KHI", "SHJ", T0),
+        keys[1]: rw.upcoming_summary([_seg("G9150", "SHJ", "KHI", T0 + timedelta(days=7))], "KHI", "SHJ", T0),
+    }
+    built = rw.people_for(people, {}, "CANCEL", None, {}, None, up)
+    by_id = {p.passenger_id: p for p in built}
+    assert by_id["PAX1"].severity > by_id["PAX3"].severity  # connection booked
+    assert by_id["PAX2"].severity > by_id["PAX3"].severity  # return booked
+    assert by_id["PAX1"].severity > by_id["PAX2"].severity  # a broken connection costs more than a return to re-plan
+    assert by_id["PAX1"].has_connection
+    assert by_id["PAX2"].has_return
+    assert not by_id["PAX3"].upcoming_count
+    plan = rw.recommend(built, 100_000)
+    row = next(r for r in plan["rows"] if r["passenger_id"] == "PAX1")
+    assert row["upcoming"]["connection"] is True
+    assert row["upcoming"]["next"]["flight_number"] == "G9201"
+    assert any("onward connection" in x for x in row["severity_reasons"])
+
+
+def test_the_reward_api_reports_each_passengers_upcoming_flights(client: TestClient, auth: dict[str, str]) -> None:
+    scenario = _scenario(client, auth, "CANCEL")
+    plan = client.post(f"/api/v1/scenarios/{scenario['id']}/rewards", headers=auth, json={"budget_aed": 5000}).json()
+    assert all({"count", "connection", "return", "next"} <= set(r["upcoming"]) for r in plan["rows"])
+    linked = [r for r in plan["rows"] if r["upcoming"]["connection"]]
+    assert linked  # the fixture's cancelled flight has passengers with an onward flight
+    assert all(any("onward connection" in x for x in r["severity_reasons"]) for r in linked)
