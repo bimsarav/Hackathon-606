@@ -171,6 +171,7 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
   const [agentStart, setAgentStart] = useState<Load>({ kind: "idle" });
   const [agentStatus, setAgentStatus] = useState<string | null>(null);
   useEffect(() => remember(AGENT_KEY, agentRunId), [agentRunId]);
+  const [recentOpen, setRecentOpen] = useState(false);
 
   const refreshHistory = useCallback(() => {
     api.scenarios().then(setHistory).catch(() => setHistory([]));
@@ -278,27 +279,37 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
 
           {history.length > 0 && (
             <div className="nav-section nav-recent">
-              <p className="nav-section-label">Recent</p>
-              <ul className="nav-history-list">
-                {history.slice(0, 6).map((h) => (
-                  <li key={h.id}>
-                    <button
-                      type="button"
-                      className="nav-item nav-history-item"
-                      onClick={() => run(
-                        h.kind === "DELAY" ? "delay" : "cancel",
-                        "Opening scenario…",
-                        () => api.scenario(h.id)
-                      )}
-                    >
-                      <span className="nav-history-badge">
-                        {h.kind === "DELAY" ? `+${h.delay_minutes}m` : "Canc"}
-                      </span>
-                      <span className="nav-history-flight">{h.flight_id.split("_")[0]}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              <button
+                type="button"
+                className="nav-section-label nav-recent-toggle"
+                onClick={() => setRecentOpen((o) => !o)}
+                aria-expanded={recentOpen}
+              >
+                Recent Searches
+                <span className="nav-recent-chevron" aria-hidden="true">{recentOpen ? "▴" : "▾"}</span>
+              </button>
+              {recentOpen && (
+                <ul className="nav-history-list">
+                  {history.slice(0, 6).map((h) => (
+                    <li key={h.id}>
+                      <button
+                        type="button"
+                        className="nav-item nav-history-item"
+                        onClick={() => run(
+                          h.kind === "DELAY" ? "delay" : "cancel",
+                          "Opening scenario…",
+                          () => api.scenario(h.id)
+                        )}
+                      >
+                        <span className="nav-history-badge">
+                          {h.kind === "DELAY" ? `+${h.delay_minutes}m` : "Canc"}
+                        </span>
+                        <span className="nav-history-flight">{h.flight_id.split("_")[0]}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
         </aside>
