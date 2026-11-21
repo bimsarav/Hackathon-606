@@ -1,0 +1,25 @@
+== ship 10:49:03 (git HEAD 12454fb)
+extracted
+ Image disruption-advisor-api:latest Built 
+ Image disruption-advisor-web:latest Built 
+ Container disruption-advisor-api-1 Running 
+ Container disruption-advisor-db-1 Running 
+ Container disruption-advisor-web-1 Recreate 
+ Container disruption-advisor-web-1 Recreated 
+ Container disruption-advisor-db-1 Waiting 
+ Container disruption-advisor-db-1 Healthy 
+ Container disruption-advisor-migrate-1 Starting 
+ Container disruption-advisor-migrate-1 Started 
+ Container disruption-advisor-migrate-1 Waiting 
+ Container disruption-advisor-migrate-1 Exited 
+ Container disruption-advisor-ingest-1 Starting 
+ Container disruption-advisor-ingest-1 Started 
+ Container disruption-advisor-ingest-1 Waiting 
+ Container disruption-advisor-ingest-1 Exited 
+ Container disruption-advisor-extracts-db-1 Starting 
+ Container disruption-advisor-api-1 Waiting 
+ Container disruption-advisor-api-1 Healthy 
+ Container disruption-advisor-web-1 Starting 
+ Container disruption-advisor-extracts-db-1 Started 
+ Container disruption-advisor-web-1 Started 
+== up returned 10:49:24
