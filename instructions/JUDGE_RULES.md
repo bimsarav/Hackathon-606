@@ -39,4 +39,5 @@ Scale: 90–100 Excellent · 80–89 Very Good · 70–79 Good · 60–69 Needs 
 - **Non-product deliverables** (workspace rules, research, tooling) get their own folder and criteria: `execution/judge/<area>/CRITERIA.md`, derived from the request that produced them.
 - **Finding IDs:** `J-<code>-<nnn>`; codes: DA = disruption-advisor, ESM = esm-hub, WR = workspace rules, KB = airline knowledge base. Add a code here when a new product or area starts.
 - **Resume and archive:** on resume, read `execution/judge/QUALITY_TRACKER.md` with the other tracking files; at product delivery, the product's `execution/judge/<product>/` folder is archived with its logs.
+- **Manual QA (MASTER_PROMPT §17.10):** in every product evaluation, assess the latest QA cycle in `execution/qa/<product>/` (coverage of the delivery-report features, evidence quality, open defects by severity). A QA PASS is evidence to check, not proof; a significant delivery without a UI-based QA cycle is a finding.
 - Judge material is internal: never put it in `products/<product>/` or on the client's Confluence (PRODUCT_RULES §7).

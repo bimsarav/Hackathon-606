@@ -6,6 +6,7 @@
 | 2026-11-21 | WR (workspace rules) | Re-evaluation after fixes (J-WR-001..013) | Full | 93 | +13 | APPROVED WITH IMPROVEMENTS | 0 | 0 | 0 | 7 | no (Low items tracked) | workspace-rules/EVAL-2026-11-21-02.md |
 | 2026-11-21 | DA (disruption-advisor) | First full evaluation of the product (code, docs, deployment, OCC browser walk-through) | Full | 81 | – | REWORK REQUIRED (mandatory rules 2 and 5 fail) | 0 | 3 | 5 | 6 | yes (deck ≤ 10 pages, MP4 + source ZIP, remove build traces) | disruption-advisor/EVAL-2026-11-21-01.md |
 | 2026-11-22 | DA (disruption-advisor) | Re-evaluation after fix release (J-DA-003, 004, 009–013; OCC + Evaluator browser walk-through) | Full | 82 | +1 | REWORK REQUIRED (mandatory rule 2 fails; rule 5 now passes) | 0 | 2 | 4 | 6 | yes (deck 14 → ≤ 10 pages, MP4 + source ZIP, commit the release) | disruption-advisor/EVAL-2026-11-21-02.md |
+| 2026-11-22 | WR (workspace rules) | Manual QA Engineer integration (MASTER_PROMPT §17, QA_RULES, hooks) | Full | 85 | – | APPROVED WITH IMPROVEMENTS | 0 | 0 | 2 | 5 | no (Medium items to fix: J-WR-015, 016) | workspace-rules/EVAL-2026-11-22-01.md |
 
 ## Recurring weaknesses
 | Weakness | Seen in | Count | Recommended standard / rule change | Status |

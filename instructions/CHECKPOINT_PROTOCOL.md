@@ -58,7 +58,7 @@ Do NOT redo: <expensive things already done and verified>
 ## 8. Resume procedure (cheapest path first)
 1. Read the injected snapshot (or `execution/RESUME.md`) plus the injected tail of `tool-activity.log` and `sessions.log`.
 2. If the last activity lines match the snapshot's "In progress" step, check **only the files that step touches** (and the saved output of any long command), then continue.
-   If the product has reached deployment work, also read `execution/DEPLOYMENT_STATUS.md` and continue from its last confirmed point (MASTER_PROMPT §13.12). On every resume, also list `input/` for a new cloud-details folder (`ls input/`; cheap) and record anything new.
+   If the product has reached deployment work, also read `execution/DEPLOYMENT_STATUS.md` and continue from its last confirmed point (MASTER_PROMPT §13.12). On every resume, also list `input/` for a new cloud-details folder (`ls input/`; cheap) and record anything new. When the product has QA or Judge activity, also read `execution/qa/<product>/DEFECTS.md` (open bugs) and the last rows of `execution/judge/QUALITY_TRACKER.md`.
 3. Only if they disagree or the snapshot is stale, read `CURRENT_TASK.md`, the last 20 lines of `execution.log` and `errors.log`, then reconcile.
 
 | Found | Meaning | Action |

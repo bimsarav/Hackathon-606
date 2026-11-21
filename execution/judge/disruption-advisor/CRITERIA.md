@@ -25,6 +25,7 @@ Created 2026-11-21. Derived from the product's own specification (JUDGE_RULES §
 3b. Scope from the briefing (`input/requirements/UC5_briefing_transcript.txt`): one or two realistic disruption scenarios shown end to end (impact, available recovery, recommended action). Product-owner answers in `input/requirements/UC5_QnA_2026-11-20.txt` apply (e.g. inventory mismatches must not break the process).
 4. The automated quality gate (`scripts/check.sh`) passes on the delivered commit, and post-deployment checks (smoke, Playwright) pass on the server.
 5. No client deliverable contains build-process traces (PRODUCT_RULES §7).
+6. A manual QA cycle through the UI of the deployed system (MASTER_PROMPT §17, `instructions/QA_RULES.md`) covers the delivered features of the release for each role (OCC, Evaluator), with evidence, and no open Critical or High QA defect remains (or the user has accepted it). The Judge assesses the QA evidence; a QA PASS alone is not proof.
 
 ## 3. Critical-failure rules (block approval regardless of score, §16.6)
 - Personal data (names, booking references, document numbers, contact details) sent to the external AI service, or present in the Git repository or Confluence.
@@ -38,4 +39,5 @@ Created 2026-11-21. Derived from the product's own specification (JUDGE_RULES §
 | Date | Change |
 |---|---|
 | 2026-11-21 | Created from UC5, the hackathon judging weights and the submission package. |
+| 2026-11-22 | Mandatory rule 6 added: manual QA cycle through the UI (user instruction 2026-11-22, MASTER_PROMPT §17). |
 | 2026-11-21 | Added UC5 §5 expected solution and §8 deliverables (3a), briefing scope and product-owner Q&A (3b), and the passenger-rights critical rule (Judge finding J-WR-008 on the first criteria review). |
