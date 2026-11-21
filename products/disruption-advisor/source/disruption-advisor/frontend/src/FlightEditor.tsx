@@ -62,9 +62,9 @@ export function FlightEditor() {
         flight: flight,
         passengers: pax.map((p) => ({ ...p, ssr: p.ssr ? p.ssr.toUpperCase() : null, fare: Number(p.fare) || 0 })),
       });
-      setMessage(`Saved. ${data.flight.flight_number} on ${utc(data.flight.std)} now uses your edits: analyse it in Flight Delay or Cancellation to see the new results.`);
+      setMessage(`Saved. ${data.flight.flight_number} on ${utc(data.flight.std)} now uses your edits, and its 7-day delay prediction was re-scored: analyse it in Flight Delay, Cancellation or the Delay Watchlist to see the new results.`);
       await open(data.flight.flight_id);
-      setMessage(`Saved. ${data.flight.flight_number} now uses your edits: analyse it in Flight Delay or Cancellation to see the new results.`);
+      setMessage(`Saved. ${data.flight.flight_number} now uses your edits, and its 7-day delay prediction was re-scored: analyse it in Flight Delay, Cancellation or the Delay Watchlist to see the new results.`);
       refreshEdits();
     } catch (e) { setError(errorText(e, "Could not save the changes.")); } finally { setBusy(false); }
   }
@@ -191,7 +191,7 @@ export function FlightEditor() {
           <div className="testdata-actions">
             <button type="button" className="btn-outline" onClick={() => { bumpSold(1); setPax((list) => [...list, { customer_key: null, pnr: "NEW01", pax_type: "AD",
               fare_family: "Basic", fare: 300, ssr: "", loyalty_tier: "none", frequency: "occasional", remove: false }]); }}>Add passenger</button>
-            <button type="button" className="primary" disabled={busy} onClick={() => void save()}>Save changes</button>
+            <button type="button" className="primary" disabled={busy} onClick={() => void save()}>{busy ? "Saving and re-scoring…" : "Save changes"}</button>
             <button type="button" className="link" disabled={busy} onClick={() => void open(data.flight.flight_id)}>Discard unsaved changes</button>
             {data.edited && <button type="button" className="reject" disabled={busy} onClick={() => void reset(data.flight.flight_id)}>Reset to real data</button>}
           </div>
