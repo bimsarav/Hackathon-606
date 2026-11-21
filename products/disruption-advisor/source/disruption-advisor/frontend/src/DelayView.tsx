@@ -6,7 +6,7 @@ import { CrewFdpAlerts } from "./CrewFdpAlerts";
 import { RotationBoard } from "./RotationBoard";
 import { RewardPanel } from "./RewardPanel";
 import { OptionKindInfo, StrategyPanel } from "./StrategyPanel";
-import { Assumptions, DecisionBar, Explanation, PassengerTable, WeightsPanel } from "./Shared";
+import { Assumptions, DecisionBar, Explanation, PassengerTable, useAiExplanation, WeightsPanel, whyLabel } from "./Shared";
 
 interface Props {
   scenario: Scenario;
@@ -17,6 +17,7 @@ interface Props {
 
 /** Scenario A: delay impact along the rotation, recovery options compared, misconnecting passengers rebooked. */
 export function DelayView({ scenario, result, meta, onUpdate }: Props) {
+  useAiExplanation(scenario, onUpdate);
   const [allLegs, setAllLegs] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [selectError, setSelectError] = useState<string | null>(null);
@@ -111,7 +112,7 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
         {result.strategies && result.strategy && (
           <Tile label="Strategy" value={STRATEGY_LABEL[result.strategy]} sub={`picks ${best.label}`} onClick={() => reveal("strategies")} />
         )}
-        <Tile label="Why?" value={result.explanation.source.startsWith("ai:") ? "AI-worded" : "Template"} sub={firstSentence(result.explanation.text)} onClick={() => reveal("why")} />
+        <Tile label="Why?" value={whyLabel(result.explanation.source, result.explanation.pending)} sub={firstSentence(result.explanation.text)} onClick={() => reveal("why")} />
         <Tile label="Recovery options" value={num(result.options.length)} sub={`recommended: ${best.label}`} onClick={() => reveal("options")} />
         <Tile label="Flight Board" value={`${num(new Set(shown.legs.map((l) => l.operated_by)).size)} aircraft`} sub={`${num(shown.legs.length)} flights in the rotation`} onClick={() => reveal("board")} />
         <Tile label="Crew duty (FDP)" value={crewLabel(shown)} sub={crewSub(shown)}
@@ -134,7 +135,7 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
       )}
 
       <Fold id="why" title="Why?" summary={firstSentence(result.explanation.text)} open={openSecs.has("why")} onToggle={() => toggle("why")}>
-        <Explanation text={result.explanation.text} source={result.explanation.source} />
+        <Explanation text={result.explanation.text} source={result.explanation.source} pending={result.explanation.pending} />
       </Fold>
 
       <Fold id="options" title="Recovery options" summary={`${num(result.options.length)} options · recommended: ${best.label}`}

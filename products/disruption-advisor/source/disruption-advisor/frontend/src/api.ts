@@ -304,9 +304,12 @@ export interface Rebooking {
   hotel_rooms?: number;
 }
 
+/** The "Why?" text. `pending`: the AI wording is still to be fetched (the analysis returns the template first). */
+export interface Explanation { text: string; source: string; pending?: boolean }
+
 interface ResultBase {
   flight: FlightRow;
-  explanation: { text: string; source: string };
+  explanation: Explanation;
   passengers: PassengerRow[];
   rebooking: Rebooking | null;
   tier_counts?: Record<string, number>;
@@ -803,6 +806,7 @@ export const api = {
     request<{ flight: RiskFlight; connections: ConnectionRisk[] }>(`/api/v1/risk/flights/${encodeURIComponent(flightId)}?limit=30`),
   predict: (flightId: string, body: PredictInputs) =>
     post<PredictResult>(`/api/v1/risk/flights/${encodeURIComponent(flightId)}/predict`, body),
+  explanation: (id: string) => post<Explanation>(`/api/v1/scenarios/${id}/explanation`, {}),
   rewards: (id: string, budgetAed: number) =>
     post<RewardPlan>(`/api/v1/scenarios/${id}/rewards`, { budget_aed: budgetAed }),
   cascade: () => request<CascadeCheck>("/api/v1/risk/cascade"),

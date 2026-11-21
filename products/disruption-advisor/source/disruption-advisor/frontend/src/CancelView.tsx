@@ -3,7 +3,7 @@ import type { CancelResult, Meta, Scenario } from "./api";
 import { Fold, Kpi, PeopleBox, Tile } from "./DelayView";
 import { aed, num, utc } from "./format";
 import { RewardPanel } from "./RewardPanel";
-import { Assumptions, DecisionBar, Explanation, PassengerTable, WeightsPanel } from "./Shared";
+import { Assumptions, DecisionBar, Explanation, PassengerTable, useAiExplanation, WeightsPanel, whyLabel } from "./Shared";
 
 interface Props {
   scenario: Scenario;
@@ -23,6 +23,7 @@ function firstSentence(text: string): string {
 /** Scenario B: cancellation with too few seats; passengers ranked by tier and weights, rebooked within inventory.
  *  Same compact layout as the Flight Delay page: decision first, "at a glance" tiles, folding sections, three boxes. */
 export function CancelView({ scenario, result, meta, onUpdate }: Props) {
+  useAiExplanation(scenario, onUpdate);
   const f = result.flight;
   const reb = result.rebooking;
   // hub itineraries reuse flights, so only direct alternatives are summed (no double counting)
@@ -82,7 +83,7 @@ export function CancelView({ scenario, result, meta, onUpdate }: Props) {
       <nav className="glance" aria-label="On this page">
         <Tile label="Priority tiers" value={`${tiers["1"] ?? 0} care`}
           sub={`${tiers["2"] ?? 0} urgent · ${tiers["3"] ?? 0} standard · ${tiers["non_revenue"] ?? 0} non-rev`} onClick={() => showBox("pax")} />
-        <Tile label="Why?" value={result.explanation.source.startsWith("ai:") ? "AI-worded" : "Template"} sub={firstSentence(result.explanation.text)} onClick={() => reveal("why")} />
+        <Tile label="Why?" value={whyLabel(result.explanation.source, result.explanation.pending)} sub={firstSentence(result.explanation.text)} onClick={() => reveal("why")} />
         <Tile label="Passengers to rebook" value={num(result.passengers.length)}
           sub={reb ? `${num(reb.protected)} protected · ${num(reb.unprotected)} without a seat` : "priority order"}
           tone={reb && reb.unprotected > 0 ? "warn" : undefined} onClick={() => showBox("pax")} />
@@ -102,7 +103,7 @@ export function CancelView({ scenario, result, meta, onUpdate }: Props) {
       )}
 
       <Fold id="why" title="Why?" summary={firstSentence(result.explanation.text)} open={openSecs.has("why")} onToggle={() => toggle("why")}>
-        <Explanation text={result.explanation.text} source={result.explanation.source} />
+        <Explanation text={result.explanation.text} source={result.explanation.source} pending={result.explanation.pending} />
       </Fold>
 
       <Fold id="weights" title="Priority weights (what-if)" summary="change the weights to re-rank passengers inside each tier"

@@ -153,3 +153,12 @@ def test_openapi_is_published(client: TestClient) -> None:
 
 def test_migrations_match_models(alembic_config: Config) -> None:
     command.check(alembic_config)  # raises if the models have changes without a migration
+
+
+def test_explanation_endpoint_returns_the_saved_text(client: TestClient, auth: dict[str, str]) -> None:
+    made = client.post(
+        "/api/v1/scenarios", headers=auth, json={"kind": "DELAY", "flight_id": F1, "delay_minutes": 150}
+    ).json()
+    got = client.post(f"/api/v1/scenarios/{made['id']}/explanation", headers=auth).json()
+    assert got["text"] == made["result"]["explanation"]["text"]  # AI off in tests: the template stays
+    assert got["pending"] is False

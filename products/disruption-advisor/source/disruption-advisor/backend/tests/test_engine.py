@@ -10,7 +10,7 @@ from app.engine import priority
 from app.engine.cost import eu261_compensation_eur, great_circle_km
 from app.engine.explain import Explainer
 from app.engine.network import absorb_delay, propagate, swap_rotations
-from app.engine.scenarios import Context, ScenarioError, analyse_cancellation, analyse_delay
+from app.engine.scenarios import Context, ScenarioError, analyse_cancellation, analyse_delay, explain_now
 from app.engine.store import Leg, OpsStore
 from tests.ops_fixture import F1, X1, t, write_ops
 
@@ -135,6 +135,35 @@ def test_explanations_are_short_and_plain(ctx: Context) -> None:
         assert len(text.split()) <= 70
         assert " leg" not in text
         assert "misconnect" not in text
+
+
+def test_the_ai_wording_comes_after_the_analysis(ctx: Context) -> None:
+    """The analysis returns the template at once; the AI text is asked for afterwards from the kept facts."""
+
+    class Writer(Explainer):
+        calls = 0
+
+        def _ask(self, instruction: str, facts: dict, max_tokens: int) -> str | None:
+            Writer.calls += 1
+            return f"AI text for {facts.get('late_flight') or facts.get('cancelled_flight')}"
+
+        @property
+        def enabled(self) -> bool:
+            return True
+
+    ai = Context(ctx.store, ctx.settings, Writer("", "claude-x", "low", 1))
+    delay = analyse_delay(ai, F1, 150, priority.DEFAULT_WEIGHTS)
+    assert Writer.calls == 0  # nothing waits for the AI
+    assert delay["explanation"]["source"] == "template"
+    assert delay["explanation"]["pending"] is True
+    assert "PNR" not in str(delay["explanation"]["facts"]).upper()
+    done = explain_now(ai, "DELAY", delay["explanation"])
+    assert done["source"] == "ai:claude-x"
+    assert done["pending"] is False
+    assert done["text"].startswith("AI text for")
+    cancel = analyse_cancellation(ai, X1, priority.DEFAULT_WEIGHTS)
+    assert explain_now(ai, "CANCEL", cancel["explanation"])["source"] == "ai:claude-x"
+    assert analyse_delay(ctx, F1, 150, priority.DEFAULT_WEIGHTS)["explanation"]["pending"] is False  # AI off
 
 
 def test_missed_connection_message_names_the_late_inbound_flight(ctx: Context) -> None:

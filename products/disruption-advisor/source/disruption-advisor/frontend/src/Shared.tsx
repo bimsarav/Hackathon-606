@@ -12,7 +12,26 @@ import {
 } from "./api";
 import { minutes, num, utc } from "./format";
 
-export function Explanation({ text, source }: { text: string; source: string }) {
+/** The analysis comes back with the template text so it is not held up by the AI; this fetches the AI wording
+ *  afterwards and swaps it in (the server saves it on the scenario). */
+export function useAiExplanation(scenario: Scenario, onUpdate: (s: Scenario) => void) {
+  const pending = !!scenario.result.explanation.pending;
+  useEffect(() => {
+    if (!pending) return;
+    let live = true;
+    api.explanation(scenario.id)
+      .then((e) => { if (live) onUpdate({ ...scenario, result: { ...scenario.result, explanation: e } } as Scenario); })
+      .catch(() => { /* the template text stays */ });
+    return () => { live = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scenario.id, pending]);
+}
+
+export function whyLabel(source: string, pending?: boolean): string {
+  return pending ? "Writing…" : source.startsWith("ai:") ? "AI-worded" : "Template";
+}
+
+export function Explanation({ text, source, pending }: { text: string; source: string; pending?: boolean }) {
   const ai = source.startsWith("ai:");
   return (
     <section className="explanation" aria-labelledby="why-title">
@@ -20,7 +39,7 @@ export function Explanation({ text, source }: { text: string; source: string }) 
       <p>{text}</p>
       <p className="small muted">
         The numbers come from the recovery engine; the language model only words them. It never decides.{" "}
-        {ai ? `Text written by ${source.slice(3)}.` : "Template text."}
+        {ai ? `Text written by ${source.slice(3)}.` : pending ? "Template text; the AI wording is on its way." : "Template text."}
       </p>
     </section>
   );
