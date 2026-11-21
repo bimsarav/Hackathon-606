@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   api,
   type ArrivalMetrics,
@@ -6,7 +6,6 @@ import {
   type Classification,
   type DocBlock,
   errorText,
-  type ModelCard,
   type ModelDocs,
   type ModelMetrics,
   type ReliabilityBin,
@@ -18,18 +17,6 @@ import { num } from "./format";
 
 const pct = (v: number | null | undefined, digits = 1) => (v == null ? "—" : `${(v * 100).toFixed(digits)}%`);
 const f3 = (v: number | null | undefined) => (v == null ? "—" : v.toFixed(3));
-
-function Section({ label, children }: { label: string; children: ReactNode }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <section className="expand-section">
-      <button type="button" className="expand-trigger link" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
-        {open ? "▾" : "▸"} {label}
-      </button>
-      {open && <div className="expand-body">{children}</div>}
-    </section>
-  );
-}
 
 /** **bold** and `code` of the bundled write-ups. */
 function Md({ text }: { text: string }) {
@@ -44,7 +31,7 @@ function Md({ text }: { text: string }) {
   );
 }
 
-function Blocks({ blocks }: { blocks: DocBlock[] }) {
+export function Blocks({ blocks }: { blocks: DocBlock[] }) {
   return (
     <>
       {blocks.map((b, i) => {
@@ -74,7 +61,7 @@ function Blocks({ blocks }: { blocks: DocBlock[] }) {
   );
 }
 
-function Calibration({ bins, title }: { bins: ReliabilityBin[]; title: string }) {
+export function Calibration({ bins, title }: { bins: ReliabilityBin[]; title: string }) {
   return (
     <>
       <p className="small muted">{title}</p>
@@ -98,7 +85,7 @@ function Calibration({ bins, title }: { bins: ReliabilityBin[]; title: string })
   );
 }
 
-function Cutoffs({ all }: { all: Record<string, Classification> }) {
+export function Cutoffs({ all }: { all: Record<string, Classification> }) {
   return (
     <>
       <p className="small muted">
@@ -150,7 +137,7 @@ function Cutoffs({ all }: { all: Record<string, Classification> }) {
   );
 }
 
-function Monthly({ folds }: { folds: RollingFold[] }) {
+export function Monthly({ folds }: { folds: RollingFold[] }) {
   const cell = (fold: RollingFold, t: string) => fold[t] as ModelMetrics | undefined;
   return (
     <>
@@ -178,7 +165,7 @@ function Monthly({ folds }: { folds: RollingFold[] }) {
   );
 }
 
-function Arrival({ metrics }: { metrics: Record<string, ArrivalMetrics> }) {
+export function Arrival({ metrics }: { metrics: Record<string, ArrivalMetrics> }) {
   return (
     <>
       <p className="small muted">
@@ -201,7 +188,7 @@ function Arrival({ metrics }: { metrics: Record<string, ArrivalMetrics> }) {
   );
 }
 
-function CascadeSummary() {
+export function CascadeSummary() {
   const [data, setData] = useState<CascadeCheck | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
@@ -231,7 +218,7 @@ function CascadeSummary() {
   );
 }
 
-function RewardModel({ docs }: { docs: ModelDocs | null }) {
+export function RewardModel({ docs }: { docs: ModelDocs | null }) {
   const [card, setCard] = useState<RewardModelCard | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
@@ -279,7 +266,7 @@ function RewardModel({ docs }: { docs: ModelDocs | null }) {
   );
 }
 
-function TestDataScoring() {
+export function TestDataScoring() {
   const [status, setStatus] = useState<TestDataStatus | null>(null);
   useEffect(() => {
     api.testData().then(setStatus).catch(() => setStatus(null));
@@ -306,53 +293,6 @@ function TestDataScoring() {
       ) : (
         <p className="small muted">No test data is loaded right now.</p>
       )}
-    </>
-  );
-}
-
-/** The rest of the model evidence, below the delay model overview (evaluator view). */
-export function ModelAnalysis({ card }: { card: ModelCard }) {
-  const [docs, setDocs] = useState<ModelDocs | null>(null);
-  const [docsError, setDocsError] = useState<string | null>(null);
-  useEffect(() => {
-    api.modelDocs().then(setDocs).catch((e) => setDocsError(errorText(e, "Could not load the model write-ups.")));
-  }, []);
-  const ev = card.evaluation;
-  return (
-    <>
-      {docsError && <p className="error" role="alert">{docsError}</p>}
-      {ev.reliability_60 && ev.reliability_60.length > 0 && (
-        <Section label="Calibration: does a 20% chance mean 20%?">
-          <Calibration bins={ev.reliability_60} title="Delay of 60+ minutes: predicted chance against what happened in the test weeks." />
-        </Section>
-      )}
-      {ev.classification && (
-        <Section label="Alert cut-offs: true and false alarms">
-          <Cutoffs all={ev.classification} />
-        </Section>
-      )}
-      {ev.rolling_monthly && ev.rolling_monthly.length > 0 && (
-        <Section label="Month-by-month results">
-          <Monthly folds={ev.rolling_monthly} />
-        </Section>
-      )}
-      {ev.arrival_model_metrics && (
-        <Section label="Arrival-delay model">
-          <Arrival metrics={ev.arrival_model_metrics} />
-        </Section>
-      )}
-      <Section label="Model comparison and tuning (delay model)">
-        {docs ? <Blocks blocks={docs.delay_selection} /> : <p className="status">Loading…</p>}
-      </Section>
-      <Section label="Reward preference model">
-        <RewardModel docs={docs} />
-      </Section>
-      <Section label="Cascade check (knock-on formula)">
-        <CascadeSummary />
-      </Section>
-      <Section label="How uploaded test flights are scored">
-        <TestDataScoring />
-      </Section>
     </>
   );
 }
