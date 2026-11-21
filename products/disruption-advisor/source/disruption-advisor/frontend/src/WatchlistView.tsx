@@ -11,6 +11,7 @@ import {
   type Watchlist,
 } from "./api";
 import { Kpi } from "./DelayView";
+import { PredictPanel } from "./PredictPanel";
 import { minutes, num, utc } from "./format";
 
 const pct = (p: number): string => `${Math.round(p * 100)}%`;
@@ -93,8 +94,9 @@ export function WatchlistView({ onAnalyse, onAgent, busy }: Props) {
                 <th scope="col">Flight</th>
                 <th scope="col">Departs</th>
                 <th scope="col">Risk</th>
-                <th scope="col" className="num">15+ min</th>
-                <th scope="col" className="num">60+ min</th>
+                <th scope="col" className="num" title="Departure delay">Dep 15+</th>
+                <th scope="col" className="num" title="Departure delay">Dep 60+</th>
+                <th scope="col" className="num" title="Arrival delay">Arr 60+</th>
                 <th scope="col" className="num" title="Delay exceeded with a 20% chance">Plan for</th>
                 <th scope="col" className="num">Connecting</th>
                 <th scope="col" className="num">Expected missed</th>
@@ -130,6 +132,7 @@ export function WatchlistView({ onAnalyse, onAgent, busy }: Props) {
                     </td>
                     <td className="num">{pct(f.p_15)}</td>
                     <td className="num">{pct(f.p_60)}</td>
+                    <td className="num">{f.a_60 === undefined ? "—" : pct(f.a_60)}</td>
                     <td className="num">{f.planning_delay_minutes ? minutes(f.planning_delay_minutes) : "on time"}</td>
                     <td className="num">{num(f.connecting_pax)}</td>
                     <td className="num">{f.expected_misconnects.toFixed(1)}</td>
@@ -137,7 +140,7 @@ export function WatchlistView({ onAnalyse, onAgent, busy }: Props) {
                   </tr>
                   {open === f.flight_id && (
                     <tr className="detail-row">
-                      <td colSpan={9}>
+                      <td colSpan={10}>
                         <FlightDetail flight={f} busy={busy} onAnalyse={onAnalyse} onAgent={onAgent} />
                       </td>
                     </tr>
@@ -237,6 +240,7 @@ function FlightDetail({ flight, busy, onAnalyse, onAgent }:
           <p className="small muted">* No MCT rule for this journey at the hub: the default MCT is used.</p>
         )}
       </div>
+      <PredictPanel flightId={flight.flight_id} />
     </div>
   );
 }

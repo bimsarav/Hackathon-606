@@ -1681,3 +1681,23 @@ tr.clickable.selected {
 .chart-legend { list-style: none; display: flex; gap: 1rem; flex-wrap: wrap; padding: 0; margin: 0 0 0.25rem; font-size: 0.8rem; color: var(--muted); }
 .chart-swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 0.35rem; vertical-align: -1px; }
 .chart-caption { margin: 0.25rem 0 0; }
+/* T-621: departure and arrival prediction panel */
+.predict-panel { grid-column: 1 / -1; }
+.predict-panel label { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; }
+.predict-panel input[type="range"] { width: 14rem; }
+.delay-slider { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; }
+.curve-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 12px 0; }
+.curve-card { border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.curve-card h4 { margin: 0 0 2px; display: flex; gap: 8px; align-items: center; }
+.curve-expected { font-weight: 600; margin: 4px 0 8px; }
+.curve-row { display: grid; grid-template-columns: 4.5rem 1fr 3rem; gap: 8px; align-items: center; font-size: 0.85rem; }
+.curve-bar { display: block; height: 8px; background: rgba(127, 127, 127, 0.2); border-radius: 4px; overflow: hidden; }
+.curve-bar > span { display: block; height: 100%; background: currentColor; opacity: 0.7; }
+
+.preset-list li { display: flex; gap: 8px; align-items: stretch; }
+.preset-list li .preset { flex: 1; }
+.predict-btn { align-self: center; white-space: nowrap; }
+.predict-card .predict-panel { grid-column: auto; }
+.filter-row-advanced { border-top: 1px solid var(--line); margin-top: 0.6rem; padding-top: 0.6rem; }
+.filter-row-advanced .row { margin-top: 0.4rem; gap: 1.5rem; flex-wrap: wrap; }
+.row-predict { margin-top: 2px; font-weight: 600; }

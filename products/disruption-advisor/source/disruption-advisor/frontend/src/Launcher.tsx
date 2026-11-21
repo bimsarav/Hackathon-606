@@ -11,6 +11,7 @@ import {
   STRATEGY_LABEL,
   type StrategyKey,
 } from "./api";
+import { DelaySlider, RowPredict } from "./PredictPanel";
 import { CarrierTail } from "./CarrierTail";
 import { utc } from "./format";
 
@@ -73,6 +74,9 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
   const [presetPageSize, setPresetPageSize] = useState<number>(5);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [advanced, setAdvanced] = useState(false);
+  const [advInbound, setAdvInbound] = useState<number | null>(null);
+  const [advDeparture, setAdvDeparture] = useState<number | null>(null);
   // Once a flight is chosen (or one is already on screen) the lists fold away to save space; one click brings them back.
   const [listHidden, setListHidden] = useState(Boolean(active));
 
@@ -99,6 +103,13 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
   useEffect(() => {
     if (active) setDelay(active.delay);
   }, [active?.flightId, active?.delay]);
+
+  // Advanced search: the greyed-out Delay slider follows the two sliders (departure delay first, else the inbound
+  // arrival delay) so the scenario is analysed with the same timing the predictions use.
+  useEffect(() => {
+    const known = advanced ? (advDeparture ?? advInbound) : null;
+    if (known !== null) setDelay(Math.min(600, Math.max(15, Math.round(known / 15) * 15)));
+  }, [advanced, advDeparture, advInbound]);
 
   /** On release, apply the new delay to the scenario on screen. */
   function commitDelay() {
@@ -190,7 +201,7 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
             <div className="filter-row-delay">
               <div className="filter-field filter-field-delay">
                 <label htmlFor="delay">Delay: <strong>{delay} min</strong></label>
-                <input id="delay" type="range" min={15} max={600} step={15} value={delay}
+                <input id="delay" type="range" min={15} max={600} step={15} value={delay} disabled={advanced}
                   onChange={(e) => setDelay(Number(e.target.value))}
                   onPointerUp={commitDelay} onKeyUp={commitDelay} onTouchEnd={commitDelay} />
               </div>
@@ -201,6 +212,27 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
                     : `Release to re-run ${active.flightNumber} with ${delay} min…`
                   : `Pick a flight below to analyse it with ${delay} min.`}
               </span>
+            </div>
+          )}
+          {/* Row 4: advanced search - what is known today; applies to every listed flight, replaces the Delay slider */}
+          {tab !== "CANCEL" && (
+            <div className="filter-row-advanced">
+              <label className="small">
+                <input type="checkbox" checked={advanced} onChange={(e) => setAdvanced(e.target.checked)} /> Advanced search
+                (add what is known today; the Delay slider is switched off). Predictions below always update on their own.
+              </label>
+              {advanced && (
+                <div className="filter-row-delay">
+                  <div className="filter-field filter-field-delay">
+                    <DelaySlider id="adv-inbound" label="Arrival: inbound aircraft arrived late by" value={advInbound}
+                                 onChange={setAdvInbound} />
+                  </div>
+                  <div className="filter-field filter-field-delay">
+                    <DelaySlider id="adv-departure" label="Departure: this flight departed / will depart late by"
+                                 value={advDeparture} onChange={setAdvDeparture} />
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </form>
@@ -265,6 +297,7 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
                       <span className="small muted">
                         {utc(f.std)} · {f.tail} · {f.booked_seats}/{f.capacity} booked
                       </span>
+                        {tab !== "CANCEL" && <RowPredict flightId={f.flight_id} inbound={advanced ? advInbound : null} departure={advanced ? advDeparture : null} />}
                     </button>
                   </li>
                 ))}
@@ -297,6 +330,7 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
                       <span className="small muted">
                         {utc(p.std)} · {p.tail} · turn {p.turn_minutes} min · {p.connecting_pax} connecting
                       </span>
+                        <RowPredict flightId={p.flight_id} inbound={advanced ? advInbound : null} departure={advanced ? advDeparture : null} />
                     </button>
                   </li>
                 ))}

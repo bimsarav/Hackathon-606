@@ -154,3 +154,30 @@ def test_watchlist_and_flight_risk_api(
     assert week["flights"] > 0
     assert "flag_60" in week
     assert client.get("/api/v1/risk/last-week").status_code == 401
+
+
+def test_live_models_are_written_and_scored(ops: Path) -> None:
+    for kind in ("dep", "arr_in", "arr_dep"):
+        for t in dr.THRESHOLDS:
+            assert (ops / "live_models" / f"{kind}_{t}.txt").exists()
+    card = json.loads((ops / "live_model_card.json").read_text())
+    assert {"dep", "arr_in", "arr_dep"} <= card.keys()
+    assert card["arr_dep"]["60"]["auc"] >= card["arr_dep"]["60"]["planning_auc"]
+
+
+def test_predict_api_planning_and_live(client: TestClient, auth: dict[str, str]) -> None:
+    url = f"/api/v1/risk/flights/{F1}/predict"
+    planning = client.post(url, json={}, headers=auth).json()
+    assert planning["departure"]["mode"] == planning["arrival"]["mode"] == "planning"
+    assert set(planning["departure"]["p"]) == {"5", "15", "30", "60", "120", "180"}
+    late = client.post(url, json={"departure_delay": 240}, headers=auth).json()
+    early = client.post(url, json={"departure_delay": 0}, headers=auth).json()
+    assert late["arrival"]["mode"] == "live: departure delay"
+    assert late["arrival"]["expected_minutes"] >= early["arrival"]["expected_minutes"]
+    inbound = client.post(url, json={"inbound_arrival_delay": 90}, headers=auth).json()
+    assert inbound["departure"]["mode"] == "live: inbound aircraft delay"
+    values = list(inbound["departure"]["p"].values())
+    assert values == sorted(values, reverse=True)  # the curve never rises with the threshold
+    assert client.post(url, json={"departure_delay": 99999}, headers=auth).status_code == 422
+    assert client.post("/api/v1/risk/flights/G9999_202611210000/predict", json={}, headers=auth).status_code == 404
+    assert client.post(url, json={}).status_code == 401

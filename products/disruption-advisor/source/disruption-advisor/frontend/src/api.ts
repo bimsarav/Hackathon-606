@@ -385,11 +385,50 @@ export interface RiskFlight {
   p_30: number;
   p_60: number;
   p_120: number;
+  a_15?: number;
+  a_60?: number;
   planning_delay_minutes: number | null;
   risk_band: "low" | "medium" | "high";
   reasons: RiskReason[];
   connecting_pax: number;
   expected_misconnects: number;
+}
+
+/** T-621: one delay curve (departure or arrival), from the planning model or from live inputs. */
+export interface LiveCurve {
+  mode: string;
+  p: Record<"5" | "15" | "30" | "60" | "120" | "180", number>;
+  expected_minutes: number;
+  planning_delay_minutes: number | null;
+  risk_band: "low" | "medium" | "high";
+}
+export interface PredictInputs {
+  inbound_arrival_delay: number | null;
+  inbound_departure_delay: number | null;
+  departure_delay: number | null;
+}
+export interface LiveMetric {
+  auc: number;
+  planning_auc: number;
+  skill: number;
+  planning_skill: number;
+}
+export interface LiveAccuracy {
+  flights: number;
+  "15": LiveMetric;
+  "60": LiveMetric;
+  mae_minutes: number;
+  planning_mae_minutes: number;
+}
+export interface PredictResult {
+  flight_id: string;
+  flight_number: string;
+  origin: string;
+  destination: string;
+  inputs: PredictInputs;
+  departure: LiveCurve;
+  arrival: LiveCurve;
+  accuracy: Partial<Record<"dep" | "arr_in" | "arr_dep", LiveAccuracy>>;
 }
 
 export interface Watchlist {
@@ -741,6 +780,8 @@ export const api = {
     request<Watchlist>(`/api/v1/risk/watchlist?days=7&band=${band}&sort=${sort}&limit=60`),
   flightRisk: (flightId: string) =>
     request<{ flight: RiskFlight; connections: ConnectionRisk[] }>(`/api/v1/risk/flights/${encodeURIComponent(flightId)}?limit=30`),
+  predict: (flightId: string, body: PredictInputs) =>
+    post<PredictResult>(`/api/v1/risk/flights/${encodeURIComponent(flightId)}/predict`, body),
   rewards: (id: string, budgetAed: number) =>
     post<RewardPlan>(`/api/v1/scenarios/${id}/rewards`, { budget_aed: budgetAed }),
   cascade: () => request<CascadeCheck>("/api/v1/risk/cascade"),

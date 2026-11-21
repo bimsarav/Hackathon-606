@@ -169,6 +169,11 @@ def test_upload_api_checks_then_adds_then_removes(client: TestClient, evaluator_
     detail = client.get("/api/v1/risk/flights/G9801_202611220500", headers=evaluator_auth)
     assert detail.status_code == 200
     assert detail.json()["flight"]["connecting_pax"] == 3
+    predict = "/api/v1/risk/flights/G9801_202611220500/predict"
+    planning = client.post(predict, json={}, headers=evaluator_auth)
+    assert planning.status_code == 200  # the planning forecast works for an uploaded flight
+    live = client.post(predict, json={"inbound_arrival_delay": 45}, headers=evaluator_auth)
+    assert live.status_code == 409  # live inputs need the day's features, which test flights do not have
     assert added["status"]["counts"] == {"flights": 3, "passenger_segments": 6, "passengers": 3}
     found = client.get("/api/v1/flights", params={"q": "G9801"}, headers=evaluator_auth).json()
     assert [f["flight_id"] for f in found] == ["G9801_202611220500"]

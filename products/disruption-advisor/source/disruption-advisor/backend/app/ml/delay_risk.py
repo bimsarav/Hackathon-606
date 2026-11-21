@@ -703,6 +703,17 @@ def run(ops: Path, default_mct: int = 50) -> dict[str, Any]:
     connection_check = _connection_backtest(
         con, ops, frame, test_rows, arrival_eval.predict(frame.x[test_rows]), p_test, default_mct
     )
+    from app.ml import live_delay  # imported here: live_delay imports this module
+
+    live_features = live_delay.inbound_features(con, ops, frame)
+    live_eval = live_delay.LiveModels.train(frame, live_features, train_e, test_start)
+    live_card = live_delay.evaluate(
+        frame, live_features, live_eval, test_e, {"dep": p_test, "arr": arrival_eval.predict(frame.x[test_e])}
+    )
+    live_delay.LiveModels.train(frame, live_features, hist, end).save(ops)
+    live_delay.write_window_features(ops, frame)
+    live_card["trained_at"] = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+    (ops / live_delay.CARD_FILE).write_text(json.dumps(live_card, indent=2))
     save_models(ops, production, arrival, frame.levels, default_mct, str(end.astype("datetime64[D]")))
     win = np.flatnonzero(frame.part == "window")
     p_win = production.predict(frame.x[win])
@@ -771,6 +782,7 @@ def run(ops: Path, default_mct: int = 50) -> dict[str, Any]:
             "treat P(120+) and P(180+) as a ranking, not a level.",
         ],
         "connections": {"pairs": connections.num_rows, "default_mct_minutes": default_mct},
+        "live_models": live_card,
     }
     (ops / "model_card.json").write_text(json.dumps(card, indent=2))
     log.info("delay risk: test AUC(60) %s vs baseline %s", metrics["60"]["auc"], metrics["60"]["baseline_auc"])

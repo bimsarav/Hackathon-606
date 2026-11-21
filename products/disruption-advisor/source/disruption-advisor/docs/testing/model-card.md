@@ -126,3 +126,16 @@ Written by ingest stage 3 into the ops data folder (Docker volume `ops-data`):
 - `flight_risk.parquet`: per window flight, P(departure delay ≥ t), arrival curve, planning delay, band, reasons, connecting passengers and expected missed connections.
 - `connection_risk.parquet`: per connecting passenger, connection time, MCT, slack and misconnect risk.
 - `model_card.json`: data ranges, features, metrics by threshold, reliability, arrival-model metrics, connection backtest and assumptions.
+
+## Live departure and arrival models (T-621, ADR 0014)
+Same data (`Flight_Punctuality_Jan-Nov_2026_Combined.xlsx`), same last-28-day holdout (5,956 unseen G9 flights), scored once. The planning models above are unchanged; the live models add what is known on the day. Inputs: delay of the aircraft's previous leg (arrival and departure) and, for arrival, this flight's own departure delay.
+
+| Model | AUC 15+ | AUC 60+ | Brier skill 60+ | Mean abs. error of expected delay (min) |
+|---|---|---|---|---|
+| Departure, planning (7 days ahead) | 0.801 | 0.770 | 0.079 | 19.6 |
+| Departure, inbound delay known | 0.908 | 0.900 | 0.429 | 13.3 |
+| Arrival, planning | 0.765 | 0.762 | 0.011 | 21.2 |
+| Arrival, inbound delay known | 0.840 | 0.887 | 0.294 | 16.4 |
+| Arrival, departure delay known | 0.930 | 0.974 | 0.601 | 10.0 |
+
+Planning features that did not help (tested on the same holdout): destination arrival-delay rate, scheduled block time (AUC change under 0.003). Expected delay is the mean of the curve with representative band values, so the minutes error is approximate. P(120+) and P(180+) stay rankings, not levels. Artifacts: `live_models/*.txt`, `live_model_card.json`, `window_features.parquet` in the ops folder; training log `execution/logs/output/T-621-train.log`.

@@ -14,8 +14,11 @@ from pathlib import Path
 from typing import Any
 
 import duckdb
+import numpy as np
 
 from app import sample_data
+from app.ml import live_delay
+from app.ml.live_delay import LiveModels
 from app.ml.reward_pref import RewardModel
 
 TABLES = ("flights", "pax_segments", "customers", "aircraft", "mct", "airports", "booking_classes")
@@ -82,6 +85,11 @@ class OpsStore:
             self._con.execute("CREATE INDEX idx_conn_in ON connection_risk (inbound_flight_id)")
         card = ops_dir / "model_card.json"
         self.model_card: dict[str, Any] = json.loads(card.read_text()) if card.exists() else {}
+        self.live_models = LiveModels.load(ops_dir)  # T-621 live departure/arrival models; None = planning only
+        window: tuple[list[str], np.ndarray] = (
+            live_delay.window_matrix(ops_dir) if self.live_models else ([], np.zeros((0, 0)))
+        )
+        self.window_ids, self.window_x = window
         self.reward_model = RewardModel.load(ops_dir)  # phase 5 preference model; None = proxy rules
         cascade = ops_dir / "cascade_check.json"
         self.cascade_check: dict[str, Any] = json.loads(cascade.read_text()) if cascade.exists() else {}

@@ -1,10 +1,11 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { type AgentRun, ApiError, type DelayResult, type Meta, type RecoveryOption, type Scenario } from "./api";
 import { agentStartError, AgentRunView } from "./AgentRunView";
 import { DelayView } from "./DelayView";
 import { WatchlistView } from "./WatchlistView";
+import { Launcher } from "./Launcher";
 
 const weights = { loyalty: 20, frequency: 15, fare_value: 20, ancillaries: 10, journey: 20, booking: 15 };
 const meta: Meta = {
@@ -258,6 +259,67 @@ describe("ask the agent from the watchlist", () => {
     await userEvent.click(await screen.findByRole("button", { name: "G9519" }));
     await userEvent.click(screen.getByRole("button", { name: "Ask the agent" }));
     expect(onAgent).toHaveBeenCalledWith(flight.flight_id, 45);
+  });
+});
+
+describe("predict departure and arrival from the watchlist", () => {
+  it("sends what is known and shows both curves", async () => {
+    const risk = {
+      flight_id: flight.flight_id, flight_number: "G9519", origin: "MCT", destination: "SHJ", std: "2026-11-21T02:00:00",
+      sta: "2026-11-21T03:00:00", tail: "A6-AOH", aircraft_model: "A320-174", p_15: 0.42, p_30: 0.31, p_60: 0.22,
+      p_120: 0.08, a_15: 0.4, a_60: 0.2, planning_delay_minutes: 45, risk_band: "high" as const, reasons: [],
+      connecting_pax: 30, expected_misconnects: 6.4,
+    };
+    const curve = (mode: string, minutes: number) => ({
+      mode, p: { "5": 0.9, "15": 0.8, "30": 0.7, "60": 0.5, "120": 0.2, "180": 0.05 }, expected_minutes: minutes,
+      planning_delay_minutes: 60, risk_band: "high" as const,
+    });
+    const fetchFn = stubFetch((url) => {
+      if (url.includes("/risk/watchlist"))
+        return { from_utc: "2026-11-20T00:00:00", days: 7, band: "medium",
+          totals: { flights: 1, high: 1, medium: 0, expected_misconnects: 6.4 }, flights: [risk] };
+      if (url.endsWith("/predict"))
+        return { flight_id: flight.flight_id, flight_number: "G9519", origin: "MCT", destination: "SHJ", inputs: {},
+          departure: curve("planning", 40), arrival: curve("live: departure delay", 110), accuracy: {} };
+      if (url.includes("/risk/flights/")) return { flight: risk, connections: [] };
+      return new Response("{}", { status: 404 });
+    });
+    render(<WatchlistView onAnalyse={() => {}} busy={false} />);
+    await userEvent.click(await screen.findByRole("button", { name: "G9519" }));
+    fireEvent.change(await screen.findByLabelText(/This flight departed/), { target: { value: "120" } });
+    expect(await screen.findByText("Expected 110 min late")).toBeInTheDocument();
+    expect(screen.getByText("Expected 40 min late")).toBeInTheDocument();
+    const call = fetchFn.mock.calls.filter(([url]) => url.endsWith("/predict")).at(-1);
+    expect(JSON.parse(String(call?.[1]?.body))).toMatchObject({ departure_delay: 120, inbound_arrival_delay: null });
+  });
+});
+
+describe("advanced search predicts every listed flight as the sliders move", () => {
+  it("re-predicts automatically and disables the delay slider", async () => {
+    const curve = (m: number) => ({ mode: "live", p: { "5": 1, "15": 1, "30": 1, "60": 0.5, "120": 0.1, "180": 0 },
+      expected_minutes: m, planning_delay_minutes: 60, risk_band: "high" as const });
+    const fetchFn = stubFetch((url, init) => {
+      if (url.includes("/presets")) return { delay: [], cancel: [] };
+      if (url.includes("/flights?")) return [flight];
+      if (url.endsWith("/predict")) {
+        const b = JSON.parse(String(init?.body));
+        return { flight_id: flight.flight_id, flight_number: "G9519", origin: "MCT", destination: "SHJ", inputs: b,
+          departure: curve(b.departure_delay ?? 10), arrival: curve((b.departure_delay ?? 10) + 5), accuracy: {} };
+      }
+      return new Response("{}", { status: 404 });
+    });
+    render(<Launcher meta={meta} busy={false} defaultTab="DELAY" hideTabNav onDelay={() => {}} onCancel={() => {}} />);
+    await userEvent.click(screen.getByRole("button", { name: "Search" }));
+    await screen.findByText(/G9519 MCT/);
+    expect(await screen.findByText(/Departure \+10 min/)).toBeInTheDocument(); // planning view, no Advanced needed
+    await userEvent.click(screen.getByLabelText(/Advanced search/));
+    expect(screen.getByLabelText(/^Delay:/)).toBeDisabled();
+    fireEvent.change(screen.getByLabelText(/Departure: this flight/), { target: { value: "90" } });
+    expect(await screen.findByText(/Departure 90 min \(set\) · Arrival \+95 min/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Delay:/)).toHaveValue("90");
+    fireEvent.change(screen.getByLabelText(/Departure: this flight/), { target: { value: "150" } });
+    expect(await screen.findByText(/Departure 150 min \(set\) · Arrival \+155 min/)).toBeInTheDocument();
+    expect(fetchFn.mock.calls.filter(([u]) => u.endsWith("/predict")).length).toBeGreaterThanOrEqual(2);
   });
 });
 
