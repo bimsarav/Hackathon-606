@@ -55,12 +55,13 @@ test("scenario B: a cancellation ranks passengers by tier and re-runs with new w
   await signIn(page);
   await page.getByRole("button", { name: "Cancellation", exact: true }).click();
   await page.locator(".preset-list .preset").first().click();
-  await page.getByRole("button", { name: "Show passenger detail" }).click();
+  await page.getByRole("button", { name: /Passengers to rebook: open details/ }).click();
   await expect(page.getByRole("heading", { name: "Passengers in priority order" })).toBeVisible();
   const firstTier = page.locator("table.pax tbody tr").first().locator(".tier");
   await expect(firstTier).toHaveText("Care");
   await expect(page.locator("tr.unprotected").first()).toBeVisible(); // not enough seats for everyone
 
+  await page.getByRole("button", { name: /Priority weights \(what-if\)/ }).click(); // folded until opened
   await page.getByLabel(/Loyalty tier/).fill("50");
   await page.getByRole("button", { name: "Re-run with these weights" }).click();
   await expect(page.locator("table.pax tbody tr").first().locator(".tier")).toHaveText("Care");

@@ -171,7 +171,11 @@ describe("result views", () => {
       },
     };
     render(<CancelView scenario={scenario} result={scenario.result as never} meta={meta} onUpdate={() => {}} />);
-    await userEvent.click(screen.getByRole("button", { name: "Show passenger detail" }));
+    // compact layout: decision first, tiles, then the passenger boxes
+    expect(screen.getByRole("region", { name: "Decision" })).toHaveTextContent("Decision on the rebooking plan");
+    expect(screen.getByRole("navigation", { name: "On this page" })).toHaveTextContent("Passengers to rebook");
+    expect(screen.queryByText("Lina Haddad")).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /Passengers to rebook: open details/ }));
     expect(screen.getByText("Lina Haddad")).toBeInTheDocument();
     expect(screen.getByText("G9203")).toBeInTheDocument();
     expect(screen.getAllByText("Care").length).toBeGreaterThan(0);

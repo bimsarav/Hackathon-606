@@ -487,7 +487,7 @@ function crewSub(o: RecoveryOption): string {
 }
 
 /** One "at a glance" tile: what a section shows, in a number; a click opens that section. */
-function Tile({ label, value, sub, tone, onClick }: { label: string; value: string; sub: string; tone?: "bad" | "warn"; onClick: () => void }) {
+export function Tile({ label, value, sub, tone, onClick }: { label: string; value: string; sub: string; tone?: "bad" | "warn"; onClick: () => void }) {
   return (
     <button type="button" className={`glance-tile${tone ? ` ${tone}` : ""}`} onClick={onClick}>
       <span className="glance-label">{label}</span>
@@ -498,8 +498,8 @@ function Tile({ label, value, sub, tone, onClick }: { label: string; value: stri
 }
 
 /** A section that folds to one line (title + summary); open, it shows its full content with a collapse link. */
-function Fold({ id, title, summary, open, onToggle, children }: {
-  id: Section; title: string; summary: string; open: boolean; onToggle: () => void; children: ReactNode;
+export function Fold({ id, title, summary, open, onToggle, children }: {
+  id: string; title: string; summary: string; open: boolean; onToggle: () => void; children: ReactNode;
 }) {
   if (open) {
     return (
@@ -522,7 +522,7 @@ function Fold({ id, title, summary, open, onToggle, children }: {
 }
 
 /** A passenger box in the Model Card style; the open one is marked and its detail shows below the boxes. */
-function PeopleBox({ kind, title, stats, active, onOpen }: {
+export function PeopleBox({ kind, title, stats, active, onOpen }: {
   kind: string; title: string; stats: { label: string; value: string }[]; active: boolean; onOpen: () => void;
 }) {
   return (
