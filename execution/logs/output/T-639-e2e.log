@@ -1,0 +1,59 @@
+
+Running 11 tests using 1 worker
+
+  ✓   1 [chromium] › tests/advisor.spec.ts:14:1 › wrong password is rejected and the API needs a token (513ms)
+  ✓   2 [chromium] › tests/advisor.spec.ts:23:1 › scenario A: a delay is assessed, options compared, recommendation approved (4.8s)
+  ✓   3 [chromium] › tests/advisor.spec.ts:54:1 › scenario B: a cancellation ranks passengers by tier and re-runs with new weights (1.1s)
+  ✓   4 [chromium] › tests/advisor.spec.ts:76:1 › phase 2: delay watchlist ranks flights, shows reasons and opens a delay scenario (3.0s)
+  ✓   5 [chromium] › tests/advisor.spec.ts:89:1 › phase 3: strategies switch the recommendation (3.2s)
+  ✓   6 [chromium] › tests/advisor.spec.ts:106:1 › phase 3: the agent investigates a flight and its recommendation opens for approval (19.0s)
+  ✓   7 [chromium] › tests/advisor.spec.ts:122:1 › phase 2: the 7-day page shows last month's cascade check and no scenario launcher (728ms)
+  ✓   8 [chromium] › tests/advisor.spec.ts:138:1 › phase 5: a budget gives a reward plan from the preference model, and the plan can be approved (2.1s)
+  ✓   9 [chromium] › tests/evaluator.spec.ts:27:1 › the OCC role does not see the Model Card and Test data views, and the API refuses them (378ms)
+  ✘  10 [chromium] › tests/evaluator.spec.ts:40:1 › the evaluator reads the model evidence, uploads two flights, analyses one and removes them (30.7s)
+  ✓  11 [chromium] › tests/evaluator.spec.ts:40:1 › the evaluator reads the model evidence, uploads two flights, analyses one and removes them (retry #1) (11.6s)
+  ✓  12 [chromium] › tests/evaluator.spec.ts:94:1 › a bad flights sheet is rejected with the row and column, and nothing is added (2.9s)
+
+
+  1) [chromium] › tests/evaluator.spec.ts:40:1 › the evaluator reads the model evidence, uploads two flights, analyses one and removes them 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: 'New scenario' })
+    Expected: visible
+    Timeout: 30000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('region', { name: 'New scenario' }) with timeout 30000ms
+      - waiting for getByRole('region', { name: 'New scenario' })
+
+
+      22 |   await page.getByLabel("Password").fill(secret);
+      23 |   await page.getByRole("button", { name: "Sign in" }).click();
+    > 24 |   await expect(page.getByRole("region", { name: "New scenario" })).toBeVisible();
+         |                                                                    ^
+      25 | }
+      26 |
+      27 | test("the OCC role does not see the Model Card and Test data views, and the API refuses them", async ({ page, request }) => {
+        at signInAs (/e2e/tests/evaluator.spec.ts:24:68)
+        at /e2e/tests/evaluator.spec.ts:43:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/evaluator-the-evaluator-re-527fb-alyses-one-and-removes-them-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/evaluator-the-evaluator-re-527fb-alyses-one-and-removes-them-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/evaluator-the-evaluator-re-527fb-alyses-one-and-removes-them-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/evaluator-the-evaluator-re-527fb-alyses-one-and-removes-them-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 flaky
+    [chromium] › tests/evaluator.spec.ts:40:1 › the evaluator reads the model evidence, uploads two flights, analyses one and removes them 
+  10 passed (1.4m)
+== finished 18:54:50
