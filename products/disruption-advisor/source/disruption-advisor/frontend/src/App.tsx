@@ -23,8 +23,8 @@ const STORAGE_KEY = "disruption-advisor-session";
 const OPEN_KEY = "disruption-advisor-open-scenario";
 const VIEW_KEY = "disruption-advisor-view";
 const AGENT_KEY = "disruption-advisor-agent-run";
-type View = "delay" | "cancel" | "agent" | "watchlist" | "model" | "testdata";
-const VIEWS: View[] = ["delay", "cancel", "agent", "watchlist", "model", "testdata"];
+type View = "delay" | "cancel" | "agent" | "watchlist" | "model" | "testdata" | "recent";
+const VIEWS: View[] = ["delay", "cancel", "agent", "watchlist", "model", "testdata", "recent"];
 /** Views only the evaluator role sees (the server refuses the others as well). */
 const EVALUATOR_VIEWS: View[] = ["model", "testdata"];
 
@@ -171,7 +171,6 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
   const [agentStart, setAgentStart] = useState<Load>({ kind: "idle" });
   const [agentStatus, setAgentStatus] = useState<string | null>(null);
   useEffect(() => remember(AGENT_KEY, agentRunId), [agentRunId]);
-  const [recentOpen, setRecentOpen] = useState(false);
 
   const refreshHistory = useCallback(() => {
     api.scenarios().then(setHistory).catch(() => setHistory([]));
@@ -278,38 +277,8 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
           </nav>
 
           {history.length > 0 && (
-            <div className="nav-section nav-recent">
-              <button
-                type="button"
-                className="nav-section-label nav-recent-toggle"
-                onClick={() => setRecentOpen((o) => !o)}
-                aria-expanded={recentOpen}
-              >
-                Recent Searches
-                <span className="nav-recent-chevron" aria-hidden="true">{recentOpen ? "▴" : "▾"}</span>
-              </button>
-              {recentOpen && (
-                <ul className="nav-history-list">
-                  {history.slice(0, 6).map((h) => (
-                    <li key={h.id}>
-                      <button
-                        type="button"
-                        className="nav-item nav-history-item"
-                        onClick={() => run(
-                          h.kind === "DELAY" ? "delay" : "cancel",
-                          "Opening scenario…",
-                          () => api.scenario(h.id)
-                        )}
-                      >
-                        <span className="nav-history-badge">
-                          {h.kind === "DELAY" ? `+${h.delay_minutes}m` : "Canc"}
-                        </span>
-                        <span className="nav-history-flight">{h.flight_id.split("_")[0]}</span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
+            <div className="nav-section">
+              <NavItem label="Recent Searches" icon="🕐" active={view === "recent"} onClick={() => setView("recent")} />
             </div>
           )}
         </aside>
@@ -466,6 +435,36 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
 
           {/* ── Test data (evaluator) ─────────────────────── */}
           {isEvaluator && view === "testdata" && <TestDataPanel />}
+
+          {/* ── Recent Searches ───────────────────────────── */}
+          {view === "recent" && (
+            <section>
+              <h1>Recent Searches</h1>
+              <p className="muted">Your last {history.length} scenario{history.length !== 1 ? "s" : ""}. Click one to reload it.</p>
+              <ul className="recent-list">
+                {history.map((h) => (
+                  <li key={h.id}>
+                    <button
+                      type="button"
+                      className="recent-item"
+                      disabled={load.kind === "busy"}
+                      onClick={() => run(
+                        h.kind === "DELAY" ? "delay" : "cancel",
+                        "Opening scenario…",
+                        () => api.scenario(h.id)
+                      )}
+                    >
+                      <span className={`recent-badge ${h.kind === "DELAY" ? "recent-badge-delay" : "recent-badge-cancel"}`}>
+                        {h.kind === "DELAY" ? `+${h.delay_minutes}m` : "Canc"}
+                      </span>
+                      <span className="recent-flight">{h.flight_id.split("_")[0]}</span>
+                      <span className="recent-kind muted small">{h.kind === "DELAY" ? "Delay scenario" : "Cancellation"}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
         </main>
       </div>

@@ -406,23 +406,48 @@ label {
   padding: 0 1.25rem 0.5rem;
   margin: 0;
 }
-button.nav-section-label {
+/* Recent Searches page */
+.recent-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 540px;
+}
+.recent-item {
   width: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background: transparent;
-  border: none;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   cursor: pointer;
-  padding-right: 1rem;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
-button.nav-section-label:hover {
-  color: #9da3ab;
+.recent-item:hover:not(:disabled) {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-sm);
 }
-.nav-recent-chevron {
-  font-size: 0.6rem;
-  opacity: 0.7;
+.recent-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  white-space: nowrap;
 }
+.recent-badge-delay  { background: var(--accent); color: var(--accent-ink); }
+.recent-badge-cancel { background: var(--bad);    color: #fff; }
+.recent-flight {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+.recent-kind { margin-left: auto; }
 .nav-item {
   width: 100%;
   display: flex;
