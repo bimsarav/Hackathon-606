@@ -71,6 +71,8 @@ class OpsStore:
         card = ops_dir / "model_card.json"
         self.model_card: dict[str, Any] = json.loads(card.read_text()) if card.exists() else {}
         self.reward_model = RewardModel.load(ops_dir)  # phase 5 preference model; None = proxy rules
+        cascade = ops_dir / "cascade_check.json"
+        self.cascade_check: dict[str, Any] = json.loads(cascade.read_text()) if cascade.exists() else {}
         week = ops_dir / "last_week.json"
         self.last_week: dict[str, Any] = json.loads(week.read_text()) if week.exists() else {}
         report = ops_dir / "ingest_report.json"

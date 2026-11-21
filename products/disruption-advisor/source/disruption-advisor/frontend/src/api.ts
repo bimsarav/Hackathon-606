@@ -359,6 +359,43 @@ export interface LastWeek {
   rows_total: number;
 }
 
+export interface CascadeRow {
+  date: string;
+  tail: string;
+  prev_flight: string;
+  prev_arrival_delay: number;
+  flight: string;
+  route: string;
+  std: string;
+  formula_etd: string;
+  actual_atd: string;
+  formula_ko: number;
+  actual_ko: number;
+  delta: number;
+}
+
+export interface CascadeCheck {
+  formula: string;
+  definition: string;
+  from: string | null;
+  to: string | null;
+  kpis: {
+    pairs: number;
+    mean_delta: number | null;
+    within_15: number;
+    within_15_share: number | null;
+    within_30: number;
+    within_30_share: number | null;
+    underestimates: number;
+    overestimates: number;
+  };
+  histogram: { label: string; count: number }[];
+  excluded: CascadeRow[];
+  excluded_rule: string;
+  rows_total: number;
+  rows: CascadeRow[];
+}
+
 export interface RewardRow {
   pnr: string;
   customer_key: string;
@@ -548,6 +585,7 @@ export const api = {
     request<{ flight: RiskFlight; connections: ConnectionRisk[] }>(`/api/v1/risk/flights/${encodeURIComponent(flightId)}?limit=30`),
   rewards: (id: string, budgetAed: number) =>
     post<RewardPlan>(`/api/v1/scenarios/${id}/rewards`, { budget_aed: budgetAed }),
+  cascade: () => request<CascadeCheck>("/api/v1/risk/cascade"),
   lastWeek: () => request<LastWeek>("/api/v1/risk/last-week"),
   modelCard: () => request<ModelCard>("/api/v1/risk/model"),
   message: (id: string, customerKey: string) =>

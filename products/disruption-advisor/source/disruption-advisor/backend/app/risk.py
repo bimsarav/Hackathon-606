@@ -57,6 +57,17 @@ def last_week(request: Request, _: CurrentUser) -> dict[str, Any]:
     return check
 
 
+@router.get("/cascade")
+def cascade(request: Request, _: CurrentUser) -> dict[str, Any]:
+    """The cascade formula against what really happened over the last month of punctuality data."""
+    check = _store(request).cascade_check
+    if not check:
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE, "The cascade check is not available yet (run the ingest)"
+        )
+    return check
+
+
 @router.get("/watchlist")
 def watchlist(
     request: Request,

@@ -49,6 +49,7 @@ known-third-party = ["alembic"]
 "tests/**" = ["S101", "S608"]  # tests build SQL from their own constants and tmp paths
 # SQL text there interpolates only constant table/column names and configured file paths (never request data);
 # every user-supplied value is passed as a bound parameter.
+"app/cascade_check.py" = ["S608"]
 "app/engine/store.py" = ["S608"]
 "app/ingest/*.py" = ["S608"]
 "app/ml/*.py" = ["S608"]

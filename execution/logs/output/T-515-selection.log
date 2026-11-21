@@ -1,0 +1,17 @@
+2026-11-21 08:18:56,757 offers 300000, passengers 111503, test offers 59312
+2026-11-21 08:18:56,757 tuning LightGBM (40 trials)
+2026-11-21 08:27:02,619 tuning XGBoost (25 trials)
+2026-11-21 08:29:07,238 validation: type average (baseline)
+2026-11-21 08:29:41,733 validation: logistic regression
+2026-11-21 08:29:46,311 validation: random forest
+2026-11-21 08:30:22,717 validation: LightGBM, current settings
+2026-11-21 08:30:36,919 validation: LightGBM, tuned
+2026-11-21 08:30:49,000 validation: XGBoost, default
+2026-11-21 08:30:56,887 validation: XGBoost, tuned
+2026-11-21 08:31:00,897 validation: CatBoost, default
+2026-11-21 08:32:01,842 validation ranking: [('LightGBM, tuned', 0.6153), ('CatBoost, default', 0.6153), ('LightGBM, current settings', 0.6157), ('XGBoost, tuned', 0.6157), ('XGBoost, default', 0.6161), ('random forest', 0.6179), ('logistic regression', 0.6381), ('type average (baseline)', 0.6551)]
+2026-11-21 08:32:01,843 final test: type average (baseline)
+2026-11-21 08:32:13,467 final test: logistic regression
+2026-11-21 08:32:15,104 final test: LightGBM, current settings
+2026-11-21 08:32:18,597 final test: LightGBM, tuned
+2026-11-21 08:32:21,989 done in 807s; winner on validation: LightGBM, tuned

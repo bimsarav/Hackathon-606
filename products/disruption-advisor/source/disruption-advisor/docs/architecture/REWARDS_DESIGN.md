@@ -3,7 +3,7 @@
 Status: design for the MVP (2026-11-21). Decision record: [ADR 0012](adr/0012-passenger-reward-recommendation.md). Code: `backend/app/engine/rewards.py`.
 
 ## What it does
-For a disrupted flight (delay or cancellation) the planner enters a **goodwill budget** in AED. The system works out how **severe** the disruption was for each passenger and how **valuable** each passenger is, then recommends a **reward type and amount** per passenger (meal voucher, shopping voucher, lounge pass, miles, free ticket) so that the total stays within the budget. A person reviews and approves; nothing is sent to passengers.
+For a disrupted flight (delay or cancellation) the planner enters a **goodwill budget** in AED. The system works out how **severe** the disruption was for each passenger and how **valuable** each passenger is, then recommends a **reward type and amount** per passenger (meal voucher, gift voucher, lounge pass, miles, free ticket) so that the total stays within the budget. A person reviews and approves; nothing is sent to passengers.
 
 ## Flow
 ```mermaid
@@ -34,7 +34,7 @@ flowchart LR
 | Type | Options | Eligibility |
 |---|---|---|
 | Meal voucher | 50 | delay 60+ min, or cancelled |
-| Shopping voucher | 100, 200, 400 | always |
+| Gift voucher | 100, 200, 400 | always |
 | Lounge pass | 120 | delay or wait of 2 h or more |
 | Miles | 5,000 (100), 10,000 (200), 20,000 (400) | loyalty members only |
 | Free ticket | 600 | severity 75 or more |

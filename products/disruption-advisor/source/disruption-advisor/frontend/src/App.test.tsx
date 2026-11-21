@@ -6,6 +6,7 @@ import { App } from "./App";
 import { CancelView } from "./CancelView";
 import { CarrierTail } from "./CarrierTail";
 import { DelayView } from "./DelayView";
+import { CascadePanel } from "./CascadePanel";
 import { LastWeekPanel } from "./LastWeekPanel";
 import { PassengerTabs } from "./PassengerTabs";
 import { RewardPanel } from "./RewardPanel";
@@ -195,11 +196,11 @@ describe("WatchlistView", () => {
       passengers: 200, rewarded: 60, by_type: { MEAL: { passengers: 40, spend_aed: 2000 }, VOUCHER: { passengers: 20, spend_aed: 2950 } },
       disruption: { score: 38, label: "moderate" }, assumptions: ["Preferences are proxy rules."],
       rows: [{ pnr: "ABC123", customer_key: "1b6e33fd55c8236f", passenger_id: "PAX1", route: "SHJ-CAI", tier: 2, severity: 63, severity_reasons: [],
-        value: 80, target_aed: 300, reward: { type: "VOUCHER", label: "Shopping voucher", detail: "AED 200 shopping voucher", cost_aed: 200 },
+        value: 80, target_aed: 300, reward: { type: "VOUCHER", label: "Gift voucher", detail: "AED 200 gift voucher", cost_aed: 200 },
         preferred: [], why: ["books online or in the app"], downgraded_for_budget: false, note: "" }] }));
     render(<RewardPanel scenario={{ id: "s1", flight_id: "G9519_202611210200", kind: "DELAY", delay_minutes: 120, weights: {}, result: {}, created_by: "x", created_at: "" } as unknown as Scenario} />);
     await userEvent.click(screen.getByRole("button", { name: "Recommend rewards" }));
-    expect(await screen.findByText("AED 200 shopping voucher")).toBeInTheDocument();
+    expect(await screen.findByText("AED 200 gift voucher")).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "Reward value (AED)" })).toBeInTheDocument();
     expect(screen.getByText(/covers 42% of the full plan/)).toBeInTheDocument();
     expect(screen.queryByText(/books online or in the app/)).not.toBeInTheDocument(); // behind "More data"
@@ -224,6 +225,35 @@ describe("WatchlistView", () => {
     expect(screen.getByText("the connection passenger table")).not.toBeVisible();
     await userEvent.click(screen.getByRole("tab", { name: "Connection passengers (3)" }));
     expect(screen.getByText("the connection passenger table")).toBeVisible();
+  });
+
+  it("shows the month's cascade check in six boxes and opens the full graphical view", async () => {
+    const row = (flight: string, delta: number, fko = 40) => ({ date: "2026-11-12", tail: "A6-ATD", prev_flight: "G9150", prev_arrival_delay: 45, flight,
+      route: "SHJ>LGW", std: "23:55", formula_etd: "00:35", actual_atd: "00:50", formula_ko: fko, actual_ko: fko + delta, delta });
+    stubFetch(() => ({ formula: "next departure = max(scheduled departure, previous arrival + 40 min)", definition: "Consecutive flights.", from: "2026-10-19", to: "2026-11-18",
+      kpis: { pairs: 1656, mean_delta: 10, within_15: 1243, within_15_share: 0.7506, within_30: 1546, within_30_share: 0.9336, underestimates: 412, overestimates: 1 },
+      histogram: [{ label: "< -15", count: 1 }, { label: "-15 to 0", count: 298 }, { label: "0 to 15", count: 909 }, { label: "15 to 30", count: 329 }, { label: "30 to 60", count: 102 }, { label: "> 60", count: 17 }],
+      excluded: [{ ...row("G9513", 1055), route: "DAC>SHJ" }], excluded_rule: "actual knock-on of 360 min or more", rows_total: 2,
+      rows: [row("G9265", 14), row("G9300", -30)] }));
+    render(<CascadePanel />);
+    expect(await screen.findByText("1,656")).toBeInTheDocument();
+    expect(screen.getByText("+10 min")).toBeInTheDocument();
+    expect(screen.getByText("75%")).toBeInTheDocument();
+    expect(screen.getByText("93%")).toBeInTheDocument();
+    expect(screen.getByText("412")).toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Expand the full view" }));
+    const dialog = screen.getByRole("dialog", { name: "Cascade prediction vs actual" });
+    expect(dialog).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Scatter of 2 pairs/ })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Number of pairs by delta range" })).toBeInTheDocument();
+    expect(screen.getByText(/1 extreme outlier left out/)).toBeInTheDocument();
+    expect(screen.getByText("G9265")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Overestimate" }));
+    expect(screen.getByText("G9300")).toBeInTheDocument();
+    expect(screen.queryByText("G9265")).not.toBeInTheDocument();
+    await userEvent.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("shows the API error when the risk data is not available", async () => {

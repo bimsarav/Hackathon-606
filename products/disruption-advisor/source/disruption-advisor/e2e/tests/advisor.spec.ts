@@ -127,6 +127,13 @@ test("phase 2: the 7-day tab shows last week's predictions against what happened
   await page.getByRole("button", { name: /Delay watchlist/ }).click();
   await expect(page.getByRole("heading", { name: "Last week: predicted vs actual" })).toBeVisible();
   await expect(page.getByText(/of flights called right/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Last month: cascade formula vs actual" })).toBeVisible();
+  await expect(page.getByText("Within ±15 min").first()).toBeVisible();
+  await page.getByRole("button", { name: "Expand the full view" }).click();
+  await expect(page.getByRole("dialog", { name: "Cascade prediction vs actual" })).toBeVisible();
+  await expect(page.getByRole("img", { name: /Scatter of/ })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toBeHidden();
   await expect(page.getByRole("heading", { name: "New scenario" })).toBeHidden();
   await expect(page.getByRole("heading", { name: "Recent scenarios" })).toBeHidden();
   await page.getByRole("button", { name: "Scenario", exact: true }).click();

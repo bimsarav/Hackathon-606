@@ -84,7 +84,7 @@ AMOUNTS: dict[str, tuple[float, ...]] = {
 }
 BEHAVIOUR = [
     "A passenger who bought a meal on the booking, or travels with children, is more likely to accept a meal voucher.",
-    "Online and app bookers and price-conscious fares (Basic, Value) are more likely to accept shopping vouchers.",
+    "Online and app bookers and price-conscious fares (Basic, Value) are more likely to accept gift vouchers.",
     "Passengers who paid for a seat, Ultimate fares and frequent travellers are more likely to accept a lounge pass; "
     "families are less likely.",
     "Miles are accepted almost only by loyalty members, more by frequent travellers and Silver tier or above.",
@@ -195,6 +195,7 @@ def generate_history(passengers: list[dict[str, Any]], seed: int = SEED) -> dict
     rows: dict[str, list[np.ndarray]] = {k: [] for k in FEATURES}
     outcome: list[np.ndarray] = []
     owner: list[np.ndarray] = []
+    truth: list[np.ndarray] = []
     for _ in range(OFFERS_PER_PASSENGER):
         sev = rng.beta(2.2, 2.5, size=n) * 100.0
         kind = rng.integers(0, len(CATEGORIES["reward_type"]), size=n)
@@ -215,8 +216,10 @@ def generate_history(passengers: list[dict[str, Any]], seed: int = SEED) -> dict
             rows[name_].append(m[name_])
         outcome.append(accepted)
         owner.append(refs)
+        truth.append(p_accept)
     out: dict[str, np.ndarray] = {k: np.concatenate(v) for k, v in rows.items()}
     out["accepted"] = np.concatenate(outcome)
+    out["p_true"] = np.concatenate(truth)  # the simulator's own probability: the best any model could do
     out["passenger_ref"] = np.concatenate(owner)
     return out
 
@@ -353,8 +356,8 @@ class RewardModel:
         }
 
 
-def run(ops: Path) -> dict[str, Any]:
-    """Ingest stage 4: simulate the history for the real passenger profiles, train, write the outputs."""
+def load_passengers(ops: Path) -> list[dict[str, Any]]:
+    """Real passenger profiles of the operating window: revenue passengers, infants excluded."""
     con = duckdb.connect()
     rows = con.execute(
         f"""SELECT p.customer_key, p.fare_family_synthetic, p.sales_channel, p.has_meal, p.has_seat, p.ancillaries,
@@ -381,7 +384,12 @@ def run(ops: Path) -> dict[str, Any]:
         "travel_frequency_band",
         "flown_segments_12m",
     )
-    passengers = [dict(zip(cols, r, strict=True)) for r in rows]
+    return [dict(zip(cols, r, strict=True)) for r in rows]
+
+
+def run(ops: Path) -> dict[str, Any]:
+    """Ingest stage 4: simulate the history for the real passenger profiles, train, write the outputs."""
+    passengers = load_passengers(ops)
     history = generate_history(passengers)
     booster, card = train(history)
     booster.save_model(str(ops / "reward_model.txt"))

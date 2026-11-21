@@ -31,7 +31,7 @@ TOP_TIERS = frozenset({"Gold", "Platinum"})
 MEAL, VOUCHER, LOUNGE, MILES, TICKET = "MEAL", "VOUCHER", "LOUNGE", "MILES", "TICKET"
 TYPE_LABEL = {
     MEAL: "Meal voucher",
-    VOUCHER: "Shopping voucher",
+    VOUCHER: "Gift voucher",
     LOUNGE: "Lounge pass",
     MILES: "Loyalty miles",
     TICKET: "Free ticket",
@@ -188,7 +188,7 @@ def eligible_options(person: Person, rules: RewardRules) -> list[Option]:
     # Never repeat what the care plan already provides: those are entitlements, not goodwill.
     if person.disrupted_minutes >= rules.meal_min_minutes and person.care_meals == 0:
         options.append(Option(MEAL, TYPE_LABEL[MEAL], rules.meal_aed, "AED 50 airport meal voucher"))
-    options += [Option(VOUCHER, TYPE_LABEL[VOUCHER], v, f"AED {v:g} shopping voucher") for v in rules.voucher_aed]
+    options += [Option(VOUCHER, TYPE_LABEL[VOUCHER], v, f"AED {v:g} gift voucher") for v in rules.voucher_aed]
     if person.disrupted_minutes >= rules.lounge_min_minutes and not person.care_hotel:
         options.append(Option(LOUNGE, TYPE_LABEL[LOUNGE], rules.lounge_aed, "Lounge access while waiting"))
     if person.loyalty_member:

@@ -20,6 +20,7 @@ import os
 import sys
 from pathlib import Path
 
+from app import cascade_check
 from app.ingest import build, convert, demo
 from app.ml import delay_risk, reward_pref
 
@@ -54,7 +55,7 @@ def main() -> int:
     inputs = fingerprint(input_dir)
     # stage 2 also reruns when its code changes (build rules, synthetic data), so a deploy picks up new logic
     code = hashlib.sha256(
-        b"".join(Path(m.__file__ or "").read_bytes() for m in (build, demo, delay_risk, reward_pref))
+        b"".join(Path(m.__file__ or "").read_bytes() for m in (build, demo, delay_risk, reward_pref, cascade_check))
     ).hexdigest()[:16]
     ops_key = f"{inputs}|demo={with_demo}|carriers={','.join(carriers)}|code={code}"
 
@@ -84,6 +85,8 @@ def main() -> int:
         log.info("stage 3 done: %s", json.dumps(delay_risk.run(data_dir / "ops", default_mct=mct)))
     else:
         log.warning("stage 3 skipped: no history_flights.parquet")
+    if (data_dir / "ops" / "history_flights.parquet").exists():
+        log.info("stage 3b done: %s", json.dumps(cascade_check.run(data_dir / "ops")))
     # stage 4 (phase 5): reward preference model, trained on simulated redemption history (app/ml/reward_pref.py)
     log.info("stage 4 done: %s", json.dumps(reward_pref.run(data_dir / "ops")))
     ops_marker.write_text(ops_key)

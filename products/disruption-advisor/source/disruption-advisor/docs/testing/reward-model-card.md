@@ -10,11 +10,11 @@ Estimate P(accept) for a given passenger, reward type, amount and disruption sev
 ## Data
 - Real passenger profiles (the operating window's bookings and customer table, revenue passengers only, infants excluded): 111,503 passengers.
 - 300,000 simulated offers (two per passenger), with a simulated accepted/declined outcome. Whole passengers are held out together: 238,836 offers train, 61,164 test.
-- Reward types and amounts (AED): meal 50, shopping voucher 100/200/400, lounge 120, miles worth 100/200/400 (members only), free ticket 600 (severe disruptions only).
+- Reward types and amounts (AED): meal 50, gift voucher 100/200/400, lounge 120, miles worth 100/200/400 (members only), free ticket 600 (severe disruptions only).
 
 ## Assumed behaviour used to simulate outcomes
 - A passenger who bought a meal on the booking, or travels with children, is more likely to accept a meal voucher.
-- Online and app bookers and price-conscious fares (Basic, Value) are more likely to accept shopping vouchers.
+- Online and app bookers and price-conscious fares (Basic, Value) are more likely to accept gift vouchers.
 - Passengers who paid for a seat, Ultimate fares and frequent travellers are more likely to accept a lounge pass; families are less likely.
 - Miles are accepted almost only by loyalty members, more by frequent travellers and Silver tier or above.
 - Free tickets are accepted more by frequent travellers, Gold or Platinum members, Ultimate fares and groups.
