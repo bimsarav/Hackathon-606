@@ -111,34 +111,69 @@ function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
     }
   }
 
+  const [reveal, setReveal] = useState(false);
+
   return (
-    <main id="main" className="login">
-      <div className="login-card">
-        <div className="login-brand brand">
-          <span className="brand-icon-wrap">
-            <img src="/brand/air-arabia-tail.svg" alt="Air Arabia" />
-          </span>
-          <span className="brand-name">aeroRecovery</span>
+    <main id="main" className="login login-split">
+      {/* Left: what the product does, at a glance */}
+      <section className="login-hero" aria-label="aeroRecovery">
+        <div className="login-hero-brand">
+          <span className="login-hero-logo"><img src="/brand/air-arabia-tail.svg" alt="Air Arabia" /></span>
+          <span className="login-hero-name">aeroRecovery</span>
         </div>
-        <p className="eyebrow">Operations Control · Passenger Control Unit</p>
-        <h1>aeroRecovery</h1>
-        <p className="muted">Assess a disruption, compare recovery options and protect passengers before the impact spreads.</p>
-        <form onSubmit={onSubmit} aria-describedby={error ? "login-error" : undefined}>
-          <label htmlFor="username">User name</label>
-          <input id="username" autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} required />
-          <label htmlFor="password">Password</label>
-          <input id="password" type="password" autoComplete="current-password" value={password}
-            onChange={(e) => setPassword(e.target.value)} required />
-          {error && (
-            <p id="login-error" className="error" role="alert">
-              {error}
-            </p>
-          )}
-          <button type="submit" className="primary" disabled={busy}>
-            {busy ? "Signing in…" : "Sign in"}
-          </button>
-        </form>
-      </div>
+        <div className="login-hero-copy">
+          <p className="login-hero-eyebrow">Disruption management · OCC &amp; PCU</p>
+          <h2 className="login-hero-title">Recover the day before the delay spreads.</h2>
+          <p className="login-hero-lead">
+            See the knock-on effect along the whole rotation, compare every recovery option by cost and protect the
+            passengers who need it most. A person approves every decision.
+          </p>
+          <ul className="login-hero-points">
+            <li><span aria-hidden="true">◎</span><div><strong>Predict</strong> delay risk for every flight in the next 7 days, with reasons</div></li>
+            <li><span aria-hidden="true">⇄</span><div><strong>Compare</strong> swaps, cancellations and holds side by side, by cost and passengers</div></li>
+            <li><span aria-hidden="true">✚</span><div><strong>Protect</strong> care passengers, connections and crew duty limits; rebook within real seats</div></li>
+          </ul>
+        </div>
+        <svg className="login-hero-route" viewBox="0 0 600 160" aria-hidden="true" focusable="false">
+          <path d="M20 140 C 180 20, 420 20, 580 120" fill="none" strokeDasharray="6 8" />
+          <circle cx="20" cy="140" r="6" /><circle cx="580" cy="120" r="6" />
+          <text x="20" y="128" textAnchor="middle">SHJ</text>
+          <text x="580" y="108" textAnchor="middle">KHI</text>
+          <g transform="translate(300 52) rotate(8)"><path d="M-14 0 L14 0 M0 -3 L6 0 L0 3 M-8 0 L-12 -6 M-8 0 L-12 6" /></g>
+        </svg>
+        <p className="login-hero-foot">Recommend-only · decisions are recorded with who and when</p>
+      </section>
+
+      {/* Right: sign in */}
+      <section className="login-panel" aria-labelledby="login-title">
+        <div className="login-form-card">
+          <h1 id="login-title">Sign in</h1>
+          <p className="muted">Use your operations account.</p>
+          <form onSubmit={onSubmit} aria-describedby={error ? "login-error" : undefined}>
+            <label htmlFor="username">User name</label>
+            <input id="username" autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} required autoFocus />
+            <label htmlFor="password">Password</label>
+            <div className="login-secret">
+              <input id="password" type={reveal ? "text" : "password"} autoComplete="current-password" value={password}
+                onChange={(e) => setPassword(e.target.value)} required />
+              <button type="button" className="login-reveal" aria-label={reveal ? "Hide what is typed" : "Show what is typed"}
+                aria-pressed={reveal} onClick={() => setReveal((v) => !v)}>{reveal ? "Hide" : "Show"}</button>
+            </div>
+            {error && (
+              <p id="login-error" className="error" role="alert">
+                {error}
+              </p>
+            )}
+            <button type="submit" className="primary login-submit" disabled={busy}>
+              {busy ? "Signing in…" : "Sign in"}
+            </button>
+          </form>
+          <p className="login-roles small muted">
+            Roles: <strong>OCC</strong> and <strong>PCU</strong> analyse and approve; <strong>Evaluator</strong> also sees the
+            Model Card and Test data.
+          </p>
+        </div>
+      </section>
     </main>
   );
 }
