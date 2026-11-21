@@ -201,3 +201,14 @@ The new Playwright tests have not been run locally (no Playwright or Docker on t
   flights still added, reason shown). Local real-data stack: stage 3 retrained once (AUC-60 0.7697, same as before), uploading the template
   scored 2 flights and 2 connections, the watchlist totals rose by those 2 flights (1,491 to 1,493), the flight page showed band, reasons and 2
   connections; removal restored the totals. The watchlist rows are capped at 60, so low-risk test flights show only in the totals and the flight page.
+
+## Production check of the test-data release (21 Nov 2026, 09:10Z, heshawa 300d7e6)
+- Smoke 11/11. Ingest stages 3 (AUC-60 0.7697), 3b (1,656 pairs) and 4 (AUC 0.7018) ran; `ops/delay_model` saved; `/testdata` writable.
+- Roles by login: OCC and PCU get 403 on `/risk/model` and `/test-data`; the evaluator gets 200; all three reach the watchlist and `/meta`; an OCC upload gets 403.
+- Evaluator upload of the template (2 flights, 4 passenger rows): scored 2 flights and 2 connections; watchlist totals 1,491 to 1,493; flight page: medium band, 2 connections;
+  delay scenario (2 missed connections), reward plan, removal restored the totals.
+- **Playwright (server, Docker): FAILED, not a pass.** 1 of 8 passed (login); scenario A and B timed out (2 min each, one retry) and the run was stopped after 3 of 8, so the
+  cascade, reward and watchlist tests did not run. Cause: `e2e/tests/advisor.spec.ts` still clicks the 'A · Delay' tab and `.preset-list .preset`, which the teammates'
+  launcher redesign (92c807c) removed; the spec was last changed in b029ef0. The test data page has no browser test. The spec needs rewriting for the new sidebar UI.
+- Frontend unit tests after pulling the teammates' newest UI commits (e0851e3, 2a06d3f): 4 of 33 fail (cancel passenger table, watchlist panel switch, two strategy tests); they test the old tabs
+  and buttons those commits removed. Not part of the deployed build and not changed by this release (33/33 before the pull).

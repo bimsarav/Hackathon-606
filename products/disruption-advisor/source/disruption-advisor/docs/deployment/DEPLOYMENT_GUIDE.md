@@ -61,6 +61,12 @@ This guide covers the target host, how the MVP and phase 2 (Predict) are deploye
 - **Ingest stages after an update:** stage 2 (operating picture), 3 (delay risk), 3b (cascade check) and 4 (reward preference model, simulated history) all rerun because their code is part of the ingest's change check; about 40 seconds in total on the server.
 - **Checks after the update:** `scripts/smoke.sh`, `E2E_BASE_URL=http://localhost:8888 scripts/e2e.sh` on the server (8 tests), and the new endpoints (`/api/v1/risk/cascade`, `/api/v1/scenarios/{id}/rewards`).
 
+### Roles, test data and the saved model (added 2026-11-21)
+- `DEMO_USERS` in the server `settings.env` needs an entry with role `EVALUATOR` (`user:password:EVALUATOR`); only that role sees the Model Card and Test data views and the server refuses the others (403). Use hex passwords (no colon or comma).
+- Compose has a `test-data` volume (`/testdata` in the api) for the evaluator's uploaded flights; the api image creates and owns the folder.
+- The first ingest after this release retrains the delay model once (minutes) and saves it in `ops/delay_model`; without it, uploaded flights are added without risk figures.
+- `scripts/e2e.sh` needs a spec that matches the current UI; the 2026-11-21 spec is stale (see the test report).
+
 ## Known limitations
 - **No HTTPS yet (phase 6).** Do not reuse the demo passwords anywhere else.
 - **No automated backup yet (phase 6).** Only the manual `pg_dump` above.
