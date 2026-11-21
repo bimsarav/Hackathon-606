@@ -1641,7 +1641,7 @@ tr.clickable.selected {
 .model-table th[scope="row"] { text-align: left; font-weight: 500; }
 .expand-body h2 { margin-top: 1.25rem; }
 .expand-body h3 { margin: 1rem 0 0.25rem; font-size: 1rem; }
-/* Crew FDP (user 2026-11-21) */
+/* Crew FDP */
 .crew-fdp h3 { margin: 1.25rem 0 0.5rem; }
 .crew-fdp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1rem 0; }
 .crew-fdp-grid caption { text-align: left; font-weight: 600; padding-bottom: 0.25rem; }
@@ -1681,7 +1681,7 @@ tr.clickable.selected {
 .chart-legend { list-style: none; display: flex; gap: 1rem; flex-wrap: wrap; padding: 0; margin: 0 0 0.25rem; font-size: 0.8rem; color: var(--muted); }
 .chart-swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 0.35rem; vertical-align: -1px; }
 .chart-caption { margin: 0.25rem 0 0; }
-/* T-621: departure and arrival prediction panel */
+/* Departure and arrival prediction panel */
 .predict-panel { grid-column: 1 / -1; }
 .predict-panel label { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; }
 .predict-panel input[type="range"] { width: 14rem; }

@@ -1,15 +1,15 @@
 # MVP and Incremental Deployment Plan
 
-Delivery cadence (user instruction 2026-11-20): design first, MVP first, host the MVP, then incremental phases. **Each phase after the MVP starts only with explicit user approval.** Phase status is tracked in the table below.
+Delivery cadence: design first, MVP first, host the MVP, then incremental phases. **Each phase after the MVP starts only with explicit approval.** Phase status is tracked in the table below.
 
 | Phase | Content | Status |
 |---|---|---|
 | 0 Design | Architecture and diagrams ([SYSTEM_ARCHITECTURE.md](../architecture/SYSTEM_ARCHITECTURE.md)) | Done 2026-11-20 |
 | 1 MVP | Scenarios A and B end to end, hosted | Done 2026-11-20: deployed and verified, incl. reboot test |
-| 2 Predict | Delay-risk prediction, 7-day watchlist, misconnect risk per passenger | Approved 2026-11-21; deployed (reboot check skipped by user) |
+| 2 Predict | Delay-risk prediction, 7-day watchlist, misconnect risk per passenger | Approved 2026-11-21; deployed (reboot check skipped by decision) |
 | 3 Agent and what-if | Claude agent (recommend-only) over the engine tools; cancel / consolidate as recovery options; strategy comparison | Approved 2026-11-21; deployed and verified 2026-11-21 (smoke 11/11, Playwright 6/6); reboot test not run |
 | 4 Extend | Equipment change, bus legs, crew, real data feeds, production hardening | Needs approval |
-| 6 Secure and protect | HTTPS (Caddy, sslip.io) and nightly PostgreSQL backup with a restore test (moved from phase 2 by the user, 2026-11-21) | Needs approval |
+| 6 Secure and protect | HTTPS (Caddy, sslip.io) and nightly PostgreSQL backup with a restore test (moved from phase 2, 2026-11-21) | Needs approval |
 
 ## Phase 1 — MVP (approved)
 **Goal:** the briefing's ask: *"Pick one or two realistic disruption scenarios. Show how the AI agent identifies impact, evaluates the available recovery, and recommends an action"*, with explanations.
@@ -41,7 +41,7 @@ Delivery cadence (user instruction 2026-11-20): design first, MVP first, host th
    - OCI server, `http://92.5.154.198:8888`.
    - Docker Compose with `restart: unless-stopped`, Docker enabled at boot.
    - Health checks, log rotation, memory limits.
-   - A reboot test is performed and recorded (engineering standards §14).
+   - A reboot test is performed and recorded.
 10. **Tests:** pytest (engine rules, API, Testcontainers PostgreSQL), Vitest (UI), Playwright (both scenarios against the composed stack), Trivy scans.
 
 **Out of scope for the MVP** (later phases):
@@ -57,16 +57,16 @@ Delivery cadence (user instruction 2026-11-20): design first, MVP first, host th
 - `scripts/check.sh` passes.
 - Playwright passes for both scenarios against the composed stack and against the hosted URL.
 - The reboot test passes.
-- The URL and logins are sent to the user.
+- The URL and logins are sent to the product owner.
 
-## Phase 2 — Predict (approved by the user 2026-11-21)
+## Phase 2 — Predict (approved 2026-11-21)
 - LightGBM delay-risk model trained on the Jan–Nov 2026 punctuality data, using only what is known 7 days ahead (stations, departure hour and weekday, aircraft type, position in the aircraft's day, turn buffer, load factor, recent station/route/network delay rates). Details: `docs/testing/model-card.md`.
 - Probability of a departure delay of 5, 15, 30, 60, 120 and 180 min or more per upcoming flight, with plain-language reasons from TreeSHAP.
 - A 7-day "at risk" watchlist that feeds Scenario A automatically.
 - Per-passenger misconnect risk.
-- (HTTPS and nightly backups moved to phase 6 by the user, 2026-11-21.)
+- (HTTPS and nightly backups moved to phase 6, 2026-11-21.)
 
-## Phase 3 — Agent and what-if (approved by the user 2026-11-21)
+## Phase 3 — Agent and what-if (approved 2026-11-21)
 Design: SYSTEM_ARCHITECTURE §11, ADR 0010 (agent), ADR 0011 (cancel, consolidate, strategies).
 
 **In scope**
@@ -97,7 +97,7 @@ Design: SYSTEM_ARCHITECTURE §11, ADR 0010 (agent), ADR 0011 (cancel, consolidat
 - `scripts/check.sh` passes.
 - Playwright passes against the server URL.
 - An agent run on prod produces a recommendation with a visible trace.
-- The URL is reported to the user.
+- The URL is reported to the product owner.
 
 ## Phase 4 — Extend (needs approval)
 - **Unaccompanied minors (future enhancement, removed from MVP scope 2026-11-21):** UMNR identification, mandatory priority (EU261 Art. 11), supervision during long waits, guardian notification, and handover rules.
@@ -105,15 +105,15 @@ Design: SYSTEM_ARCHITECTURE §11, ADR 0010 (agent), ADR 0011 (cancel, consolidat
 - Equipment change (different type or capacity) and bus + air journeys.
 - Crew legality, when crew data exists.
 - Replace synthetic data with real loyalty, SSR, fare-family and aircraft files as they arrive.
-- CI/CD deployment, monitoring and alerting, and the full §14 operations baseline.
+- CI/CD deployment, monitoring and alerting, and the full operations baseline (monitoring, backups, restart checks).
 
-## Phase 5 — Passenger rewards (approved by the user 2026-11-21)
+## Phase 5 — Passenger rewards (approved 2026-11-21)
 - Disruption severity per passenger and passenger value, from which a goodwill reward is set in AED.
 - A budget field in the scenario screen: the system recommends a reward type and amount per passenger (meal voucher, gift voucher, lounge pass, miles, free ticket) that fits the budget.
 - Preferences are proxy rules (meal and seat bought, sales channel, fare family, loyalty, frequency, family booking), labelled as assumptions. A trained preference model replaces them if redemption data arrives.
 - Recommend-only: the plan is approved through the decisions audit log; nothing is sent to passengers. Design: `docs/architecture/REWARDS_DESIGN.md`, ADR 0012.
 
-## Phase 6 — Secure and protect (needs approval; moved from phase 2 by the user, 2026-11-21)
+## Phase 6 — Secure and protect (needs approval; moved from phase 2, 2026-11-21)
 - HTTPS through Caddy and Let's Encrypt on a free sslip.io hostname, with `:8888` kept (design: ADR 0009).
 - Nightly PostgreSQL backup with a restore test (design: ADR 0009).
 
@@ -123,6 +123,6 @@ Design: SYSTEM_ARCHITECTURE §11, ADR 0010 (agent), ADR 0011 (cancel, consolidat
 3. Run Playwright locally.
 4. Run the Trivy scans.
 5. Tag the images, deploy (copy the tree to the server and run `docker compose up -d --build`, see `docs/deployment/DEPLOYMENT_GUIDE.md`; take a manual `pg_dump` of the database first; automated nightly backups come in phase 6), and run migrations.
-6. Verify (engineering standards §13.9): health checks, Playwright against the server URL, and the logs.
+6. Verify: health checks, Playwright against the server URL, and the logs.
 7. Rollback = redeploy the previous image tag. The rollback steps are in the runbook.
 8. Report the URL and results, update the phase status table above, and wait for approval of the next phase.

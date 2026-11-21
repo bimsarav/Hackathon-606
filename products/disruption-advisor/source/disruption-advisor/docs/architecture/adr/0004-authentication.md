@@ -1,7 +1,7 @@
 # ADR-0004: Authentication and authorization
 
 - **Status:** Accepted for the MVP (2026-11-20). Revisit before production (phase 4).
-- **Context:** Every product needs authentication (engineering standards §9.12). FastAPI has no built-in user system.
+- **Context:** Every product needs authentication. FastAPI has no built-in user system.
 - **Options:**
   1. **OIDC with an existing identity provider (recommended)** (Keycloak, Entra ID, Auth0, Cognito, ...). The SPA uses the authorization code flow with PKCE; the API validates bearer JWTs against the provider's JWKS in a FastAPI dependency and maps roles or claims to permissions.
   2. **Self-hosted Keycloak** in Compose, when no identity provider exists but SSO, MFA or federation is required.

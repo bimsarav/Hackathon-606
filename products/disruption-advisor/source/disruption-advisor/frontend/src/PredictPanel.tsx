@@ -48,7 +48,7 @@ export function DelaySlider({ id, label, value, onChange }:
   );
 }
 
-/** T-621: predict departure AND arrival delay; add what is known today (inbound aircraft, own departure) to sharpen it. */
+/** Predict departure AND arrival delay; add what is known today (inbound aircraft, own departure) to sharpen it. */
 export function PredictPanel({ flightId, fixed }: { flightId: string; fixed?: { inbound: number | null; departure: number | null } }) {
   const [ownInbound, setInbound] = useState<number | null>(null);
   const [ownDeparture, setDeparture] = useState<number | null>(null);

@@ -1,7 +1,7 @@
 # Full stack: docker compose up -d --build   (first: scripts/init-settings.sh, then fill in settings.env), then open http://localhost:${WEB_PORT}
 # Settings live in settings.env; Docker Compose reads them through the link .env -> settings.env.
 # Start order: db (healthy) → migrate (done) and ingest (done) → api (healthy) → web. Every long-running service
-# restarts unless stopped, so the stack comes back by itself after a server reboot (engineering standards §14).
+# restarts unless stopped, so the stack comes back by itself after a server reboot.
 name: disruption-advisor
 
 x-logging: &logging

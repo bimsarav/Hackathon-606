@@ -1,7 +1,7 @@
 """Read-only access to the operating picture (``<data_dir>/ops/*.parquet``) through an in-memory DuckDB.
 
 The window is small (thousands of flights, ~300k passenger-segments), so the tables are loaded once at start-up
-and queried with SQL. Every query reads only the columns it needs (engineering standards §9.25).
+and queried with SQL. Every query reads only the columns it needs.
 """
 
 from __future__ import annotations
@@ -85,7 +85,7 @@ class OpsStore:
             self._con.execute("CREATE INDEX idx_conn_in ON connection_risk (inbound_flight_id)")
         card = ops_dir / "model_card.json"
         self.model_card: dict[str, Any] = json.loads(card.read_text()) if card.exists() else {}
-        self.live_models = LiveModels.load(ops_dir)  # T-621 live departure/arrival models; None = planning only
+        self.live_models = LiveModels.load(ops_dir)  # live departure/arrival models (ADR 0014); None = planning only
         window: tuple[list[str], np.ndarray] = (
             live_delay.window_matrix(ops_dir) if self.live_models else ([], np.zeros((0, 0)))
         )
@@ -126,7 +126,7 @@ class OpsStore:
             if sold.exists()
             else set()
         )
-        # Crew FDP headroom (user 2026-11-21): rostered flights, and per flight number from its rostered history
+        # Crew FDP headroom: rostered flights, and per flight number from its rostered history
         self.crew_by_flight: dict[str, CrewHeadroom] = {}
         self.crew_by_number: dict[str, CrewHeadroom] = {}
         crew, est = ops_dir / "crew_flights.parquet", ops_dir / "crew_fdp_estimates.parquet"

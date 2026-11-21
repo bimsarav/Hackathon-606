@@ -1,6 +1,6 @@
-# Reward Preference Model: Selection and Hyperparameter Tuning (T-515)
+# Reward Preference Model: Selection and Hyperparameter Tuning
 
-Tool: `backend/tools/reward_model_selection.py`. Raw results: `execution/logs/output/T-515/reward_model_selection.json` (project log). Rule followed: MASTER_PROMPT §9.23.7 (baseline first, candidates compared, controlled tuning, decision on validation results).
+Tool: `backend/tools/reward_model_selection.py`. Re-running the tool reproduces the raw results. Method: baseline first, candidates compared, controlled tuning, decision on validation results.
 
 > **SYNTHETIC DATA.** The outcomes are simulated (see [reward-model-card.md](reward-model-card.md)). This run measures how well each model recovers the assumed behaviour, not how real customers behave.
 
@@ -39,7 +39,7 @@ Tool: `backend/tools/reward_model_selection.py`. Raw results: `execution/logs/ou
 - **The gain from tuning is negligible:** log-loss 0.6157 to 0.6153 on validation, 0.6151 to 0.6147 on the final test. The previous settings were already at the plateau. LightGBM, XGBoost and CatBoost are indistinguishable (all within 0.001 log-loss), and the random forest is only slightly behind.
 - **The model class matters, the tuning does not:** logistic regression is clearly worse (log-loss 0.6384, it misses the interactions) and the type average is the weakest.
 - **Distance to the limit:** against the type-average baseline (0.6552) and the oracle (0.5890), the tuned model closes 61% of the possible log-loss gap, logistic regression 25%. The rest is each passenger's personal taste in the simulator (random noise no feature can explain). On real data the ceiling is unknown.
-- Class weights were not tried: the plan needs calibrated probabilities, and balancing the classes would distort them (as in the delay model, T-511).
+- Class weights were not tried: the plan needs calibrated probabilities, and balancing the classes would distort them (as in the delay model: docs/testing/model-selection.md).
 - The proxy rules of the first version score AUC 0.6666 on the same test.
 
 ## Re-check after the upcoming-flight features and the family-lifted tier (local, 2026-11-21)

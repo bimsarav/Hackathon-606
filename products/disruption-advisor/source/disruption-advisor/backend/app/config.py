@@ -40,14 +40,14 @@ class Settings(BaseSettings):
     cost_hotel_per_night: float = 350.0
     cost_meal_voucher: float = 50.0
     cost_rebooking_handling: float = 25.0
-    # Goodwill cost of a missed connection (user 2026-11-21): base AED x passenger value, so stranding a frequent or
+    # Goodwill cost of a missed connection: base AED x passenger value, so stranding a frequent or
     # high-tier loyal traveller costs more. Value = 1 + 2 x loyalty tier value (Basic .25 .. Platinum 1) + frequency
     # bonus (frequent 1, regular .5). Assumed, configurable.
     cost_misconnect_goodwill: float = 150.0
-    # Holding a connecting flight for late inbound passengers (user 2026-11-21): longest hold considered.
+    # Holding a connecting flight for late inbound passengers: longest hold considered.
     hold_max_minutes: int = 60
-    # Crew FDP check (user 2026-11-21): an option that takes a crew past its maximum FDP is alerted (a breach);
-    # under this many minutes left it is flagged "tight". Alert only at this stage (user): no crew recovery is
+    # Crew FDP check: an option that takes a crew past its maximum FDP is alerted (a breach);
+    # under this many minutes left it is flagged "tight". Alert only at this stage: no crew recovery is
     # planned, so a breach adds no cost unless COST_RESERVE_CREW (AED per breached flight) is set.
     crew_tight_minutes: int = 30
     cost_reserve_crew: float = 0.0

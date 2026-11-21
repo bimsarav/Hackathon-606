@@ -1,4 +1,4 @@
-"""Model comparison and hyperparameter tuning for the reward preference model (ADR 0012, MASTER_PROMPT 9.23.7).
+"""Model comparison and hyperparameter tuning for the reward preference model (ADR 0012, docs/architecture/adr/).
 
 Offline research tool, not part of the API image. Needs lightgbm, xgboost, catboost, scikit-learn, pandas, optuna in a
 scratch virtualenv. Run from `backend/`:

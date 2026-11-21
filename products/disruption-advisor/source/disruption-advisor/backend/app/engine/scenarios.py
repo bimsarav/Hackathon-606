@@ -211,7 +211,7 @@ def _option_kpis(ctx: Context, key: str, label: str, plan: RotationPlan, cancell
 
 def _misconnect_goodwill(ctx: Context, missed: list[Connection]) -> float:
     """Goodwill cost of the missed connections, by passenger value: a frequent or high-tier loyal traveller (own tier
-    or the family account's) is worth more to keep (user 2026-11-21). Base x (1 + 2 x tier value + frequency)."""
+    or the family account's) is worth more to keep. Base x (1 + 2 x tier value + frequency)."""
     if not missed:
         return 0.0
     keys = {(c.pnr, c.customer_key) for c in missed}
@@ -228,7 +228,7 @@ def _misconnect_goodwill(ctx: Context, missed: list[Connection]) -> float:
 
 
 def _crew_check(ctx: Context, plan: RotationPlan) -> dict[str, Any]:
-    """Crew FDP check (user 2026-11-21): each delayed flight's extra minutes against its tightest crew member's
+    """Crew FDP check: each delayed flight's extra minutes against its tightest crew member's
     headroom (max FDP - planned FDP). The roster is used when the flight has one, else the 10th percentile of the
     flight number's rostered history ("estimated"). Crew are assumed to stay with their flight (also after a swap).
     Over the maximum is a breach (alert only; COST_RESERVE_CREW adds a cost when set, default 0); under
@@ -291,7 +291,7 @@ def _crew_text(crew: dict[str, Any]) -> str:
 
 def _cascade(plan: RotationPlan) -> dict[str, Any]:
     """How far the delay spreads: flights and aircraft delayed, how many beyond the first two flights of each
-    aircraft, and when the last delayed flight lands (user 2026-11-21: look past the next flight)."""
+    aircraft, and when the last delayed flight lands (look past the next flight)."""
     delayed = plan.delayed()
     by_tail: dict[str, list[Any]] = {}
     for timing in delayed:
@@ -306,7 +306,7 @@ def _cascade(plan: RotationPlan) -> dict[str, Any]:
 
 
 def _with_holds(ctx: Context, base: dict[str, Any], horizon_end: datetime) -> dict[str, Any] | None:
-    """Hold variant of an option (user 2026-11-21): for each onward flight that its connecting passengers would miss,
+    """Hold variant of an option: for each onward flight that its connecting passengers would miss,
     try holding it just long enough (up to HOLD_MAX) for them to make the minimum connection time. The hold delays that
     flight and its aircraft's later flights (knock-on on another aircraft) and can break other connections; it is
     kept only when the option's total cost, including the passengers' goodwill cost, goes down."""
@@ -468,7 +468,7 @@ def analyse_delay(
             )
         )
 
-    # Hold the connecting flight instead of letting passengers miss it, where that is cheaper (user 2026-11-21):
+    # Hold the connecting flight instead of letting passengers miss it, where that is cheaper:
     # tried on absorbing the delay and on the cheapest swap.
     bases = [o for o in options if o["kind"] == "absorb"] + sorted(
         (o for o in options if o["kind"] == "swap"), key=strategies.lowest_cost

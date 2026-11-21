@@ -9,7 +9,7 @@ assumed behaviour model (the assumptions are listed in BEHAVIOUR below). The tra
 those assumptions, not real customer choices. It is a working pipeline to be retrained on real redemption data:
 replace `generate_history` with the airline's offer log and nothing else changes.
 
-Outputs (ops folder, Parquet / text as per engineering standards):
+Outputs (ops folder, Parquet / text):
   reward_history_synthetic.parquet   the simulated offers and outcomes (labelled synthetic)
   reward_model.txt                   the LightGBM model
   reward_model_card.json             data, features, metrics against baselines, calibration, assumptions
@@ -41,7 +41,7 @@ HOLDOUT_SHARE = 0.2
 ROUNDS = 200
 PARAMS: dict[
     str, Any
-] = {  # tuned with Optuna on grouped validation folds (T-515, docs/testing/reward-model-selection.md)
+] = {  # tuned with Optuna on grouped validation folds (tuning record: docs/testing/reward-model-selection.md)
     "objective": "binary",
     "learning_rate": 0.0347,
     "num_leaves": 37,

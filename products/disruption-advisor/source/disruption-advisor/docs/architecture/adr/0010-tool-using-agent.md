@@ -1,6 +1,6 @@
 # ADR-0010: A recommend-only Claude agent on the Messages API, with a deterministic planner fallback
 
-- **Status:** Accepted (2026-11-21, phase 3 approved by the user)
+- **Status:** Accepted (2026-11-21, phase 3 approved; phase approvals: docs/delivery/MVP_AND_INCREMENTAL_PLAN.md)
 - **Context:**
   - Phase 3 asks for an agent that coordinates the impact, recovery, priority and rebooking modules and explains its chain of reasoning.
   - Phase 1 rules still hold: the engine decides the numbers, a person approves every action, and no personal data goes to the AI service (ADR 0007).

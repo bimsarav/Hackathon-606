@@ -1,4 +1,4 @@
-"""Passenger care while waiting for the new flight (user request 2026-11-21).
+"""Passenger care while waiting for the new flight.
 
 Rules (configurable; assumptions to validate with the airline, labelled in the UI):
   wait < 2 h                      no care

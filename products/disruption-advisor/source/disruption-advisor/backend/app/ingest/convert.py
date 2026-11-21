@@ -1,4 +1,4 @@
-"""Stage 1 of the ingest: convert every raw airline extract to typed Parquet (engineering standards §9.25).
+"""Stage 1 of the ingest: convert every raw airline extract to typed Parquet.
 
 All later work reads these Parquet files, never the raw CSV/Excel. Nothing here edits the input files.
 
@@ -349,7 +349,7 @@ FARE_COLUMNS = (
 
 
 def fares_source(input_dir: Path) -> Path | None:
-    """The fares list (user 2026-11-21): a supplied Parquet (INPUT_DIR/parquet/raw/fares.parquet), else the CSV as
+    """The fares list: a supplied Parquet (INPUT_DIR/parquet/raw/fares.parquet), else the CSV as
     delivered (INPUT_DIR/fares_list.csv, or a folder of that name holding fares_list.csv)."""
     for candidate in (
         input_dir / "parquet" / "raw" / "fares.parquet",
@@ -381,7 +381,7 @@ def convert_fares(input_dir: Path, out_dir: Path) -> dict[str, int]:
     return {"fares": int(row[0]) if row else 0}
 
 
-# Crew roster extract (user 2026-11-21): one row per crew member per flight with FDP values in minutes. The names in
+# Crew roster extract: one row per crew member per flight with FDP values in minutes. The names in
 # the source are personal data and are never copied: only these columns reach the data volume.
 CREW_COLUMNS = (
     "carrier_code",

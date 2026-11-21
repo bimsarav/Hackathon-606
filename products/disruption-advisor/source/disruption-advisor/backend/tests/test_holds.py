@@ -1,5 +1,5 @@
 """Hold the connecting flight vs let passengers misconnect, passenger value in the cost, and the cascade beyond the
-next flight (user 2026-11-21)."""
+next flight."""
 
 from pathlib import Path
 from typing import Any

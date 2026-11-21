@@ -1,6 +1,6 @@
 """Stage 2 of the ingest: build the operating picture (``<DATA_DIR>/ops/*.parquet``) from the typed raw Parquet.
 
-Everything is read from Parquet with column selection and filter pushdown (standards §9.25). Synthetic values
+Everything is read from Parquet with column selection and filter pushdown. Synthetic values
 fill the data the airline did not supply (decisions Q4-Q11, Q25, Q30). They are deterministic, and every one is
 labelled: a ``*_synthetic`` column or a ``*_source`` column says where a value came from.
 
@@ -55,12 +55,12 @@ class Window:
 
 
 DEFAULT_WINDOW = Window(datetime(2026, 11, 20), datetime(2026, 11, 19), datetime(2026, 12, 1))
-# Scope (user decision 2026-11-21): only the airline's own flights. Partner and other carriers in the extracts
+# Scope: only the airline's own flights. Partner and other carriers in the extracts
 # (3L, 3O, E5, 9P, 4P) are excluded from the operating picture; including them is a future enhancement.
 DEFAULT_CARRIERS: tuple[str, ...] = ("G9",)
 
 
-# Loyalty (user 2026-11-21: use the given "Loyalty_Sample Data.xlsx"). The sample defines the tier ladder and its
+# Loyalty (from the given "Loyalty_Sample Data.xlsx"). The sample defines the tier ladder and its
 # recovery priority (Basic Lowest, Silver Low, Gold Medium, Platinum High), points balances (Basic adult 10,000,
 # Basic child 3,000, Silver 60,000) and family accounts with a head of family. It cannot be joined to the bookings
 # (it holds e-mail IDs and names, the bookings are name-free), so every member gets a synthetic account built the
@@ -135,7 +135,7 @@ def build(
         FROM fit f LEFT JOIN best b USING (reg)""",
     )
 
-    # Fares list (user 2026-11-21): fares whose outbound travel validity overlaps the window. Validities are text
+    # Fares list: fares whose outbound travel validity overlaps the window. Validities are text
     # ranges "from~to" (several separated by commas); "4000-01-01" means open-ended.
     fares_file = raw / "fares.parquet"
     if fares_file.exists():
@@ -316,7 +316,7 @@ def build(
                coalesce(s.baggage_kg, 0) AS baggage_kg, s.meals IS NOT NULL AS has_meal,
                s.seat_code IS NOT NULL AS has_seat, s.sales_channel,
                p.pnr_size, p.adults, p.children, p.infants,
-               -- Unaccompanied minors (UMNR) are out of scope (user 2026-11-21): no UMNR code is derived.
+               -- Unaccompanied minors (UMNR) are out of scope: no UMNR code is derived.
                CASE WHEN s.pax_type = 'IN' THEN 'INFT'
                     {ssr_case}
                END AS ssr_code,
@@ -466,7 +466,7 @@ def build(
     return report
 
 
-# Crew FDP (user 2026-11-21). The roster gives, per crew member and flight, the planned FDP of the duty and the
+# Crew FDP. The roster gives, per crew member and flight, the planned FDP of the duty and the
 # crew member's maximum FDP (both minutes). Headroom = max FDP - planned FDP: how much later the duty can end before
 # the limit. A flight's headroom is its tightest crew member's (usually a pilot). Crew IDs and names are not kept.
 CREW_EXTRA_DELAYS = (30, 60, 90, 120, 180)

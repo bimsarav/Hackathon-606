@@ -3,7 +3,7 @@
 Disruption Advisor helps an airline's Operations Control Centre (OCC) and Passenger Control Unit (PCU) handle a flight disruption before it cascades.
 - **Scenario A, delay:** for a delayed flight it shows every later flight on the same aircraft rotation and every passenger connection that breaks over the next 7 days. It compares recovery options (absorb the delay, swap in a same-type aircraft, or, since phase 3, cancel or consolidate a later round trip of the delayed aircraft) on delay, missed connections, passengers and cost, and recommends one.
 - **Scenario B, cancellation:** for a cancelled flight it ranks the affected passengers. Strict tiers come first (mandated care, then urgency); configurable weights order passengers inside a tier (loyalty, travel frequency, fare, ancillaries, journey, family/group). It then assigns passengers to alternative flights within the seats actually available, keeping bookings together.
-- **Strategies (phase 3):** "Lowest cost" (default), "Protect passengers" and "Least delay" each pick their best option from the same list, shown side by side. Switching the strategy changes the recommendation, not the numbers. Design: [ADR 0011](docs/architecture/adr/0011-cancel-consolidate-and-strategies.md).
+- **Strategies (phase 3):** "Lowest cost" (default), "Protect passengers" and "Least delay" each pick their best option from the same list, shown side by side. Switching the strategy changes the recommendation, not the numbers. Design: [ADR 0011](docs/architecture/adr/0011-cancel-consolidate-and-strategies.md) (`docs/architecture/adr/0011-cancel-consolidate-and-strategies.md`).
 - **Test data:** `TEST_DATA_DIR` (default `/testdata`, the `test-data` volume) holds flights the evaluator adds in the *Test data* tab.
 - **Agent (phase 3):** on request, a Claude agent investigates a flight with read-only engine tools, shows each step live and recommends one engine option with reasons, risks and checks. The result opens as a normal scenario for approval. A rule-based planner answers when the AI is unavailable. No personal data is sent. Details: [docs/testing/agent-card.md](docs/testing/agent-card.md).
 - **Explanations:** every recommendation is explained in plain English, written by Claude when an API key is configured, otherwise by templates, and passenger messages are drafted.
@@ -57,7 +57,7 @@ Every long-running service restarts by itself, including after a server reboot.
 - **Fares list** (`fares_list.csv`, or `parquet/raw/fares.parquet` in `INPUT_DIR`):
   - **Booking-class level:** each class gets a level, the share of passengers in cheaper classes, which makes up 30% of the fare value.
   - **Sold connections:** the only X/SHJ/Y connections rebooking may offer as two-flight itineraries through the hub.
-- **Crew roster** (`parquet/crew/crew.parquet` in `INPUT_DIR`, user 2026-11-21):
+- **Crew roster** (`parquet/crew/crew.parquet` in `INPUT_DIR`):
   - Copied without crew names into `raw/crew.parquet`; the operating data keeps only per-flight counts and headroom, no crew IDs.
   - **Headroom** = maximum FDP − planned FDP of the tightest crew member on the flight (`crew_flights.parquet`). Flights without a roster use the 10th percentile of the same flight number's history (`crew_fdp_estimates.parquet`, labelled estimated).
   - Every recovery option checks each delayed flight's delay against that headroom: under `CREW_TIGHT_MINUTES` (30) left is tight, past the maximum needs a reserve crew (`COST_RESERVE_CREW`, AED 15,000 per flight, assumed). The agent sees the result; the model page shows the FDP analysis (`GET /api/v1/crew/fdp`).
@@ -90,7 +90,7 @@ Logs are written to `logs/`.
 | `/api/v1/risk/cascade` | The last month's cascade check: the knock-on formula against real departures, with all pairs (read-only) |
 | `/api/v1/scenarios/{id}/rewards` | Goodwill reward plan for the passengers of the scenario's flight within a budget (phase 5, [design](docs/architecture/REWARDS_DESIGN.md)); computed on request, approved through `/decisions` |
 | `/api/v1/risk/model-docs`, `/api/v1/risk/reward-model` | Evaluator only: the model comparison and tuning write-ups and the reward model card shown in the Model Card view |
-| `/api/v1/test-data` (+ `/spec`) | Evaluator test data: file description, check, add and remove a few flights with their passengers ([ADR 0013](docs/architecture/adr/0013-test-data-upload.md)) |
+| `/api/v1/test-data` (+ `/spec`) | Evaluator test data: file description, check, add and remove a few flights with their passengers ([ADR 0013](docs/architecture/adr/0013-test-data-upload.md) (`docs/architecture/adr/0013-test-data-upload.md`)) |
 | `/api/v1/scenarios/{id}/strategy` | Switch a delay scenario's strategy (lowest cost, protect passengers, least delay); the recommendation follows (phase 3) |
 | `/api/v1/agent/runs` (+ `/{id}`) | Start an agent run on a flight and follow its steps; the result is saved as a scenario for approval (phase 3, [agent card](docs/testing/agent-card.md)) |
 | `/api/openapi.json`, `/api/docs` | OpenAPI schema and Swagger UI |

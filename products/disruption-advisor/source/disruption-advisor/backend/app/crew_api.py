@@ -1,4 +1,4 @@
-"""Crew FDP analysis (user 2026-11-21): what the crew roster says about flight duty period headroom.
+"""Crew FDP analysis: what the crew roster says about flight duty period headroom.
 
 Built by the ingest (app/ingest/build.py ``_crew``) from the roster's planned/actual FDP and maximum FDP. Contains
 counts and percentages only: no crew names or IDs.

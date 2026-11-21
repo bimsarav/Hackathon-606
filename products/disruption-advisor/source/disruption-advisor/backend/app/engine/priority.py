@@ -8,7 +8,7 @@ Tier order (Q12, UC5: rights and mandatory assistance are respected independentl
 Non-revenue passengers come after all revenue passengers. The weighted score only orders passengers within the
 same tier, so commercial value can never move someone across a tier.
 
-Loyalty follows the airline's loyalty sample (user 2026-11-21): tiers Basic < Silver < Gold < Platinum carry the
+Loyalty follows the airline's loyalty sample: tiers Basic < Silver < Gold < Platinum carry the
 recovery priority Lowest < Low < Medium < High; enrolment alone (Basic) already counts above a non-member; and a
 family account travels on the head of family's tier, so a child or a non-member spouse on the family booking is not
 ranked below the head (the better of the person's own tier and the family tier is used).
@@ -19,7 +19,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-# Unaccompanied minors (UMNR) are out of scope (user decision 2026-11-21; future enhancement).
+# Unaccompanied minors (UMNR) are out of scope (future enhancement).
 CARE_SSRS = frozenset({"WCHR", "WCHS", "WCHC", "BLND", "DEAF", "MEDA", "PREG"})
 LOYALTY_PRIORITY = {"Basic": "Lowest", "Silver": "Low", "Gold": "Medium", "Platinum": "High"}  # airline sample
 PRIORITY_VALUE = {"Lowest": 0.25, "Low": 0.5, "Medium": 0.75, "High": 1.0}

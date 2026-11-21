@@ -123,7 +123,7 @@ export interface RecoveryOption {
 
 export type OptionKind = "absorb" | "swap" | "cancel" | "consolidate" | "hold";
 
-/** A connecting flight held for late inbound passengers (user 2026-11-21). */
+/** A connecting flight held for late inbound passengers. */
 export interface HeldFlight {
   flight_id: string;
   flight_number: string;
@@ -139,7 +139,7 @@ export interface Cascade {
   delay_ends: string | null;
   passenger_delay_minutes: number;
 }
-/** Crew FDP check of one option (user 2026-11-21): delays against the tightest crew member's headroom. */
+/** Crew FDP check of one option: delays against the tightest crew member's headroom. */
 export interface CrewFlight {
   flight_id: string;
   flight_number: string;
@@ -394,7 +394,7 @@ export interface RiskFlight {
   expected_misconnects: number;
 }
 
-/** T-621: one delay curve (departure or arrival), from the planning model or from live inputs. */
+/** One delay curve (departure or arrival), from the planning model or from live inputs. */
 export interface LiveCurve {
   mode: string;
   p: Record<"5" | "15" | "30" | "60" | "120" | "180", number>;

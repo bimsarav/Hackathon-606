@@ -275,8 +275,8 @@ flowchart LR
 - **Time:** all logic runs in UTC; local times come from the airport time-zone table (Q9, Q22).
 - **Limits (MVP):** G9 flights only (no partner or other carriers), no crew legality (no crew data), no equipment change, no bus legs, simulated "now" = 2026-11-20 (Q2).
 
-## 10. Phase 2: Predict (approved by the user on 21 Nov 2026)
-Phase 2 adds a forward view (which flights are likely to be late in the next 7 days, and which passengers are likely to misconnect) (HTTPS and nightly backups, first planned here, were moved to phase 6 by the user on 2026-11-21; see §10.3). The engine and the human approval loop of phase 1 are unchanged: predictions only rank and pre-fill, a person still runs and approves the scenario.
+## 10. Phase 2: Predict (approved on 21 Nov 2026)
+Phase 2 adds a forward view (which flights are likely to be late in the next 7 days, and which passengers are likely to misconnect) (HTTPS and nightly backups, first planned here, were moved to phase 6 on 2026-11-21; see §10.3). The engine and the human approval loop of phase 1 are unchanged: predictions only rank and pre-fill, a person still runs and approves the scenario.
 
 ### 10.1 Delay-risk pipeline
 ```mermaid
@@ -306,7 +306,7 @@ flowchart TB
 ```
 - The inbound arrival delay has its own curve (a second set of LightGBM models trained on actual arrival delays), and the onward flight's departure-delay curve is included, so a late onward flight saves some connections. The two delays are taken as independent. Back-tested on past connections: 0.70 predicted vs 0.69 observed (model card).
 
-### 10.3 Deployment additions (moved to phase 6, user 2026-11-21; not built yet)
+### 10.3 Deployment additions (moved to phase 6; not built yet)
 ```mermaid
 flowchart LR
   user([OCC / PCU]) -->|https://92-5-154-198.sslip.io| caddy
@@ -324,7 +324,7 @@ flowchart LR
 - **Backups** stay on the server disk (no off-site target was supplied); off-site copies are a phase 4 item. The restore test is run after deployment and recorded.
 - Details: [ADR 0008](adr/0008-delay-risk-model.md), [ADR 0009](adr/0009-https-and-backups.md).
 
-## 11. Phase 3: Agent and what-if (approved by the user on 21 Nov 2026)
+## 11. Phase 3: Agent and what-if (approved on 21 Nov 2026)
 Phase 3 adds three things on top of phases 1 and 2. The engine still computes every number, and a person still approves every action.
 1. **Two more recovery levers** for a delay: cancel a downstream round trip, and consolidate (the same, when every passenger fits on other flights on the same route that day).
 2. **Strategies compared side by side.** "Lowest cost", "Protect passengers" and "Least delay" each pick their best option from the same option list.

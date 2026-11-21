@@ -1,13 +1,13 @@
 # ADR-0012: Passenger reward recommendation with proxy preferences and a budget
 
-- **Status:** Accepted (2026-11-21, phase 5 approved by the user)
+- **Status:** Accepted (2026-11-21, phase 5 approved; phase approvals: docs/delivery/MVP_AND_INCREMENTAL_PLAN.md)
 - **Context:** After a disruption the airline can offer goodwill rewards. The planner needs a defensible way to decide who gets what within a budget. The data has passenger value signals (loyalty, frequency, fare, ancillaries) but no record of which rewards customers accepted, so a trained preference model is not possible yet.
 - **Decision:**
   - **Severity x value -> target amount -> reward type -> budget fit**, as in `docs/architecture/REWARDS_DESIGN.md`.
-  - **Preferences:** first by proxy rules (meal and seat bought, sales channel, fare family, loyalty, frequency, family booking); then (2026-11-21, the user allowed synthetic data) by a **LightGBM acceptance model trained on simulated redemption history**, with the proxy rules kept as the fallback and as a baseline. Everything derived from the simulated history is labelled synthetic.
+  - **Preferences:** first by proxy rules (meal and seat bought, sales channel, fare family, loyalty, frequency, family booking); then (2026-11-21, synthetic training data approved) by a **LightGBM acceptance model trained on simulated redemption history**, with the proxy rules kept as the fallback and as a baseline. Everything derived from the simulated history is labelled synthetic.
   - **Budget fitting by marginal downgrade:** deterministic, explainable, fast for hundreds of passengers; no solver needed.
   - **Recommend-only:** the plan is computed on request (not stored); approval is recorded through the existing decisions audit log. Nothing is sent to passengers.
-- **Selection and tuning (T-515):** LightGBM compared with logistic regression, random forest, XGBoost, CatBoost and a type-average baseline on grouped folds of the simulated history; LightGBM tuned with Optuna. The gain from tuning was negligible; the tree models are tied (`docs/testing/reward-model-selection.md`).
+- **Selection and tuning:** LightGBM compared with logistic regression, random forest, XGBoost, CatBoost and a type-average baseline on grouped folds of the simulated history; LightGBM tuned with Optuna. The gain from tuning was negligible; the tree models are tied (`docs/testing/reward-model-selection.md`).
 - **Alternatives considered:**
   - **Trained acceptance model:** the right long-term answer, but there is no redemption data. The rules replace it behind the same interface when data exists.
   - **CP-SAT allocation:** exact for linear utilities, but the concave utility and the downgrade ladder are simpler and easier to explain greedily.

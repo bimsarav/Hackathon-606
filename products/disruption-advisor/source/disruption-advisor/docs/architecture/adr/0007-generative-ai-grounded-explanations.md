@@ -1,7 +1,7 @@
 # ADR-0007: Generative AI only for grounded explanations and message drafts
 
 - **Status:** Accepted (2026-11-20)
-- **Context:** UC5 asks for explained recommendations and personalised communications. The data is treated as real passenger data (Q3), and the user allowed sending data to an external AI service. Decisions must stay explainable and auditable (GDPR Art. 22; human in the loop, Q21).
+- **Context:** UC5 asks for explained recommendations and personalised communications. The data is treated as real passenger data (Q3), and sending minimised data to an external AI service was approved. Decisions must stay explainable and auditable (GDPR Art. 22; human in the loop, Q21).
 - **Decision:**
   - **Separation:** the engine decides. The Anthropic Claude API (Python SDK 2.12, model `claude-opus-5-5` per the Claude API guidance, `AI_MODEL` configurable, effort `low`) only rewrites the engine's facts into English text: the recommendation narrative and passenger message drafts.
   - **What is sent:** a fixed system instruction to use only the given facts. Facts exclude names, PNRs, contact details and customer keys.

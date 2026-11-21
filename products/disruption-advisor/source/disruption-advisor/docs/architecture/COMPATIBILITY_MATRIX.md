@@ -1,6 +1,6 @@
 # Disruption Advisor Compatibility Matrix
 
-From the organisation's stack profile `python-fastapi`. Every version below was resolved from official registries (PyPI, npm, Docker Hub) and proven together by `scripts/verify-profile.sh python-fastapi`: quality gate, Compose smoke test and Trivy. Support dates are from endoflife.date and the projects' own policies. Keep this file in step with `backend/pyproject.toml`, `backend/uv.lock`, `frontend/package.json`, `frontend/package-lock.json`, the Dockerfiles and `compose.yml` (engineering standards §9.21).
+Every version below was resolved from official registries (PyPI, npm, Docker Hub) and proven together by the quality gate (`scripts/check.sh`), the Compose smoke test (`scripts/smoke.sh`) and Trivy. Support dates are from endoflife.date and the projects' own policies. Keep this file in step with `backend/pyproject.toml`, `backend/uv.lock`, `frontend/package.json`, `frontend/package-lock.json`, the Dockerfiles and `compose.yml`.
 
 | Technology | Selected version | Runtime it needs | Dependency compatibility | Database compatibility | Build / deploy requirements | Support lifecycle | Known limitations |
 |---|---|---|---|---|---|---|---|
@@ -9,7 +9,7 @@ From the organisation's stack profile `python-fastapi`. Every version below was 
 | FastAPI | 0.165.0 (Starlette 1.10.0) | Python 3.11+ | Pydantic 2.14 | — | App factory `app.main:create_app` | Active; 0.x minors may change behaviour | Pin the minor version; re-verify on bump |
 | uvicorn (standard) | 0.54.0 | Python 3.10+ | ASGI; `log_config=None` → structlog | — | `python -m app.serve` (workers, proxy headers) | Active | — |
 | Pydantic / pydantic-settings | 2.14.4 / 2.16.3 | Python 3.10+/3.11+ | mypy plugin `pydantic.mypy` | — | Settings from environment variables | Active (v2) | — |
-| SQLAlchemy | 2.1.9 | Python 3.11+ | psycopg 3 dialect `postgresql+psycopg` | PostgreSQL 18 | Engine per app, session per request | Active (2.x) | Sync sessions by default (async only when justified, §9.3.1) |
+| SQLAlchemy | 2.1.9 | Python 3.11+ | psycopg 3 dialect `postgresql+psycopg` | PostgreSQL 18 | Engine per app, session per request | Active (2.x) | Sync sessions by default (async only when justified) |
 | Alembic | 1.20.1 | SQLAlchemy 2.x | `prepend_sys_path = .` needed for the CLI | PostgreSQL 18 | Compose `migrate` service (`alembic upgrade head`) | Active | Autogenerate needs review; `command.check` test guards drift |
 | psycopg (binary) | 3.3.9 | Python 3.10+ | SQLAlchemy 2 | PostgreSQL 10–18 | Binary wheel | Active | — |
 | PostgreSQL | 18.7 (`postgres:18.7-alpine`) | — | psycopg 3.3 | — | Volume at `/var/lib/postgresql` (18+ layout) | Supported until 2030-11-14 | Single instance in Compose; production: managed PostgreSQL |
@@ -29,5 +29,5 @@ From the organisation's stack profile `python-fastapi`. Every version below was 
 | OR-Tools (CP-SAT) | 9.15.6755 | Python 3.9+ (cp314 manylinux wheel) | — | — | API image | Active | Wheel is large (part of the 1 GB API image) |
 | Anthropic Python SDK | 2.12.0 | Python 3.10+ | httpx2 (SDK 1.x+) | — | API image; `ANTHROPIC_API_KEY` secret | Active | Model `claude-opus-5-5`; beta `server-side-fallback-2026-07-01`. Phase 3 agent: Messages API tool use with strict schemas, also beta `thinking-display-updates-2026-08-18`; no new package |
 | Playwright | 1.65.1 (`mcr.microsoft.com/playwright:v1.65.1`) | Node (in image) | Chromium bundled | — | `scripts/e2e.sh`, Docker | Active | Test-only |
-| Trivy | 0.76.2 (`aquasec/trivy`), trivy-action v0.36.0 in CI | — | — | — | CI and `scripts/verify-profile.sh` | Active | — |
+| Trivy | 0.76.2 (`aquasec/trivy`), trivy-action v0.36.0 in CI | — | — | — | CI | Active | — |
 | Docker / Compose | Engine 20.10+, Compose v2.21+ | — | — | — | `depends_on: service_completed_successfully` / `service_healthy` | — | — |

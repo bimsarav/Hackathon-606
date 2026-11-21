@@ -1,4 +1,4 @@
-"""Live delay models: departure and arrival delay predicted from what is known on the day (T-621, ADR 0011).
+"""Live delay models: departure and arrival delay predicted from what is known on the day (ADR 0014).
 
 The planning models (app/ml/delay_risk.py) use only information known 7 days ahead and reach AUC about 0.77 for a
 60+ minute delay. Delay is driven mostly by what happens on the day, so these models add three inputs that the

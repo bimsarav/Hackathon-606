@@ -74,7 +74,7 @@ New tests in this phase:
   - training is deterministic (same data, same output);
   - the watchlist and flight-risk API (sign-in required).
 - `frontend/src/App.test.tsx`: the watchlist lists flights at risk, opens one with reasons and connections and starts a scenario; it shows the API error when the risk data is not available.
-- `frontend/src/RotationBoard.test.tsx` (teammate addition): legs sit on the scheduled aircraft before and on the operating aircraft after; both boards render with a summary of the change.
+- `frontend/src/RotationBoard.test.tsx`: legs sit on the scheduled aircraft before and on the operating aircraft after; both boards render with a summary of the change.
 
 ## Model evaluation (time-ordered)
 Evaluation model trained on 2026-01-01 .. 2026-10-21 (57,104 flights), tested on 2026-10-21 .. 2026-11-18 (5,956 flights), production run on the server:
@@ -92,7 +92,7 @@ Missed-connection backtest (SHJ connections in the test weeks, no-slack band): 0
 | Smoke test `scripts/smoke.sh` | **11/11** |
 | Playwright `scripts/e2e.sh` (Chromium) | **4 passed**: wrong password and token check; scenario A; scenario B; phase 2 watchlist (ranks flights, shows reasons, opens a delay scenario) |
 | Risk API | Watchlist 1,491 flights in 7 days: 18 high, 140 medium risk; model card served |
-| Reboot test | **Not done** (skipped by user decision) |
+| Reboot test | **Not done** (skipped by decision) |
 
 The local Playwright run was not done: the development machine's bookings Parquet still uses the old `dep_year` layout. The runtime code is identical to the server, so the end-to-end tests ran against the server. No Trivy scan is recorded for the phase 2 images.
 
@@ -165,7 +165,7 @@ The e2e folder's `tsconfig.json` needs `@types/node` in the e2e `devDependencies
 | Negative budget on the local stack | 500, because the local run uses Python 3.12 and `HTTPStatus.UNPROCESSABLE_CONTENT` needs 3.13+; the server (Python 3.14) returned 422 on the same request |
 
 ### Model results
-- Delay model tuning and comparison (nine candidates): [model-selection.md](model-selection.md), including the check of the teammates' `month` and `route_freq` features.
+- Delay model tuning and comparison (nine candidates): [model-selection.md](model-selection.md), including the check of `month` and `route_freq` features.
 - Reward preference model (eight candidates, grouped folds, oracle bound): [reward-model-selection.md](reward-model-selection.md) and [reward-model-card.md](reward-model-card.md). The outcomes are simulated.
 
 ### Production check (2026-11-21 05:35 UTC, heshawa `2d58d6e`)
@@ -208,9 +208,9 @@ The new Playwright tests have not been run locally (no Playwright or Docker on t
 - Evaluator upload of the template (2 flights, 4 passenger rows): scored 2 flights and 2 connections; watchlist totals 1,491 to 1,493; flight page: medium band, 2 connections;
   delay scenario (2 missed connections), reward plan, removal restored the totals.
 - **Playwright (server, Docker): FAILED, not a pass.** 1 of 8 passed (login); scenario A and B timed out (2 min each, one retry) and the run was stopped after 3 of 8, so the
-  cascade, reward and watchlist tests did not run. Cause: `e2e/tests/advisor.spec.ts` still clicks the 'A · Delay' tab and `.preset-list .preset`, which the teammates'
+  cascade, reward and watchlist tests did not run. Cause: `e2e/tests/advisor.spec.ts` still clicks the 'A · Delay' tab and `.preset-list .preset`, which the
   launcher redesign (92c807c) removed; the spec was last changed in b029ef0. The test data page has no browser test. The spec needs rewriting for the new sidebar UI.
-- Frontend unit tests after pulling the teammates' newest UI commits (e0851e3, 2a06d3f): 4 of 33 fail (cancel passenger table, watchlist panel switch, two strategy tests); they test the old tabs
+- Frontend unit tests after pulling newest UI commits (e0851e3, 2a06d3f): 4 of 33 fail (cancel passenger table, watchlist panel switch, two strategy tests); they test the old tabs
   and buttons those commits removed. Not part of the deployed build and not changed by this release (33/33 before the pull).
 
 ## Model Card view: all model evidence (21 Nov 2026, local, not yet deployed)
@@ -234,10 +234,10 @@ The new Playwright tests have not been run locally (no Playwright or Docker on t
 
 ## Production check, UI polish release (21 Nov 2026, 10:49Z, heshawa 12454fb)
 - Smoke 11/11; public address 200; OCC and PCU get 403 on `/risk/model`, `/risk/model-docs`, `/risk/reward-model` and `/test-data`, the evaluator 200.
-- **Playwright on the server: 11/11 passed (1.7 min, finished 10:51:27Z)**, against the renamed headings ('Recovery options', 'Why?'), the launcher that folds its lists away after a flight is chosen, and the teammates' breadcrumb and Recent Searches navigation.
+- **Playwright on the server: 11/11 passed (1.7 min, finished 10:51:27Z)**, against the renamed headings ('Recovery options', 'Why?'), the launcher that folds its lists away after a flight is chosen, and breadcrumb and Recent Searches navigation.
   The evaluator test left no test data behind.
 - Frontend unit tests 40/40 before the deploy (Launcher fold, role views, Model Card sections, test data page). Backend unit tests were not run against Postgres here (no Docker).
-- The server had been redeployed by a teammate at 10:19Z (a63dc8d, crew duty check); it matched the repository exactly, so nothing was lost. Redeploys by several people keep landing on this one server: compare the server tree with the repository first (DEPLOYMENT_GUIDE).
+- The server had been redeployed at 10:19Z (a63dc8d, crew duty check); it matched the repository exactly, so nothing was lost. Several people deploy to this one server: compare the server tree with the repository first (DEPLOYMENT_GUIDE).
 
 ## Production check, live delay merge (21 Nov 2026, 14:35Z, heshawa 9e4d051)
 - The server had been redeployed at 11:32Z with live delay models that were not in git; the tree was saved, merged (3-way, CSS conflict only) and deployed.

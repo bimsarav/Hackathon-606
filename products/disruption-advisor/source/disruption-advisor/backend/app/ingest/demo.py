@@ -1,6 +1,6 @@
 """Optional, clearly labelled demo scenario (DEMO_SCENARIO=true), appended to the operating picture.
 
-Purpose (user request 2026-11-21): show the case "an inbound flight is delayed, its connecting passengers misconnect,
+Purpose: show the case "an inbound flight is delayed, its connecting passengers misconnect,
 and the next flight on their onward route is fully booked". The route SHJ-HBE has no real flights in the extracts,
 so seat availability is exactly as designed. All rows are synthetic: flights carry capacity_source
 'synthetic-demo', passenger names are invented, and nothing here comes from airline data.
@@ -83,7 +83,7 @@ def _fid(fn: str, std: datetime) -> str:
 
 
 def _append(path: Path, rows: list[dict[str, Any]]) -> int:
-    """Parquet files are immutable: rewrite the table with the demo rows appended (standards §9.25)."""
+    """Parquet files are immutable: rewrite the table with the demo rows appended."""
     existing = pq.read_table(path)
     # DuckDB marks columns without nulls as required; demo rows leave operational fields (e.g. actual times) empty.
     schema = pa.schema([field.with_nullable(True) for field in existing.schema])

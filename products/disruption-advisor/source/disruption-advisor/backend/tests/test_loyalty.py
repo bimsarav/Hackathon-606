@@ -1,4 +1,4 @@
-"""Loyalty per the airline's loyalty sample (user 2026-11-21): tier ladder and priority, family accounts."""
+"""Loyalty per the airline's loyalty sample: tier ladder and priority, family accounts."""
 
 from typing import Any
 

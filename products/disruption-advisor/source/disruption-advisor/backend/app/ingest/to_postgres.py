@@ -1,4 +1,4 @@
-"""Load the airline extracts into PostgreSQL (schema ``extracts``), user request 2026-11-21.
+"""Load the airline extracts into PostgreSQL (schema ``extracts``).
 
 The app keeps reading the typed Parquet (ADR 0005); this copy makes the same data queryable in PostgreSQL for
 analysts and reports. Source: the stage-1 output in ``DATA_DIR/raw`` (already typed, bookings without names).

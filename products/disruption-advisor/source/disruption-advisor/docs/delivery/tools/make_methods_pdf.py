@@ -185,11 +185,11 @@ story += [p("6. Recovery options and their cost", H1), p("6.1 Same-type aircraft
     "station at that time. Each feasible swap is propagated with the formulas of Section 5 for both aircraft.")]
 story += [p("6.2 Connection feasibility", H2), p(
     "A connection is the same passenger in the same booking arriving at a station and leaving it 15 minutes to 20 hours later "
-    "(user decision Q8). It is missed when the new connection time is below the Minimum Connecting Time: the hub table for that "
+    "(product-owner decision Q8). It is missed when the new connection time is below the Minimum Connecting Time: the hub table for that "
     "origin/hub/destination (50-55 min at SHJ) or a 50-minute default [STD, R8]. Assessing impact per passenger journey matters "
     "because about half of passenger delay minutes come from cancellations and missed connections [ACADEMIC, R9].")]
 story += [p("6.3 Cost model and ranking", H2), p(
-    "Each option is costed with assumed, configurable rates (user decision Q15) and, under the default strategy, the cheapest is "
+    "Each option is costed with assumed, configurable rates (product-owner decision Q15) and, under the default strategy, the cheapest is "
     "recommended; ties are broken by fewer missed connections (other strategies: Section 10.2). Delay minutes, passengers affected and missed connections are shown beside the cost so the trade-off "
     "stays visible (contrastive comparison).")]
 story += [p("cost = 400 AED x delay minutes<br/>"
@@ -389,7 +389,7 @@ story += bullets([
     "<b>Grounded generation:</b> the model (claude-opus-5-5, low effort) gets a fixed system instruction ('use only the facts given') "
     "and a JSON of engine facts. It never chooses an option or a passenger.",
     "<b>Data minimisation:</b> no names, booking references or contact details are sent; only flight numbers, stations, times, counts "
-    "and reasons (GDPR principle; data treated as real per user decision Q3).",
+    "and reasons (GDPR principle; data treated as real per product-owner decision Q3).",
     "<b>Resilience:</b> server-side refusal fallback; on any API error, timeout or refusal a deterministic template is used, so the "
     "tool works without the AI.",
     "<b>Human in the loop:</b> operational control of flights is a legal responsibility of the captain and dispatcher or the "

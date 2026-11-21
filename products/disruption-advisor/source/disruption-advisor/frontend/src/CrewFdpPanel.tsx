@@ -6,7 +6,7 @@ const CREW_TYPE: Record<string, string> = {
   CP: "Captain", FO: "First officer", SO: "Second officer", CS: "Senior cabin crew", CC: "Cabin crew",
 };
 
-/** Crew FDP analysis from the roster (user 2026-11-21): headroom to the maximum FDP and the effect of extra delay. */
+/** Crew FDP analysis from the roster: headroom to the maximum FDP and the effect of extra delay. */
 export function CrewFdpPanel() {
   const [data, setData] = useState<CrewFdp | null>(null);
   const [missing, setMissing] = useState(false);

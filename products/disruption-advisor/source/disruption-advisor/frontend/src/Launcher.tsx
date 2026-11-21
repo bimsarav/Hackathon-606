@@ -34,7 +34,7 @@ interface Props {
   onOpenRecent?: (scenarioId: string) => void;
 }
 
-/** Advanced search (inbound / departure "known today") is hidden for now (user 2026-11-21); the code stays. */
+/** Advanced search (inbound / departure "known today") is hidden for now; the code stays. */
 const SHOW_ADVANCED = false;
 const RECENT_CHIPS = 6;
 const SUGGESTION_CHIPS = 8;

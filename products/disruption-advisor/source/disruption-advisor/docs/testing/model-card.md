@@ -38,7 +38,7 @@ Only information known 7 days ahead. No actual times of the day itself are used.
 | `station_rate`, `route_rate`, `network_rate` | Share of flights 15+ min late at the station, on the route and in the whole network, over days 35 to 7 before the flight |
 
 ## Training
-- LightGBM 4.7, binary objective, tuned settings (T-511: 120 rounds, 11 leaves, at least 60 rows per leaf, learning rate 0.039, L2 17, row sampling 0.86), fixed seed and deterministic mode, so the same data gives the same model. How they were chosen: [model-selection.md](model-selection.md).
+- LightGBM 4.7, binary objective, tuned settings (120 rounds, 11 leaves, at least 60 rows per leaf, learning rate 0.039, L2 17, row sampling 0.86), fixed seed and deterministic mode, so the same data gives the same model. How they were chosen: [model-selection.md](model-selection.md).
 - **Recency weights:** a flight's weight halves every 109 days of age. Delay levels change a lot by season (16% of flights 15+ min late in June, 45% in October), so recent months count more.
 - **Retraining:** every ingest run that rebuilds the operating picture (ingest stage 3). A new data drop retrains and rescores. There is no separate training service.
 
@@ -47,7 +47,7 @@ Only information known 7 days ahead. No actual times of the day itself are used.
 - **Production model:** the same recipe on all history. It scores the window.
 - **Baseline:** the historical rate of the same route at the same local departure hour, smoothed toward the overall rate.
 
-> The results below are from the production run before tuning (T-510). The tuned model's numbers are in [model-selection.md](model-selection.md) and replace these at the next redeploy.
+> The results below are from the production run before tuning. The tuned model's numbers are in [model-selection.md](model-selection.md) and replace these at the next redeploy.
 
 ## Results (production run on the server, verified 2026-11-21)
 Train 2026-01-01 .. 2026-10-21 (57,104 flights); test 2026-10-21 .. 2026-11-18 (5,956 flights).
@@ -57,7 +57,7 @@ Train 2026-01-01 .. 2026-10-21 (57,104 flights); test 2026-10-21 .. 2026-11-18 (
 | 15 min | **0.798** | 0.741 |
 | 60 min | **0.757** | 0.676 |
 
-AUC is the chance that a late flight is ranked above an on-time one (0.5 = coin toss, 1.0 = perfect). The model card also records the Brier score, a climatology Brier score and a reliability table for the 60-minute model, for every threshold. Evidence: `execution/logs/output/T-506-risk-api-prod.log` (project log, not part of this repository).
+AUC is the chance that a late flight is ranked above an on-time one (0.5 = coin toss, 1.0 = perfect). The model card also records the Brier score, a climatology Brier score and a reliability table for the 60-minute model, for every threshold. Evidence: docs/testing/test-report.md.
 
 At verification the watchlist held 1,491 flights in the next 7 days: 18 high and 140 medium risk.
 
@@ -110,7 +110,7 @@ LightGBM's own probabilities are used. An isotonic calibration step, fitted on a
 - **Slack** = connection time − MCT. The MCT comes from the hub table for the journey; where there is no rule, the default MCT (`DEFAULT_MCT_MINUTES`, 50) is used and flagged in the UI.
 - **Risk** = P(inbound arrival delay − onward departure delay > slack). It combines the inbound flight's arrival-delay curve and the onward flight's departure-delay curve, taken as independent. So a late onward flight can save a connection.
 - Per flight, **expected missed connections** = the sum of its passengers' risks.
-- **Backtest** (test weeks, flight pairs arriving at SHJ and leaving 15–240 min later, default MCT): in the "no slack" band the model predicted a 0.70 miss rate against 0.69 observed. Evidence: `execution/logs/execution.log`, T-502/503.
+- **Backtest** (test weeks, flight pairs arriving at SHJ and leaving 15–240 min later, default MCT): in the "no slack" band the model predicted a 0.70 miss rate against 0.69 observed. Evidence: docs/testing/test-report.md.
 
 ## Limitations and assumptions
 - **Seven-day view only.** Same-day information (actual inbound delay, weather, ATC slots) is not used, so on the day the delay-propagation engine of Scenario A is the better tool.
@@ -127,7 +127,7 @@ Written by ingest stage 3 into the ops data folder (Docker volume `ops-data`):
 - `connection_risk.parquet`: per connecting passenger, connection time, MCT, slack and misconnect risk.
 - `model_card.json`: data ranges, features, metrics by threshold, reliability, arrival-model metrics, connection backtest and assumptions.
 
-## Live departure and arrival models (T-621, ADR 0014)
+## Live departure and arrival models (ADR 0014)
 Same data (`Flight_Punctuality_Jan-Nov_2026_Combined.xlsx`), same last-28-day holdout (5,956 unseen G9 flights), scored once. The planning models above are unchanged; the live models add what is known on the day. Inputs: delay of the aircraft's previous leg (arrival and departure) and, for arrival, this flight's own departure delay.
 
 | Model | AUC 15+ | AUC 60+ | Brier skill 60+ | Mean abs. error of expected delay (min) |
@@ -138,4 +138,4 @@ Same data (`Flight_Punctuality_Jan-Nov_2026_Combined.xlsx`), same last-28-day ho
 | Arrival, inbound delay known | 0.840 | 0.887 | 0.294 | 16.4 |
 | Arrival, departure delay known | 0.930 | 0.974 | 0.601 | 10.0 |
 
-Planning features that did not help (tested on the same holdout): destination arrival-delay rate, scheduled block time (AUC change under 0.003). Expected delay is the mean of the curve with representative band values, so the minutes error is approximate. P(120+) and P(180+) stay rankings, not levels. Artifacts: `live_models/*.txt`, `live_model_card.json`, `window_features.parquet` in the ops folder; training log `execution/logs/output/T-621-train.log`.
+Planning features that did not help (tested on the same holdout): destination arrival-delay rate, scheduled block time (AUC change under 0.003). Expected delay is the mean of the curve with representative band values, so the minutes error is approximate. P(120+) and P(180+) stay rankings, not levels. Artifacts: `live_models/*.txt`, `live_model_card.json`, `window_features.parquet` in the ops folder; training results: docs/testing/test-report.md.

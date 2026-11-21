@@ -1,4 +1,4 @@
-"""Crew FDP check (user 2026-11-21): the roster is ingested without names, each flight gets its tightest crew
+"""Crew FDP check: the roster is ingested without names, each flight gets its tightest crew
 member's headroom (max FDP - planned FDP), and every recovery option is checked against it."""
 
 from datetime import datetime
@@ -56,7 +56,7 @@ def test_a_long_delay_is_alerted_as_an_fdp_breach(ctx: Context) -> None:
     assert (tight["flight_number"], tight["minutes_left"], tight["source"]) == ("G9003", 23, "estimated")
     over = next(f for f in crew["flights"] if f["status"] == "over")
     assert (over["origin"], over["destination"], over["new_std"]) == ("SHJ", "LHE", t(13, 21))
-    assert absorb["cost_breakdown"]["reserve_crew"] == 0  # alert only (user): a breach adds no cost by default
+    assert absorb["cost_breakdown"]["reserve_crew"] == 0  # alert only: a breach adds no cost by default
 
 
 def test_a_breach_can_be_costed_when_configured(ctx: Context) -> None:

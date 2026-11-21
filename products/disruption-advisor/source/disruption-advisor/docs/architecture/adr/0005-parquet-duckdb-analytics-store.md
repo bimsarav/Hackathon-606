@@ -1,7 +1,7 @@
 # ADR-0005: Parquet + DuckDB for the airline extracts; PostgreSQL only for user records
 
 - **Status:** Accepted (2026-11-20)
-- **Context:** The extracts are large: 27.9M booking rows in nested zips (Latin-1, some malformed lines) plus Excel and CSV files. They are read-mostly and analytical. engineering standards §9.25 (user rule) requires tabular data to be converted to Parquet first. The product owner said booking/inventory mismatches must not break the process.
+- **Context:** The extracts are large: 27.9M booking rows in nested zips (Latin-1, some malformed lines) plus Excel and CSV files. They are read-mostly and analytical. Tabular data is converted to Parquet first (column and filter pushdown, explicit types). The product owner said booking/inventory mismatches must not break the process.
 - **Decision:**
   - A one-shot `ingest` service converts every extract to typed Parquet (zstd; bookings partitioned by departure year, sorted by departure time), counts and skips malformed rows, and builds the operating window as Parquet (`app/ingest`).
   - The API loads the window tables into in-memory DuckDB and queries them with column selection and filter push-down.

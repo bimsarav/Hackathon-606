@@ -35,7 +35,7 @@ An OCC or PCU user asks the agent to look at one flight, optionally with a delay
   - flight G9519 with no delay given; the agent used the 56-minute planning delay;
   - 7 tool calls in 37 s; the prompt cache read 9.8k tokens;
   - it recommended `swap:A6-ANO` under "protect passengers", with grounded reasons and crew, aircraft and seat checks;
-  - log: `execution/logs/output/T-603-live-agent-probe.log`.
+  - evidence: docs/testing/test-report.md.
 
 ## Known limits
 - Output varies between runs (wording, sometimes the order of tool calls). The option list and its numbers do not.

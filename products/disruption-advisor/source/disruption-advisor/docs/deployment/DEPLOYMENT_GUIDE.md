@@ -17,14 +17,14 @@ This guide covers the target host, how the MVP and phase 2 (Predict) are deploye
 3. **Create `settings.env`** with `scripts/init-settings.sh` and fill it with new random values: database password, `TOKEN_SECRET`, `DEMO_USERS` passwords, `ANTHROPIC_API_KEY`. Set `WEB_PORT=8888` and `INPUT_DIR` to the input folder, (the script sets mode 600).
 4. **Build and start:** `docker compose build && docker compose up -d`. The first `ingest` takes about 4 minutes.
    - Ingest **stage 3** (phase 2) trains the delay-risk model and scores the window. It takes about 30 s on the server and writes `flight_risk.parquet`, `connection_risk.parquet` and `model_card.json` into the ops volume. It reruns whenever stage 2 reruns (new extracts, options or build code), so every data drop retrains the model. Without these files the risk endpoints answer 503 and the rest of the app works as before.
-5. **Verify** (engineering standards §13.9):
+5. **Verify**:
    - `scripts/smoke.sh http://<server>:8888`
    - `E2E_BASE_URL=http://<server>:8888 scripts/e2e.sh`, run from a workstation with Docker
    - `docker compose ps` shows `api` and `web` as healthy
    - `docker compose logs ingest` shows `stage 3 done`, and the "Delay watchlist (7 days)" tab lists flights
    - `docker compose logs api` shows no errors
 
-## Restart resilience (engineering standards §14)
+## Restart resilience
 - **Docker starts at boot:** `systemctl is-enabled docker` returns `enabled`.
 - **Services restart by themselves:** `db`, `api` and `web` use `restart: unless-stopped`. After a reboot the Docker daemon restarts only these three. The one-shot `migrate` and `ingest` jobs do not run again, and need not, because their results persist in the `db-data` and `ops-data` volumes. They run on every `docker compose up`, and `ingest` skips the work when the inputs are unchanged.
 - **Startup order is based on readiness, not container start:** the database must be healthy, `migrate` and `ingest` must complete, and `api` must be healthy (database plus operating data loaded) before `web` starts. Compose enforces this order on `docker compose up`. After a reboot the daemon starts the containers without that ordering, which is safe because the API connects to PostgreSQL lazily (pool pre-ping) and `/health/ready` reports DOWN until the database answers.

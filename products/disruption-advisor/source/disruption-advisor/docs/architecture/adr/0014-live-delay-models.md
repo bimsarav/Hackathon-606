@@ -1,4 +1,4 @@
-# ADR 0014: Live departure and arrival delay models (T-621)
+# ADR 0014: Live departure and arrival delay models
 
 Status: accepted (2026-11-21) · Builds on ADR 0008 (delay-risk model)
 

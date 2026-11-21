@@ -1,6 +1,6 @@
 # ADR 0013: Test data upload for evaluators
 
-Status: accepted (21 Nov 2026), user request. Not yet deployed.
+Status: accepted (21 Nov 2026). Not yet deployed.
 
 ## Context
 Evaluators will bring one or two flights of their own and want to search them and see the disruption details. The

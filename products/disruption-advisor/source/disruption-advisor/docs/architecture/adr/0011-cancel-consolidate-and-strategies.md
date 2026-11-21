@@ -1,6 +1,6 @@
 # ADR-0011: Cancel and consolidate as delay-recovery options; strategies as orderings over one option list
 
-- **Status:** Accepted (2026-11-21, phase 3 approved by the user)
+- **Status:** Accepted (2026-11-21, phase 3 approved; phase approvals: docs/delivery/MVP_AND_INCREMENTAL_PLAN.md)
 - **Context:**
   - Phases 1–2 offer two levers for a delay (absorb, swap) and rank them by cost only.
   - Phase 3 asks for cancel or consolidate with passenger protection, and for a side-by-side comparison of strategies (protect passengers, lowest cost, least delay).

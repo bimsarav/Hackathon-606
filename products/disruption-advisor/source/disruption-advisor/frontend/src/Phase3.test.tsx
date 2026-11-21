@@ -343,7 +343,7 @@ describe("predict departure and arrival from the watchlist", () => {
 });
 
 describe("advanced search predicts every listed flight as the sliders move", () => {
-  // Advanced search is hidden for now (user 2026-11-21, SHOW_ADVANCED in Launcher.tsx); re-enable with it.
+  // Advanced search is hidden for now (SHOW_ADVANCED in Launcher.tsx); re-enable with it.
   it.skip("re-predicts automatically and disables the delay slider", async () => {
     const curve = (m: number) => ({ mode: "live", p: { "5": 1, "15": 1, "30": 1, "60": 0.5, "120": 0.1, "180": 0 },
       expected_minutes: m, planning_delay_minutes: 60, risk_band: "high" as const });

@@ -312,7 +312,7 @@ def history() -> list[dict[str, Any]]:
     return rows
 
 
-# Crew FDP (user 2026-11-21), written only by the crew tests so the other tests keep their costs. G9002 has a roster
+# Crew FDP, written only by the crew tests so the other tests keep their costs. G9002 has a roster
 # with 100 minutes of headroom (captain tightest), G9003 none but an estimate from its history (170 minutes, so a
 # 150-minute delay leaves 20: tight); the other flights have no crew data.
 def write_crew(ops: Path) -> None:

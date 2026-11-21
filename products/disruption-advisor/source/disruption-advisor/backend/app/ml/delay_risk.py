@@ -40,7 +40,7 @@ log = logging.getLogger("ingest.delay_risk")
 THRESHOLDS = (5, 15, 30, 60, 120, 180)
 REASON_THRESHOLD = 60  # reasons explain the risk of a delay of an hour or more
 TEST_DAYS = 28
-HALF_LIFE_DAYS = 109  # tuned (T-511, docs/testing/model-selection.md)
+HALF_LIFE_DAYS = 109  # tuned (docs/testing/model-selection.md)
 LAST_WEEK_DAYS = 7
 LAG_FROM, LAG_TO = 35, 7  # recent delay rates: days [flight - 35, flight - 7], so they are known 7 days ahead
 MIN_CONNECTION, MAX_CONNECTION = 15, 20 * 60  # minutes (decision Q8)
@@ -48,7 +48,7 @@ HUB_OFFSET_HOURS = 4  # the aircraft day is counted in hub time (SHJ, UTC+4)
 BANDS = ((0.30, "high"), (0.15, "medium"))  # on P(delay >= 60 min); base rate about 10%
 PARAMS: dict[
     str, Any
-] = {  # tuned with Optuna on time-ordered validation blocks (T-511, docs/testing/model-selection.md)
+] = {  # tuned with Optuna on time-ordered validation blocks (tuning record: docs/testing/model-selection.md)
     "objective": "binary",
     "learning_rate": 0.0391,
     "num_leaves": 11,
@@ -76,7 +76,7 @@ NUMERIC = (
     "station_rate",
     "route_rate",
     "network_rate",
-    # Added T-511: month captures seasonal drift; route_freq captures route busyness.
+    # month captures seasonal drift; route_freq captures route busyness.
     "month",
     "route_freq",
 )

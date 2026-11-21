@@ -151,7 +151,7 @@ function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
   }
 
   const [reveal, setReveal] = useState(false);
-  // Login look (user 2026-11-21: compare four styles): ?login=ops | board | photo | minimal; default = split.
+  // Login look (four styles to compare): ?login=ops | board | photo | minimal; default = split.
   const variant = new URLSearchParams(window.location.search).get("login") ?? LOGIN_VARIANT;
   const form = (
     <form onSubmit={onSubmit} aria-describedby={error ? "login-error" : undefined}>

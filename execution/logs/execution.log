@@ -206,3 +206,4 @@
 2026-11-21T15:25Z | T-628 | DONE | search redesign + option name once deployed (7c990a9); smoke 11/11, Playwright 11/11; one failed build (b677204, type check) fixed | output/T-627..628-*.log
 2026-11-21T15:30Z | T-629 | DONE | cancellation page compact layout deployed (cda0fd7); smoke 11/11, Playwright 11/11 | output/T-629-*.log
 2026-11-21T15:50Z | T-630 | DONE | chips only + crew after Flight Board deployed (7addde6); smoke 11/11, Playwright 11/11 | output/T-630-*.log
+2026-11-21T16:02Z | T-633 | DONE | trace cleanup reapplied on branch v1.0.0 (f30210d; earlier commit 2196d33 had been reset away): doc diff of 2196d33 applied (26 .md in source/disruption-advisor + PRODUCT_RULES §7), README ADR links now also show their in-source path; 0 code files changed vs HEAD; gate PASS output/T-633-check.log; NOT committed | output/T-633-check.log

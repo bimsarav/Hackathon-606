@@ -66,3 +66,16 @@ Content that can be pasted straight into a Confluence page (the Markdown paste o
 - **No Mermaid or HTML.** Diagrams as plain-text (ASCII) diagrams inside code blocks.
 - Use plain text labels (Done, Partial, Not done) instead of emoji status symbols.
 - Suggested sections: Overview · Business problem and goals · Scope and features · Architecture (services, Kafka topics, data stores) · Technology stack · Environments and deployment · How to build, run and test · API summary · Security · Test results · Known limitations and open decisions · Roadmap · Contacts/ownership (placeholders).
+
+## 7. No build-process traces in client deliverables (user instruction 2026-11-21)
+The product solution and its Confluence pages are shared with the client. They must never mention how the product was built with the AI assistant: no "approved by the user", "(user 2026-11-21)", "user decision / request / instruction"; no task or decision IDs (T-511, D-028); no `execution/` paths or log files; no MASTER_PROMPT or engineering-standards section numbers; no stack-profile, toolkit or technology-selection-checkpoint notes; no "teammate" or session remarks. Provenance stays in `execution/` only.
+
+**Do not write traces in the first place.** New docs, ADRs, code comments, tests and commit-ready files state neutral facts ("Accepted (2026-11-21)", "Scope: G9 only", "skipped by decision", "product-owner decision Q8").
+
+**Cleaning existing traces:**
+1. Change only files inside `products/<product-name>/source/<product-name>/`; nothing outside that path.
+2. Change documentation only (`README.md`, `docs/**/*.md`). Never change system code while cleaning: no edits under `backend/`, `frontend/`, `e2e/`, `scripts/`, `compose.yml` or other code and config files, comments included. Docs that must stay identical to a file under the code tree (e.g. `docs/testing/*-selection.md` and `backend/app/data/model_docs/`) stay unchanged; list them as remaining.
+3. Where a removed text pointed somewhere (a log, an approval, an evidence file), say where the reader finds it inside the source instead (e.g. `docs/testing/test-report.md`, `docs/delivery/MVP_AND_INCREMENTAL_PLAN.md`).
+   References to design records (ADRs, cards, reports) show their path inside the source in visible text, not only as a link target, e.g. "[ADR 0011](docs/architecture/adr/0011-….md) (`docs/architecture/adr/0011-….md`)".
+4. Prove functionality is unchanged: `git diff --name-only` shows only `.md` files, and `scripts/check.sh` passes. Save its output under `execution/logs/output/`.
+5. Report every trace left in code or locked docs, and ask before touching them.

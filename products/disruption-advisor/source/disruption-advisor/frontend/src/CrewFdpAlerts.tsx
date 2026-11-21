@@ -5,7 +5,7 @@ const CREW_TYPE: Record<string, string> = {
   CP: "Captain", FO: "First officer", SO: "Second officer", CS: "Senior cabin crew", CC: "Cabin crew",
 };
 
-/** Crew FDPs (user 2026-11-21): an alert, shown only when a recovery option would take a crew past its maximum
+/** Crew FDPs: an alert, shown only when a recovery option would take a crew past its maximum
  *  flight duty period. Alert only at this stage: no crew recovery is planned. */
 export function CrewFdpAlerts({ options, selectedKey }: { options: RecoveryOption[]; selectedKey: string }) {
   const breaching = options.filter((o) => o.crew?.status === "over");

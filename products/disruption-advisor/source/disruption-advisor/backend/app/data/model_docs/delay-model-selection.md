@@ -1,6 +1,6 @@
-# Model Selection and Hyperparameter Tuning (T-511)
+# Model Selection and Hyperparameter Tuning
 
-Tool: `backend/tools/model_selection.py` (offline; needs lightgbm, xgboost, catboost, scikit-learn, pandas, optuna). Raw results: `execution/logs/output/T-511/model_selection.json` (project log, not part of this repository). Rule followed: MASTER_PROMPT §9.23.7 (baseline first, compare candidates, controlled tuning, decide on validation results).
+Tool: `backend/tools/model_selection.py` (offline; needs lightgbm, xgboost, catboost, scikit-learn, pandas, optuna). Re-running the tool reproduces the raw results. Method: baseline first, compare candidates, controlled tuning, decide on validation results.
 
 ## Protocol (time-ordered, no leakage)
 - **Final test:** the last 28 days of history (2026-10-21 onward, 5956 flights). Scored once, after every choice was made.
@@ -36,10 +36,10 @@ Tool: `backend/tools/model_selection.py` (offline; needs lightgbm, xgboost, catb
 - **Caveat, stated plainly:** on the July to September validation blocks the simple route × hour baseline and logistic regression have a slightly better mean score than the tuned boosted models; delay levels shift a lot from block to block there. On the final test period the boosted model ranks clearly better (AUC 60: 0.761 against 0.715 for logistic regression and 0.677 for the baseline). The route × hour baseline and logistic regression stay as the documented references.
 - **Class weights** were tried and rejected: they distort the probabilities (score -0.47). Cut-offs are chosen on the unweighted probabilities instead (cut-off sweep in the model card).
 - The earlier figures (AUC 60 = 0.757) were measured on a period that had also been used to pick the half-life; the table above is the honest comparison.
-- Not yet redeployed: the production server still runs the old settings until the user approves the redeploy.
+- Not yet redeployed: the production server still runs the old settings until the redeploy is approved.
 
 ## Merged feature check: `month` and `route_freq` (local, 2026-11-21)
-A teammate's change added two features to the delay model, `month` and `route_freq` (route flights per day). After the merge the model uses the tuned settings above with these two extra features, a combination nobody had validated. It was checked on the same time-ordered protocol (three validation blocks, then the final 28 days):
+A later change added two features to the delay model, `month` and `route_freq` (route flights per day). After the merge the model uses the tuned settings above with these two extra features, a combination nobody had validated. It was checked on the same time-ordered protocol (three validation blocks, then the final 28 days):
 
 | Features | Validation score | Final AUC 15 | Final AUC 60 | Final Brier 15 | Final Brier 60 |
 |---|---|---|---|---|---|
