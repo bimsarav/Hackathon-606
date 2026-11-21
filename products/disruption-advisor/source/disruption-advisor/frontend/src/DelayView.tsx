@@ -94,8 +94,8 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
       {/* The decision comes first: approve or reject the option on screen (recorded with who and when). */}
       <section className="decision-top" aria-label="Decision">
         <p className="small decision-top-label">
-          <strong>{override ? "Selected (override):" : "Recommended:"}</strong> {shown.label}
-          <span className="muted"> · change it in Recovery options below</span>
+          <strong>{override ? "Decision on your selected option (override)" : "Decision on the recommended option"}</strong>
+          <span className="muted"> · change the option in Recovery options below</span>
         </p>
         {override && (
           <p className="note">
@@ -196,21 +196,21 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
 
       <CrewFdpAlerts options={result.options} selectedKey={shown.key} />
 
-      <Fold id="crew" title={`Crew duty (FDP): ${shown.label}`}
-        summary={`${crewLabel(shown)} · ${crewSub(shown)}${shown.crew?.worst ? ` · tightest ${num(shown.crew.worst.minutes_left)} min left` : ""}`}
+      <Fold id="crew" title="Crew duty (FDP)"
+        summary={`selected option · ${crewLabel(shown)} · ${crewSub(shown)}${shown.crew?.worst ? ` · tightest ${num(shown.crew.worst.minutes_left)} min left` : ""}`}
         open={openSecs.has("crew")} onToggle={() => toggle("crew")}>
         <CrewSection option={shown} />
       </Fold>
 
-      <Fold id="board" title={`Flight Board: ${shown.label}`} summary={`${num(shown.legs.length)} flights of the affected aircraft`}
+      <Fold id="board" title="Flight Board" summary={`selected option · ${num(shown.legs.length)} flights of the affected aircraft`}
         open={openSecs.has("board")} onToggle={() => toggle("board")}>
         <RotationBoard option={shown} disruptedId={result.flight.flight_id} meta={meta} />
       </Fold>
 
-      <Fold id="legs" title={`Flights affected: ${shown.label}`} summary={`${num(shown.legs_delayed)} delayed of ${num(shown.legs.length)}`}
+      <Fold id="legs" title="Flights affected" summary={`selected option · ${num(shown.legs_delayed)} delayed of ${num(shown.legs.length)}`}
         open={openSecs.has("legs")} onToggle={() => toggle("legs")}>
       <section aria-labelledby="legs-title">
-        <h2 id="legs-title">Flights affected: {shown.label}</h2>
+        <h2 id="legs-title">Flights affected</h2>
         <p className="small muted">Every flight this option touches over the next {meta.horizon_days} days, new times in UTC.</p>
         <div className="table-wrap">
           <table>
@@ -555,7 +555,7 @@ function CrewSection({ option }: { option: RecoveryOption }) {
   const crew = option.crew;
   return (
     <section aria-labelledby="crew-title">
-      <h2 id="crew-title">Crew duty (FDP): {option.label}</h2>
+      <h2 id="crew-title">Crew duty (FDP)</h2>
       {!crew || crew.flights.length === 0 ? (
         <p className="muted">
           No crew data for the flights of this option (no rostered crew and no duty estimate, for example a synthetic demo

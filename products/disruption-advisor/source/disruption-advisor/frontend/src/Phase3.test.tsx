@@ -134,7 +134,7 @@ describe("strategy comparison", () => {
     await userEvent.click(screen.getAllByRole("button", { name: "▴ Collapse" })[0] as HTMLElement);
     expect(screen.queryByText(/Click a card to apply that strategy/)).not.toBeInTheDocument();
     await userEvent.click(within(glance).getByRole("button", { name: /^Crew duty/ }));
-    expect(screen.getByRole("heading", { name: /^Crew duty \(FDP\): / })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /^Crew duty \(FDP\)/ })).toBeInTheDocument();
     expect(screen.getByText(/No crew data for the flights of this option/)).toBeInTheDocument();
     expect(within(glance).getByRole("button", { name: /^Crew duty/ })).toHaveTextContent("no crew data for this flight");
   });
@@ -150,7 +150,7 @@ describe("strategy comparison", () => {
     const res = base.result as DelayResult;
     const scenario = delayScenario({ options: res.options.map((o) => (o.key === res.recommended_key ? { ...o, crew } : o)) });
     render(<DelayView scenario={scenario} result={scenario.result as DelayResult} meta={meta} onUpdate={() => {}} />);
-    await userEvent.click(screen.getByRole("button", { name: /^Crew duty \(FDP\): / }));
+    await userEvent.click(screen.getByRole("button", { name: "Crew duty (FDP)", exact: true }));
     const table = screen.getByRole("table", { name: "Crew duty by flight" });
     expect(within(table).getByText("G9520")).toBeInTheDocument();
     expect(within(table).getByText("20 min")).toBeInTheDocument();
