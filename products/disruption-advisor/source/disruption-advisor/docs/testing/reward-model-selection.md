@@ -41,3 +41,15 @@ Tool: `backend/tools/reward_model_selection.py`. Raw results: `execution/logs/ou
 - **Distance to the limit:** against the type-average baseline (0.6552) and the oracle (0.5890), the tuned model closes 61% of the possible log-loss gap, logistic regression 25%. The rest is each passenger's personal taste in the simulator (random noise no feature can explain). On real data the ceiling is unknown.
 - Class weights were not tried: the plan needs calibrated probabilities, and balancing the classes would distort them (as in the delay model, T-511).
 - The proxy rules of the first version score AUC 0.6666 on the same test.
+
+## Re-check after the upcoming-flight features and the family-lifted tier (local, 2026-11-21)
+The model gained four inputs after this tuning: the number of later flights, a connection, a return, and the family-lifted loyalty tier. The same grouped folds and final test were run again with the tuned and the previous settings:
+
+| Settings | Validation log-loss | Validation AUC | Final log-loss | Final AUC | Final Brier |
+|---|---|---|---|---|---|
+| Previous default (250 rounds) | 0.6097 | 0.7026 | 0.6081 | 0.7047 | 0.2103 |
+| Tuned (200 rounds), kept | 0.6095 | 0.7028 | 0.6081 | 0.7050 | 0.2102 |
+| Type-average baseline | n/a | n/a | 0.6494 | 0.6164 | n/a |
+| Oracle (best possible) | n/a | n/a | 0.5825 | 0.7403 | n/a |
+
+The settings still tie with the default, so no new search was needed. The model closes about 62% of the log-loss gap between the baseline and the oracle (it was 61% before the new inputs); the new signals therefore add a little, and the simulated personal taste remains the limit.
