@@ -73,6 +73,8 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
   const [presetPageSize, setPresetPageSize] = useState<number>(5);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  // Once a flight is chosen (or one is already on screen) the lists fold away to save space; one click brings them back.
+  const [listHidden, setListHidden] = useState(Boolean(active));
 
   function inRange(std: string, origin?: string, destination?: string): boolean {
     const day = std.slice(0, 10);
@@ -90,7 +92,7 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
     setQuery(""); setOriginFilter(""); setDestFilter("");
     setFromDate(""); setToDate("");
     setSearchPage(0); setPresetPage(0);
-    setResults(null); setSearchError(null);
+    setResults(null); setSearchError(null); setListHidden(false);
   }
 
   // Keep the slider in step with the scenario on screen (e.g. one reopened from history).
@@ -114,6 +116,7 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
     event.preventDefault();
     setSearchError(null);
     setSearchPage(0);
+    setListHidden(false);
     try {
       setResults(await api.flights(query.trim()));
     } catch (e: unknown) {
@@ -122,6 +125,7 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
   }
 
   function start(flightId: string) {
+    setListHidden(true);
     if (tab === "DELAY") onDelay(flightId, delay);
     else if (tab === "CANCEL") onCancel(flightId);
     else onAgent?.({ flight_id: flightId, delay_minutes: agentDelay, strategy: agentStrategy, note: agentNote.trim() });
@@ -236,90 +240,100 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
         </div>
       )}
 
-      {searchError && <p className="error">{searchError}</p>}
-      {results && results.length === 0 && <p className="muted small">No flights match.</p>}
-      {results && results.length > 0 && (() => {
-        const filtered = results.filter((f) => inRange(f.std, f.origin, f.destination));
-        return (
-          <>
-            <ul className="preset-list">
-              {filtered.slice(searchPage * searchPageSize, (searchPage + 1) * searchPageSize).map((f) => (
-                <li key={f.flight_id}>
-                  <button type="button" className="preset" disabled={busy} onClick={() => start(f.flight_id)}>
-                    <span className="preset-title">
-                      <CarrierTail flightNumber={f.flight_number} />
-                      {f.flight_number} {f.origin}→{f.destination}
-                    </span>
-                    <span className="small muted">
-                      {utc(f.std)} · {f.tail} · {f.booked_seats}/{f.capacity} booked
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <Paginator total={filtered.length} page={searchPage} pageSize={searchPageSize}
-              onPage={setSearchPage} onPageSize={setSearchPageSize} />
-            {filtered.length === 0 && <p className="muted small">No flights in that date range.</p>}
-          </>
-        );
-      })()}
+      {listHidden ? (
+        <p className="small">
+          <button type="button" className="link" onClick={() => setListHidden(false)}>
+            Show suggested flights
+          </button>
+        </p>
+      ) : (
+        <>
+        {searchError && <p className="error">{searchError}</p>}
+        {results && results.length === 0 && <p className="muted small">No flights match.</p>}
+        {results && results.length > 0 && (() => {
+          const filtered = results.filter((f) => inRange(f.std, f.origin, f.destination));
+          return (
+            <>
+              <ul className="preset-list">
+                {filtered.slice(searchPage * searchPageSize, (searchPage + 1) * searchPageSize).map((f) => (
+                  <li key={f.flight_id}>
+                    <button type="button" className="preset" disabled={busy} onClick={() => start(f.flight_id)}>
+                      <span className="preset-title">
+                        <CarrierTail flightNumber={f.flight_number} />
+                        {f.flight_number} {f.origin}→{f.destination}
+                      </span>
+                      <span className="small muted">
+                        {utc(f.std)} · {f.tail} · {f.booked_seats}/{f.capacity} booked
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <Paginator total={filtered.length} page={searchPage} pageSize={searchPageSize}
+                onPage={setSearchPage} onPageSize={setSearchPageSize} />
+              {filtered.length === 0 && <p className="muted small">No flights in that date range.</p>}
+            </>
+          );
+        })()}
 
-      <h3>Suggested flights</h3>
-      {presetError && <p className="error">{presetError}</p>}
-      {!presets && !presetError && <p className="muted small">Finding suitable flights…</p>}
-      {presets && tab !== "CANCEL" && (() => {
-        const items = presets.delay.filter((p) => inRange(p.std, p.origin, p.destination));
-        const page = presetPage;
-        const ps = presetPageSize;
-        return (
-          <>
-            <ul className="preset-list">
-              {items.slice(page * ps, (page + 1) * ps).map((p) => (
-                <li key={p.flight_id}>
-                  <button type="button" className="preset" disabled={busy} onClick={() => start(p.flight_id)}>
-                    <span className="preset-title">
-                      <CarrierTail flightNumber={p.flight_number} />
-                      {p.flight_number} {p.origin}→{p.destination}
-                      {p.is_demo && <span className="chip chip-synthetic">Demo (synthetic)</span>}
-                    </span>
-                    <span className="small muted">
-                      {utc(p.std)} · {p.tail} · turn {p.turn_minutes} min · {p.connecting_pax} connecting
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <Paginator total={items.length} page={page} pageSize={ps}
-              onPage={setPresetPage} onPageSize={setPresetPageSize} />
-          </>
-        );
-      })()}
-      {presets && tab === "CANCEL" && (() => {
-        const items = presets.cancel.filter((p) => inRange(p.std, p.origin, p.destination));
-        const page = presetPage;
-        const ps = presetPageSize;
-        return (
-          <>
-            <ul className="preset-list">
-              {items.slice(page * ps, (page + 1) * ps).map((p) => (
-                <li key={p.flight_id}>
-                  <button type="button" className="preset" disabled={busy} onClick={() => start(p.flight_id)}>
-                    <span className="preset-title">
-                      <CarrierTail flightNumber={p.flight_number} />
-                      {p.flight_number} {p.origin}→{p.destination}
-                    </span>
-                    <span className="small muted">
-                      {utc(p.std)} · {p.tail} · {p.booked_seats} booked · {p.free_seats} free seats on alternatives
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <Paginator total={items.length} page={page} pageSize={ps}
-              onPage={setPresetPage} onPageSize={setPresetPageSize} />
-          </>
-        );
-      })()}
+        <h3>Suggested flights</h3>
+        {presetError && <p className="error">{presetError}</p>}
+        {!presets && !presetError && <p className="muted small">Finding suitable flights…</p>}
+        {presets && tab !== "CANCEL" && (() => {
+          const items = presets.delay.filter((p) => inRange(p.std, p.origin, p.destination));
+          const page = presetPage;
+          const ps = presetPageSize;
+          return (
+            <>
+              <ul className="preset-list">
+                {items.slice(page * ps, (page + 1) * ps).map((p) => (
+                  <li key={p.flight_id}>
+                    <button type="button" className="preset" disabled={busy} onClick={() => start(p.flight_id)}>
+                      <span className="preset-title">
+                        <CarrierTail flightNumber={p.flight_number} />
+                        {p.flight_number} {p.origin}→{p.destination}
+                        {p.is_demo && <span className="chip chip-synthetic">Demo (synthetic)</span>}
+                      </span>
+                      <span className="small muted">
+                        {utc(p.std)} · {p.tail} · turn {p.turn_minutes} min · {p.connecting_pax} connecting
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <Paginator total={items.length} page={page} pageSize={ps}
+                onPage={setPresetPage} onPageSize={setPresetPageSize} />
+            </>
+          );
+        })()}
+        {presets && tab === "CANCEL" && (() => {
+          const items = presets.cancel.filter((p) => inRange(p.std, p.origin, p.destination));
+          const page = presetPage;
+          const ps = presetPageSize;
+          return (
+            <>
+              <ul className="preset-list">
+                {items.slice(page * ps, (page + 1) * ps).map((p) => (
+                  <li key={p.flight_id}>
+                    <button type="button" className="preset" disabled={busy} onClick={() => start(p.flight_id)}>
+                      <span className="preset-title">
+                        <CarrierTail flightNumber={p.flight_number} />
+                        {p.flight_number} {p.origin}→{p.destination}
+                      </span>
+                      <span className="small muted">
+                        {utc(p.std)} · {p.tail} · {p.booked_seats} booked · {p.free_seats} free seats on alternatives
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <Paginator total={items.length} page={page} pageSize={ps}
+                onPage={setPresetPage} onPageSize={setPresetPageSize} />
+            </>
+          );
+        })()}
+        </>
+      )}
     </section>
   );
 }
