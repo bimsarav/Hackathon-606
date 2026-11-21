@@ -1,0 +1,34 @@
+synced
+alembic before: 0002  agent_runs: 1
+extracts-db Up 11 minutes
+rollback tag: pre-202611210257
+-rw-r--r--. 1 opc opc 1136436 Nov 21 02:57 /home/opc/backups/disruption-advisor/pre-202611210257.dump
+#18 DONE 0.0s
+ Image disruption-advisor-web:latest Built 
+ Container disruption-advisor-db-1 Healthy 
+ Container disruption-advisor-migrate-run-20128920965e Creating 
+ Container disruption-advisor-migrate-run-20128920965e Created 
+ Container disruption-advisor-api-1 Starting 
+ Container disruption-advisor-api-1 Started 
+ Container disruption-advisor-api-1 Waiting 
+ Container disruption-advisor-api-1 Healthy 
+api Up 30 seconds (healthy)
+db Up 7 hours (healthy)
+extracts-db Up 11 minutes
+web Up 25 minutes (healthy)
+alembic after: 0002
+exit=0
+== build migrate (api image) 02:58:33
+#21 DONE 0.0s
+ Image disruption-advisor-api:latest Built 
+ Container disruption-advisor-migrate-run-e7c48dd63ae0 Creating 
+ Container disruption-advisor-migrate-run-e7c48dd63ae0 Created 
+ Container disruption-advisor-api-1 Recreated 
+ Container disruption-advisor-api-1 Starting 
+ Container disruption-advisor-api-1 Started 
+api Up 30 seconds (healthy)
+db Up 7 hours (healthy)
+extracts-db Up 20 minutes
+web Up 34 minutes (healthy)
+2
+exit=0
