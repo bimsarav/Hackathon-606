@@ -92,16 +92,33 @@ export function TestDataPanel() {
   };
 
   const ready = Boolean(files.flights && files.passengers);
+  const [mode, setMode] = useState<"add" | "edit">("add");
 
   return (
     <section className="testdata" aria-label="Test data">
       <h2>Test data</h2>
       <p className="muted small">
-        Add a few flights and their passengers to try the advisor on your own cases. They are added to the live
-        data and labelled <strong>judge test data</strong>; the real data and the trained models stay unchanged.
-        After adding, search the flight in the <strong>Scenario</strong> tab, set a delay or a cancellation and
-        review the disruption, rebooking and rewards.
+        Try the advisor on your own cases. The real data and the trained models stay unchanged; everything here can be
+        removed or reset. Afterwards, analyse the flight in <strong>Flight Delay</strong> or <strong>Cancellation</strong>.
       </p>
+      <div className="model-grid testdata-modes" role="group" aria-label="Test data options">
+        <button type="button" className={`model-box${mode === "add" ? " active" : ""}`} aria-pressed={mode === "add"} onClick={() => setMode("add")}>
+          <span className="eyebrow">Option 1</span>
+          <span className="model-box-title">Add new flights</span>
+          <span className="model-box-note small muted">Upload two CSV sheets (flights, passengers) from the templates; the flights are added next to the real ones.</span>
+          <span className="model-box-open small">{status?.loaded ? `${status.counts?.flights ?? 0} test flights loaded` : "Open →"}</span>
+        </button>
+        <button type="button" className={`model-box${mode === "edit" ? " active" : ""}`} aria-pressed={mode === "edit"} onClick={() => setMode("edit")}>
+          <span className="eyebrow">Option 2</span>
+          <span className="model-box-title">Edit an existing flight</span>
+          <span className="model-box-note small muted">Change a real flight and its passengers in a table, save, and see the results change; reset restores it.</span>
+          <span className="model-box-open small">Open →</span>
+        </button>
+      </div>
+
+      {mode === "edit" && <FlightEditor />}
+      {mode === "add" && (
+      <>
       {error && <p className="error" role="alert">{error}</p>}
 
       {status?.loaded && (
@@ -234,7 +251,8 @@ export function TestDataPanel() {
         </ul>
       )}
 
-      <FlightEditor />
+      </>
+      )}
     </section>
   );
 }

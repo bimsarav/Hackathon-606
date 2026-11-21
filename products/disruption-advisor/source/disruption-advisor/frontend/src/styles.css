@@ -1805,3 +1805,5 @@ tr.clickable.selected {
 .flight-editor-table td.num input { width: 6rem; text-align: right; }
 .flight-editor-table tr.removed td { opacity: 0.45; text-decoration: line-through; }
 .edited-chip { display: inline-flex; gap: 0.35rem; align-items: center; margin-right: 0.75rem; }
+.testdata-modes { margin: 0.75rem 0 1.25rem; }
+.testdata .flight-editor { margin-top: 0; padding-top: 0; border-top: 0; }
