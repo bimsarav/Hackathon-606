@@ -16,7 +16,6 @@ import { Launcher } from "./Launcher";
 import { CascadePanel } from "./CascadePanel";
 import { ModelCardView } from "./ModelCardView";
 import { WatchlistView } from "./WatchlistView";
-import { utc } from "./format";
 
 const STORAGE_KEY = "disruption-advisor-session";
 const OPEN_KEY = "disruption-advisor-open-scenario";
@@ -112,12 +111,14 @@ function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
   return (
     <main id="main" className="login">
       <div className="login-card">
-        <div className="login-brand">
-          <img className="brand-tail" src="/brand/air-arabia-tail.svg" alt="" />
-          <img className="brand-logo" src="/brand/air-arabia-logo.svg" alt="Air Arabia" />
+        <div className="login-brand brand">
+          <span className="brand-icon-wrap">
+            <img src="/brand/air-arabia-tail.svg" alt="Air Arabia" />
+          </span>
+          <span className="brand-name">aeroRecovery</span>
         </div>
         <p className="eyebrow">Operations Control · Passenger Control Unit</p>
-        <h1>Disruption Advisor</h1>
+        <h1>aeroRecovery</h1>
         <p className="muted">Assess a disruption, compare recovery options and protect passengers before the impact spreads.</p>
         <form onSubmit={onSubmit} aria-describedby={error ? "login-error" : undefined}>
           <label htmlFor="username">User name</label>
@@ -230,22 +231,20 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
     <>
       <header className="site-header">
         <span className="brand">
-          <img className="brand-tail" src="/brand/air-arabia-tail.svg" alt="" />
-          <img className="brand-logo" src="/brand/air-arabia-logo.svg" alt="Air Arabia" />
-          <span className="brand-divider" aria-hidden="true" />
-          <span className="brand-name">Disruption Advisor</span>
-        </span>
-        {meta && (
-          <span className="header-meta">
-            <span className="chip">Ops clock {utc(meta.now_utc)}</span>
-            <span className={`chip ${meta.ai_enabled ? "chip-ok" : "chip-warn"}`}>
-              {meta.ai_enabled ? `AI: ${meta.ai_model}` : "AI off"}
-            </span>
+          <span className="brand-icon-wrap">
+            <img src="/brand/air-arabia-tail.svg" alt="Air Arabia" />
           </span>
-        )}
+          <span className="brand-name">aeroRecovery</span>
+        </span>
+        <span className="header-menu-btn">
+          <span aria-hidden="true">☰</span> Menu
+        </span>
         <span className="header-user">
-          {session.username} · <strong>{session.role}</strong>
-          <button type="button" className="link" onClick={onSignOut}>
+          <span className="user-avatar" aria-hidden="true">
+            {session.username.charAt(0).toUpperCase()}
+          </span>
+          <span className="user-name">{session.username}</span>
+          <button type="button" className="link sign-out-btn" onClick={onSignOut}>
             Sign out
           </button>
         </span>

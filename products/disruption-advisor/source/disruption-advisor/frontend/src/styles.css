@@ -10,8 +10,8 @@
   --dim: #9aa0a6;
   --line: #e0e2e5;
   --brand: #ff0141;
-  --accent: #c8002b;
-  --accent-hover: #a80024;
+  --accent: #1255b4;
+  --accent-hover: #0e43a0;
   --accent-ink: #ffffff;
   --head: #ffffff;
   --head-ink: #1f2124;
@@ -45,9 +45,9 @@
     --dim: #6b6f75;
     --line: #2d2d31;
     --brand: #ff3358;
-    --accent: #ff4d6d;
-    --accent-hover: #ff6b84;
-    --accent-ink: #1a0007;
+    --accent: #4a8ed4;
+    --accent-hover: #5b9bd5;
+    --accent-ink: #ffffff;
     --head: #17171a;
     --head-ink: #ededef;
     --head-line: #2d2d31;
@@ -279,84 +279,103 @@ label {
   border-style: dashed;
 }
 
-/* Header — always dark regardless of OS theme */
+/* Header — blue bar matching aeroANCI reference */
 .site-header {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
   align-items: center;
-  background: #0d1117;
-  color: #e2e5e9;
-  border-bottom: 1px solid rgba(255,255,255,.07);
-  box-shadow: inset 0 -3px 0 var(--brand);
-  padding: 0.65rem max(16px, env(safe-area-inset-left, 0px)) 0.8rem;
+  gap: 0;
+  background: #1255b4;
+  color: #ffffff;
+  border-bottom: none;
+  box-shadow: 0 1px 4px rgba(0,0,0,.25);
+  padding: 0 max(16px, env(safe-area-inset-left, 0px));
+  height: 48px;
   position: sticky;
   top: 0;
   z-index: 10;
 }
-.site-header .chip {
-  border-color: rgba(255,255,255,.12);
-  color: #c8cdd4;
-  background: rgba(255,255,255,.06);
-}
-.site-header .chip-ok {
-  color: #57c98a;
-  background: rgba(87,201,138,.15);
-  border-color: transparent;
-}
-.site-header .chip-warn {
-  color: #e0a93e;
-  background: rgba(224,169,62,.15);
-  border-color: transparent;
-}
-.site-header .chip-synthetic {
-  border-color: rgba(255,255,255,.18);
-  border-style: dashed;
-}
 .site-header .link {
-  color: #ff6b84;
+  color: rgba(255,255,255,.8);
 }
 .site-header .link:hover {
-  color: #ff8fa3;
+  color: #ffffff;
 }
+/* Brand: circle icon + app name */
 .brand {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
   font-weight: 700;
-  letter-spacing: 0.01em;
+  flex-shrink: 0;
 }
-.brand-logo {
-  height: 18px;
+.brand-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.brand-icon-wrap img {
+  height: 20px;
   width: auto;
   display: block;
-}
-.brand-tail {
-  height: 22px;
-  width: auto;
-  display: block;
-}
-.brand-divider {
-  width: 1px;
-  height: 22px;
-  background: rgba(255,255,255,.15);
+  filter: brightness(0) invert(1);
 }
 .brand-name {
   font-size: 1rem;
-  color: #e2e5e9;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.01em;
 }
-.header-meta {
+/* Vertical divider + Menu label */
+.header-menu-btn {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 1.25rem;
+  padding-left: 1.25rem;
+  border-left: 1px solid rgba(255,255,255,.25);
+  color: rgba(255,255,255,.9);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: default;
+  user-select: none;
 }
+/* Right: avatar + username + sign out */
 .header-user {
   margin-left: auto;
   display: flex;
-  gap: 0.6rem;
   align-items: center;
-  color: #c8cdd4;
+  gap: 0.65rem;
+  color: rgba(255,255,255,.9);
   font-size: 0.88rem;
+}
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+.user-name {
+  font-weight: 500;
+}
+.sign-out-btn {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,.65) !important;
+  padding-left: 0.5rem;
+  border-left: 1px solid rgba(255,255,255,.2);
+  margin-left: 0.1rem;
 }
 
 /* Layout */
@@ -373,11 +392,15 @@ label {
   }
 }
 
-/* Dark navigation sidebar */
+/* Dark navigation sidebar — sticky, always full viewport height */
 .nav-sidebar {
-  background: #0d1117;
-  border-right: 1px solid rgba(255,255,255,.07);
+  background: #1a1e2e;
+  border-right: 1px solid rgba(255,255,255,.06);
   overflow-y: auto;
+  position: sticky;
+  top: 0;
+  align-self: start;
+  min-height: 100vh;
   padding: 1rem 0 2rem;
   color: #c8cdd4;
 }
@@ -425,7 +448,7 @@ label {
 .nav-item.active {
   background: rgba(255,255,255,.08);
   color: #ffffff;
-  border-left-color: var(--brand);
+  border-left-color: #4a8ed4;
   font-weight: 600;
 }
 .nav-icon {
@@ -611,6 +634,57 @@ main {
 }
 .launcher h2 {
   margin-top: 0;
+}
+/* Prominent search bar at top of launcher */
+.launcher-search {
+  margin-bottom: 0.5rem;
+}
+.launcher-search input {
+  font-size: 1rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px 0 0 8px;
+}
+.launcher-search button {
+  border-radius: 0 8px 8px 0;
+  padding: 0.65rem 1.1rem;
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.launcher-search button:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+/* Paginator */
+.paginator {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+  font-size: 0.82rem;
+}
+.paginator-info {
+  color: var(--muted);
+  flex: 1;
+}
+.paginator-btn {
+  padding: 0.25rem 0.6rem;
+  font-size: 1rem;
+  line-height: 1;
+  min-width: 2rem;
+  border-radius: 6px;
+}
+.paginator-size {
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
 }
 
 /* Result */
@@ -854,11 +928,19 @@ tr.detail td {
   gap: 0.7rem;
   margin-bottom: 1.2rem;
 }
-.login-brand .brand-logo {
-  height: 22px;
+.login-brand .brand-icon-wrap {
+  width: 40px;
+  height: 40px;
+  background: #f4f5f7;
+  border: 1px solid var(--line);
 }
-.login-brand .brand-tail {
-  height: 30px;
+.login-brand .brand-icon-wrap img {
+  height: 26px;
+  filter: none; /* original red tail on white login card */
+}
+.login-brand .brand-name {
+  color: var(--ink);
+  font-size: 1.1rem;
 }
 .login-card form {
   display: flex;
