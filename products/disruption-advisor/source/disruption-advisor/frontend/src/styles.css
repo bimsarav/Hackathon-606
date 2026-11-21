@@ -1733,3 +1733,24 @@ tr.clickable.selected {
 .decision-top { margin: 0 0 1rem; padding: 0.75rem 1rem; border: 1px solid var(--line); border-left: 3px solid var(--accent);
   border-radius: var(--radius); background: var(--panel); }
 .decision-top-label { margin: 0 0 0.5rem; }
+
+/* Launcher: one search bar (box + delay), day chips, more filters, one list */
+.search-bar form { display: flex; flex-direction: column; gap: 0.6rem; }
+.search-row { display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; }
+.search-box { flex: 2 1 22rem; display: flex; align-items: center; gap: 0.4rem; border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--panel); padding: 0 0 0 0.6rem; }
+.search-box:focus-within { border-color: var(--accent); }
+.search-box input { flex: 1; border: 0; background: transparent; padding: 0.55rem 0.25rem; font: inherit; color: var(--ink); outline: none; }
+.search-icon { color: var(--muted); font-size: 1.1rem; }
+.search-go { border-radius: 0 var(--radius) var(--radius) 0; }
+.search-delay { flex: 1 1 16rem; display: flex; flex-direction: column; gap: 0.2rem; }
+.search-delay label { font-size: 0.85rem; }
+.search-delay input[type="range"] { width: 100%; }
+.search-days { display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center; }
+.chip-btn { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 999px; padding: 0.15rem 0.7rem; font: inherit; font-size: 0.82rem; cursor: pointer; }
+.chip-btn.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.search-more { margin-left: auto; }
+.search-filters { border-top: 1px solid var(--line); padding-top: 0.6rem; }
+.search-hint { margin: 0; }
+.list-head { display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+.list-head h3 { margin: 0.75rem 0 0.5rem; }

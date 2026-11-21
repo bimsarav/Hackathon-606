@@ -55,7 +55,7 @@ function Paginator({
   );
 }
 
-export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab, hideTabNav }: Props) {
+export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defaultTab, hideTabNav }: Props) {
   const [tab, setTab] = useState<Tab>(defaultTab ?? "DELAY");
   const [presets, setPresets] = useState<{ delay: DelayPreset[]; cancel: CancelPreset[] } | null>(null);
   const [presetError, setPresetError] = useState<string | null>(null);
@@ -80,6 +80,17 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
   // Once a flight is chosen (or one is already on screen) the lists fold away to save space; one click brings them back.
   const [listHidden, setListHidden] = useState(Boolean(active));
   const [chosen, setChosen] = useState<string | null>(active?.flightNumber ?? null);
+  const [moreFilters, setMoreFilters] = useState(false);
+  // The day before "now" too: the operating data starts a day early (and has the crew roster).
+  const days = Array.from({ length: (meta?.horizon_days ?? 7) + 2 }, (_, i) => {
+    const d = new Date(`${(meta?.now_utc ?? "2026-11-20T00:00:00").slice(0, 10)}T00:00:00Z`);
+    d.setUTCDate(d.getUTCDate() + i - 1);
+    return d.toISOString().slice(0, 10);
+  });
+  const day = fromDate && fromDate === toDate ? fromDate : "";
+  function pickDay(value: string) {
+    setFromDate(value); setToDate(value); setSearchPage(0); setPresetPage(0);
+  }
 
   function inRange(std: string, origin?: string, destination?: string): boolean {
     const day = std.slice(0, 10);
@@ -124,17 +135,31 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
       .catch((e: unknown) => setPresetError(errorText(e, "Could not load suggestions.")));
   }, []);
 
-  async function search(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function runSearch(text: string) {
     setSearchError(null);
     setSearchPage(0);
     setListHidden(false);
     try {
-      setResults(await api.flights(query.trim()));
+      setResults(await api.flights(text));
     } catch (e: unknown) {
       setSearchError(errorText(e, "Search failed."));
     }
   }
+
+  async function search(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await runSearch(query.trim());
+  }
+
+  // Search as you type (2+ characters, after a short pause); an empty box goes back to the suggestions.
+  useEffect(() => {
+    const text = query.trim();
+    if (text.length === 0) { setResults(null); return; }
+    if (text.length < 2) return;
+    const timer = window.setTimeout(() => void runSearch(text), 350);
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
 
   function start(flightId: string) {
     setListHidden(true);
@@ -168,31 +193,21 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
 
       {/* Multi-column filter card */}
       {!listHidden && (
-      <div className="filter-card">
+      <div className="filter-card search-bar">
         <form onSubmit={search}>
-          {/* Row 1: flight fields + type + dep from */}
-          <div className="filter-row">
-            <div className="filter-field">
-              <label htmlFor="ff-flight">Flight / Tail</label>
-              <input id="ff-flight" placeholder="e.g. G9519, A6-ARI"
+          {/* One line: search box, (scenario type,) delay */}
+          <div className="search-row">
+            <div className="search-box">
+              <label htmlFor="ff-flight" className="visually-hidden">Flight / Tail</label>
+              <span className="search-icon" aria-hidden="true">⌕</span>
+              <input id="ff-flight" placeholder="Flight, airport or tail (e.g. G9519, SHJ, A6-ARI)" autoComplete="off"
                 value={query} maxLength={10}
                 onChange={(e) => setQuery(e.target.value.replace(/[^A-Za-z0-9-]/g, ""))} />
-            </div>
-            <div className="filter-field">
-              <label htmlFor="ff-origin">Origin</label>
-              <input id="ff-origin" placeholder="e.g. SHJ"
-                value={originFilter} maxLength={4}
-                onChange={(e) => setOriginFilter(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))} />
-            </div>
-            <div className="filter-field">
-              <label htmlFor="ff-dest">Destination</label>
-              <input id="ff-dest" placeholder="e.g. DXB"
-                value={destFilter} maxLength={4}
-                onChange={(e) => setDestFilter(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))} />
+              <button type="submit" className="search-go">Search</button>
             </div>
             {!hideTabNav && (
               <div className="filter-field">
-                <label htmlFor="ff-type">Scenario Type</label>
+                <label htmlFor="ff-type">Scenario</label>
                 <select id="ff-type" value={tab} onChange={(e) => setTab(e.target.value as Tab)}>
                   <option value="DELAY">Delay</option>
                   <option value="CANCEL">Cancellation</option>
@@ -200,63 +215,79 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
                 </select>
               </div>
             )}
-            <div className="filter-field">
-              <label htmlFor="dep-from">Dep. Date From (UTC)</label>
-              <input id="dep-from" type="date" value={fromDate}
-                onChange={(e) => handleFromDate(e.target.value)} />
-            </div>
-          </div>
-          {/* Row 2: dep to + actions */}
-          <div className="filter-row-b">
-            <div className="filter-field">
-              <label htmlFor="dep-to">Dep. Date To (UTC)</label>
-              <input id="dep-to" type="date" value={toDate}
-                onChange={(e) => handleToDate(e.target.value)} />
-            </div>
-            <div className="filter-actions">
-              <button type="button" className="btn-outline" onClick={resetFilters}>Reset</button>
-              <button type="submit">Search</button>
-            </div>
-          </div>
-          {/* Row 3: delay slider (DELAY type only) */}
-          {tab === "DELAY" && (
-            <div className="filter-row-delay">
-              <div className="filter-field filter-field-delay">
+            {tab === "DELAY" && (
+              <div className="search-delay">
                 <label htmlFor="delay">Delay: <strong>{delay} min</strong></label>
                 <input id="delay" type="range" min={15} max={600} step={15} value={delay} disabled={advanced}
                   onChange={(e) => setDelay(Number(e.target.value))}
                   onPointerUp={commitDelay} onKeyUp={commitDelay} onTouchEnd={commitDelay} />
               </div>
-              <span className={`small ${active ? "muted" : "hint"}`} style={{ whiteSpace: "nowrap", alignSelf: "center", paddingTop: "0.9rem" }}>
-                {active
-                  ? delay === active.delay
-                    ? `Applied to ${active.flightNumber}. Move and release to re-run.`
-                    : `Release to re-run ${active.flightNumber} with ${delay} min…`
-                  : `Pick a flight below to analyse it with ${delay} min.`}
-              </span>
-            </div>
-          )}
-          {/* Row 4: advanced search - what is known today; applies to every listed flight, replaces the Delay slider */}
-          {tab !== "CANCEL" && (
-            <div className="filter-row-advanced">
-              <label className="small">
-                <input type="checkbox" checked={advanced} onChange={(e) => setAdvanced(e.target.checked)} /> Advanced search
-                (add what is known today; the Delay slider is switched off). Predictions below always update on their own.
-              </label>
-              {advanced && (
-                <div className="filter-row-delay">
-                  <div className="filter-field filter-field-delay">
-                    <DelaySlider id="adv-inbound" label="Arrival: inbound aircraft arrived late by" value={advInbound}
-                                 onChange={setAdvInbound} />
-                  </div>
-                  <div className="filter-field filter-field-delay">
-                    <DelaySlider id="adv-departure" label="Departure: this flight departed / will depart late by"
-                                 value={advDeparture} onChange={setAdvDeparture} />
-                  </div>
+            )}
+          </div>
+          {/* Day chips + more filters */}
+          <div className="search-days" role="group" aria-label="Departure day (UTC)">
+            <span className="small muted">Day</span>
+            <button type="button" className={`chip-btn${day === "" && !fromDate && !toDate ? " on" : ""}`} aria-pressed={day === "" && !fromDate && !toDate}
+              onClick={() => pickDay("")}>All</button>
+            {days.map((d) => {
+              const label = new Date(`${d}T00:00:00Z`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", timeZone: "UTC" });
+              return (
+                <button key={d} type="button" className={`chip-btn${day === d ? " on" : ""}`} aria-pressed={day === d} onClick={() => pickDay(d)}>{label}</button>
+              );
+            })}
+            <button type="button" className="link small search-more" aria-expanded={moreFilters} onClick={() => setMoreFilters((v) => !v)}>
+              {moreFilters ? "Fewer filters ▴" : "More filters ▾"}
+            </button>
+          </div>
+          {moreFilters && (
+            <div className="search-filters">
+              <div className="filter-row">
+                <div className="filter-field">
+                  <label htmlFor="ff-origin">Origin</label>
+                  <input id="ff-origin" placeholder="e.g. SHJ" value={originFilter} maxLength={4}
+                    onChange={(e) => setOriginFilter(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))} />
+                </div>
+                <div className="filter-field">
+                  <label htmlFor="ff-dest">Destination</label>
+                  <input id="ff-dest" placeholder="e.g. DXB" value={destFilter} maxLength={4}
+                    onChange={(e) => setDestFilter(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))} />
+                </div>
+                <div className="filter-field">
+                  <label htmlFor="dep-from">Dep. Date From (UTC)</label>
+                  <input id="dep-from" type="date" value={fromDate} onChange={(e) => handleFromDate(e.target.value)} />
+                </div>
+                <div className="filter-field">
+                  <label htmlFor="dep-to">Dep. Date To (UTC)</label>
+                  <input id="dep-to" type="date" value={toDate} onChange={(e) => handleToDate(e.target.value)} />
+                </div>
+                <div className="filter-actions">
+                  <button type="button" className="btn-outline" onClick={resetFilters}>Reset</button>
+                </div>
+              </div>
+              {/* Advanced search - what is known today; applies to every listed flight, replaces the Delay slider */}
+              {tab !== "CANCEL" && (
+                <div className="filter-row-advanced">
+                  <label className="small">
+                    <input type="checkbox" checked={advanced} onChange={(e) => setAdvanced(e.target.checked)} /> Advanced search
+                    (add what is known today; the Delay slider is switched off). Predictions below always update on their own.
+                  </label>
+                  {advanced && (
+                    <div className="filter-row-delay">
+                      <div className="filter-field filter-field-delay">
+                        <DelaySlider id="adv-inbound" label="Arrival: inbound aircraft arrived late by" value={advInbound}
+                                     onChange={setAdvInbound} />
+                      </div>
+                      <div className="filter-field filter-field-delay">
+                        <DelaySlider id="adv-departure" label="Departure: this flight departed / will depart late by"
+                                     value={advDeparture} onChange={setAdvDeparture} />
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
           )}
+          {tab === "DELAY" && !active && <p className="small muted search-hint">Pick a flight below to analyse it with {delay} min.</p>}
         </form>
       </div>
       )}
@@ -298,7 +329,12 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
       {listHidden ? null : (
         <>
         {searchError && <p className="error">{searchError}</p>}
-        {results && results.length === 0 && <p className="muted small">No flights match.</p>}
+        {results && (
+          <div className="list-head">
+            <h3>{results.length === 0 ? `No flights match “${query.trim()}”` : `${results.filter((f) => inRange(f.std, f.origin, f.destination)).length} flights match “${query.trim()}”`}</h3>
+            <button type="button" className="link small" onClick={() => { setQuery(""); setResults(null); }}>Clear search · back to suggestions</button>
+          </div>
+        )}
         {results && results.length > 0 && (() => {
           const filtered = results.filter((f) => inRange(f.std, f.origin, f.destination));
           return (
@@ -326,6 +362,8 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
           );
         })()}
 
+        {!results && (
+        <>
         <h3>Suggested flights</h3>
         {presetError && <p className="error">{presetError}</p>}
         {!presets && !presetError && <p className="muted small">Finding suitable flights…</p>}
@@ -383,6 +421,8 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
             </>
           );
         })()}
+        </>
+        )}
         </>
       )}
     </section>

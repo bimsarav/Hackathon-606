@@ -360,6 +360,7 @@ describe("advanced search predicts every listed flight as the sliders move", () 
     await userEvent.click(screen.getByRole("button", { name: "Search" }));
     await screen.findByText(/G9519 MCT/);
     expect(await screen.findByText(/Departure \+10 min/)).toBeInTheDocument(); // planning view, no Advanced needed
+    await userEvent.click(screen.getByRole("button", { name: /More filters/ })); // advanced search sits under More filters
     await userEvent.click(screen.getByLabelText(/Advanced search/));
     expect(screen.getByLabelText(/^Delay:/)).toBeDisabled();
     fireEvent.change(screen.getByLabelText(/Departure: this flight/), { target: { value: "90" } });
