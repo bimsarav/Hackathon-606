@@ -105,7 +105,8 @@ TOOLS: list[dict[str, Any]] = [
     {
         "name": "assess_delay",
         "description": "Run the engine's delay scenario for a flight and a departure delay (15-1440 minutes): every "
-        "recovery option (absorb, swap aircraft, cancel or consolidate a later round trip) with cost, aircraft "
+        "recovery option (absorb, swap aircraft, cancel or consolidate a later round trip, or hold a connecting flight "
+        "for late passengers) with cost, aircraft "
         "delay, passenger delay, missed connections, cancelled passengers and passengers left without a seat, "
         "plus each strategy's pick.",
         "input_schema": _obj({"flight_id": FLIGHT_ID, "delay_minutes": INT}),
@@ -384,6 +385,8 @@ def _option_brief(o: dict[str, Any]) -> dict[str, Any]:
         "cancelled_passengers": o["cancelled_passengers"],
         "passengers_without_seat": o["passengers_without_seat"],
         "picked_by": o["picked_by"],
+        "connecting_flights_held": [f"{h['flight_number']} {h['minutes']} min" for h in o.get("holds", [])],
+        "cascade": {k: v for k, v in (o.get("cascade") or {}).items() if k != "delay_ends"},
     }
 
 

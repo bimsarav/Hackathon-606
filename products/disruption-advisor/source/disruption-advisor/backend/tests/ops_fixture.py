@@ -54,6 +54,8 @@ FLIGHTS = [
     _flight("G9301", "T4", "SHJ", "CAI", t(11, 30), t(15, 30), 174, 174),
     _flight("G9011", "T5", "SHJ", "LHE", t(13), t(16), 215, 205),
     _flight("G9012", "T5", "LHE", "SHJ", t(17), t(20), 215, 200),
+    # T6: a later KHI-SHJ, so a cancelled F1's connecting passengers can be re-protected through SHJ (gap 3)
+    _flight("G9007", "T6", "KHI", "SHJ", t(12), t(14), 174, 100),
 ]
 F1, X1 = FLIGHTS[0]["flight_id"], FLIGHTS[6]["flight_id"]
 F2, F3 = FLIGHTS[1]["flight_id"], FLIGHTS[2]["flight_id"]
@@ -87,6 +89,8 @@ def _pax(fid: str, pnr: str, key: str, ptype: str, o: str, d: str, dep: datetime
         "ssr_code": None,
         "ssr_source": "synthetic",
         "sales_channel": "Web",
+        # booking-class level from the fares list (E30 mid-ladder; DU = staff code, not sold: None)
+        "booking_class_level": None if kw.get("booking_code") == "DU" else 0.5,
         # PNRB travels with an infant and its head b0000001 is a Silver member: a family account (loyalty sample)
         "family_account_synthetic": pnr == "PNRB",
         "family_head_synthetic": key == "b0000001",
@@ -211,6 +215,21 @@ def write_ops(data_dir: Path) -> Path:
         "flights": FLIGHTS,
         "pax_segments": PAX,
         "customers": CUSTOMERS,
+        # fares list (gap 3): KHI/SHJ/CAI is sold as a connection; LHE/SHJ/CAI too (but its only pair misses MCT)
+        "sold_connections": [
+            {"origin": "KHI", "hub": "SHJ", "destination": "CAI"},
+            {"origin": "LHE", "hub": "SHJ", "destination": "CAI"},
+        ],
+        "booking_class_levels": [
+            {
+                "booking_code": "E30",
+                "ladder": 0.105,
+                "onds": 3012,
+                "median_one_way_aed": 900.0,
+                "window_passengers": 19004,
+                "level": 0.5,
+            },
+        ],
         "airports": AIRPORTS,
         "mct": [
             {

@@ -1,0 +1,2 @@
+time="2026-11-21T07:33:15Z" level=warning msg="volume \"disruption-advisor_ops-data\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+{"offers": 300000, "auc": 0.702}

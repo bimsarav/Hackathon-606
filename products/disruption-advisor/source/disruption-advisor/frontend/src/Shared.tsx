@@ -260,7 +260,7 @@ export function PassengerTable({ scenario, rows, meta }: { scenario: Scenario; r
                           <span className="muted"> · {p.frequency ?? "—"}</span>
                         </p>
                         <p className="small muted">
-                          {p.fare_family ?? "—"}* · fare {num(Math.round(p.fare))} · extras {num(Math.round(p.ancillaries))}
+                          {p.fare_family ?? "—"}* · {p.booking_code ? <BookingClass p={p} /> : null}fare {num(Math.round(p.fare))} · extras {num(Math.round(p.ancillaries))}
                         </p>
                         {p.care?.flags && p.care.flags.length > 0 && (
                           <p className="small">
@@ -338,6 +338,17 @@ export function LoyaltyCell({ p }: { p: PassengerRow }) {
     <span title={title || undefined}>
       {tier}*{priority ? ` (${priority})` : ""}
       {family ? <span className="chip small loyalty-family">{family}</span> : null}
+    </span>
+  );
+}
+
+/** Booking class and its level from the fares list (share of passengers in cheaper classes). */
+export function BookingClass({ p }: { p: PassengerRow }) {
+  const level = p.booking_class_level;
+  return (
+    <span title={level != null ? `Booking class level ${Math.round(level * 100)}/100 (fares list): share of passengers in cheaper classes` : "Booking class not in the fares list: fare family used"}>
+      class {p.booking_code}
+      {level != null ? ` (${Math.round(level * 100)})` : ""} ·{" "}
     </span>
   );
 }

@@ -53,6 +53,9 @@ Every long-running service restarts by itself, including after a server reboot.
   Capacity comes from the inventory allocation (curtail/oversell) where available, otherwise from the aircraft layout inferred from the data.
 - **Stage 3 (`app/ml/delay_risk.py`, phase 2):** trains the delay-risk model on the 2026 history (LightGBM, features known 7 days ahead) and scores the window. Writes `flight_risk.parquet`, `connection_risk.parquet` and `model_card.json` to `<data>/ops`. It reruns with stage 2, so every new data drop retrains the model. Details: [docs/testing/model-card.md](docs/testing/model-card.md).
 - **Synthetic fields:** the extracts have no loyalty tier, fare family or special-service codes, so these are synthetic, deterministic and labelled in the UI.
+- **Fares list** (`fares_list.csv`, or `parquet/raw/fares.parquet` in `INPUT_DIR`):
+  - **Booking-class level:** each class gets a level, the share of passengers in cheaper classes, which makes up 30% of the fare value.
+  - **Sold connections:** the only X/SHJ/Y connections rebooking may offer as two-flight itineraries through the hub.
 - **Loyalty, modelled on the airline's loyalty sample:**
   - Membership is the real booking flag.
   - Tiers are Basic, Silver, Gold and Platinum, with recovery priority Lowest, Low, Medium and High.

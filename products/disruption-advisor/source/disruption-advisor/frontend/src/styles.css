@@ -1207,6 +1207,12 @@ tr.clickable.selected {
 .chip.kind {
   background: var(--bg);
 }
+/* holding a connecting flight: a protective choice (the "ok" colours, not the "bad" colours of cancelling) */
+.chip.kind-hold {
+  background: var(--ok-bg);
+  color: var(--ok);
+  border-color: transparent;
+}
 .chip.kind-cancel,
 .chip.kind-consolidate {
   background: var(--bad-bg);

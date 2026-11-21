@@ -8,7 +8,7 @@ async function signIn(page: Page) {
   await page.getByLabel("User name").fill(user);
   await page.getByLabel("Password").fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page.getByText("Start with a disruption")).toBeVisible();
+  await expect(page.getByRole("region", { name: "New scenario" })).toBeVisible();
 }
 
 test("wrong password is rejected and the API needs a token", async ({ page, request }) => {

@@ -129,7 +129,7 @@ describe("strategy comparison", () => {
     };
     const scenario = delayScenario({ passengers: [pax, { ...pax, customer_key: "k2", name: "Omar Said", group: "missed_connection" }] });
     render(<DelayView scenario={scenario} result={scenario.result as DelayResult} meta={meta} onUpdate={() => {}} />);
-    expect(screen.getByText("Flight cancelled")).toBeInTheDocument();
+    expect(screen.getByText("Cancelled")).toBeInTheDocument();
     expect(screen.getByText("Missed connection")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /missed connections and cancelled flights \(2\)/ })).toBeInTheDocument();
   });
@@ -258,5 +258,25 @@ describe("ask the agent from the watchlist", () => {
     await userEvent.click(await screen.findByRole("button", { name: "G9519" }));
     await userEvent.click(screen.getByRole("button", { name: "Ask the agent" }));
     expect(onAgent).toHaveBeenCalledWith(flight.flight_id, 45);
+  });
+});
+
+describe("hold and cascade in the options table", () => {
+  it("shows the held flight, the connections kept and the knock-on", async () => {
+    const { OptionKindInfo } = await import("./StrategyPanel");
+    const { render: r, screen: s } = await import("@testing-library/react");
+    r(
+      <OptionKindInfo
+        option={{
+          key: "hold:absorb", label: "Absorb + hold", kind: "hold",
+          holds: [{ flight_id: "G9301_202611211130", flight_number: "G9301", minutes: 25, connections_kept: 2 }],
+          cascade: { flights_delayed: 5, aircraft: 2, beyond_next_flight: 2, delay_ends: "2026-11-21T22:40:00",
+            passenger_delay_minutes: 9000 },
+        } as never}
+      />,
+    );
+    expect(s.getByText("Hold connection")).toBeInTheDocument();
+    expect(s.getByText(/Holds G9301 25 min/)).toBeInTheDocument();
+    expect(s.getByText(/5 flights on 2 aircraft \(2 beyond the next flight\)/)).toBeInTheDocument();
   });
 });

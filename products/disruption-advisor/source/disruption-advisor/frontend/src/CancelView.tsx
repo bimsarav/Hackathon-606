@@ -15,7 +15,10 @@ interface Props {
 export function CancelView({ scenario, result, meta, onUpdate }: Props) {
   const f = result.flight;
   const reb = result.rebooking;
-  const seats = reb ? reb.alternatives.reduce((s, a) => s + a.available_seats, 0) : 0;
+  // hub itineraries reuse flights, so only direct alternatives are summed (no double counting)
+  const direct = reb ? reb.alternatives.filter((a) => !a.via) : [];
+  const viaHub = reb ? reb.alternatives.length - direct.length : 0;
+  const seats = direct.reduce((s, a) => s + a.available_seats, 0);
   const tiers = result.tier_counts ?? {};
 
   return (
@@ -32,7 +35,8 @@ export function CancelView({ scenario, result, meta, onUpdate }: Props) {
       </header>
 
       <section className="kpis" aria-label="Re-accommodation at a glance">
-        <Kpi label="Free seats on alternatives" value={num(seats)} sub={`${reb?.alternatives.length ?? 0} flights within 24 h`} />
+        <Kpi label="Free seats on alternatives" value={num(seats)}
+          sub={`${direct.length} direct flights within 24 h${viaHub ? ` · ${viaHub} via SHJ` : ""}`} />
         <Kpi label="Protected" value={num(reb?.protected ?? 0)} sub={`${reb?.groups_split ?? 0} booking(s) split`} />
         <Kpi label="Hotel rooms" value={num(reb?.hotel_rooms ?? 0)} sub={`care ${aed(reb?.care_cost_aed ?? 0)}`} />
         <Kpi label="Without a seat" value={num(reb?.unprotected ?? 0)} sub="next day + hotel, or refund" />
@@ -66,7 +70,14 @@ export function CancelView({ scenario, result, meta, onUpdate }: Props) {
               <tbody>
                 {reb.alternatives.map((a) => (
                   <tr key={a.flight_id}>
-                    <td>{a.flight_number}</td>
+                    <td>
+                      {a.flight_number}
+                      {a.via && (
+                        <span className="chip small" title={`Two flights through ${a.via}, sold as a connection; for passengers going to ${a.for_destination ?? "the same destination"}`}>
+                          via {a.via}{a.for_destination ? ` → ${a.for_destination}` : ""}
+                        </span>
+                      )}
+                    </td>
                     <td>{utc(a.std)}</td>
                     <td className="num">{a.available_seats}</td>
                     <td className="num">{a.assigned}</td>

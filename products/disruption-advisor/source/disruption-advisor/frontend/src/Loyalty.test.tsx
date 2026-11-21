@@ -25,3 +25,13 @@ describe("LoyaltyCell", () => {
     expect(screen.getByText("Gold*")).toBeInTheDocument();
   });
 });
+
+describe("BookingClass", () => {
+  it("shows the class and its level from the fares list, or that it is not in the list", async () => {
+    const { BookingClass } = await import("./Shared");
+    const { rerender } = render(<BookingClass p={{ ...base, booking_code: "E33", booking_class_level: 0.62 }} />);
+    expect(screen.getByText(/class E33 \(62\)/)).toBeInTheDocument();
+    rerender(<BookingClass p={{ ...base, booking_code: "DU", booking_class_level: null }} />);
+    expect(screen.getByTitle(/not in the fares list/)).toBeInTheDocument();
+  });
+});

@@ -1,0 +1,253 @@
+2026-11-21 05:58:44,863 INFO stage 1 done: {"rotation": 4646, "punctuality": 65943, "mct": 39, "inventory": 368873, "inventory_rejected": 1, "schedule": 6143, "schedule_rejected": 0, "fares": 1456941, "bookings": {"loaded": 27879509, "rejected": 0, "persons": 6286595, "supplied_parquet": 1}}
+2026-11-21 05:58:53,120 INFO stage 2 done: {"airports": 142, "aircraft": 81, "sold_connections": 10413, "booking_classes": 388, "booking_class_levels": 84, "customers": 174723, "pax_segments": 299417, "flights": 2614, "history_flights": 63322, "mct": 39}
+2026-11-21 05:59:16,863 INFO stage 3 done: {"scored": 2623, "connections": 88434, "auc_60": 0.7697}
+2026-11-21 05:59:16,935 INFO stage 3b done: {"pairs": 1656, "excluded": 3}
+2026-11-21 05:59:21,311 INFO stage 4 done: {"offers": 300000, "auc": 0.7009}
+#1 [migrate internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.89kB done
+#1 DONE 0.0s
+
+#2 [migrate internal] load .dockerignore
+#2 transferring context: 120B done
+#2 DONE 0.0s
+
+#3 [migrate internal] load metadata for docker.io/library/python:3.14.10-slim-trixie
+#3 ...
+
+#4 [migrate internal] load metadata for ghcr.io/astral-sh/uv:0.13.9
+#4 DONE 0.7s
+
+#3 [migrate internal] load metadata for docker.io/library/python:3.14.10-slim-trixie
+#3 DONE 1.2s
+
+#5 [migrate uv 1/1] FROM ghcr.io/astral-sh/uv:0.13.9@sha256:d3b601f0c7b118bc1753febf7c41cc80981df678445e0254284eecf84db79a7d
+#5 DONE 0.0s
+
+#6 [migrate base 1/4] FROM docker.io/library/python:3.14.10-slim-trixie@sha256:9aaa474097d094040649f2162a627c0049b408f52138d980916788d80f04802f
+#6 DONE 0.0s
+
+#7 [migrate internal] load build context
+#7 transferring context: 260.83kB done
+#7 DONE 0.0s
+
+#8 [migrate base 2/4] RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/*
+#8 CACHED
+
+#9 [migrate base 3/4] COPY --from=uv /uv /uvx /usr/local/bin/
+#9 CACHED
+
+#10 [migrate base 4/4] WORKDIR /app
+#10 CACHED
+
+#11 [migrate build 1/5] COPY pyproject.toml uv.lock .python-version ./
+#11 DONE 0.2s
+
+#12 [migrate build 2/5] RUN uv sync --frozen --no-dev --no-install-project
+#12 1.399 Using CPython 3.14.10 interpreter at: /usr/local/bin/python3.14
+#12 1.399 Creating virtual environment at: .venv
+#12 1.881 Downloading numpy (15.0MiB)
+#12 1.884 Downloading psycopg-binary (3.7MiB)
+#12 1.885 Downloading pydantic-core (2.2MiB)
+#12 1.887 Downloading lightgbm (3.3MiB)
+#12 1.888 Downloading sqlalchemy (4.4MiB)
+#12 1.889 Downloading scipy (33.7MiB)
+#12 1.890 Downloading pyarrow (52.5MiB)
+#12 1.895 Downloading ortools (28.5MiB)
+#12 1.895 Downloading anthropic (2.4MiB)
+#12 1.900 Downloading uvloop (4.2MiB)
+#12 1.900 Downloading duckdb (23.8MiB)
+#12 1.900 Downloading pandas (11.5MiB)
+#12 5.001  Downloaded pydantic-core
+#12 5.359  Downloaded anthropic
+#12 6.182  Downloaded lightgbm
+#12 6.579  Downloaded psycopg-binary
+#12 6.926  Downloaded uvloop
+#12 7.012  Downloaded sqlalchemy
+#12 10.89  Downloaded pandas
+#12 12.51  Downloaded numpy
+#12 15.56  Downloaded duckdb
+#12 16.62  Downloaded ortools
+#12 17.53  Downloaded scipy
+#12 19.54  Downloaded pyarrow
+#12 19.54 Prepared 49 packages in 18.13s
+#12 21.04 Installed 49 packages in 1.49s
+#12 38.07 Bytecode compiled 7456 files in 17.02s
+#12 38.07  + absl-py==2.5.1
+#12 38.07  + alembic==1.20.1
+#12 38.07  + annotated-doc==0.0.7
+#12 38.07  + annotated-types==0.8.0
+#12 38.07  + anthropic==2.12.0
+#12 38.07  + anyio==4.16.0
+#12 38.07  + click==8.5.1
+#12 38.07  + docstring-parser==0.18.0
+#12 38.07  + duckdb==2.0.1
+#12 38.07  + fastapi==0.165.0
+#12 38.07  + h11==0.16.0
+#12 38.07  + httpcore2==2.16.2
+#12 38.07  + httptools==0.9.0
+#12 38.07  + httpx2==2.16.2
+#12 38.07  + idna==3.20
+#12 38.07  + immutabledict==4.3.1
+#12 38.07  + jiter==0.19.0
+#12 38.07  + lightgbm==4.7.0
+#12 38.07  + mako==1.4.3
+#12 38.07  + markupsafe==3.0.4
+#12 38.07  + narwhals==2.29.0
+#12 38.07  + numpy==2.5.5
+#12 38.07  + opentelemetry-api==1.45.2
+#12 38.07  + ortools==9.15.6755
+#12 38.07  + pandas==3.1.1
+#12 38.07  + protobuf==6.33.6
+#12 38.07  + psycopg==3.3.9
+#12 38.07  + psycopg-binary==3.3.9
+#12 38.07  + pyarrow==26.0.1
+#12 38.07  + pydantic==2.14.4
+#12 38.07  + pydantic-core==2.50.5
+#12 38.07  + pydantic-settings==2.16.3
+#12 38.07  + python-calamine==0.9.1
+#12 38.07  + python-dateutil==4.0.0
+#12 38.07  + python-dotenv==1.2.4
+#12 38.07  + pyyaml==6.0.3
+#12 38.07  + scipy==1.18.1
+#12 38.07  + sniffio==1.3.1
+#12 38.07  + sqlalchemy==2.1.9
+#12 38.07  + starlette==1.10.0
+#12 38.07  + structlog==26.1.0
+#12 38.07  + truststore==0.10.5
+#12 38.07  + typing-extensions==4.16.0
+#12 38.07  + typing-inspection==0.4.5
+#12 38.07  + tzdata==2026.6
+#12 38.07  + uvicorn==0.54.0
+#12 38.07  + uvloop==0.23.0
+#12 38.07  + watchfiles==1.3.0
+#12 38.07  + websockets==17.4
+#12 DONE 39.5s
+
+#13 [migrate build 3/5] COPY alembic.ini ./
+#13 DONE 0.1s
+
+#14 [migrate build 4/5] COPY alembic ./alembic
+#14 DONE 0.1s
+
+#15 [migrate build 5/5] COPY app ./app
+#15 DONE 0.1s
+
+#16 [migrate runtime 2/4] RUN apt-get update && apt-get upgrade -y --no-install-recommends  && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/*  && python -m pip uninstall -y pip && rm -rf /usr/local/lib/python3.14/ensurepip/_bundled  && groupadd --system app && useradd --system --gid app --home-dir /app --shell /usr/sbin/nologin app  && mkdir -p /data && chown app:app /data
+#16 CACHED
+
+#17 [migrate runtime 3/4] WORKDIR /app
+#17 CACHED
+
+#18 [migrate runtime 4/4] COPY --from=build /app /app
+#18 DONE 4.5s
+
+#19 [migrate] exporting to image
+#19 exporting layers
+#19 exporting layers 7.5s done
+#19 writing image sha256:64cd724806736e62a118d63cf5a28457f30d6f2e142640f76853a883f122d6ef done
+#19 naming to docker.io/library/disruption-advisor-api:latest 0.0s done
+#19 DONE 7.5s
+
+#20 [web internal] load .dockerignore
+#20 transferring context: 72B done
+#20 DONE 0.0s
+
+#21 [web internal] load build definition from Dockerfile
+#21 transferring dockerfile: 953B done
+#21 DONE 0.0s
+
+#22 [web internal] load metadata for docker.io/library/node:26.13.1-alpine
+#22 DONE 0.0s
+
+#23 [web internal] load metadata for docker.io/library/nginx:1.30.7-alpine
+#23 DONE 1.2s
+
+#24 [web stage-1 1/4] FROM docker.io/library/nginx:1.30.7-alpine@sha256:caf4e1e032a20f9c3c5e28fc7f25ffd768ad8677b4975c54193075997b3a97e3
+#24 DONE 0.0s
+
+#25 [web build 1/6] FROM docker.io/library/node:26.13.1-alpine
+#25 DONE 0.0s
+
+#26 [web internal] load build context
+#26 transferring context: 155.84kB done
+#26 DONE 0.0s
+
+#27 [web build 2/6] WORKDIR /web
+#27 CACHED
+
+#28 [web build 3/6] COPY package.json package-lock.json ./
+#28 CACHED
+
+#29 [web build 4/6] RUN npm ci --no-audit --no-fund
+#29 CACHED
+
+#30 [web build 5/6] COPY . .
+#30 DONE 0.1s
+
+#31 [web build 6/6] RUN npm run build
+#31 0.714 
+#31 0.714 > disruption-advisor-web@0.1.0 build
+#31 0.714 > tsc --noEmit && vite build
+#31 0.714 
+#31 2.173 vite v8.3.8 building client environment for production...
+#31 2.205 transforming...
+#31 2.365 ✓ 31 modules transformed.
+#31 2.423 rendering chunks...
+#31 2.508 computing gzip size...
+#31 2.520 dist/index.html                   0.66 kB │ gzip:  0.37 kB
+#31 2.520 dist/assets/index-oeztZcJ0.css   17.98 kB │ gzip:  4.56 kB
+#31 2.520 dist/assets/index-B4Yybe4L.js   318.84 kB │ gzip: 93.87 kB
+#31 2.520 
+#31 2.521 ✓ built in 344ms
+#31 DONE 2.7s
+
+#32 [web stage-1 2/4] RUN apk upgrade --no-cache  && sed -i -e '/^user /d' -e 's,^pid .*,pid /tmp/nginx.pid;,' /etc/nginx/nginx.conf  && chown -R nginx:nginx /var/cache/nginx
+#32 CACHED
+
+#33 [web stage-1 3/4] COPY nginx.conf /etc/nginx/conf.d/default.conf
+#33 CACHED
+
+#34 [web stage-1 4/4] COPY --from=build /web/dist /usr/share/nginx/html
+#34 DONE 0.1s
+
+#35 [web] exporting to image
+#35 exporting layers 0.1s done
+#35 writing image sha256:888c4045b81893f08788572551d0d1dd0f1952c3089d23da17d214024215be88 done
+#35 naming to docker.io/library/disruption-advisor-web:latest 0.0s done
+#35 DONE 0.1s
+build exit=0
+time="2026-11-21T06:00:42Z" level=warning msg="volume \"disruption-advisor_ops-data\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container disruption-advisor-db-1  Running
+time="2026-11-21T06:00:47Z" level=warning msg="volume \"disruption-advisor_ops-data\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+migrate exit=0
+time="2026-11-21T06:00:50Z" level=warning msg="volume \"disruption-advisor_ops-data\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container disruption-advisor-api-1  Recreate
+ api Your kernel does not support swap limit capabilities or the cgroup is not mounted. Memory limited without swap. 
+ Container disruption-advisor-api-1  Recreated
+ Container disruption-advisor-web-1  Recreate
+ web Your kernel does not support swap limit capabilities or the cgroup is not mounted. Memory limited without swap. 
+ Container disruption-advisor-web-1  Recreated
+ Container disruption-advisor-api-1  Starting
+ Container disruption-advisor-api-1  Started
+ Container disruption-advisor-api-1  Waiting
+ Container disruption-advisor-api-1  Healthy
+ Container disruption-advisor-web-1  Starting
+ Container disruption-advisor-web-1  Started
+== smoke 11/11
+DELAY G9901 +45: recommended hold:swap:A6-DME
+   hold | Swap: A6-DME takes over G9902 + hold G9951 15 min (23 connections kept | cost 24000.0 | miss 0 | cascade 2 f/ 2 ac
+   swap | Swap: A6-DME takes over G9902 | cost 25350.0 | miss 23 | cascade 1 f/ 1 ac
+   swap | Swap: A6-ARJ takes over G9902 | cost 25350.0 | miss 23 | cascade 1 f/ 1 ac
+   swap | Swap: A6-ARL takes over G9902 | cost 25350.0 | miss 23 | cascade 1 f/ 1 ac
+CANCEL G9511: pax 213 protected 171 no seat 42 | via SHJ 98 e.g. G9519/G9181
+  booking class shown for 134 of 213 | e.g. E33 0.7948 | fare value pts 7.9
+== e2e
+  ✓  1 [chromium] › tests/advisor.spec.ts:14:1 › wrong password is rejected and the API needs a token (669ms)
+  ✓  2 [chromium] › tests/advisor.spec.ts:23:1 › scenario A: a delay is assessed, options compared, recommendation approved (25.9s)
+  ✓  3 [chromium] › tests/advisor.spec.ts:54:1 › scenario B: a cancellation ranks passengers by tier and re-runs with new weights (5.8s)
+  ✓  4 [chromium] › tests/advisor.spec.ts:74:1 › phase 2: delay watchlist ranks flights, shows reasons and opens a delay scenario (12.5s)
+  ✓  5 [chromium] › tests/advisor.spec.ts:87:1 › phase 3: strategies switch the recommendation (18.1s)
+  ✓  6 [chromium] › tests/advisor.spec.ts:106:1 › phase 3: the agent investigates a flight and its recommendation opens for approval (35.9s)
+  ✓  7 [chromium] › tests/advisor.spec.ts:122:1 › phase 2: the 7-day tab shows last month's cascade check instead of the scenario launcher (1.5s)
+  ✓  8 [chromium] › tests/advisor.spec.ts:141:1 › phase 5: a budget gives a reward plan from the preference model, and the plan can be approved (10.4s)
+  8 passed (1.9m)

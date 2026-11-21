@@ -312,12 +312,60 @@ def convert_csvs(input_dir: Path, out_dir: Path) -> dict[str, int]:
     return counts
 
 
+FARE_COLUMNS = (
+    "fare_id",
+    "status",
+    "booking_code",
+    "ond",
+    "journey_type",
+    "currency",
+    "sale_validities",
+    "inbound_flight_validities",
+    "outbound_flight_validities",
+    "adult_value",
+)
+
+
+def fares_source(input_dir: Path) -> Path | None:
+    """The fares list (user 2026-11-21): a supplied Parquet (INPUT_DIR/parquet/raw/fares.parquet), else the CSV as
+    delivered (INPUT_DIR/fares_list.csv, or a folder of that name holding fares_list.csv)."""
+    for candidate in (
+        input_dir / "parquet" / "raw" / "fares.parquet",
+        input_dir / "fares_list.csv" / "fares_list.csv",
+        input_dir / "fares_list.csv",
+    ):
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def convert_fares(input_dir: Path, out_dir: Path) -> dict[str, int]:
+    """Fares list -> raw/fares.parquet, typed (fare id, booking class, O&D labels like KHI/SHJ/CAI, journey type,
+    validity ranges as text, adult fare in AED). Read with column and filter pushdown by the build."""
+    source = fares_source(input_dir)
+    if source is None:
+        log.info("no fares list supplied: booking-class levels and sold-connection checks are skipped")
+        return {}
+    con = duckdb.connect()
+    if source.suffix == ".parquet":
+        select = f"SELECT {', '.join(FARE_COLUMNS)} FROM read_parquet('{source}')"
+    else:
+        select = f"""SELECT CAST(id AS BIGINT) AS fare_id, status, booking_class_id AS booking_code, ond_labels AS ond,
+                            journey_type, currency, sale_validities, inbound_flight_validities,
+                            outbound_flight_validities, CAST(adult_value AS DOUBLE) AS adult_value
+                     FROM read_csv('{source}', header = true, all_varchar = true)"""
+    con.execute(f"COPY ({select}) TO '{out_dir / 'fares.parquet'}' (FORMAT parquet, COMPRESSION zstd)")
+    row = con.execute(f"SELECT count(*) FROM '{out_dir / 'fares.parquet'}'").fetchone()
+    return {"fares": int(row[0]) if row else 0}
+
+
 def run(input_dir: Path, data_dir: Path, skip_bookings: bool = False) -> dict[str, Any]:
     out_dir = data_dir / "raw"
     out_dir.mkdir(parents=True, exist_ok=True)
     result: dict[str, Any] = {}
     result.update(convert_excel(input_dir, out_dir))
     result.update(convert_csvs(input_dir, out_dir))
+    result.update(convert_fares(input_dir, out_dir))
     if not skip_bookings:
         supplied = supplied_bookings(input_dir)
         if supplied is not None:
