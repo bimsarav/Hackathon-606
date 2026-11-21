@@ -43,7 +43,7 @@ flowchart LR
 1. Each passenger gets a **target** = 600 AED x severity/100 x (0.4 + 0.6 x value/100).
 2. Each eligible option has a utility = severity factor x value factor x preference x sqrt(cost), so many modest rewards beat one large one.
 3. The plan starts from each passenger's best option within the target. If the total is over budget, the step that loses the least utility per AED saved is downgraded, one step at a time, until the plan fits.
-4. Statutory care (meals and hotel under the care rules, EU261 where it applies) is not paid from the goodwill budget and is shown separately in the scenario.
+4. **No overlap with care:** statutory and policy care (meals, hotel, transport, refund option under `care.py`, EU261 where it applies) is not paid from the goodwill budget and is shown separately in the scenario. A reward is never offered that repeats it: no meal voucher to a passenger whose care plan already gives meals, no lounge pass to one who already gets a hotel. Goodwill is what comes on top: vouchers, miles, lounge passes for passengers without a hotel, free tickets.
 
 ## Limits stated plainly
 - Preferences are **proxies**, not stated preferences: no redemption history exists. The UI labels them as assumptions.

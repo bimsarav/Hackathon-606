@@ -77,6 +77,8 @@ class Person:
     disrupted_minutes: int
     loyalty_member: bool
     non_revenue: bool
+    care_meals: int = 0  # meal vouchers the care plan already gives this passenger (statutory/policy, not goodwill)
+    care_hotel: bool = False  # the care plan already gives a hotel room
     prefs: dict[str, float] = field(default_factory=dict)
     pref_reasons: dict[str, list[str]] = field(default_factory=dict)
     accept: dict[tuple[str, float], float] = field(default_factory=dict)  # trained model: P(accept) per option
@@ -183,10 +185,11 @@ def preferences(p: dict[str, Any]) -> tuple[dict[str, float], dict[str, list[str
 
 def eligible_options(person: Person, rules: RewardRules) -> list[Option]:
     options: list[Option] = []
-    if person.disrupted_minutes >= rules.meal_min_minutes:
+    # Never repeat what the care plan already provides: those are entitlements, not goodwill.
+    if person.disrupted_minutes >= rules.meal_min_minutes and person.care_meals == 0:
         options.append(Option(MEAL, TYPE_LABEL[MEAL], rules.meal_aed, "AED 50 airport meal voucher"))
     options += [Option(VOUCHER, TYPE_LABEL[VOUCHER], v, f"AED {v:g} shopping voucher") for v in rules.voucher_aed]
-    if person.disrupted_minutes >= rules.lounge_min_minutes:
+    if person.disrupted_minutes >= rules.lounge_min_minutes and not person.care_hotel:
         options.append(Option(LOUNGE, TYPE_LABEL[LOUNGE], rules.lounge_aed, "Lounge access while waiting"))
     if person.loyalty_member:
         options += [Option(MILES, TYPE_LABEL[MILES], v, f"{m:,} loyalty miles") for m, v in rules.miles]
@@ -349,9 +352,8 @@ def people_for(
     """Build the inputs from the flight's passengers and the scenario result (missed connections, waits)."""
     cancelled = kind == "CANCEL"
     missed = {(c["pnr"], c["customer_key"]) for c in scenario.get("misconnections", [])}
-    waits = {
-        (r["pnr"], r["customer_key"]): (r.get("care") or {}).get("wait_minutes") for r in scenario.get("passengers", [])
-    }
+    cares = {(r["pnr"], r["customer_key"]): (r.get("care") or {}) for r in scenario.get("passengers", [])}
+    waits = {key: c.get("wait_minutes") for key, c in cares.items()}
     ranked = priority.rank(passengers, weights, missed, {})
     scores = sorted(x.score for x in ranked)
 
@@ -385,6 +387,8 @@ def people_for(
                 disrupted_minutes=max(disrupted, delay_minutes or 0),
                 loyalty_member=bool(p.get("is_loyalty_member")),
                 non_revenue=r.non_revenue,
+                care_meals=int(cares.get(key, {}).get("meals") or 0),
+                care_hotel=bool(cares.get(key, {}).get("hotel")),
                 prefs=prefs,
                 pref_reasons=why,
             )

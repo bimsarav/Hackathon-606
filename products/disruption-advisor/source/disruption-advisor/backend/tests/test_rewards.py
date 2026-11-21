@@ -212,3 +212,23 @@ def test_plan_uses_the_model_and_still_respects_the_budget(trained: tuple[Any, d
     top = next(r for r in plan["rows"] if r["reward"])
     assert 0 < top["reward"]["acceptance"] <= 1
     assert top["why"][0].startswith("predicted acceptance")
+
+
+def test_a_reward_never_repeats_what_the_care_plan_already_gives() -> None:
+    rules = rw.RewardRules()
+    plain = person(1, sev=70.0)
+    fed = person(2, sev=70.0)
+    fed.care_meals = 3
+    housed = person(3, sev=70.0)
+    housed.care_hotel = True
+    kinds = {
+        k: {o.kind for o in rw.eligible_options(p, rules)}
+        for k, p in (("plain", plain), ("fed", fed), ("housed", housed))
+    }
+    assert rw.MEAL in kinds["plain"]
+    assert rw.LOUNGE in kinds["plain"]
+    assert rw.MEAL not in kinds["fed"]  # care already gives meal vouchers
+    assert rw.LOUNGE not in kinds["housed"]  # care already gives a hotel room
+    plan = rw.recommend([plain, fed, housed], 10_000)
+    meals = [r for r in plan["rows"] if r["reward"] and r["reward"]["type"] == rw.MEAL]
+    assert all(r["pnr"] == plain.pnr for r in meals)
