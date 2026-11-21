@@ -699,6 +699,15 @@ main {
   border-radius: 6px;
   white-space: nowrap;
 }
+.filter-actions button[type="submit"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: 1px solid var(--accent);
+}
+.filter-actions button[type="submit"]:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
 .btn-outline {
   background: var(--panel);
   color: var(--ink);

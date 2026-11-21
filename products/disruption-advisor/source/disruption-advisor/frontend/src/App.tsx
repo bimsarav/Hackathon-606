@@ -256,7 +256,7 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
               <p className="nav-section-label">Analyze</p>
               <NavItem label="Flight Delay" icon="↑" active={view === "delay"} onClick={() => setView("delay")} />
               <NavItem label="Cancellation" icon="✕" active={view === "cancel"} onClick={() => setView("cancel")} />
-              <NavItem label="Ask the Agent" icon="◎" active={view === "agent"} onClick={() => setView("agent")} />
+              <NavItem label="Predict the Flight Delay" icon="◎" active={view === "agent"} onClick={() => setView("agent")} />
             </div>
             <div className="nav-section">
               <p className="nav-section-label">Monitor</p>

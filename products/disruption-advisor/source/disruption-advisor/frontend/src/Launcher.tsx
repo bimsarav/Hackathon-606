@@ -159,7 +159,7 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
                 <select id="ff-type" value={tab} onChange={(e) => setTab(e.target.value as Tab)}>
                   <option value="DELAY">Delay</option>
                   <option value="CANCEL">Cancellation</option>
-                  {onAgent && <option value="AGENT">Ask the agent</option>}
+                  {onAgent && <option value="AGENT">Predict the Flight Delay</option>}
                 </select>
               </div>
             )}

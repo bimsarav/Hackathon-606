@@ -50,6 +50,7 @@ PUNCTUALITY_XLSX = "Flight_Punctuality_Jan-Nov_2026_Combined.xlsx"
 INVENTORY_CSV = "Flight Inventory.csv"
 SCHEDULE_CSV = "Flight Schedule.csv"
 MCT_XLSX = "Connection Time.xlsx"
+CREW_CSV = "t_flight_crew_inf.csv"
 
 _YN = "CASE WHEN {c} = 'Y' THEN TRUE WHEN {c} = 'N' THEN FALSE END"
 
@@ -302,6 +303,25 @@ def convert_csvs(input_dir: Path, out_dir: Path) -> dict[str, int]:
           FROM read_csv('{input_dir / SCHEDULE_CSV}', header = true, all_varchar = true, ignore_errors = true)
         ) TO '{out_dir / "schedule.parquet"}' (FORMAT parquet, COMPRESSION zstd)
     """)
+    crew_path = input_dir / CREW_CSV
+    if crew_path.exists():
+        con.execute(f"""
+            COPY (
+              SELECT flight_reference,
+                     TRY_CAST(crew_reference AS INTEGER) AS crew_reference,
+                     crew_type,
+                     TRY_CAST(crew_id AS INTEGER) AS crew_id,
+                     first_name, last_name,
+                     TRY_STRPTIME(sign_in_date_time_zulu,  '%Y-%m-%d %H:%M:%S.%f') AS sign_in_utc,
+                     TRY_STRPTIME(sign_out_date_time_zulu, '%Y-%m-%d %H:%M:%S.%f') AS sign_out_utc,
+                     TRY_CAST(planned_fdp_value AS DOUBLE) AS planned_fdp_value,
+                     TRY_CAST(actual_fdp_value  AS DOUBLE) AS actual_fdp_value,
+                     (is_pic = 'true') AS is_pic
+              FROM read_csv('{crew_path}', header=true, all_varchar=true,
+                            delim='\\t', ignore_errors=true)
+              ORDER BY flight_reference, crew_type, crew_id
+            ) TO '{out_dir / "crew.parquet"}' (FORMAT parquet, COMPRESSION zstd)
+        """)
     counts: dict[str, int] = {}
     for name, src in (("inventory", INVENTORY_CSV), ("schedule", SCHEDULE_CSV)):
         written = con.execute(f"SELECT count(*) FROM '{out_dir / f'{name}.parquet'}'").fetchone()[0]  # type: ignore[index]
@@ -309,6 +329,8 @@ def convert_csvs(input_dir: Path, out_dir: Path) -> dict[str, int]:
             data_lines = sum(1 for line in fh if line.strip()) - 1
         counts[name] = written
         counts[f"{name}_rejected"] = data_lines - written  # malformed rows (e.g. a truncated last line) are skipped
+    if crew_path.exists():
+        counts["crew"] = con.execute(f"SELECT count(*) FROM '{out_dir / 'crew.parquet'}'").fetchone()[0]  # type: ignore[index]
     return counts
 
 
