@@ -84,11 +84,10 @@ describe("strategy comparison", () => {
     const scenario = delayScenario();
     render(<DelayView scenario={scenario} result={scenario.result as DelayResult} meta={meta} onUpdate={onUpdate} />);
 
-    const group = screen.getByRole("group", { name: "Strategy" });
-    const buttons = within(group).getAllByRole("button");
-    expect(buttons.map((b) => b.textContent)).toEqual(["Lowest cost", "Protect passengers", "Least delay"]);
-    expect(within(group).getByRole("button", { name: "Lowest cost" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByText(/changes which option is\s+recommended, not the numbers/)).toBeInTheDocument();
+    const cards = Array.from(document.querySelectorAll<HTMLElement>(".strategy-card"));
+    expect(cards.map((c) => c.dataset.strategy)).toEqual(["lowest_cost", "protect_passengers", "least_delay"]);
+    expect(cards.map((c) => c.getAttribute("aria-pressed"))).toEqual(["true", "false", "false"]);
+    expect(screen.getByText(/Click a card to apply that strategy/)).toBeInTheDocument();
 
     const card = document.querySelector('[data-strategy="least_delay"]') as HTMLElement;
     expect(within(card).getByText("Cancel G9521/G9522 round trip")).toBeInTheDocument();
@@ -102,7 +101,7 @@ describe("strategy comparison", () => {
     expect(within(table).getByText("Cancel")).toBeInTheDocument();
     expect(within(table).getByText(/Cancels G9521 SHJ→KHI/)).toBeInTheDocument();
 
-    await userEvent.click(within(group).getByRole("button", { name: "Least delay" }));
+    await userEvent.click(card);
     const call = fetchFn.mock.calls.find(([url]) => url.endsWith("/strategy"));
     expect(call?.[0]).toBe("/api/v1/scenarios/s1/strategy");
     expect(JSON.parse(call?.[1]?.body as string)).toEqual({ strategy: "least_delay" });
@@ -117,7 +116,7 @@ describe("strategy comparison", () => {
     expect(document.querySelector("tr.recommended th")).toHaveTextContent("Cancel G9521/G9522 round trip");
   });
 
-  it("labels passengers by why they need a new flight", () => {
+  it("labels passengers by why they need a new flight", async () => {
     stubFetch(() => []);
     const pax = {
       rank: 1, pnr: "ABC123", customer_key: "k1", name: "Lina Haddad", pax_type: "AD", route: "SHJ-KHI",
@@ -129,6 +128,7 @@ describe("strategy comparison", () => {
     };
     const scenario = delayScenario({ passengers: [pax, { ...pax, customer_key: "k2", name: "Omar Said", group: "missed_connection" }] });
     render(<DelayView scenario={scenario} result={scenario.result as DelayResult} meta={meta} onUpdate={() => {}} />);
+    await userEvent.click(screen.getByRole("button", { name: "Show passenger detail" }));
     expect(screen.getByText("Cancelled")).toBeInTheDocument();
     expect(screen.getByText("Missed connection")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /missed connections and cancelled flights \(2\)/ })).toBeInTheDocument();

@@ -11,6 +11,7 @@ import {
   setToken,
 } from "./api";
 import { CancelView } from "./CancelView";
+import { CascadePanel } from "./CascadePanel";
 import { DelayView } from "./DelayView";
 import { Launcher } from "./Launcher";
 import { ModelCardView } from "./ModelCardView";
@@ -434,6 +435,7 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
           {view === "watchlist" && (
             <>
               {scenario && <RewardPanel scenario={scenario} />}
+              <CascadePanel />
               {meta && (
                 <WatchlistView
                   busy={busy}

@@ -157,7 +157,7 @@ describe("result views", () => {
     expect(screen.getByText("Template text")).toBeInTheDocument();
   });
 
-  it("lists cancelled-flight passengers with tier and recommended flight", () => {
+  it("lists cancelled-flight passengers with tier and recommended flight", async () => {
     stubFetch(() => []);
     const scenario: Scenario = {
       id: "s2", kind: "CANCEL", flight_id: "G9201_202611211200", delay_minutes: null, weights, created_by: "pcu",
@@ -171,6 +171,7 @@ describe("result views", () => {
       },
     };
     render(<CancelView scenario={scenario} result={scenario.result as never} meta={meta} onUpdate={() => {}} />);
+    await userEvent.click(screen.getByRole("button", { name: "Show passenger detail" }));
     expect(screen.getByText("Lina Haddad")).toBeInTheDocument();
     expect(screen.getByText("G9203")).toBeInTheDocument();
     expect(screen.getAllByText("Care").length).toBeGreaterThan(0);
@@ -229,7 +230,7 @@ describe("WatchlistView", () => {
     expect(screen.getByText(/Next: G9201 SHJ-CAI/)).toBeInTheDocument();
   });
 
-  it("switches one panel between the connection passengers and the rewards", async () => {
+  it("shows the connection passengers and the rewards as two separate banners, each opened on its own", async () => {
     stubFetch(() => []);
     const scenario = { id: "s1", flight_id: "G9519_202611210200", kind: "DELAY", delay_minutes: 120, weights: {}, result: {}, created_by: "x", created_at: "" } as unknown as Scenario;
     render(
@@ -237,14 +238,18 @@ describe("WatchlistView", () => {
         <p>the connection passenger table</p>
       </PassengerTabs>,
     );
-    expect(screen.getByRole("tab", { name: "Connection passengers (3)" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("heading", { name: "Connection passengers (3)" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Passenger rewards / compensation" })).toBeVisible();
+    expect(screen.queryByText("the connection passenger table")).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Passenger rewards (goodwill)" })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Show passenger detail" }));
     expect(screen.getByText("the connection passenger table")).toBeVisible();
-    expect(screen.getByRole("heading", { name: "Passenger rewards (goodwill)", hidden: true })).not.toBeVisible();
-    await userEvent.click(screen.getByRole("tab", { name: "Passenger rewards / compensation" }));
+    expect(screen.queryByRole("heading", { name: "Passenger rewards (goodwill)" })).not.toBeInTheDocument(); // rewards stay closed
+    await userEvent.click(screen.getByRole("button", { name: /Show rewards & compensation/ }));
     expect(screen.getByRole("heading", { name: "Passenger rewards (goodwill)" })).toBeVisible();
-    expect(screen.getByText("the connection passenger table")).not.toBeVisible();
-    await userEvent.click(screen.getByRole("tab", { name: "Connection passengers (3)" }));
-    expect(screen.getByText("the connection passenger table")).toBeVisible();
+    expect(screen.getByText("the connection passenger table")).toBeVisible(); // the first banner stays open
+    await userEvent.click(screen.getAllByRole("button", { name: "Hide detail" })[0] as HTMLElement);
+    expect(screen.queryByText("the connection passenger table")).not.toBeInTheDocument();
   });
 
   it("shows the month's cascade check in six boxes and opens the full graphical view", async () => {

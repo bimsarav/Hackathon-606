@@ -22,7 +22,7 @@ test("wrong password is rejected and the API needs a token", async ({ page, requ
 
 test("scenario A: a delay is assessed, options compared, recommendation approved", async ({ page }) => {
   await signIn(page);
-  await page.getByRole("tab", { name: "A · Delay" }).click();
+  await page.getByRole("button", { name: "Flight Delay", exact: true }).click();
   await page.locator(".preset-list .preset").first().click();
   await expect(page.getByRole("heading", { name: "Recovery options compared" })).toBeVisible();
   const recommended = page.locator("tr.recommended");
@@ -53,8 +53,9 @@ test("scenario A: a delay is assessed, options compared, recommendation approved
 
 test("scenario B: a cancellation ranks passengers by tier and re-runs with new weights", async ({ page }) => {
   await signIn(page);
-  await page.getByRole("tab", { name: "B · Cancellation" }).click();
+  await page.getByRole("button", { name: "Cancellation", exact: true }).click();
   await page.locator(".preset-list .preset").first().click();
+  await page.getByRole("button", { name: "Show passenger detail" }).click();
   await expect(page.getByRole("heading", { name: "Passengers in priority order" })).toBeVisible();
   const firstTier = page.locator("table.pax tbody tr").first().locator(".tier");
   await expect(firstTier).toHaveText("Care");
@@ -73,7 +74,7 @@ test("scenario B: a cancellation ranks passengers by tier and re-runs with new w
 
 test("phase 2: delay watchlist ranks flights, shows reasons and opens a delay scenario", async ({ page }) => {
   await signIn(page);
-  await page.getByRole("button", { name: /Delay watchlist/ }).click();
+  await page.getByRole("button", { name: "Delay Watchlist", exact: true }).click();
   await expect(page.getByRole("heading", { name: /Delay watchlist/ })).toBeVisible();
   await page.getByRole("combobox", { name: /^Risk/ }).selectOption("all");
   const table = page.getByRole("table", { name: "Watchlist flights" });
@@ -86,15 +87,12 @@ test("phase 2: delay watchlist ranks flights, shows reasons and opens a delay sc
 
 test("phase 3: strategies switch the recommendation", async ({ page }) => {
   await signIn(page);
-  await page.getByRole("tab", { name: "A · Delay" }).click();
+  await page.getByRole("button", { name: "Flight Delay", exact: true }).click();
   await page.locator(".preset-list .preset").first().click();
   await expect(page.getByRole("heading", { name: "Strategies compared" })).toBeVisible();
-  const switcher = page.getByRole("group", { name: "Strategy" });
-  await expect(switcher.getByRole("button", { name: "Lowest cost" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(".strategy-card.active")).toHaveAttribute("data-strategy", "lowest_cost");
 
-  await switcher.getByRole("button", { name: "Protect passengers" }).click();
-  await expect(switcher.getByRole("button", { name: "Protect passengers" })).toHaveAttribute("aria-pressed", "true");
+  await page.locator('.strategy-card[data-strategy="protect_passengers"]').click();
   const active = page.locator(".strategy-card.active");
   await expect(active).toHaveAttribute("data-strategy", "protect_passengers");
   const pick = (await active.locator(".strategy-pick").innerText()).trim();
@@ -106,7 +104,7 @@ test("phase 3: strategies switch the recommendation", async ({ page }) => {
 test("phase 3: the agent investigates a flight and its recommendation opens for approval", async ({ page }) => {
   test.setTimeout(180_000);
   await signIn(page);
-  await page.getByRole("tab", { name: "Ask the agent" }).click();
+  await page.getByRole("button", { name: "Predict the Flight Delay", exact: true }).click();
   await page.getByLabel("Strategy", { exact: true }).selectOption("protect_passengers");
   await page.locator(".preset-list .preset").first().click();
   // Works whether the AI or the rule-based planner answers.
@@ -119,12 +117,10 @@ test("phase 3: the agent investigates a flight and its recommendation opens for 
   await expect(page.getByRole("heading", { name: /Agent recommendation/ })).toBeVisible();
 });
 
-test("phase 2: the 7-day tab shows last month's cascade check instead of the scenario launcher", async ({
-  page,
-}) => {
+test("phase 2: the 7-day page shows last month's cascade check and no scenario launcher", async ({ page }) => {
   await signIn(page);
-  await expect(page.getByRole("heading", { name: "New scenario" })).toBeVisible();
-  await page.getByRole("button", { name: /Delay watchlist/ }).click();
+  await expect(page.getByRole("region", { name: "New scenario" })).toBeVisible();
+  await page.getByRole("button", { name: "Delay Watchlist", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Last month: cascade formula vs actual" })).toBeVisible();
   await expect(page.getByText("Within ±15 min").first()).toBeVisible();
   await page.getByRole("button", { name: "Expand the full view" }).click();
@@ -132,18 +128,16 @@ test("phase 2: the 7-day tab shows last month's cascade check instead of the sce
   await expect(page.getByRole("img", { name: /Scatter of/ })).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toBeHidden();
-  await expect(page.getByRole("heading", { name: "New scenario" })).toBeHidden();
-  await expect(page.getByRole("heading", { name: "Recent scenarios" })).toBeHidden();
-  await page.getByRole("button", { name: "Scenario", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "New scenario" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "New scenario" })).toBeHidden();
+  await page.getByRole("button", { name: "Flight Delay", exact: true }).click();
+  await expect(page.getByRole("region", { name: "New scenario" })).toBeVisible();
 });
 
 test("phase 5: a budget gives a reward plan from the preference model, and the plan can be approved", async ({ page }) => {
   await signIn(page);
-  await page.getByRole("tab", { name: "A · Delay" }).click();
+  await page.getByRole("button", { name: "Flight Delay", exact: true }).click();
   await page.locator(".preset-list .preset").first().click();
-  await expect(page.getByRole("tab", { name: /Connection passengers/ })).toHaveAttribute("aria-selected", "true");
-  await page.getByRole("tab", { name: "Passenger rewards / compensation" }).click();
+  await page.getByRole("button", { name: "Show rewards & compensation" }).click();
   await expect(page.getByRole("heading", { name: "Passenger rewards (goodwill)" })).toBeVisible();
   await page.getByLabel("Budget (AED)").fill("4000");
   await page.getByRole("button", { name: "Recommend rewards" }).click();
