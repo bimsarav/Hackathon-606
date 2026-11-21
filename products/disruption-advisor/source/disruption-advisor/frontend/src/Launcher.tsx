@@ -128,8 +128,7 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
   }
 
   return (
-    <section className="launcher" aria-labelledby="launcher-title">
-      <h2 id="launcher-title">New scenario</h2>
+    <section className="launcher" aria-label="New scenario">
 
       {/* Multi-column filter card */}
       <div className="filter-card">
@@ -170,36 +169,37 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
                 onChange={(e) => handleFromDate(e.target.value)} />
             </div>
           </div>
-          {/* Row 2: dep to + delay slider + actions */}
+          {/* Row 2: dep to + actions */}
           <div className="filter-row-b">
             <div className="filter-field">
               <label htmlFor="dep-to">Dep. Date To (UTC)</label>
               <input id="dep-to" type="date" value={toDate}
                 onChange={(e) => handleToDate(e.target.value)} />
             </div>
-            {tab === "DELAY" && (
+            <div className="filter-actions">
+              <button type="button" className="btn-outline" onClick={resetFilters}>Reset</button>
+              <button type="submit">Search</button>
+            </div>
+          </div>
+          {/* Row 3: delay slider (DELAY type only) */}
+          {tab === "DELAY" && (
+            <div className="filter-row-delay">
               <div className="filter-field filter-field-delay">
                 <label htmlFor="delay">Delay: <strong>{delay} min</strong></label>
                 <input id="delay" type="range" min={15} max={600} step={15} value={delay}
                   onChange={(e) => setDelay(Number(e.target.value))}
                   onPointerUp={commitDelay} onKeyUp={commitDelay} onTouchEnd={commitDelay} />
               </div>
-            )}
-            <div className="filter-actions">
-              <button type="button" className="btn-outline" onClick={resetFilters}>Reset</button>
-              <button type="submit">Search</button>
+              <span className={`small ${active ? "muted" : "hint"}`} style={{ whiteSpace: "nowrap", alignSelf: "center", paddingTop: "0.9rem" }}>
+                {active
+                  ? delay === active.delay
+                    ? `Applied to ${active.flightNumber}. Move and release to re-run.`
+                    : `Release to re-run ${active.flightNumber} with ${delay} min…`
+                  : `Pick a flight below to analyse it with ${delay} min.`}
+              </span>
             </div>
-          </div>
+          )}
         </form>
-        {tab === "DELAY" && (
-          <p className={`small ${active ? "muted" : "hint"}`} style={{ marginTop: "0.5rem", marginBottom: 0 }}>
-            {active
-              ? delay === active.delay
-                ? `Applied to ${active.flightNumber}. Move and release to re-run.`
-                : `Release to re-run ${active.flightNumber} with ${delay} min…`
-              : `Pick a flight below to analyse it with ${delay} min.`}
-          </p>
-        )}
       </div>
 
       {tab === "AGENT" && onAgent && (

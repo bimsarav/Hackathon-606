@@ -669,8 +669,16 @@ main {
 .filter-row-b .filter-field {
   flex: 0 0 160px;
 }
+.filter-row-delay {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-top: 0.65rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--line);
+}
 .filter-field-delay {
-  flex: 1 1 200px !important;
+  flex: 1 1 auto;
 }
 .filter-field-delay input[type="range"] {
   padding: 0;
@@ -684,6 +692,12 @@ main {
   display: flex;
   gap: 0.5rem;
   align-items: flex-end;
+}
+.filter-actions button {
+  font-size: 0.875rem;
+  padding: 0.38rem 1rem;
+  border-radius: 6px;
+  white-space: nowrap;
 }
 .btn-outline {
   background: var(--panel);
