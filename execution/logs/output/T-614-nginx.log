@@ -1,0 +1,8 @@
+synced
+web rollback tag: pre-202611210442
+ Image disruption-advisor-web:latest Built 
+ Container disruption-advisor-web-1 Started 
+3
+== smoke 11/11
+  8 passed (1.3m)
+exit=0

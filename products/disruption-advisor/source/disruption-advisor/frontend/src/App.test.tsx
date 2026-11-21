@@ -92,9 +92,8 @@ describe("App", () => {
     await userEvent.type(screen.getByLabelText("User name"), "occ");
     await userEvent.type(screen.getByLabelText("Password"), "pw");
     await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
-    expect(await screen.findByText("Start with a disruption")).toBeInTheDocument();
+    expect(await screen.findByRole("region", { name: "New scenario" })).toBeInTheDocument();
     expect(await screen.findByText(/142 connecting/)).toBeInTheDocument();
-    expect(screen.getByText("AI off: template explanations")).toBeInTheDocument();
   });
 });
 
@@ -111,20 +110,23 @@ describe("roles", () => {
     await userEvent.type(screen.getByLabelText("User name"), "u");
     await userEvent.type(screen.getByLabelText("Password"), "pw");
     await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
-    await screen.findByText("Start with a disruption");
+    await screen.findByRole("region", { name: "New scenario" });
   }
+
+  const navNames = () =>
+    within(screen.getByRole("navigation")).getAllByRole("button").map((b) => b.textContent?.replace(/^[^A-Za-z]+/, "").trim());
 
   it("shows the evaluator every view, including Model and Test data", async () => {
     await signIn("EVALUATOR");
-    const names = within(screen.getByRole("navigation", { name: "Views" })).getAllByRole("button").map((b) => b.textContent);
-    expect(names).toEqual(["Scenario", "Delay watchlist (7 days)", "Agent", "Model", "Test data"]);
+    expect(navNames()).toEqual([
+      "Flight Delay", "Cancellation", "Predict the Flight Delay", "Delay Watchlist", "Model Card", "Test data",
+    ]);
   });
 
   it.each(["OCC", "PCU"] as const)("hides Model and Test data from %s, even when one was remembered", async (role) => {
     sessionStorage.setItem("disruption-advisor-view", "testdata");
     await signIn(role);
-    const names = within(screen.getByRole("navigation", { name: "Views" })).getAllByRole("button").map((b) => b.textContent);
-    expect(names).toEqual(["Scenario", "Delay watchlist (7 days)", "Agent"]);
+    expect(navNames()).toEqual(["Flight Delay", "Cancellation", "Predict the Flight Delay", "Delay Watchlist"]);
     expect(screen.queryByRole("heading", { name: "Test data" })).not.toBeInTheDocument();
   });
 });

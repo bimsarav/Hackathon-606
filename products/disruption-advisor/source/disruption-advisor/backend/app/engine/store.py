@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 import threading
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -81,6 +81,35 @@ class OpsStore:
         self.last_week: dict[str, Any] = json.loads(week.read_text()) if week.exists() else {}
         report = ops_dir / "ingest_report.json"
         self.report: dict[str, Any] = json.loads(report.read_text()) if report.exists() else {}
+        # Build PAX_COLUMNS dynamically: columns added in later ingest versions use NULL AS <col> fallback.
+        _pax_cols = {r["column_name"] for r in self.query("DESCRIBE pax_segments")}
+        _cust_cols = {r["column_name"] for r in self.query("DESCRIBE customers")}
+        _pax_optional = (
+            "family_account_synthetic",
+            "family_head_synthetic",
+            "family_tier_synthetic",
+            "booking_class_level",
+        )
+        _cust_optional = ("loyalty_priority", "loyalty_id_synthetic", "available_points_synthetic")
+        _family_sel = ", ".join(f"p.{c}" if c in _pax_cols else f"NULL AS {c}" for c in _pax_optional)
+        _loyalty_sel = ", ".join(f"c.{c}" if c in _cust_cols else f"NULL AS {c}" for c in _cust_optional)
+        self.PAX_COLUMNS = (
+            "p.flight_id, p.pnr, p.customer_key, p.pax_type, p.origin, p.destination, "
+            "p.dep_utc, p.booking_code, p.revenue_type, p.fare_family_synthetic, p.fare, p.ancillaries, "
+            "p.baggage_kg, p.has_meal, p.has_seat, p.pnr_size, p.adults, p.children, p.infants, p.ssr_code, "
+            "p.ssr_source, p.sales_channel, p.passenger_id, "
+            "p.passport_number_synthetic, p.national_id_synthetic, p.identity_rule, "
+            f"{_family_sel}, "
+            f"c.is_loyalty_member, c.loyalty_tier_synthetic, {_loyalty_sel}, "
+            "c.travel_frequency_band, c.flown_segments_12m, c.ambiguous_common_name"
+        )
+        # Connections the airline sells (fares list, X/hub/Y), for rebooking through the hub (gap 3)
+        sold = ops_dir / "sold_connections.parquet"
+        self.sold_connections: set[tuple[str, str, str]] = (
+            {(o, h, d) for o, h, d in self._con.execute(f"SELECT origin, hub, destination FROM '{sold}'").fetchall()}
+            if sold.exists()
+            else set()
+        )
 
     def _add_test_data(self, test_dir: Path | None, tables: tuple[str, ...] = sample_data.TABLES) -> int | None:
         """Append the uploaded test flights (app/sample_data.py) to the in-memory tables; the Parquet is untouched."""
@@ -171,18 +200,38 @@ class OpsStore:
         )
         return [self._leg(r) for r in rows]
 
+    def via_hub(
+        self,
+        origin: str,
+        destination: str,
+        hub: str,
+        after: datetime,
+        before: datetime,
+        exclude: list[str],
+        min_connection: timedelta,
+        max_connection: timedelta,
+        limit: int = 12,
+    ) -> list[tuple[Leg, Leg]]:
+        """Two-flight itineraries origin -> hub -> destination that the airline sells as a connection (fares list),
+        leaving after ``after``, arriving by ``before``, with a connection between the minimum (MCT) and maximum
+        time. Earliest arrival first."""
+        if origin == hub or destination == hub or (origin, hub, destination) not in self.sold_connections:
+            return []
+        rows = self.query(
+            f"""SELECT {", ".join("a." + c.strip() for c in LEG_COLUMNS.split(","))},
+                       {", ".join("b." + c.strip() + " AS b_" + c.strip() for c in LEG_COLUMNS.split(","))}
+                FROM flights a JOIN flights b
+                  ON b.origin = a.destination AND b.std >= a.sta + ? AND b.std <= a.sta + ?
+                WHERE a.origin = ? AND a.destination = ? AND b.destination = ?
+                  AND a.std > ? AND b.sta <= ? AND a.sta IS NOT NULL AND b.sta IS NOT NULL
+                  AND NOT list_contains(?, a.flight_id) AND NOT list_contains(?, b.flight_id)
+                ORDER BY b.sta, a.std LIMIT ?""",
+            [min_connection, max_connection, origin, hub, destination, after, before, exclude, exclude, limit],
+        )
+        cols = [c.strip() for c in LEG_COLUMNS.split(",")]
+        return [(self._leg({c: r[c] for c in cols}), self._leg({c: r[f"b_{c}"] for c in cols})) for r in rows]
+
     # --- passengers ----------------------------------------------------------------------------------------
-    PAX_COLUMNS = (
-        "p.flight_id, p.pnr, p.customer_key, p.pax_type, p.origin, p.destination, "
-        "p.dep_utc, p.booking_code, p.revenue_type, p.fare_family_synthetic, p.fare, p.ancillaries, "
-        "p.baggage_kg, p.has_meal, p.has_seat, p.pnr_size, p.adults, p.children, p.infants, p.ssr_code, "
-        "p.ssr_source, p.sales_channel, p.passenger_id, "
-        "p.passport_number_synthetic, p.national_id_synthetic, p.identity_rule, "
-        "p.family_account_synthetic, p.family_head_synthetic, p.family_tier_synthetic, "
-        "c.is_loyalty_member, c.loyalty_tier_synthetic, c.loyalty_priority, c.loyalty_id_synthetic, "
-        "c.available_points_synthetic, c.travel_frequency_band, "
-        "c.flown_segments_12m, c.ambiguous_common_name"
-    )
 
     def passengers_on(self, flight_ids: list[str]) -> list[dict[str, Any]]:
         if not flight_ids:

@@ -160,5 +160,17 @@ def cancel_round_trip(disrupted: Leg, rest: list[Leg], delay: timedelta, min_tur
     return plan
 
 
+def hold_flight(plan: RotationPlan, held: Leg, minutes: int, rotation: list[Leg], min_turn: Turn) -> RotationPlan:
+    """Hold ``held`` for ``minutes`` so late connecting passengers can make it. The hold runs down that aircraft's
+    own rotation (``rotation``: its later flights), so the knock-on on another aircraft is part of the plan. Flights
+    already in ``plan`` keep the later of the two times."""
+    out = RotationPlan(dict(plan.timings))
+    for t in propagate([held, *rotation], held.std + timedelta(minutes=minutes), min_turn, held.tail):
+        current = out.timings.get(t.leg.flight_id)
+        if current is None or t.new_std > current.new_std:
+            out.timings[t.leg.flight_id] = t
+    return out
+
+
 def first_departure_from(legs: list[Leg], station: str, not_before: datetime) -> Leg | None:
     return next((leg for leg in legs if leg.origin == station and leg.std >= not_before), None)

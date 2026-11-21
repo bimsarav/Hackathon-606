@@ -49,7 +49,7 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
   return (
     <article className="result">
       <header className="result-head">
-        <p className="eyebrow">Scenario A · Delay</p>
+        <p className="eyebrow">Flight Delay</p>
         <h1>
           {f.flight_number} {f.origin}→{f.destination} +{minutes(result.delay_minutes)}
         </h1>

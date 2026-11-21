@@ -11,13 +11,14 @@ import {
   type StrategyKey,
   type StrategyPick,
 } from "./api";
-import { aed, minutes, num } from "./format";
+import { aed, minutes, num, utc } from "./format";
 
 export const KIND_LABEL: Record<OptionKind, string> = {
   absorb: "Absorb",
   swap: "Swap",
   cancel: "Cancel",
   consolidate: "Consolidate",
+  hold: "Hold connection",
 };
 
 /** Passenger delay in hours (the engine sends minutes summed over passengers). */
@@ -111,6 +112,19 @@ export function OptionKindInfo({ option: o }: { option: RecoveryOption }) {
   return (
     <>
       {o.kind && <span className={`chip kind kind-${o.kind}`}>{KIND_LABEL[o.kind]}</span>}
+      {o.holds && o.holds.length > 0 && (
+        <span className="small muted block">
+          Holds {o.holds.map((h) => `${h.flight_number} ${h.minutes} min`).join(", ")} ·{" "}
+          {num(o.holds.reduce((s, h) => s + h.connections_kept, 0))} connections kept
+        </span>
+      )}
+      {o.cascade && o.cascade.flights_delayed > 0 && (
+        <span className="small muted block" title="How far the delay spreads, including onto other aircraft">
+          Knock-on: {num(o.cascade.flights_delayed)} flights on {num(o.cascade.aircraft)} aircraft
+          {o.cascade.beyond_next_flight > 0 ? ` (${num(o.cascade.beyond_next_flight)} beyond the next flight)` : ""}
+          {o.cascade.delay_ends ? ` · until ${utc(o.cascade.delay_ends)}` : ""}
+        </span>
+      )}
       {o.cancelled_flights && o.cancelled_flights.length > 0 && (
         <span className="small muted block">
           Cancels {o.cancelled_flights.map((c) => `${c.flight_number} ${c.origin}→${c.destination}`).join(", ")} ·{" "}

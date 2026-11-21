@@ -110,7 +110,7 @@ def rank(
         values = {
             "loyalty": TIER_VALUE.get(tier_name, 0.0),
             "frequency": FREQUENCY_VALUE.get(str(p.get("travel_frequency_band") or "occasional"), 0.2),
-            "fare_value": 0.7 * fare_pct(p["fare"]) + 0.3 * FAMILY_VALUE.get(str(p.get("fare_family_synthetic")), 0.4),
+            "fare_value": fare_value(p, fare_pct(p["fare"])),
             "ancillaries": min((p.get("ancillaries") or 0.0) / 150.0, 1.0),
             "journey": min(0.6 * has_onward + 0.2 * max(segs - 1, 0), 1.0),
             "booking": 1.0 if family else (0.5 if p.get("pnr_size", 1) >= 5 else 0.0),
@@ -128,6 +128,16 @@ def rank(
         )
     out.sort(key=lambda r: r.sort_key)
     return out
+
+
+def fare_value(p: dict[str, Any], paid_percentile: float) -> float:
+    """Fare value 0-1 (UC5 "fare paid, fare family, booking class and booking value"): 50 % fare paid (percentile
+    among the affected passengers), 30 % booking-class level from the fares list (share of passengers in cheaper
+    classes; codes the fares list does not sell fall back to the fare family) and 20 % fare family."""
+    family = FAMILY_VALUE.get(str(p.get("fare_family_synthetic")), 0.4)
+    level = p.get("booking_class_level")
+    booking_class = float(level) if level is not None else family
+    return 0.5 * paid_percentile + 0.3 * booking_class + 0.2 * family
 
 
 def explain(r: Ranked) -> str:

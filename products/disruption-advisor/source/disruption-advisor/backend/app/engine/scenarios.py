@@ -27,6 +27,7 @@ from app.engine.network import (
     TurnTimes,
     absorb_delay,
     cancel_round_trip,
+    hold_flight,
     round_trip_pairs,
     swap_rotations,
 )
@@ -35,6 +36,11 @@ from app.engine.store import Leg, OpsStore
 
 SWAP_SEARCH = timedelta(hours=3)
 MAX_SWAP_OPTIONS = 3
+MAX_HOLD_CANDIDATES = 5  # onward flights tried for a hold, most missed connections first
+HOLD_STEP = 5  # holds are rounded up to 5 minutes
+FREQUENCY_BONUS = {"frequent": 1.0, "regular": 0.5}
+HUB = "SHJ"  # rebooking through the hub (gap 3)
+HUB_ARRIVAL_SLACK = timedelta(hours=12)  # a hub itinerary leaves within the window and may arrive up to 12 h later
 CANCEL_WINDOW = timedelta(hours=24)  # round trips considered for cancellation (ADR 0011)
 MAX_CANCEL_OPTIONS = 3
 CONSOLIDATE_WITHIN_MINUTES = 360  # every cancelled passenger rebooked on the same route within 6 h
@@ -143,7 +149,8 @@ def _option_kpis(ctx: Context, key: str, label: str, plan: RotationPlan, cancell
     care = sum(care_cost(cm, t.delay_minutes, overnight=False) * t.leg.booked_pax for t in delayed)
     eu = sum(_eu261(ctx, t.leg) * t.leg.booked_pax for t in delayed if t.delay_minutes >= 180)
     misconnect_cost = len(missed) * (cm.rebooking_handling + cm.meal_voucher)
-    total = delay_cost + care + eu * cm.eur_to_aed + misconnect_cost
+    goodwill = _misconnect_goodwill(ctx, missed)
+    total = delay_cost + care + eu * cm.eur_to_aed + misconnect_cost + goodwill
     return {
         "key": key,
         "kind": key.split(":")[0],
@@ -160,7 +167,10 @@ def _option_kpis(ctx: Context, key: str, label: str, plan: RotationPlan, cancell
             "passenger_care": round(care),
             "eu261_compensation": round(eu * cm.eur_to_aed),
             "misconnect_handling": round(misconnect_cost),
+            "misconnect_goodwill": round(goodwill),
         },
+        "cascade": _cascade(plan),
+        "holds": [],
         "legs": [
             {
                 "flight_id": t.leg.flight_id,
@@ -191,7 +201,93 @@ def _option_kpis(ctx: Context, key: str, label: str, plan: RotationPlan, cancell
         "cancelled_passengers": 0,  # set from the rebooking list (seated passengers) in _option_passengers
         "_missed": missed,
         "_cancelled": cancelled_legs,
+        "_plan": plan,
     }
+
+
+def _misconnect_goodwill(ctx: Context, missed: list[Connection]) -> float:
+    """Goodwill cost of the missed connections, by passenger value: a frequent or high-tier loyal traveller (own tier
+    or the family account's) is worth more to keep (user 2026-11-21). Base x (1 + 2 x tier value + frequency)."""
+    if not missed:
+        return 0.0
+    keys = {(c.pnr, c.customer_key) for c in missed}
+    rows = {
+        (p["pnr"], p["customer_key"]): p for p in ctx.store.passengers_on(sorted({c.inbound_flight_id for c in missed}))
+    }
+    base, total = ctx.settings.cost_misconnect_goodwill, 0.0
+    for key in keys:
+        p = rows.get(key, {})
+        family = p.get("family_tier_synthetic") if p.get("family_account_synthetic") else None
+        tier = max(priority.TIER_VALUE.get(p.get("loyalty_tier_synthetic"), 0.0), priority.TIER_VALUE.get(family, 0.0))
+        total += base * (1 + 2 * tier + FREQUENCY_BONUS.get(str(p.get("travel_frequency_band")), 0.0))
+    return total
+
+
+def _cascade(plan: RotationPlan) -> dict[str, Any]:
+    """How far the delay spreads: flights and aircraft delayed, how many beyond the first two flights of each
+    aircraft, and when the last delayed flight lands (user 2026-11-21: look past the next flight)."""
+    delayed = plan.delayed()
+    by_tail: dict[str, list[Any]] = {}
+    for timing in delayed:
+        by_tail.setdefault(timing.operated_by, []).append(timing)
+    return {
+        "flights_delayed": len(delayed),
+        "aircraft": len(by_tail),
+        "beyond_next_flight": sum(max(len(ts) - 2, 0) for ts in by_tail.values()),
+        "delay_ends": max((ts.new_sta for ts in delayed), default=None),
+        "passenger_delay_minutes": sum(ts.delay_minutes * ts.leg.booked_pax for ts in delayed),
+    }
+
+
+def _with_holds(ctx: Context, base: dict[str, Any], horizon_end: datetime) -> dict[str, Any] | None:
+    """Hold variant of an option (user 2026-11-21): for each onward flight that its connecting passengers would miss,
+    try holding it just long enough (up to HOLD_MAX) for them to make the minimum connection time. The hold delays that
+    flight and its aircraft's later flights (knock-on on another aircraft) and can break other connections; it is
+    kept only when the option's total cost, including the passengers' goodwill cost, goes down."""
+    missed: list[Connection] = base["_missed"]
+    plan: RotationPlan = base["_plan"]
+    by_outbound: dict[str, list[Connection]] = {}
+    for c in missed:
+        by_outbound.setdefault(c.outbound_flight_id, []).append(c)
+    current: dict[str, Any] = base
+    holds: list[dict[str, Any]] = []
+    for outbound_id, conns in sorted(by_outbound.items(), key=lambda kv: (-len(kv[1]), kv[0]))[:MAX_HOLD_CANDIDATES]:
+        out = ctx.store.leg(outbound_id)
+        if out is None or outbound_id in plan.timings:
+            continue  # unknown, or already moved by this option (e.g. flown by the delayed aircraft)
+        need = 0
+        for c in conns:
+            inbound = plan.timings.get(c.inbound_flight_id)
+            if inbound is not None:
+                need = max(
+                    need, int((inbound.new_sta + timedelta(minutes=c.mct_minutes) - out.std).total_seconds() // 60)
+                )
+        minutes = -(-need // HOLD_STEP) * HOLD_STEP
+        if minutes <= 0 or minutes > ctx.settings.hold_max_minutes:
+            continue
+        rotation = [x for x in ctx.store.tail_legs(out.tail, out.std, horizon_end) if x.std > out.std]
+        trial_plan = hold_flight(plan, out, minutes, rotation, ctx.min_turn)
+        trial = _option_kpis(ctx, base["key"], base["label"], trial_plan, base["_cancelled"])
+        if trial["cost_aed"] < current["cost_aed"]:
+            kept = len(conns) - sum(1 for m in trial["_missed"] if m.outbound_flight_id == outbound_id)
+            plan, current = trial_plan, trial
+            holds.append(
+                {
+                    "flight_id": out.flight_id,
+                    "flight_number": out.flight_number,
+                    "minutes": minutes,
+                    "connections_kept": kept,
+                }
+            )
+    if not holds:
+        return None
+    what = ", ".join(f"{h['flight_number']} {h['minutes']} min" for h in holds)
+    kept = sum(int(h["connections_kept"]) for h in holds)
+    option = _option_kpis(
+        ctx, f"hold:{base['key']}", f"{base['label']} + hold {what} ({kept} connections kept)", plan, base["_cancelled"]
+    )
+    option["kind"], option["holds"] = "hold", holds
+    return option
 
 
 def _option_passengers(ctx: Context, o: dict[str, Any], weights: dict[str, float]) -> dict[str, Any]:
@@ -306,10 +402,18 @@ def analyse_delay(
             )
         )
 
+    # Hold the connecting flight instead of letting passengers miss it, where that is cheaper (user 2026-11-21):
+    # tried on absorbing the delay and on the cheapest swap.
+    bases = [o for o in options if o["kind"] == "absorb"] + sorted(
+        (o for o in options if o["kind"] == "swap"), key=strategies.lowest_cost
+    )[:1]
+    options += [h for h in (_with_holds(ctx, b, horizon_end) for b in bases) if h is not None]
+
     payloads = {o["key"]: _option_passengers(ctx, o, weights) for o in options}
     missed_by_option: dict[str, list[Connection]] = {o["key"]: o.pop("_missed") for o in options}
     for o in options:
         o.pop("_cancelled")
+        o.pop("_plan")
     picks = strategies.picks(options)
     for o in options:
         o["picked_by"] = [name for name, key in picks.items() if key == o["key"]]
@@ -451,14 +555,19 @@ def _rebook_cancelled(ctx: Context, leg: Leg, weights: dict[str, float], exclude
 
     ranked = priority.rank(passengers, weights, onward, seg_counts)
     after = max(ctx.settings.now_utc, leg.std - timedelta(hours=3))
-    alts = ctx.store.alternatives(
-        leg.origin,
-        leg.destination,
-        after,
-        leg.std + timedelta(hours=ctx.settings.rebooking_window_hours),
-        sorted({leg.flight_id, *exclude}),
+    until = leg.std + timedelta(hours=ctx.settings.rebooking_window_hours)
+    excluded = sorted({leg.flight_id, *exclude})
+    options: list[Leg | rebooking.Itinerary] = list(
+        ctx.store.alternatives(leg.origin, leg.destination, after, until, excluded)
     )
-    result = rebooking.plan(ranked, alts, leg.sta, deadline)
+    options += _hub_itineraries(ctx, leg, connections, after, until, excluded)
+    final_destination = {(c.pnr, c.customer_key): c.final_destination for c in connections}
+    final_arrival = {
+        (c.pnr, c.customer_key): out.sta for c in connections if (out := ctx.store.leg(c.outbound_flight_id))
+    }
+    result = rebooking.plan(
+        ranked, options, leg.sta, deadline, final_destination=final_destination, final_arrival=final_arrival
+    )
     payload = _passenger_payload(
         ctx,
         ranked,
@@ -477,6 +586,37 @@ def _rebook_cancelled(ctx: Context, leg: Leg, weights: dict[str, float], exclude
         "rebooking_handling": round(seated * cm.rebooking_handling),
     }
     return {"ranked": ranked, "result": result, "payload": payload, "cost": cost, "eu": eu, "onward": onward}
+
+
+def _hub_itineraries(
+    ctx: Context, leg: Leg, connections: list[Connection], after: datetime, until: datetime, excluded: list[str]
+) -> list[rebooking.Itinerary]:
+    """Rebooking through the hub (gap 3), only on connections the airline sells (fares list) and within the MCT:
+    - the cancelled flight flies into the hub: connecting passengers may move to a new inbound flight AND a new onward
+      flight to their final destination (their original onward flight is excluded, they already hold that seat);
+    - the cancelled flight does not touch the hub (e.g. RKT-CCJ): everyone may travel through the hub."""
+    hub, out = HUB, []
+
+    def pairs(origin: str, destination: str, extra: list[str]) -> list[tuple[Leg, Leg]]:
+        mct = ctx.store.mct_minutes(origin, hub, destination, default=ctx.settings.default_mct_minutes)
+        return ctx.store.via_hub(
+            origin,
+            destination,
+            hub,
+            after,
+            until + HUB_ARRIVAL_SLACK,
+            excluded + extra,
+            timedelta(minutes=mct),
+            ctx.max_connection,
+        )
+
+    if leg.destination == hub:
+        for dest in sorted({c.final_destination for c in connections}):
+            held = sorted({c.outbound_flight_id for c in connections if c.final_destination == dest})
+            out += [rebooking.Itinerary((a, b), for_destination=dest) for a, b in pairs(leg.origin, dest, held)]
+    elif leg.origin != hub:
+        out += [rebooking.Itinerary((a, b)) for a, b in pairs(leg.origin, leg.destination, [])]
+    return out
 
 
 def analyse_cancellation(ctx: Context, flight_id: str, weights: dict[str, float]) -> dict[str, Any]:
@@ -586,6 +726,8 @@ def _passenger_payload(
                 "frequency": p.get("travel_frequency_band"),
                 "fare": p["fare"],
                 "fare_family": p.get("fare_family_synthetic"),
+                "booking_code": p.get("booking_code"),
+                "booking_class_level": p.get("booking_class_level"),
                 "ancillaries": p["ancillaries"],
                 "ssr": p.get("ssr_code"),
                 "ssr_source": p.get("ssr_source"),
@@ -657,6 +799,9 @@ def _assumptions(ctx: Context) -> list[str]:
         f"Cancelling a round trip: its passengers are rebooked on the same route within "
         f"{s.rebooking_window_hours} h; revenue loss is not counted (no fare revenue per flight is supplied).",
         f"Passenger delay minutes count {NO_SEAT_DELAY_MINUTES // 60} h for each passenger left without a seat.",
+        f"A missed connection costs AED {s.cost_misconnect_goodwill:g} goodwill x passenger value (1 + 2 x loyalty "
+        f"tier value + 1 frequent / 0.5 regular); a connecting flight may be held up to {s.hold_max_minutes} min "
+        "when that costs less, including the knock-on on its aircraft.",
     ]
 
 

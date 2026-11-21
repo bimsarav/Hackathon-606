@@ -40,6 +40,12 @@ class Settings(BaseSettings):
     cost_hotel_per_night: float = 350.0
     cost_meal_voucher: float = 50.0
     cost_rebooking_handling: float = 25.0
+    # Goodwill cost of a missed connection (user 2026-11-21): base AED x passenger value, so stranding a frequent or
+    # high-tier loyal traveller costs more. Value = 1 + 2 x loyalty tier value (Basic .25 .. Platinum 1) + frequency
+    # bonus (frequent 1, regular .5). Assumed, configurable.
+    cost_misconnect_goodwill: float = 150.0
+    # Holding a connecting flight for late inbound passengers (user 2026-11-21): longest hold considered.
+    hold_max_minutes: int = 60
     eur_to_aed: float = 4.0
     cost_transport: float = 60.0  # one way, airport <-> hotel
 

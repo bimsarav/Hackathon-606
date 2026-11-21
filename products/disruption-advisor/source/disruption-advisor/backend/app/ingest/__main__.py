@@ -31,7 +31,9 @@ def fingerprint(input_dir: Path) -> str:
     """Names, sizes and modification times of the extracts and of any supplied name-free bookings Parquet."""
     h = hashlib.sha256()
     supplied = convert.supplied_bookings(input_dir)
+    fares = convert.fares_source(input_dir)
     files = [p for p in input_dir.iterdir() if p.is_file()] + (list(supplied.rglob("*.parquet")) if supplied else [])
+    files += [fares] if fares and fares not in files else []
     for f in sorted(files):
         st = f.stat()
         h.update(f"{f.relative_to(input_dir)}|{st.st_size}|{int(st.st_mtime)}".encode())

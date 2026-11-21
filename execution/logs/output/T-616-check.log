@@ -1,0 +1,12 @@
+PASS backend-sync
+PASS backend-lint
+PASS backend-format
+PASS backend-types
+PASS backend-tests
+108 passed in 37.15s
+PASS frontend-install
+PASS frontend-typecheck
+PASS frontend-tests
+      Tests  26 passed (26)
+PASS frontend-build
+exit=0

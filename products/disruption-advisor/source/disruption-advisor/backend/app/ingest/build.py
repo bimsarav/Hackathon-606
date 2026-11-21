@@ -132,6 +132,47 @@ def build(
         FROM fit f LEFT JOIN best b USING (reg)""",
     )
 
+    # Fares list (user 2026-11-21): fares whose outbound travel validity overlaps the window. Validities are text
+    # ranges "from~to" (several separated by commas); "4000-01-01" means open-ended.
+    fares_file = raw / "fares.parquet"
+    if fares_file.exists():
+        c.execute(f"""
+            CREATE OR REPLACE TEMP TABLE fares_window AS
+            SELECT DISTINCT f.fare_id, f.booking_code, f.ond, f.journey_type, f.adult_value
+            FROM read_parquet('{fares_file}') f, unnest(string_split(f.outbound_flight_validities, ',')) AS v(r)
+            WHERE f.status = 'A' AND f.currency = 'AED' AND f.adult_value > 0
+              AND try_strptime(split_part(r, '~', 1), '%Y-%m-%dT%H:%M') < {w_end}
+              AND coalesce(try_strptime(split_part(split_part(r, '~', 2), ':', 1) || ':'
+                                        || split_part(split_part(r, '~', 2), ':', 2), '%Y-%m-%dT%H:%M'),
+                           TIMESTAMP '4000-01-01') >= {w_start}""")
+        # Booking-class ladder: within each one-way O&D the classes are ranked by fare (percent rank); a class's
+        # ladder position is its average rank over the O&Ds that sell it, so route price levels cancel out.
+        c.execute("""
+            CREATE OR REPLACE TEMP TABLE class_ladder AS
+            WITH r AS (SELECT booking_code, ond, percent_rank() OVER (PARTITION BY ond ORDER BY adult_value) AS pr
+                       FROM (SELECT booking_code, ond, min(adult_value) AS adult_value FROM fares_window
+                             WHERE journey_type = 'ONE_WAY' GROUP BY 1, 2))
+            SELECT r.booking_code, avg(r.pr) AS ladder, count(*) AS onds,
+                   (SELECT median(adult_value) FROM fares_window w
+                    WHERE w.booking_code = r.booking_code AND w.journey_type = 'ONE_WAY') AS median_one_way_aed
+            FROM r GROUP BY 1""")
+        # Connections the airline sells (one-way O&D X/SHJ/Y with X <> Y): only these are offered as rebooking
+        # itineraries through the hub (gap 3).
+        counts["sold_connections"] = out(
+            "sold_connections",
+            """
+            SELECT DISTINCT string_split(ond, '/')[1] AS origin, string_split(ond, '/')[2] AS hub,
+                   string_split(ond, '/')[3] AS destination
+            FROM fares_window
+            WHERE journey_type = 'ONE_WAY' AND len(string_split(ond, '/')) = 3
+              AND string_split(ond, '/')[1] <> string_split(ond, '/')[3]""",
+        )
+    else:
+        c.execute(
+            "CREATE OR REPLACE TEMP TABLE class_ladder"
+            " (booking_code VARCHAR, ladder DOUBLE, onds BIGINT, median_one_way_aed DOUBLE)"
+        )
+
     # Booking classes (Q7/Q8): non-revenue codes from the data; E-ladder split by passenger share 50/35/15.
     counts["booking_classes"] = out(
         "booking_classes",
@@ -167,6 +208,23 @@ def build(
               AND {active}
               AND (substr(flight_number, 1, 2) IN {in_scope} OR starts_with(flight_number, '02')))
         WHERE rn = 1""")
+
+    # Booking-class level 0-1 (gap: booking class in fare value): classes in ladder order, level = share of the
+    # window's passengers booked in cheaper classes (+ half the class's own share). Most passengers book a narrow
+    # band of the ladder, so this spreads the level over the classes actually sold. NULL for codes the fares list
+    # does not sell (promo, staff, ...): the priority then falls back to the fare family.
+    counts["booking_class_levels"] = out(
+        "booking_class_levels",
+        """
+        WITH pax AS (SELECT booking_code, count(*) AS n FROM seg WHERE booking_code IS NOT NULL GROUP BY 1),
+             j AS (SELECT l.booking_code, l.ladder, l.onds, l.median_one_way_aed, coalesce(p.n, 0) AS n
+                   FROM class_ladder l LEFT JOIN pax p USING (booking_code))
+        SELECT booking_code, round(ladder, 4) AS ladder, onds, round(median_one_way_aed) AS median_one_way_aed,
+               n AS window_passengers,
+               round((sum(n) OVER (ORDER BY ladder, booking_code) - n / 2.0) / greatest(sum(n) OVER (), 1), 4)
+                   AS level
+        FROM j""",
+    )
 
     # Customer profiles (Q4): real 12-month history and membership by customer key; synthetic loyalty account.
     priority_case = " ".join(f"WHEN '{t}' THEN '{p}'" for t, p in LOYALTY_PRIORITY.items())
@@ -266,10 +324,13 @@ def build(
                -- synthetic family loyalty account (see "family" above)
                fa.pnr IS NOT NULL AS family_account_synthetic,
                coalesce(fa.head_key = s.customer_key, FALSE) AS family_head_synthetic,
-               fa.family_tier AS family_tier_synthetic, fa.family_priority AS family_priority_synthetic
+               fa.family_tier AS family_tier_synthetic, fa.family_priority AS family_priority_synthetic,
+               -- booking-class level from the fares list (NULL for codes it does not sell: promo, staff, ...)
+               bl.level AS booking_class_level
         FROM seg s
         JOIN pnr p ON p.pnr = s.pnr
         LEFT JOIN family fa ON fa.pnr = s.pnr
+        LEFT JOIN booking_class_levels bl ON bl.booking_code = s.booking_code
         LEFT JOIN booking_classes bc ON bc.booking_code = coalesce(s.booking_code, '(blank)')
         LEFT JOIN inf i ON i.pnr = s.pnr AND i.customer_key = s.customer_key
         LEFT JOIN ad a ON a.pnr = s.pnr AND a.n = ((i.n - 1) % greatest(p.adults, 1)) + 1

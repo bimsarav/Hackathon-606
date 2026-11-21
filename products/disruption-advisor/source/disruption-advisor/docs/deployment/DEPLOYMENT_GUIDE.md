@@ -47,6 +47,7 @@ This guide covers the target host, how the MVP and phase 2 (Predict) are deploye
 
   Migrations run automatically (phase 3 adds Alembic 0002: the `agent_runs` table).
 - **Phase 3 agent:** needs outbound HTTPS to the Anthropic API and `ANTHROPIC_API_KEY`; without it, agent runs are answered by the rule-based planner. Limits: `AGENT_MAX_TOOL_CALLS`, `AGENT_TIMEOUT_SECONDS`, `AGENT_EFFORT`. A run interrupted by a restart shows as failed and can be started again.
+- **API-only restarts are safe:** web's nginx resolves `api` through Docker's DNS on each request (cached 10 s, `frontend/nginx.conf`), so recreating the api container needs no web restart. Before 2026-11-21 nginx resolved it once at start-up, and an api-only recreate gave 502 until web was restarted.
 - **Rollback:** before each update, tag the running images, for example `docker tag disruption-advisor-api:latest disruption-advisor-api:rollback` (same for `web`). To roll back, retag `:rollback` as `:latest` and run `docker compose up -d`.
 - **Database backup (manual in the MVP):**
   - back up with `docker compose exec db pg_dump -U $POSTGRES_USER $POSTGRES_DB > backup.sql`;

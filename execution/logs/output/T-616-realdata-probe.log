@@ -1,0 +1,26 @@
+2026-11-21 05:39:42,767 INFO stage 1: converting extracts to Parquet
+2026-11-21 05:39:46,897 INFO stage 1 done: {"rotation": 4646, "punctuality": 65943, "mct": 39, "inventory": 368873, "inventory_rejected": 1, "schedule": 6143, "schedule_rejected": 0, "fares": 1456941, "bookings": {"loaded": 27879509, "rejected": 0, "persons": 6286595, "supplied_parquet": 1}}
+2026-11-21 05:39:46,897 INFO stage 2: building the operating picture
+2026-11-21 05:39:54,598 INFO stage 2 done: {"airports": 142, "aircraft": 81, "sold_connections": 10413, "booking_classes": 388, "booking_class_levels": 84, "customers": 174723, "pax_segments": 299417, "flights": 2614, "history_flights": 63322, "mct": 39}
+2026-11-21 05:40:18,150 INFO stage 3 done: {"scored": 2623, "connections": 88434, "auc_60": 0.7697}
+2026-11-21 05:40:18,222 INFO stage 3b done: {"pairs": 1656, "excluded": 3}
+2026-11-21 05:40:22,609 INFO stage 4 done: {"offers": 300000, "auc": 0.7009}
+sold connections: 10413
+booking class level coverage: [{'c': 0.863, 'm': 0.52}]
+G9901_202611220500 +45: 0.7s best=hold:swap:A6-DME cost 24,000 miss 0 cascade 2f/2ac(+0 beyond next)  holds: E takes over G9902 + hold G9951 15 min (23 connections kept) cost 24,000 miss 0; he delay on A6-DMA + hold G9951 15 min (23 connections kept) cost 55,200 miss 0
+G9901_202611220500 +90: 0.8s best=swap:A6-ARL cost 43,350 miss 23 cascade 1f/1ac(+0 beyond next)  holds: 
+G9901_202611220500 +150: 1.0s best=swap:A6-ARL cost 75,350 miss 23 cascade 1f/1ac(+0 beyond next)  holds: 
+G9148_202611231355 +45: 1.9s best=swap:A6-ATJ cost 30,975 miss 17 cascade 5f/2ac(+1 beyond next)  holds: 
+G9148_202611231355 +90: 1.7s best=swap:A6-ATJ cost 50,850 miss 23 cascade 5f/2ac(+1 beyond next)  holds: 
+G9148_202611231355 +150: 1.8s best=swap:A6-ATJ cost 86,750 miss 29 cascade 5f/2ac(+1 beyond next)  holds: 
+G9148_202611201355 +45: 2.6s best=swap:A6-AOW cost 36,525 miss 78 cascade 1f/1ac(+0 beyond next)  holds: 
+G9148_202611201355 +90: 2.0s best=swap:A6-ATH cost 61,450 miss 102 cascade 2f/1ac(+0 beyond next)  holds: 
+G9148_202611201355 +150: 3.1s best=swap:A6-ATH cost 108,350 miss 144 cascade 2f/1ac(+0 beyond next)  holds: the delay on A6-ATG + hold G9147 5 min (11 connections kept) cost 283,050 miss 159
+G9176_202611201405 +45: 2.0s best=swap:A6-AOW cost 42,375 miss 107 cascade 1f/1ac(+0 beyond next)  holds: he delay on A6-ATJ + hold G9177 20 min (75 connections kept) cost 75,975 miss 107
+G9176_202611201405 +90: 1.4s best=swap:A6-ATH cost 65,950 miss 125 cascade 2f/1ac(+0 beyond next)  holds: 
+G9176_202611201405 +150: 1.5s best=swap:A6-ATH cost 102,225 miss 130 cascade 2f/1ac(+0 beyond next)  holds: 
+cancel G9148_202611241355 (208 connecting): 0.5s pax 206 protected 86 without seat 120 hub options 3 rebooked via SHJ 0
+cancel G9148_202611211355 (206 connecting): 0.5s pax 215 protected 44 without seat 171 hub options 50 rebooked via SHJ 40 e.g. G9148/G9467 (Rebooked through SHJ to the final destination; Seats availab)
+cancel G9182_202611211410 (202 connecting): 0.6s pax 217 protected 32 without seat 185 hub options 36 rebooked via SHJ 32 e.g. G9182/G9496 (Rebooked through SHJ to the final destination; Seats availab)
+cancel G9511_202611211650 (198 connecting): 5.5s pax 213 protected 171 without seat 42 hub options 28 rebooked via SHJ 98 e.g. G9519/G9181 (Rebooked through SHJ to the final destination; Seats availab)
+temp volume removed

@@ -110,6 +110,8 @@ export interface RecoveryOption {
   legs: OptionLeg[];
   // Phase 3 (ADR 0011); optional so scenarios saved before phase 3 still render.
   kind?: OptionKind;
+  holds?: HeldFlight[];
+  cascade?: Cascade;
   cancelled_flights?: CancelledFlight[];
   cancelled_passengers?: number;
   passengers_rebooked?: number;
@@ -118,7 +120,24 @@ export interface RecoveryOption {
   picked_by?: StrategyKey[];
 }
 
-export type OptionKind = "absorb" | "swap" | "cancel" | "consolidate";
+export type OptionKind = "absorb" | "swap" | "cancel" | "consolidate" | "hold";
+
+/** A connecting flight held for late inbound passengers (user 2026-11-21). */
+export interface HeldFlight {
+  flight_id: string;
+  flight_number: string;
+  minutes: number;
+  connections_kept: number;
+}
+
+/** How far an option's delay spreads (beyond the next flight, onto other aircraft). */
+export interface Cascade {
+  flights_delayed: number;
+  aircraft: number;
+  beyond_next_flight: number;
+  delay_ends: string | null;
+  passenger_delay_minutes: number;
+}
 export type StrategyKey = "lowest_cost" | "protect_passengers" | "least_delay";
 export const STRATEGY_KEYS: StrategyKey[] = ["lowest_cost", "protect_passengers", "least_delay"];
 export const STRATEGY_LABEL: Record<StrategyKey, string> = {
@@ -179,6 +198,9 @@ export interface PassengerRow {
   frequency: string | null;
   fare: number;
   fare_family: string | null;
+  /** Booking class (e.g. E30) and its level 0-1 from the fares list; null level = not in the fares list. */
+  booking_code?: string | null;
+  booking_class_level?: number | null;
   ancillaries: number;
   ssr: string | null;
   ssr_source: string | null;
@@ -216,6 +238,10 @@ export interface Alternative {
   available_seats: number;
   capacity_source: string;
   assigned: number;
+  /** Two flights through this hub (gap 3); absent or null for a direct flight. */
+  via?: string | null;
+  /** Hub itinerary offered only to passengers whose journey ends here. */
+  for_destination?: string | null;
 }
 
 export interface Rebooking {

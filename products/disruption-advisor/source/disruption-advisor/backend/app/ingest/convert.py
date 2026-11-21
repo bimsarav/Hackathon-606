@@ -50,6 +50,7 @@ PUNCTUALITY_XLSX = "Flight_Punctuality_Jan-Nov_2026_Combined.xlsx"
 INVENTORY_CSV = "Flight Inventory.csv"
 SCHEDULE_CSV = "Flight Schedule.csv"
 MCT_XLSX = "Connection Time.xlsx"
+CREW_CSV = "t_flight_crew_inf.csv"
 
 _YN = "CASE WHEN {c} = 'Y' THEN TRUE WHEN {c} = 'N' THEN FALSE END"
 
@@ -302,6 +303,25 @@ def convert_csvs(input_dir: Path, out_dir: Path) -> dict[str, int]:
           FROM read_csv('{input_dir / SCHEDULE_CSV}', header = true, all_varchar = true, ignore_errors = true)
         ) TO '{out_dir / "schedule.parquet"}' (FORMAT parquet, COMPRESSION zstd)
     """)
+    crew_path = input_dir / CREW_CSV
+    if crew_path.exists():
+        con.execute(f"""
+            COPY (
+              SELECT flight_reference,
+                     TRY_CAST(crew_reference AS INTEGER) AS crew_reference,
+                     crew_type,
+                     TRY_CAST(crew_id AS INTEGER) AS crew_id,
+                     first_name, last_name,
+                     TRY_STRPTIME(sign_in_date_time_zulu,  '%Y-%m-%d %H:%M:%S.%f') AS sign_in_utc,
+                     TRY_STRPTIME(sign_out_date_time_zulu, '%Y-%m-%d %H:%M:%S.%f') AS sign_out_utc,
+                     TRY_CAST(planned_fdp_value AS DOUBLE) AS planned_fdp_value,
+                     TRY_CAST(actual_fdp_value  AS DOUBLE) AS actual_fdp_value,
+                     (is_pic = 'true') AS is_pic
+              FROM read_csv('{crew_path}', header=true, all_varchar=true,
+                            delim='\\t', ignore_errors=true)
+              ORDER BY flight_reference, crew_type, crew_id
+            ) TO '{out_dir / "crew.parquet"}' (FORMAT parquet, COMPRESSION zstd)
+        """)
     counts: dict[str, int] = {}
     for name, src in (("inventory", INVENTORY_CSV), ("schedule", SCHEDULE_CSV)):
         written = con.execute(f"SELECT count(*) FROM '{out_dir / f'{name}.parquet'}'").fetchone()[0]  # type: ignore[index]
@@ -309,7 +329,56 @@ def convert_csvs(input_dir: Path, out_dir: Path) -> dict[str, int]:
             data_lines = sum(1 for line in fh if line.strip()) - 1
         counts[name] = written
         counts[f"{name}_rejected"] = data_lines - written  # malformed rows (e.g. a truncated last line) are skipped
+    if crew_path.exists():
+        counts["crew"] = con.execute(f"SELECT count(*) FROM '{out_dir / 'crew.parquet'}'").fetchone()[0]  # type: ignore[index]
     return counts
+
+
+FARE_COLUMNS = (
+    "fare_id",
+    "status",
+    "booking_code",
+    "ond",
+    "journey_type",
+    "currency",
+    "sale_validities",
+    "inbound_flight_validities",
+    "outbound_flight_validities",
+    "adult_value",
+)
+
+
+def fares_source(input_dir: Path) -> Path | None:
+    """The fares list (user 2026-11-21): a supplied Parquet (INPUT_DIR/parquet/raw/fares.parquet), else the CSV as
+    delivered (INPUT_DIR/fares_list.csv, or a folder of that name holding fares_list.csv)."""
+    for candidate in (
+        input_dir / "parquet" / "raw" / "fares.parquet",
+        input_dir / "fares_list.csv" / "fares_list.csv",
+        input_dir / "fares_list.csv",
+    ):
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def convert_fares(input_dir: Path, out_dir: Path) -> dict[str, int]:
+    """Fares list -> raw/fares.parquet, typed (fare id, booking class, O&D labels like KHI/SHJ/CAI, journey type,
+    validity ranges as text, adult fare in AED). Read with column and filter pushdown by the build."""
+    source = fares_source(input_dir)
+    if source is None:
+        log.info("no fares list supplied: booking-class levels and sold-connection checks are skipped")
+        return {}
+    con = duckdb.connect()
+    if source.suffix == ".parquet":
+        select = f"SELECT {', '.join(FARE_COLUMNS)} FROM read_parquet('{source}')"
+    else:
+        select = f"""SELECT CAST(id AS BIGINT) AS fare_id, status, booking_class_id AS booking_code, ond_labels AS ond,
+                            journey_type, currency, sale_validities, inbound_flight_validities,
+                            outbound_flight_validities, CAST(adult_value AS DOUBLE) AS adult_value
+                     FROM read_csv('{source}', header = true, all_varchar = true)"""
+    con.execute(f"COPY ({select}) TO '{out_dir / 'fares.parquet'}' (FORMAT parquet, COMPRESSION zstd)")
+    row = con.execute(f"SELECT count(*) FROM '{out_dir / 'fares.parquet'}'").fetchone()
+    return {"fares": int(row[0]) if row else 0}
 
 
 def run(input_dir: Path, data_dir: Path, skip_bookings: bool = False) -> dict[str, Any]:
@@ -318,6 +387,7 @@ def run(input_dir: Path, data_dir: Path, skip_bookings: bool = False) -> dict[st
     result: dict[str, Any] = {}
     result.update(convert_excel(input_dir, out_dir))
     result.update(convert_csvs(input_dir, out_dir))
+    result.update(convert_fares(input_dir, out_dir))
     if not skip_bookings:
         supplied = supplied_bookings(input_dir)
         if supplied is not None:
