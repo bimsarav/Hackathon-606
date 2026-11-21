@@ -81,8 +81,6 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
   const [agentNote, setAgentNote] = useState("");
   const [searchPage, setSearchPage] = useState(0);
   const [searchPageSize, setSearchPageSize] = useState<number>(5);
-  const [presetPage, setPresetPage] = useState(0);
-  const [presetPageSize, setPresetPageSize] = useState<number>(5);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [advanced, setAdvanced] = useState(false);
@@ -92,7 +90,6 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
   const [listHidden, setListHidden] = useState(Boolean(active));
   const [chosen, setChosen] = useState<string | null>(active?.flightNumber ?? null);
   const [moreFilters, setMoreFilters] = useState(false);
-  const [suggestionList, setSuggestionList] = useState(false); // chips by default; the full cards on request
   // The day before "now" too: the operating data starts a day early (and has the crew roster).
   const days = Array.from({ length: (meta?.horizon_days ?? 7) + 2 }, (_, i) => {
     const d = new Date(`${(meta?.now_utc ?? "2026-11-20T00:00:00").slice(0, 10)}T00:00:00Z`);
@@ -101,7 +98,7 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
   });
   const day = fromDate && fromDate === toDate ? fromDate : "";
   function pickDay(value: string) {
-    setFromDate(value); setToDate(value); setSearchPage(0); setPresetPage(0);
+    setFromDate(value); setToDate(value); setSearchPage(0);
   }
 
   function inRange(std: string, origin?: string, destination?: string, tail?: string, flightNumber?: string): boolean {
@@ -116,13 +113,13 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
     return true;
   }
 
-  function handleFromDate(v: string) { setFromDate(v); setSearchPage(0); setPresetPage(0); }
-  function handleToDate(v: string)   { setToDate(v);   setSearchPage(0); setPresetPage(0); }
+  function handleFromDate(v: string) { setFromDate(v); setSearchPage(0); }
+  function handleToDate(v: string)   { setToDate(v);   setSearchPage(0); }
 
   function resetFilters() {
     setQuery(""); setOriginFilter(""); setDestFilter(""); setTailFilter("");
     setFromDate(""); setToDate("");
-    setSearchPage(0); setPresetPage(0);
+    setSearchPage(0);
     setResults(null); setSearchError(null); setListHidden(false);
   }
 
@@ -397,15 +394,10 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
 
         {!results && (
         <>
-        <div className="list-head">
-          <h3>Suggested flights</h3>
-          <button type="button" className="link small" onClick={() => setSuggestionList((v) => !v)}>
-            {suggestionList ? "Show as chips" : "Show as list"}
-          </button>
-        </div>
+        <h3>Suggested flights</h3>
         {presetError && <p className="error">{presetError}</p>}
         {!presets && !presetError && <p className="muted small">Finding suitable flights…</p>}
-        {presets && !suggestionList && (() => {
+        {presets && (() => {
           const items = (tab === "CANCEL" ? presets.cancel : presets.delay)
             .filter((p) => inRange(p.std, p.origin, p.destination, p.tail, p.flight_number)).slice(0, SUGGESTION_CHIPS);
           return (
@@ -428,60 +420,6 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
                 );
               })}
             </ul>
-          );
-        })()}
-        {presets && suggestionList && tab !== "CANCEL" && (() => {
-          const items = presets.delay.filter((p) => inRange(p.std, p.origin, p.destination, p.tail, p.flight_number));
-          const page = presetPage;
-          const ps = presetPageSize;
-          return (
-            <>
-              <ul className="preset-list">
-                {items.slice(page * ps, (page + 1) * ps).map((p) => (
-                  <li key={p.flight_id}>
-                    <button type="button" className="preset" disabled={busy} onClick={() => start(p.flight_id)}>
-                      <span className="preset-title">
-                        <CarrierTail flightNumber={p.flight_number} />
-                        {p.flight_number} {p.origin}→{p.destination}
-                        {p.is_demo && <span className="chip chip-synthetic">Demo (synthetic)</span>}
-                      </span>
-                      <span className="small muted">
-                        {utc(p.std)} · {p.tail} · turn {p.turn_minutes} min · {p.connecting_pax} connecting
-                      </span>
-                        <RowPredict flightId={p.flight_id} inbound={advanced ? advInbound : null} departure={advanced ? advDeparture : null} />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              <Paginator total={items.length} page={page} pageSize={ps}
-                onPage={setPresetPage} onPageSize={setPresetPageSize} />
-            </>
-          );
-        })()}
-        {presets && suggestionList && tab === "CANCEL" && (() => {
-          const items = presets.cancel.filter((p) => inRange(p.std, p.origin, p.destination, p.tail, p.flight_number));
-          const page = presetPage;
-          const ps = presetPageSize;
-          return (
-            <>
-              <ul className="preset-list">
-                {items.slice(page * ps, (page + 1) * ps).map((p) => (
-                  <li key={p.flight_id}>
-                    <button type="button" className="preset" disabled={busy} onClick={() => start(p.flight_id)}>
-                      <span className="preset-title">
-                        <CarrierTail flightNumber={p.flight_number} />
-                        {p.flight_number} {p.origin}→{p.destination}
-                      </span>
-                      <span className="small muted">
-                        {utc(p.std)} · {p.tail} · {p.booked_seats} booked · {p.free_seats} free seats on alternatives
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              <Paginator total={items.length} page={page} pageSize={ps}
-                onPage={setPresetPage} onPageSize={setPresetPageSize} />
-            </>
           );
         })()}
         </>

@@ -43,7 +43,7 @@ describe("launcher flight lists", () => {
     expect(screen.getByText(/142 conn/)).toBeInTheDocument();
   });
 
-  it("shows recent scenarios as chips that reopen them, and the suggestions as a list on request", async () => {
+  it("shows recent scenarios and suggestions as chips; a recent chip reopens its scenario", async () => {
     stub();
     const onOpenRecent = vi.fn();
     const recent = [{ id: "s9", kind: "DELAY" as const, flight_id: "G9502_202611201835", delay_minutes: 60, created_by: "occ", created_at: "2026-11-21T10:00:00" }];
@@ -51,8 +51,8 @@ describe("launcher flight lists", () => {
     await userEvent.click(within(screen.getByRole("group", { name: "Recent scenarios" })).getByRole("button", { name: "G9502 · +60m" }));
     expect(onOpenRecent).toHaveBeenCalledWith("s9");
     await screen.findByText(/142 conn/);
-    await userEvent.click(screen.getByRole("button", { name: "Show as list" }));
-    expect(await screen.findByText(/turn 55 min · 142 connecting/)).toBeInTheDocument(); // the full card
+    expect(screen.queryByRole("button", { name: /Show as list/ })).not.toBeInTheDocument(); // always chips
+    expect(screen.getByRole("button", { name: /G9519/ })).toHaveAttribute("title", expect.stringContaining("142 connecting")); // detail on hover
   });
 
   it("searches as you type, shows one list (results or suggestions) and filters by day", async () => {

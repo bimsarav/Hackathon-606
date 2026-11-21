@@ -125,7 +125,7 @@ describe("strategy comparison", () => {
     render(<DelayView scenario={scenario} result={scenario.result as DelayResult} meta={meta} onUpdate={() => {}} />);
     const glance = screen.getByRole("navigation", { name: "On this page" });
     const labels = within(glance).getAllByRole("button").map((b) => b.querySelector(".glance-label")?.textContent);
-    expect(labels).toEqual(["Strategy", "Why?", "Recovery options", "Crew duty (FDP)", "Flight Board", "Flights affected",
+    expect(labels).toEqual(["Strategy", "Why?", "Recovery options", "Flight Board", "Crew duty (FDP)", "Flights affected",
       "Connections at risk", "Passengers & rewards", "Assumptions"]);
     expect(screen.getByRole("heading", { name: "Recovery options" })).toBeInTheDocument(); // the decision stays open
     expect(screen.queryByText(/Click a card to apply that strategy/)).not.toBeInTheDocument(); // strategies folded

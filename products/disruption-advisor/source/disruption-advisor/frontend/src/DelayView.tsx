@@ -113,9 +113,9 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
         )}
         <Tile label="Why?" value={result.explanation.source.startsWith("ai:") ? "AI-worded" : "Template"} sub={firstSentence(result.explanation.text)} onClick={() => reveal("why")} />
         <Tile label="Recovery options" value={num(result.options.length)} sub={`recommended: ${best.label}`} onClick={() => reveal("options")} />
+        <Tile label="Flight Board" value={`${num(new Set(shown.legs.map((l) => l.operated_by)).size)} aircraft`} sub={`${num(shown.legs.length)} flights in the rotation`} onClick={() => reveal("board")} />
         <Tile label="Crew duty (FDP)" value={crewLabel(shown)} sub={crewSub(shown)}
           tone={shown.crew?.status === "over" ? "bad" : shown.crew?.status === "tight" ? "warn" : undefined} onClick={() => reveal("crew")} />
-        <Tile label="Flight Board" value={`${num(new Set(shown.legs.map((l) => l.operated_by)).size)} aircraft`} sub={`${num(shown.legs.length)} flights in the rotation`} onClick={() => reveal("board")} />
         <Tile label="Flights affected" value={num(shown.legs_delayed)} sub={`delayed of ${num(shown.legs.length)}`} onClick={() => reveal("legs")} />
         <Tile label="Connections at risk" value={num(result.misconnections.length)} sub={`of ${num(shown.connections_checked)} checked`}
           tone={result.misconnections.length > 0 ? "warn" : undefined} onClick={() => showPeople("conn")} />
@@ -196,15 +196,16 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
 
       <CrewFdpAlerts options={result.options} selectedKey={shown.key} />
 
-      <Fold id="crew" title="Crew duty (FDP)"
-        summary={`selected option · ${crewLabel(shown)} · ${crewSub(shown)}${shown.crew?.worst ? ` · tightest ${num(shown.crew.worst.minutes_left)} min left` : ""}`}
-        open={openSecs.has("crew")} onToggle={() => toggle("crew")}>
-        <CrewSection option={shown} />
-      </Fold>
 
       <Fold id="board" title="Flight Board" summary={`selected option · ${num(shown.legs.length)} flights of the affected aircraft`}
         open={openSecs.has("board")} onToggle={() => toggle("board")}>
         <RotationBoard option={shown} disruptedId={result.flight.flight_id} meta={meta} />
+      </Fold>
+
+      <Fold id="crew" title="Crew duty (FDP)"
+        summary={`selected option · ${crewLabel(shown)} · ${crewSub(shown)}${shown.crew?.worst ? ` · tightest ${num(shown.crew.worst.minutes_left)} min left` : ""}`}
+        open={openSecs.has("crew")} onToggle={() => toggle("crew")}>
+        <CrewSection option={shown} />
       </Fold>
 
       <Fold id="legs" title="Flights affected" summary={`selected option · ${num(shown.legs_delayed)} delayed of ${num(shown.legs.length)}`}
