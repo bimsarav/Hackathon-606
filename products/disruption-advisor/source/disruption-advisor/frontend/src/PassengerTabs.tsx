@@ -2,10 +2,7 @@ import { type ReactNode, useState } from "react";
 import type { Scenario } from "./api";
 import { RewardPanel } from "./RewardPanel";
 
-type Tab = "passengers" | "rewards";
-
-/** One panel, two components: the passengers affected by the disruption (connections to protect or rebook) and the
- * goodwill rewards for every passenger of the flight. Both stay mounted, so nothing typed or chosen is lost on a switch. */
+/** Two separate collapsible banners: passengers affected by the disruption, and goodwill rewards. */
 export function PassengerTabs({
   scenario,
   passengersLabel,
@@ -15,27 +12,45 @@ export function PassengerTabs({
   passengersLabel: string;
   children: ReactNode;
 }) {
-  const [tab, setTab] = useState<Tab>("passengers");
-  const tabs: [Tab, string][] = [
-    ["passengers", passengersLabel],
-    ["rewards", "Passenger rewards / compensation"],
-  ];
+  const [paxOpen, setPaxOpen] = useState(false);
+  const [rewardOpen, setRewardOpen] = useState(false);
+
   return (
-    <section className="passenger-panel" aria-label="Passengers">
-      <div className="tabs" role="tablist" aria-label="Passenger views">
-        {tabs.map(([key, label]) => (
-          <button key={key} type="button" role="tab" id={`ptab-${key}`} aria-controls={`ppane-${key}`}
-            aria-selected={tab === key} className={tab === key ? "tab active" : "tab"} onClick={() => setTab(key)}>
-            {label}
+    <>
+      <section aria-labelledby="ptab-passengers-title">
+        <h2 id="ptab-passengers-title">{passengersLabel}</h2>
+        {!paxOpen ? (
+          <button type="button" className="primary" onClick={() => setPaxOpen(true)}>
+            Show passenger detail
           </button>
-        ))}
-      </div>
-      <div role="tabpanel" id="ppane-passengers" aria-labelledby="ptab-passengers" hidden={tab !== "passengers"}>
-        {children}
-      </div>
-      <div role="tabpanel" id="ppane-rewards" aria-labelledby="ptab-rewards" hidden={tab !== "rewards"}>
-        <RewardPanel scenario={scenario} />
-      </div>
-    </section>
+        ) : (
+          <>
+            <button type="button" className="link" style={{ marginBottom: "0.75rem", display: "inline-block" }}
+              onClick={() => setPaxOpen(false)}>
+              Hide detail
+            </button>
+            {children}
+          </>
+        )}
+      </section>
+
+      <section aria-labelledby="ptab-rewards-title">
+        <h2 id="ptab-rewards-title">Passenger rewards / compensation</h2>
+        <p className="small muted">Goodwill rewards and EU261 compensation for affected passengers.</p>
+        {!rewardOpen ? (
+          <button type="button" className="primary" onClick={() => setRewardOpen(true)}>
+            Show rewards &amp; compensation
+          </button>
+        ) : (
+          <>
+            <button type="button" className="link" style={{ marginBottom: "0.75rem", display: "inline-block" }}
+              onClick={() => setRewardOpen(false)}>
+              Hide detail
+            </button>
+            <RewardPanel scenario={scenario} />
+          </>
+        )}
+      </section>
+    </>
   );
 }
