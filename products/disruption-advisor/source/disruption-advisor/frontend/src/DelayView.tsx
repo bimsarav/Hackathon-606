@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api, type ConnectionRisk, type DelayResult, errorText, type Meta, type PassengerRow, type RecoveryOption, type Scenario } from "./api";
 import { aed, hhmm, minutes, num, utc } from "./format";
 import { AgentRecommendationPanel } from "./AgentRunView";
+import { CrewFdpAlerts } from "./CrewFdpAlerts";
 import { RotationBoard } from "./RotationBoard";
 import { PassengerTabs } from "./PassengerTabs";
 import { OptionKindInfo, StrategyPanel } from "./StrategyPanel";
@@ -135,6 +136,8 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
         <DecisionBar scenario={scenario} target={`option:${shown.key}`}
           label={override ? "selected option (override)" : "recommended option"} requireComment={override} />
       </section>
+
+      <CrewFdpAlerts options={result.options} selectedKey={shown.key} />
 
       <RotationBoard option={shown} disruptedId={result.flight.flight_id} meta={meta} />
 

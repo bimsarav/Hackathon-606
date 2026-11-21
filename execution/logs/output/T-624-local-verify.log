@@ -1,0 +1,10 @@
+smoke PASS count: 7
+FAIL sign in as occ
+crew/fdp 200
+recommended swap:A6-ANO
+ - Swap: A6-ANO takes over G9294 | ok 0 | reserve cost 0 | AED 153325
+ - Swap: A6-ARI takes over G9294 | ok 0 | reserve cost 0 | AED 154650
+ - Swap: A6-AQG takes over G9294 | over 2 | reserve cost 0 | AED 262775
+ - Cancel round trip G9294/G9295 (SHJ-TBS-SHJ) | ok 0 | reserve cost 0 | AED 330245
+ - Absorb the delay on A6-ARD | over 1 | reserve cost 0 | AED 418325
+ - Cancel round trip G9548/G9549 (SHJ-KHI-SHJ) | over 1 | reserve cost 0 | AED 439200

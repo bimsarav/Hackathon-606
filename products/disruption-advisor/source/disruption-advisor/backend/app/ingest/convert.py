@@ -381,6 +381,52 @@ def convert_fares(input_dir: Path, out_dir: Path) -> dict[str, int]:
     return {"fares": int(row[0]) if row else 0}
 
 
+# Crew roster extract (user 2026-11-21): one row per crew member per flight with FDP values in minutes. The names in
+# the source are personal data and are never copied: only these columns reach the data volume.
+CREW_COLUMNS = (
+    "carrier_code",
+    "flight_number",
+    "std_utc",
+    "sta_utc",
+    "origin",
+    "destination",
+    "tail",
+    "status_code",
+    "crew_type",
+    "crew_id",
+    "is_pic",
+    "sign_in_utc",
+    "sign_out_utc",
+    "planned_fdp_value",
+    "actual_fdp_value",
+    "planned_max_fdp_value",
+    "actual_max_fdp_value",
+)
+
+
+def crew_source(input_dir: Path) -> Path | None:
+    """The crew roster with FDP values: INPUT_DIR/parquet/crew/crew.parquet, or INPUT_DIR/crew.parquet."""
+    for candidate in (input_dir / "parquet" / "crew" / "crew.parquet", input_dir / "crew.parquet"):
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def convert_crew(input_dir: Path, out_dir: Path) -> dict[str, int]:
+    """Crew roster -> raw/crew.parquet with the name-free columns only (CREW_COLUMNS)."""
+    source = crew_source(input_dir)
+    if source is None:
+        log.info("no crew roster supplied: the crew FDP check uses no data and reports 'unknown'")
+        return {}
+    con = duckdb.connect()
+    con.execute(
+        f"COPY (SELECT {', '.join(CREW_COLUMNS)} FROM read_parquet('{source}')) "
+        f"TO '{out_dir / 'crew.parquet'}' (FORMAT parquet, COMPRESSION zstd)"
+    )
+    row = con.execute(f"SELECT count(*) FROM '{out_dir / 'crew.parquet'}'").fetchone()
+    return {"crew_rows": int(row[0]) if row else 0}
+
+
 def run(input_dir: Path, data_dir: Path, skip_bookings: bool = False) -> dict[str, Any]:
     out_dir = data_dir / "raw"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -388,6 +434,7 @@ def run(input_dir: Path, data_dir: Path, skip_bookings: bool = False) -> dict[st
     result.update(convert_excel(input_dir, out_dir))
     result.update(convert_csvs(input_dir, out_dir))
     result.update(convert_fares(input_dir, out_dir))
+    result.update(convert_crew(input_dir, out_dir))
     if not skip_bookings:
         supplied = supplied_bookings(input_dir)
         if supplied is not None:

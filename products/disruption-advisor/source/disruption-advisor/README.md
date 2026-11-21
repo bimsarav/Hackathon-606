@@ -57,6 +57,10 @@ Every long-running service restarts by itself, including after a server reboot.
 - **Fares list** (`fares_list.csv`, or `parquet/raw/fares.parquet` in `INPUT_DIR`):
   - **Booking-class level:** each class gets a level, the share of passengers in cheaper classes, which makes up 30% of the fare value.
   - **Sold connections:** the only X/SHJ/Y connections rebooking may offer as two-flight itineraries through the hub.
+- **Crew roster** (`parquet/crew/crew.parquet` in `INPUT_DIR`, user 2026-11-21):
+  - Copied without crew names into `raw/crew.parquet`; the operating data keeps only per-flight counts and headroom, no crew IDs.
+  - **Headroom** = maximum FDP − planned FDP of the tightest crew member on the flight (`crew_flights.parquet`). Flights without a roster use the 10th percentile of the same flight number's history (`crew_fdp_estimates.parquet`, labelled estimated).
+  - Every recovery option checks each delayed flight's delay against that headroom: under `CREW_TIGHT_MINUTES` (30) left is tight, past the maximum needs a reserve crew (`COST_RESERVE_CREW`, AED 15,000 per flight, assumed). The agent sees the result; the model page shows the FDP analysis (`GET /api/v1/crew/fdp`).
 - **Loyalty, modelled on the airline's loyalty sample:**
   - Membership is the real booking flag.
   - Tiers are Basic, Silver, Gold and Platinum, with recovery priority Lowest, Low, Medium and High.

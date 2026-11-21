@@ -1,0 +1,113 @@
+#1 [migrate internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.89kB done
+#1 DONE 0.0s
+
+#2 [migrate internal] load .dockerignore
+#2 transferring context: 120B done
+#2 DONE 0.0s
+
+#3 [migrate internal] load metadata for docker.io/library/python:3.14.10-slim-trixie
+#3 ...
+
+#4 [migrate internal] load metadata for ghcr.io/astral-sh/uv:0.13.9
+#4 DONE 0.6s
+
+#3 [migrate internal] load metadata for docker.io/library/python:3.14.10-slim-trixie
+#3 DONE 1.0s
+
+#5 [migrate uv 1/1] FROM ghcr.io/astral-sh/uv:0.13.9@sha256:d3b601f0c7b118bc1753febf7c41cc80981df678445e0254284eecf84db79a7d
+#5 DONE 0.0s
+
+#6 [migrate base 1/4] FROM docker.io/library/python:3.14.10-slim-trixie@sha256:9aaa474097d094040649f2162a627c0049b408f52138d980916788d80f04802f
+#6 DONE 0.0s
+
+#7 [migrate base 2/4] RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [migrate base 3/4] COPY --from=uv /uv /uvx /usr/local/bin/
+#8 CACHED
+
+#9 [migrate base 4/4] WORKDIR /app
+#9 CACHED
+
+#10 [migrate runtime 2/4] RUN apt-get update && apt-get upgrade -y --no-install-recommends  && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/*  && python -m pip uninstall -y pip && rm -rf /usr/local/lib/python3.14/ensurepip/_bundled  && groupadd --system app && useradd --system --gid app --home-dir /app --shell /usr/sbin/nologin app  && mkdir -p /data && chown app:app /data
+#10 CACHED
+
+#11 [migrate runtime 3/4] WORKDIR /app
+#11 CACHED
+
+#12 [migrate internal] load build context
+#12 transferring context: 636.46kB 0.0s done
+#12 DONE 0.0s
+
+#13 [migrate build 1/5] COPY pyproject.toml uv.lock .python-version ./
+#13 CACHED
+
+#14 [migrate build 4/5] COPY alembic ./alembic
+#14 CACHED
+
+#15 [migrate build 2/5] RUN uv sync --frozen --no-dev --no-install-project
+#15 CACHED
+
+#16 [migrate build 3/5] COPY alembic.ini ./
+#16 CACHED
+
+#17 [migrate build 5/5] COPY app ./app
+#17 DONE 0.1s
+
+#18 [migrate runtime 4/4] COPY --from=build /app /app
+#18 DONE 4.6s
+
+#19 [migrate] exporting to image
+#19 exporting layers
+#19 exporting layers 7.5s done
+#19 writing image sha256:2f486a9010eff3af81dcca2bd608489aa3a656eef953c3f5f4f56e18a91ca04b done
+#19 naming to docker.io/library/disruption-advisor-api:latest 0.0s done
+#19 DONE 7.5s
+
+#20 [web internal] load .dockerignore
+#20 transferring context: 72B done
+#20 DONE 0.0s
+
+#21 [web internal] load build definition from Dockerfile
+#21 transferring dockerfile: 953B done
+#21 DONE 0.0s
+
+#22 [web internal] load metadata for docker.io/library/node:26.13.1-alpine
+#22 DONE 0.0s
+
+#23 [web internal] load metadata for docker.io/library/nginx:1.30.7-alpine
+#23 DONE 0.3s
+
+#24 [web stage-1 1/4] FROM docker.io/library/nginx:1.30.7-alpine@sha256:caf4e1e032a20f9c3c5e28fc7f25ffd768ad8677b4975c54193075997b3a97e3
+#24 DONE 0.0s
+
+#25 [web build 1/6] FROM docker.io/library/node:26.13.1-alpine
+#25 CACHED
+
+#26 [web build 2/6] WORKDIR /web
+#26 DONE 0.1s
+
+#27 [web internal] load build context
+#27 transferring context: 371.06kB done
+#27 DONE 0.0s
+
+#28 [web] exporting to image
+#28 exporting layers
+#28 exporting layers 0.1s done
+#28 writing image sha256:b8f8c7ff81457ef52d45ae7d1f776b0c32d1db31019d768dac0e8c4c394c7e74 done
+#28 naming to docker.io/library/disruption-advisor-web:latest 0.0s done
+#28 DONE 0.1s
+time="2026-11-21T09:34:01Z" level=warning msg="volume \"disruption-advisor_ops-data\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container disruption-advisor-api-1  Recreate
+ api Your kernel does not support swap limit capabilities or the cgroup is not mounted. Memory limited without swap. 
+ Container disruption-advisor-api-1  Recreated
+ Container disruption-advisor-web-1  Recreate
+ web Your kernel does not support swap limit capabilities or the cgroup is not mounted. Memory limited without swap. 
+ Container disruption-advisor-web-1  Recreated
+ Container disruption-advisor-api-1  Starting
+ Container disruption-advisor-api-1  Started
+ Container disruption-advisor-api-1  Waiting
+ Container disruption-advisor-api-1  Healthy
+ Container disruption-advisor-web-1  Starting
+ Container disruption-advisor-web-1  Started

@@ -310,3 +310,32 @@ def history() -> list[dict[str, Any]]:
                 }
             )
     return rows
+
+
+# Crew FDP (user 2026-11-21), written only by the crew tests so the other tests keep their costs. G9002 has a roster
+# with 100 minutes of headroom (captain tightest), G9003 none but an estimate from its history (170 minutes, so a
+# 150-minute delay leaves 20: tight); the other flights have no crew data.
+def write_crew(ops: Path) -> None:
+    crew_flights = [
+        {
+            "flight_id": F2,
+            "flight_number": "G9002",
+            "std": t(10, 45),
+            "crew": 6,
+            "pilots": 2,
+            "headroom_minutes": 100,
+            "tightest": "CP",
+            "planned_fdp": 560,
+            "max_fdp": 660,
+            "sign_in": t(9, 45),
+        }
+    ]
+    estimates = [
+        {"flight_number": "G9003", "flights": 40, "headroom_p10": 170, "headroom_median": 260, "tightest": "FO"},
+    ]
+    pq.write_table(pa.Table.from_pylist(crew_flights), ops / "crew_flights.parquet")
+    pq.write_table(pa.Table.from_pylist(estimates), ops / "crew_fdp_estimates.parquet")
+    (ops / "crew_fdp.json").write_text(
+        '{"summary": {"duties": 2, "headroom_median": 135},'
+        ' "extra_delay": [{"extra_minutes": 60, "pct_over_max": 4.2}]}'
+    )

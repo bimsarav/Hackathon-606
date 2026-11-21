@@ -1,0 +1,6 @@
+flight G9901_202611220500
+recommended: hold:swap:A6-DME
+ - Swap: A6-DME takes over G9902 + hold G9951 15 min (23 connections kept) | missed None | knock-on 2
+ - Swap: A6-DME takes over G9902 | missed None | knock-on 1
+ - Swap: A6-ARJ takes over G9902 | missed None | knock-on 1
+ - Swap: A6-ARL takes over G9902 | missed None | knock-on 1

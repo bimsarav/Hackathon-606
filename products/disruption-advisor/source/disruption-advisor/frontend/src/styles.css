@@ -1638,3 +1638,11 @@ tr.clickable.selected {
 .model-table th[scope="row"] { text-align: left; font-weight: 500; }
 .expand-body h2 { margin-top: 1.25rem; }
 .expand-body h3 { margin: 1rem 0 0.25rem; font-size: 1rem; }
+/* Crew FDP (user 2026-11-21) */
+.crew-fdp h3 { margin: 1.25rem 0 0.5rem; }
+.crew-fdp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1rem 0; }
+.crew-fdp-grid caption { text-align: left; font-weight: 600; padding-bottom: 0.25rem; }
+.crew-fdp-alert { padding: 0.6rem 0.8rem; border-radius: 6px; background: var(--warn-bg, #fff4e0); margin: 0.5rem 0 0.75rem; }
+.crew-fdp-alert.bad { background: var(--bad-bg); color: var(--bad); }
+.crew-fdps tr.selected td, .crew-fdps tr.selected th { background: var(--bad-bg); }
+.crew-fdps .chip { margin-left: 0.4rem; }

@@ -1,0 +1,23 @@
+== typecheck
+
+> disruption-advisor-web@0.1.0 typecheck
+> tsc --noEmit
+
+== tests
+ ✓ src/Loyalty.test.tsx (3 tests) 151ms
+ ✓ src/RotationBoard.test.tsx (2 tests) 309ms
+ ✓ src/Crew.test.tsx (3 tests) 234ms
+ ✓ src/Phase3.test.tsx (10 tests) 1972ms
+   ✓ strategy comparison (4)
+     ✓ shows the three strategies with their picks and switches the active one on the server 1007ms
+ ✓ src/App.test.tsx (11 tests) 2222ms
+   ✓ App (2)
+     ✓ asks for sign-in and shows the API error on a wrong password 735ms
+     ✓ signs in and shows the scenario launcher with suggestions 406ms
+ Test Files  5 passed (5)
+      Tests  29 passed (29)
+== build
+dist/assets/index-C2pkRTpB.css   26.23 kB │ gzip:  6.16 kB
+dist/assets/index-Btr3_tb-.js   323.70 kB │ gzip: 94.75 kB
+
+✓ built in 1.21s

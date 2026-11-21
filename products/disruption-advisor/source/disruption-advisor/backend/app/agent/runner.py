@@ -33,6 +33,8 @@ How to work:
   matter (usually each strategy's pick). Look at the aircraft rotation if it helps explain the options.
 - Recommend an option the engine produced (its key from assess_delay). Prefer the controller's strategy when one is
   given; recommend another strategy's pick only when the figures clearly justify it, and say why.
+- Each option has a crew_fdp check (crew maximum flight duty period). An option that breaches the maximum FDP or
+  leaves the crew tight is a risk to state; "estimated" means the flight has no roster and its history was used.
 - Every number you mention must come from a tool result. Never invent flights, times, costs or passengers.
 - You only recommend. A person approves or overrides; nothing is executed.
 - Before each tool call, write one short sentence for the controller on what you are checking and why.
@@ -232,7 +234,18 @@ def run_planner(
         risks.append(f"{impact['without_seat']} passengers have no seat within the rebooking window.")
     if option["cancelled_flights"]:
         risks.append(f"Cancels {', '.join(option['cancelled_flights'])}; revenue loss is not counted.")
-    checks = ["Crew control confirms the plan is legal for the crews (no crew data in the tool)."]
+    crew = option.get("crew_fdp") or {}
+    if crew.get("status") == "over":
+        risks.append(
+            f"{crew['flights_over_max_fdp']} flight(s) would breach the crew maximum FDP "
+            f"({crew['least_margin_flight']} by {-crew['least_minutes_left']} min, {crew['basis']})."
+        )
+    elif crew.get("status") == "tight":
+        risks.append(
+            f"Crew FDP is tight: {crew['least_minutes_left']} min left on {crew['least_margin_flight']} "
+            f"({crew['basis']})."
+        )
+    checks = ["Crew control confirms the crew pairings and rest (the tool checks only the maximum FDP)."]
     if option["kind"] == "swap":
         checks.append("Maintenance and station confirm the swap aircraft is serviceable and ready.")
     call(

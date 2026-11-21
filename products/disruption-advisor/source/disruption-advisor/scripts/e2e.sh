@@ -9,7 +9,7 @@ set -a; if [ -f settings.env ]; then . ./settings.env; elif [ -f .env ]; then . 
 FIRST="${DEMO_USERS%%,*}"
 E2E_USER="${E2E_USER:-${FIRST%%:*}}"
 REST="${FIRST#*:}"; E2E_PASSWORD="${E2E_PASSWORD:-${REST%%:*}}"
-EVAL="$(printf '%s' "${DEMO_USERS:-}" | tr ',' '\n' | grep -i ':EVALUATOR$' | head -1)"
+EVAL="$(printf '%s' "${DEMO_USERS:-}" | tr ',' '\n' | grep -i ':EVALUATOR$' | head -1 || true)"  # none: the evaluator tests skip
 E2E_EVAL_USER="${E2E_EVAL_USER:-${EVAL%%:*}}"
 EVREST="${EVAL#*:}"; E2E_EVAL_PASSWORD="${E2E_EVAL_PASSWORD:-${EVREST%%:*}}"
 BASE="${E2E_BASE_URL:-http://localhost:${WEB_PORT:-8080}}"

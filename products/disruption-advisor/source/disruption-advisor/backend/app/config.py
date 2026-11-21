@@ -46,6 +46,11 @@ class Settings(BaseSettings):
     cost_misconnect_goodwill: float = 150.0
     # Holding a connecting flight for late inbound passengers (user 2026-11-21): longest hold considered.
     hold_max_minutes: int = 60
+    # Crew FDP check (user 2026-11-21): an option that takes a crew past its maximum FDP is alerted (a breach);
+    # under this many minutes left it is flagged "tight". Alert only at this stage (user): no crew recovery is
+    # planned, so a breach adds no cost unless COST_RESERVE_CREW (AED per breached flight) is set.
+    crew_tight_minutes: int = 30
+    cost_reserve_crew: float = 0.0
     eur_to_aed: float = 4.0
     cost_transport: float = 60.0  # one way, airport <-> hotel
 

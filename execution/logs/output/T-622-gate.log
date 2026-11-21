@@ -1,0 +1,19 @@
+== ruff
+All checks passed!
+10 files already formatted
+== mypy
+app/engine/store.py:86: error: Need type annotation for "window_x"  [var-annotated]
+Found 1 error in 1 file (checked 65 source files)
+== pytest
+........................................................................ [ 58%]
+...................................................                      [100%]
+123 passed in 54.78s
+== tsc
+
+> disruption-advisor-web@0.1.0 typecheck
+> tsc --noEmit
+
+== vitest
+ Test Files  5 passed (5)
+      Tests  32 passed (32)
+== lint

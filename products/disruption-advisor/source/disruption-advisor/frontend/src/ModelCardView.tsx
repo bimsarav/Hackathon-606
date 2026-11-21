@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, type ModelCard, type ModelMetrics, errorText } from "./api";
+import { CrewFdpPanel } from "./CrewFdpPanel";
 import { num } from "./format";
 import { ModelAnalysis } from "./ModelAnalysis";
 
@@ -279,6 +280,7 @@ export function ModelCardView() {
       </Expandable>
 
       <ModelAnalysis card={card} />
+      <CrewFdpPanel />
 
     </article>
   );

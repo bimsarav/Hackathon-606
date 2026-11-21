@@ -15,6 +15,9 @@ Outputs:
   pax_segments.parquet    active passenger-segments in the window with enrichment and SSRs
   mct.parquet             hub connection times
   history_flights.parquet G9 flights 1 Jan 2026 to the window start with actual times, aircraft chain, bookings
+  crew_flights.parquet    per flight: crew count and the tightest FDP headroom (max FDP - planned FDP), name-free
+  crew_fdp_estimates.parquet per flight number: headroom from its rostered history, for flights with no roster
+  crew_fdp.json           FDP analysis of the roster (headroom, over-max duties, effect of extra delay)
   ingest_report.json      counts, mismatches and data-quality notes (shown in the UI)
 """
 
@@ -422,6 +425,15 @@ def build(
         FROM '{raw}/mct.parquet' WHERE hub_ond_status = 'ACT'""",
     )
 
+    crew_file = raw / "crew.parquet"
+    needed = {"flight_number", "std_utc", "planned_fdp_value", "planned_max_fdp_value", "carrier_code"}
+    if crew_file.exists():
+        have = {r[0] for r in c.execute(f"DESCRIBE SELECT * FROM read_parquet('{crew_file}')").fetchall()}
+        if needed <= have:
+            counts.update(_crew(c, crew_file, ops, in_scope, out))
+        else:  # the older crew CSV (t_flight_crew_inf.csv) has no flight number, STD or maximum FDP
+            counts["crew_skipped"] = f"crew data lacks {sorted(needed - have)}: no crew FDP check"
+
     quality = {
         "segments_without_flight": c.execute(
             "SELECT count(*) FROM pax_segments p ANTI JOIN flights f USING (flight_id)"
@@ -452,3 +464,94 @@ def build(
     }
     (ops / "ingest_report.json").write_text(json.dumps(report, indent=2, default=str))
     return report
+
+
+# Crew FDP (user 2026-11-21). The roster gives, per crew member and flight, the planned FDP of the duty and the
+# crew member's maximum FDP (both minutes). Headroom = max FDP - planned FDP: how much later the duty can end before
+# the limit. A flight's headroom is its tightest crew member's (usually a pilot). Crew IDs and names are not kept.
+CREW_EXTRA_DELAYS = (30, 60, 90, 120, 180)
+
+
+def _crew(c: duckdb.DuckDBPyConnection, crew_file: Path, ops: Path, in_scope: str, out: Any) -> dict[str, Any]:
+    c.execute(f"""
+        CREATE OR REPLACE TEMP TABLE crew_rows AS
+        SELECT flight_number || '_' || strftime(std_utc, '%Y%m%d%H%M') AS flight_id, flight_number, std_utc,
+               crew_type, crew_id, sign_in_utc, planned_fdp_value AS planned, actual_fdp_value AS actual,
+               planned_max_fdp_value AS max_fdp,
+               coalesce(nullif(actual_max_fdp_value, 0), planned_max_fdp_value) AS actual_max
+        FROM read_parquet('{crew_file}')
+        WHERE carrier_code IN {in_scope} AND status_code = 'SCH' AND planned_fdp_value > 0
+          AND planned_max_fdp_value > 0 AND std_utc IS NOT NULL""")
+    counts: dict[str, Any] = {}
+    counts["crew_flights"] = out(
+        "crew_flights",
+        """
+        SELECT flight_id, any_value(flight_number) AS flight_number, any_value(std_utc) AS std,
+               count(*)::INTEGER AS crew, count(*) FILTER (WHERE crew_type IN ('CP', 'FO', 'SO'))::INTEGER AS pilots,
+               min(max_fdp - planned)::INTEGER AS headroom_minutes, arg_min(crew_type, max_fdp - planned) AS tightest,
+               max(planned)::INTEGER AS planned_fdp, min(max_fdp)::INTEGER AS max_fdp, min(sign_in_utc) AS sign_in
+        FROM crew_rows GROUP BY flight_id""",
+    )
+    counts["crew_fdp_estimates"] = out(
+        "crew_fdp_estimates",
+        """
+        SELECT flight_number, count(*)::INTEGER AS flights,
+               quantile_disc(headroom_minutes, 0.1)::INTEGER AS headroom_p10,
+               median(headroom_minutes)::INTEGER AS headroom_median,
+               mode(tightest) AS tightest
+        FROM crew_flights GROUP BY flight_number""",
+    )
+    # Analysis per duty (crew member + sign-in), on what actually happened.
+    c.execute("""
+        CREATE OR REPLACE TEMP TABLE duties AS
+        SELECT crew_id, crew_type, sign_in_utc, max(planned) AS p, max(actual) AS a, min(max_fdp) AS mx,
+               min(actual_max) AS amx
+        FROM crew_rows WHERE actual > 0 GROUP BY ALL""")
+
+    def rows(sql: str) -> list[dict[str, Any]]:
+        rel = c.execute(sql)
+        cols = [d[0] for d in rel.description]
+        return [dict(zip(cols, r, strict=True)) for r in rel.fetchall()]
+
+    summary = rows("""
+        SELECT count(*) AS duties, round(median(mx - p)) AS headroom_median, round(quantile_cont(mx - p, 0.05))
+               AS headroom_p5, round(median(mx)) AS max_fdp_median, round(avg(p)) AS planned_avg,
+               round(avg(a)) AS actual_avg, round(100.0 * count(*) FILTER (WHERE a > p) / count(*), 1) AS pct_over_plan,
+               count(*) FILTER (WHERE a > amx) AS over_max, count(*) FILTER (WHERE amx > mx) AS extended_max,
+               round(100.0 * count(*) FILTER (WHERE amx - a < 60) / count(*), 1) AS pct_under_60_left
+        FROM duties""")[0]
+    match = rows("""
+        SELECT count(*) AS roster_flights,
+               count(*) FILTER (WHERE flight_id IN (SELECT flight_id FROM history_flights)) AS in_history,
+               count(*) FILTER (WHERE flight_id IN (SELECT flight_id FROM flights)) AS in_window
+        FROM crew_flights""")[0]
+    analysis = {
+        "source": "crew roster (planned/actual FDP and maximum FDP, minutes); names and crew IDs are not kept",
+        "period": rows("SELECT min(std_utc) AS first, max(std_utc) AS last FROM crew_rows")[0],
+        "summary": summary,
+        "matched": match,
+        "bands": rows("""
+            SELECT band, count(*) AS duties, round(100.0 * count(*) / sum(count(*)) OVER (), 1) AS pct FROM (
+                SELECT CASE WHEN amx - a < 0 THEN 'over max' WHEN amx - a < 30 THEN '< 30 min left'
+                            WHEN amx - a < 60 THEN '30-60 min left' WHEN amx - a < 120 THEN '60-120 min left'
+                            ELSE '120+ min left' END AS band, amx - a AS left_ FROM duties)
+            GROUP BY band ORDER BY min(left_)"""),
+        "by_crew_type": rows("""
+            SELECT crew_type, count(*) AS duties, round(median(mx)) AS max_fdp_median,
+                   round(quantile_cont(amx - a, 0.05)) AS left_p5
+            FROM duties GROUP BY 1 HAVING count(*) >= 50 ORDER BY 2 DESC"""),
+        "by_sign_in_hour": rows("""
+            SELECT hour(sign_in_utc) AS hour_utc, count(*) AS duties, round(avg(mx)) AS max_fdp_avg,
+                   round(avg(a)) AS actual_avg, round(100.0 * count(*) FILTER (WHERE amx - a < 60) / count(*), 1)
+                   AS pct_under_60_left
+            FROM duties WHERE sign_in_utc IS NOT NULL GROUP BY 1 ORDER BY 1"""),
+        "extra_delay": [
+            rows(f"""SELECT {d} AS extra_minutes,
+                            round(100.0 * count(*) FILTER (WHERE a + {d} > amx) / count(*), 1) AS pct_over_max
+                     FROM duties""")[0]
+            for d in CREW_EXTRA_DELAYS
+        ],
+    }
+    (ops / "crew_fdp.json").write_text(json.dumps(analysis, indent=2, default=str))
+    counts["crew_duties_analysed"] = summary["duties"]
+    return counts

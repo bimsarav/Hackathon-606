@@ -387,6 +387,23 @@ def _option_brief(o: dict[str, Any]) -> dict[str, Any]:
         "picked_by": o["picked_by"],
         "connecting_flights_held": [f"{h['flight_number']} {h['minutes']} min" for h in o.get("holds", [])],
         "cascade": {k: v for k, v in (o.get("cascade") or {}).items() if k != "delay_ends"},
+        "crew_fdp": _crew_brief(o.get("crew")),
+    }
+
+
+def _crew_brief(crew: dict[str, Any] | None) -> dict[str, Any] | None:
+    """Crew FDP check for one option: counts and the least margin (minutes), no crew identities."""
+    if not crew:
+        return None
+    worst = crew.get("worst") or {}
+    return {
+        "status": crew["status"],
+        "flights_over_max_fdp": crew["flights_over"],
+        "flights_tight": crew["flights_tight"],
+        "flights_without_crew_data": crew["flights_unknown"],
+        "least_minutes_left": worst.get("minutes_left"),
+        "least_margin_flight": worst.get("flight_number"),
+        "basis": worst.get("source"),
     }
 
 

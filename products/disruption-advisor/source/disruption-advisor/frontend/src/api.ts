@@ -112,6 +112,7 @@ export interface RecoveryOption {
   kind?: OptionKind;
   holds?: HeldFlight[];
   cascade?: Cascade;
+  crew?: CrewCheck;
   cancelled_flights?: CancelledFlight[];
   cancelled_passengers?: number;
   passengers_rebooked?: number;
@@ -138,6 +139,56 @@ export interface Cascade {
   delay_ends: string | null;
   passenger_delay_minutes: number;
 }
+/** Crew FDP check of one option (user 2026-11-21): delays against the tightest crew member's headroom. */
+export interface CrewFlight {
+  flight_id: string;
+  flight_number: string;
+  // route and new departure; optional so scenarios saved before them still render
+  origin?: string;
+  destination?: string;
+  new_std?: string;
+  delay_minutes: number;
+  headroom_minutes: number;
+  minutes_left: number;
+  crew_type: string | null;
+  source: "roster" | "estimated";
+  status: "ok" | "tight" | "over";
+}
+
+export interface CrewCheck {
+  status: "ok" | "tight" | "over" | "unknown";
+  flights_checked: number;
+  flights_over: number;
+  flights_tight: number;
+  flights_unknown: number;
+  estimated: number;
+  worst: CrewFlight | null;
+  flights: CrewFlight[];
+}
+
+/** FDP analysis of the crew roster (counts and percentages only). */
+export interface CrewFdp {
+  period: { first: string; last: string };
+  summary: {
+    duties: number;
+    headroom_median: number;
+    headroom_p5: number;
+    max_fdp_median: number;
+    planned_avg: number;
+    actual_avg: number;
+    pct_over_plan: number;
+    over_max: number;
+    extended_max: number;
+    pct_under_60_left: number;
+  };
+  matched: { roster_flights: number; in_history: number; in_window: number };
+  bands: { band: string; duties: number; pct: number }[];
+  by_crew_type: { crew_type: string; duties: number; max_fdp_median: number; left_p5: number }[];
+  by_sign_in_hour: { hour_utc: number; duties: number; max_fdp_avg: number; actual_avg: number; pct_under_60_left: number }[];
+  extra_delay: { extra_minutes: number; pct_over_max: number }[];
+  rules: { tight_below_minutes: number };
+}
+
 export type StrategyKey = "lowest_cost" | "protect_passengers" | "least_delay";
 export const STRATEGY_KEYS: StrategyKey[] = ["lowest_cost", "protect_passengers", "least_delay"];
 export const STRATEGY_LABEL: Record<StrategyKey, string> = {
@@ -701,6 +752,7 @@ export const api = {
   uploadTestData: (flightsCsv: string, passengersCsv: string, commit: boolean) =>
     post<TestDataReport>("/api/v1/test-data", { flights_csv: flightsCsv, passengers_csv: passengersCsv, commit }),
   removeTestData: () => request<TestDataStatus>("/api/v1/test-data", { method: "DELETE" }),
+  crewFdp: () => request<CrewFdp>("/api/v1/crew/fdp"),
   message: (id: string, customerKey: string) =>
     post<{ text: string; source: string }>(`/api/v1/scenarios/${id}/messages`, { customer_key: customerKey }),
 };

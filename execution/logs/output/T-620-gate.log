@@ -1,0 +1,15 @@
+== ruff (my files)
+All checks passed!
+== ruff all (info)
+
+Found 1 error.
+[*] 1 fixable with `--fix`.
+== format
+12 files already formatted
+== mypy
+app/engine/store.py:86: error: Need type annotation for "window_x"  [var-annotated]
+Found 1 error in 1 file (checked 65 source files)
+== pytest
+........................................................................ [ 58%]
+...................................................                      [100%]
+123 passed in 47.35s

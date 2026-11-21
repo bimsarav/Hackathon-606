@@ -47,6 +47,14 @@ class Leg:
         return max(self.capacity - self.booked_seats, 0)
 
 
+@dataclass(frozen=True)
+class CrewHeadroom:
+    minutes: int  # max FDP - planned FDP of the tightest crew member
+    crew_type: str | None  # CP captain, FO first officer, CC/CS cabin crew, ...
+    source: str  # "roster" (this flight's crew) or "estimated" (the flight number's history)
+    flights: int = 1  # rostered flights behind an estimate
+
+
 LEG_COLUMNS = (
     "flight_id, flight_number, airline, tail, origin, destination, std, sta, capacity, booked_seats, "
     "booked_pax, aircraft_model, capacity_source"
@@ -110,6 +118,27 @@ class OpsStore:
             if sold.exists()
             else set()
         )
+        # Crew FDP headroom (user 2026-11-21): rostered flights, and per flight number from its rostered history
+        self.crew_by_flight: dict[str, CrewHeadroom] = {}
+        self.crew_by_number: dict[str, CrewHeadroom] = {}
+        crew, est = ops_dir / "crew_flights.parquet", ops_dir / "crew_fdp_estimates.parquet"
+        if crew.exists():
+            for fid, minutes, tightest in self._con.execute(
+                f"SELECT flight_id, headroom_minutes, tightest FROM '{crew}'"
+            ).fetchall():
+                self.crew_by_flight[fid] = CrewHeadroom(int(minutes), tightest, "roster")
+        if est.exists():
+            for number, minutes, tightest, n in self._con.execute(
+                f"SELECT flight_number, headroom_p10, tightest, flights FROM '{est}'"
+            ).fetchall():
+                self.crew_by_number[number] = CrewHeadroom(int(minutes), tightest, "estimated", int(n))
+        fdp = ops_dir / "crew_fdp.json"
+        self.crew_fdp: dict[str, Any] = json.loads(fdp.read_text()) if fdp.exists() else {}
+
+    def crew_headroom(self, leg: Leg) -> CrewHeadroom | None:
+        """Minutes the duty of ``leg``'s tightest crew member can still be extended before the maximum FDP: the
+        roster when the flight has one, else the 10th percentile of the same flight number's rostered history."""
+        return self.crew_by_flight.get(leg.flight_id) or self.crew_by_number.get(leg.flight_number)
 
     def _add_test_data(self, test_dir: Path | None, tables: tuple[str, ...] = sample_data.TABLES) -> int | None:
         """Append the uploaded test flights (app/sample_data.py) to the in-memory tables; the Parquet is untouched."""

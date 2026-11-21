@@ -34,6 +34,8 @@ def fingerprint(input_dir: Path) -> str:
     fares = convert.fares_source(input_dir)
     files = [p for p in input_dir.iterdir() if p.is_file()] + (list(supplied.rglob("*.parquet")) if supplied else [])
     files += [fares] if fares and fares not in files else []
+    crew = convert.crew_source(input_dir)
+    files += [crew] if crew and crew not in files else []
     for f in sorted(files):
         st = f.stat()
         h.update(f"{f.relative_to(input_dir)}|{st.st_size}|{int(st.st_mtime)}".encode())

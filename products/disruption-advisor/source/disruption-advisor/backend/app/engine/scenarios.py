@@ -150,7 +150,9 @@ def _option_kpis(ctx: Context, key: str, label: str, plan: RotationPlan, cancell
     eu = sum(_eu261(ctx, t.leg) * t.leg.booked_pax for t in delayed if t.delay_minutes >= 180)
     misconnect_cost = len(missed) * (cm.rebooking_handling + cm.meal_voucher)
     goodwill = _misconnect_goodwill(ctx, missed)
-    total = delay_cost + care + eu * cm.eur_to_aed + misconnect_cost + goodwill
+    crew = _crew_check(ctx, plan)
+    reserve_crew = crew["flights_over"] * ctx.settings.cost_reserve_crew
+    total = delay_cost + care + eu * cm.eur_to_aed + misconnect_cost + goodwill + reserve_crew
     return {
         "key": key,
         "kind": key.split(":")[0],
@@ -168,8 +170,10 @@ def _option_kpis(ctx: Context, key: str, label: str, plan: RotationPlan, cancell
             "eu261_compensation": round(eu * cm.eur_to_aed),
             "misconnect_handling": round(misconnect_cost),
             "misconnect_goodwill": round(goodwill),
+            "reserve_crew": round(reserve_crew),
         },
         "cascade": _cascade(plan),
+        "crew": crew,
         "holds": [],
         "legs": [
             {
@@ -221,6 +225,68 @@ def _misconnect_goodwill(ctx: Context, missed: list[Connection]) -> float:
         tier = max(priority.TIER_VALUE.get(p.get("loyalty_tier_synthetic"), 0.0), priority.TIER_VALUE.get(family, 0.0))
         total += base * (1 + 2 * tier + FREQUENCY_BONUS.get(str(p.get("travel_frequency_band")), 0.0))
     return total
+
+
+def _crew_check(ctx: Context, plan: RotationPlan) -> dict[str, Any]:
+    """Crew FDP check (user 2026-11-21): each delayed flight's extra minutes against its tightest crew member's
+    headroom (max FDP - planned FDP). The roster is used when the flight has one, else the 10th percentile of the
+    flight number's rostered history ("estimated"). Crew are assumed to stay with their flight (also after a swap).
+    Over the maximum is a breach (alert only; COST_RESERVE_CREW adds a cost when set, default 0); under
+    ``crew_tight_minutes`` left it is "tight"."""
+    tight_below = ctx.settings.crew_tight_minutes
+    flights: list[dict[str, Any]] = []
+    unknown = 0
+    for t in plan.delayed():
+        h = ctx.store.crew_headroom(t.leg)
+        if h is None:
+            unknown += 1
+            continue
+        left = h.minutes - t.delay_minutes
+        flights.append(
+            {
+                "flight_id": t.leg.flight_id,
+                "flight_number": t.leg.flight_number,
+                "origin": t.leg.origin,
+                "destination": t.leg.destination,
+                "new_std": t.new_std,
+                "delay_minutes": t.delay_minutes,
+                "headroom_minutes": h.minutes,
+                "minutes_left": left,
+                "crew_type": h.crew_type,
+                "source": h.source,
+                "status": "over" if left < 0 else "tight" if left < tight_below else "ok",
+            }
+        )
+    over = sum(1 for f in flights if f["status"] == "over")
+    tight = sum(1 for f in flights if f["status"] == "tight")
+    worst = min(flights, key=lambda f: f["minutes_left"], default=None)
+    status = "over" if over else "tight" if tight else "ok" if flights else "unknown"
+    return {
+        "status": status,
+        "flights_checked": len(flights),
+        "flights_over": over,
+        "flights_tight": tight,
+        "flights_unknown": unknown,
+        "estimated": sum(1 for f in flights if f["source"] == "estimated"),
+        "worst": worst,
+        "flights": [f for f in flights if f["status"] != "ok"],
+    }
+
+
+def _crew_text(crew: dict[str, Any]) -> str:
+    """One line on the crew FDP check, for the explanation and the agent (no crew identities)."""
+    worst = crew.get("worst")
+    if crew["status"] == "unknown" or worst is None:
+        return "no crew FDP data for the delayed flights"
+    basis = "estimated" if worst["source"] == "estimated" else "rostered"
+    if crew["status"] == "over":
+        return (
+            f"{crew['flights_over']} flight(s) would breach the crew maximum FDP "
+            f"(worst {worst['flight_number']}: {-worst['minutes_left']} min over, {basis} crew)"
+        )
+    return f"crew within FDP limits; least margin {worst['minutes_left']} min on {worst['flight_number']} ({basis})" + (
+        f", {crew['flights_tight']} flight(s) tight" if crew["status"] == "tight" else ""
+    )
 
 
 def _cascade(plan: RotationPlan) -> dict[str, Any]:
@@ -433,6 +499,7 @@ def analyse_delay(
             "passengers_missing_connections": o["misconnects"],
             "passengers_without_seat": o["passengers_without_seat"],
             "estimated_cost_aed": round(o["cost_aed"]),
+            "crew_fdp": _crew_text(o["crew"]),
         }
 
     facts = {
@@ -795,7 +862,10 @@ def _assumptions(ctx: Context) -> list[str]:
         "Loyalty tier, fare family and most special-service codes are synthetic (labelled in the passenger list).",
         f"Costs are assumed: delay AED {s.cost_delay_per_minute:g}/min, hotel AED {s.cost_hotel_per_night:g}, "
         f"meal AED {s.cost_meal_voucher:g}, handling AED {s.cost_rebooking_handling:g}; EU261 on EU/EEA/CH departures.",
-        "Crew legality is not checked (no crew data); crew control must confirm any swap or cancellation.",
+        f"Crew FDP: each delayed flight's delay is checked against its tightest crew member's headroom (maximum FDP "
+        "- planned FDP) from the crew roster, or for flights without a roster the 10th percentile of the same flight "
+        f"number's history (estimated); under {s.crew_tight_minutes} min left is tight, over the maximum is an FDP "
+        "breach (alert for crew control; no crew recovery is planned). Crew stay with their flight.",
         f"Cancelling a round trip: its passengers are rebooked on the same route within "
         f"{s.rebooking_window_hours} h; revenue loss is not counted (no fare revenue per flight is supplied).",
         f"Passenger delay minutes count {NO_SEAT_DELAY_MINUTES // 60} h for each passenger left without a seat.",
