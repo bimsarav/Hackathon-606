@@ -60,6 +60,8 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
   const [presetError, setPresetError] = useState<string | null>(null);
   const [delay, setDelay] = useState(150);
   const [query, setQuery] = useState("");
+  const [originFilter, setOriginFilter] = useState("");
+  const [destFilter, setDestFilter] = useState("");
   const [results, setResults] = useState<FlightRow[] | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [agentDelay, setAgentDelay] = useState<number | null>(null);
@@ -72,15 +74,24 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
-  function inRange(std: string): boolean {
-    const day = std.slice(0, 10); // YYYY-MM-DD in UTC
+  function inRange(std: string, origin?: string, destination?: string): boolean {
+    const day = std.slice(0, 10);
     if (fromDate && day < fromDate) return false;
     if (toDate && day > toDate) return false;
+    if (originFilter && origin && !origin.includes(originFilter)) return false;
+    if (destFilter && destination && !destination.includes(destFilter)) return false;
     return true;
   }
 
   function handleFromDate(v: string) { setFromDate(v); setSearchPage(0); setPresetPage(0); }
   function handleToDate(v: string)   { setToDate(v);   setSearchPage(0); setPresetPage(0); }
+
+  function resetFilters() {
+    setQuery(""); setOriginFilter(""); setDestFilter("");
+    setFromDate(""); setToDate("");
+    setSearchPage(0); setPresetPage(0);
+    setResults(null); setSearchError(null);
+  }
 
   // Keep the slider in step with the scenario on screen (e.g. one reopened from history).
   useEffect(() => {
@@ -120,96 +131,79 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
     <section className="launcher" aria-labelledby="launcher-title">
       <h2 id="launcher-title">New scenario</h2>
 
-      {/* Search bar always at the top */}
-      <form className="search launcher-search" onSubmit={search} role="search">
-        <label htmlFor="flight-search" className="visually-hidden">
-          Flight number, airport or aircraft
-        </label>
-        <input id="flight-search" placeholder="Search by flight number, airport or tail (e.g. G9519, SHJ, A6-ARI)"
-          value={query} maxLength={10}
-          onChange={(e) => setQuery(e.target.value.replace(/[^A-Za-z0-9-]/g, ""))} />
-        <button type="submit">Search</button>
-      </form>
-      {/* Departure date range filter */}
-      <div className="date-range-row">
-        <span className="date-range-label">Departure (UTC)</span>
-        <label className="visually-hidden" htmlFor="dep-from">From</label>
-        <input id="dep-from" type="date" value={fromDate} onChange={(e) => handleFromDate(e.target.value)} />
-        <span className="date-range-sep">–</span>
-        <label className="visually-hidden" htmlFor="dep-to">To</label>
-        <input id="dep-to" type="date" value={toDate} onChange={(e) => handleToDate(e.target.value)} />
-        {(fromDate || toDate) && (
-          <button type="button" className="date-range-clear" onClick={() => { handleFromDate(""); handleToDate(""); }}>✕</button>
-        )}
-      </div>
-
-      {searchError && <p className="error">{searchError}</p>}
-      {results && results.length === 0 && <p className="muted small">No flights match.</p>}
-      {results && results.length > 0 && (() => {
-        const filtered = results.filter((f) => inRange(f.std));
-        return (
-        <>
-          <ul className="preset-list">
-            {filtered.slice(searchPage * searchPageSize, (searchPage + 1) * searchPageSize).map((f) => (
-              <li key={f.flight_id}>
-                <button type="button" className="preset" disabled={busy} onClick={() => start(f.flight_id)}>
-                  <span className="preset-title">
-                    <CarrierTail flightNumber={f.flight_number} />
-                    {f.flight_number} {f.origin}→{f.destination}
-                  </span>
-                  <span className="small muted">
-                    {utc(f.std)} · {f.tail} · {f.booked_seats}/{f.capacity} booked
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-          <Paginator total={filtered.length} page={searchPage} pageSize={searchPageSize}
-            onPage={setSearchPage} onPageSize={setSearchPageSize} />
-          {filtered.length === 0 && <p className="muted small">No flights in that date range.</p>}
-        </>
-        );
-      })()}
-
-      {!hideTabNav && (
-        <div className="tabs" role="tablist" aria-label="Disruption type" style={{ marginTop: "0.75rem" }}>
-          <button type="button" role="tab" aria-selected={tab === "DELAY"} className={tab === "DELAY" ? "tab active" : "tab"}
-            onClick={() => setTab("DELAY")}>
-            A · Delay
-          </button>
-          <button type="button" role="tab" aria-selected={tab === "CANCEL"} className={tab === "CANCEL" ? "tab active" : "tab"}
-            onClick={() => setTab("CANCEL")}>
-            B · Cancellation
-          </button>
-          {onAgent && (
-            <button type="button" role="tab" aria-selected={tab === "AGENT"} className={tab === "AGENT" ? "tab active" : "tab"}
-              onClick={() => setTab("AGENT")}>
-              Ask the agent
-            </button>
-          )}
-        </div>
-      )}
-
-      {tab === "DELAY" && (
-        <div className="field" style={{ marginTop: "0.5rem" }}>
-          <label htmlFor="delay">
-            Delay: <strong>{delay} min</strong>
-          </label>
-          <input id="delay" type="range" min={15} max={600} step={15} value={delay}
-            onChange={(e) => setDelay(Number(e.target.value))}
-            onPointerUp={commitDelay} onKeyUp={commitDelay} onTouchEnd={commitDelay} />
-          <span className={active ? "small muted" : "small hint"}>
+      {/* Multi-column filter card */}
+      <div className="filter-card">
+        <form onSubmit={search}>
+          {/* Row 1: flight fields + type + dep from */}
+          <div className="filter-row">
+            <div className="filter-field">
+              <label htmlFor="ff-flight">Flight / Tail</label>
+              <input id="ff-flight" placeholder="e.g. G9519, A6-ARI"
+                value={query} maxLength={10}
+                onChange={(e) => setQuery(e.target.value.replace(/[^A-Za-z0-9-]/g, ""))} />
+            </div>
+            <div className="filter-field">
+              <label htmlFor="ff-origin">Origin</label>
+              <input id="ff-origin" placeholder="e.g. SHJ"
+                value={originFilter} maxLength={4}
+                onChange={(e) => setOriginFilter(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))} />
+            </div>
+            <div className="filter-field">
+              <label htmlFor="ff-dest">Destination</label>
+              <input id="ff-dest" placeholder="e.g. DXB"
+                value={destFilter} maxLength={4}
+                onChange={(e) => setDestFilter(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))} />
+            </div>
+            {!hideTabNav && (
+              <div className="filter-field">
+                <label htmlFor="ff-type">Scenario Type</label>
+                <select id="ff-type" value={tab} onChange={(e) => setTab(e.target.value as Tab)}>
+                  <option value="DELAY">Delay</option>
+                  <option value="CANCEL">Cancellation</option>
+                  {onAgent && <option value="AGENT">Ask the agent</option>}
+                </select>
+              </div>
+            )}
+            <div className="filter-field">
+              <label htmlFor="dep-from">Dep. Date From (UTC)</label>
+              <input id="dep-from" type="date" value={fromDate}
+                onChange={(e) => handleFromDate(e.target.value)} />
+            </div>
+          </div>
+          {/* Row 2: dep to + delay slider + actions */}
+          <div className="filter-row-b">
+            <div className="filter-field">
+              <label htmlFor="dep-to">Dep. Date To (UTC)</label>
+              <input id="dep-to" type="date" value={toDate}
+                onChange={(e) => handleToDate(e.target.value)} />
+            </div>
+            {tab === "DELAY" && (
+              <div className="filter-field filter-field-delay">
+                <label htmlFor="delay">Delay: <strong>{delay} min</strong></label>
+                <input id="delay" type="range" min={15} max={600} step={15} value={delay}
+                  onChange={(e) => setDelay(Number(e.target.value))}
+                  onPointerUp={commitDelay} onKeyUp={commitDelay} onTouchEnd={commitDelay} />
+              </div>
+            )}
+            <div className="filter-actions">
+              <button type="button" className="btn-outline" onClick={resetFilters}>Reset</button>
+              <button type="submit">Search</button>
+            </div>
+          </div>
+        </form>
+        {tab === "DELAY" && (
+          <p className={`small ${active ? "muted" : "hint"}`} style={{ marginTop: "0.5rem", marginBottom: 0 }}>
             {active
               ? delay === active.delay
                 ? `Applied to ${active.flightNumber}. Move and release to re-run.`
                 : `Release to re-run ${active.flightNumber} with ${delay} min…`
               : `Pick a flight below to analyse it with ${delay} min.`}
-          </span>
-        </div>
-      )}
+          </p>
+        )}
+      </div>
 
-      {tab === "AGENT" && (
-        <div className="agent-form" style={{ marginTop: "0.5rem" }}>
+      {tab === "AGENT" && onAgent && (
+        <div className="agent-form">
           <p className="small muted">
             The agent uses the recovery engine, explains each step and recommends one option. You review and approve it.
           </p>
@@ -219,9 +213,7 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
               onChange={(e) => setAgentDelay(e.target.value ? Number(e.target.value) : null)}>
               <option value="">Let the agent use the predicted delay</option>
               {AGENT_DELAYS.map((d) => (
-                <option key={d} value={d}>
-                  {d} min
-                </option>
+                <option key={d} value={d}>{d} min</option>
               ))}
             </select>
           </div>
@@ -231,25 +223,52 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
               onChange={(e) => setAgentStrategy(e.target.value ? (e.target.value as StrategyKey) : null)}>
               <option value="">No preference</option>
               {STRATEGY_KEYS.map((k) => (
-                <option key={k} value={k}>
-                  {STRATEGY_LABEL[k]}
-                </option>
+                <option key={k} value={k}>{STRATEGY_LABEL[k]}</option>
               ))}
             </select>
           </div>
           <div className="field">
             <label htmlFor="agent-note">Note for the agent (optional)</label>
-            <textarea id="agent-note" rows={2} maxLength={500} value={agentNote} placeholder="e.g. crew for A6-AOH times out at 18:00Z"
+            <textarea id="agent-note" rows={2} maxLength={500} value={agentNote}
+              placeholder="e.g. crew for A6-AOH times out at 18:00Z"
               onChange={(e) => setAgentNote(e.target.value)} />
           </div>
         </div>
       )}
 
+      {searchError && <p className="error">{searchError}</p>}
+      {results && results.length === 0 && <p className="muted small">No flights match.</p>}
+      {results && results.length > 0 && (() => {
+        const filtered = results.filter((f) => inRange(f.std, f.origin, f.destination));
+        return (
+          <>
+            <ul className="preset-list">
+              {filtered.slice(searchPage * searchPageSize, (searchPage + 1) * searchPageSize).map((f) => (
+                <li key={f.flight_id}>
+                  <button type="button" className="preset" disabled={busy} onClick={() => start(f.flight_id)}>
+                    <span className="preset-title">
+                      <CarrierTail flightNumber={f.flight_number} />
+                      {f.flight_number} {f.origin}→{f.destination}
+                    </span>
+                    <span className="small muted">
+                      {utc(f.std)} · {f.tail} · {f.booked_seats}/{f.capacity} booked
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <Paginator total={filtered.length} page={searchPage} pageSize={searchPageSize}
+              onPage={setSearchPage} onPageSize={setSearchPageSize} />
+            {filtered.length === 0 && <p className="muted small">No flights in that date range.</p>}
+          </>
+        );
+      })()}
+
       <h3>Suggested flights</h3>
       {presetError && <p className="error">{presetError}</p>}
       {!presets && !presetError && <p className="muted small">Finding suitable flights…</p>}
       {presets && tab !== "CANCEL" && (() => {
-        const items = presets.delay.filter((p) => inRange(p.std));
+        const items = presets.delay.filter((p) => inRange(p.std, p.origin, p.destination));
         const page = presetPage;
         const ps = presetPageSize;
         return (
@@ -276,7 +295,7 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
         );
       })()}
       {presets && tab === "CANCEL" && (() => {
-        const items = presets.cancel.filter((p) => inRange(p.std));
+        const items = presets.cancel.filter((p) => inRange(p.std, p.origin, p.destination));
         const page = presetPage;
         const ps = presetPageSize;
         return (
