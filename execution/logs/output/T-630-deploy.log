@@ -1,0 +1,11 @@
+== tag pre-202611211543
+tagged
+== ship 15:43:02 (git 7addde6)
+extracted
+ Container disruption-advisor-ingest-1 Started 
+ Container disruption-advisor-api-1 Healthy 
+ Container disruption-advisor-extracts-db-1 Started 
+ Container disruption-advisor-web-1 Started 
+== up 15:43:13
+disruption-advisor-web:latest 2026-11-21 15:43:10 +0000 GMT
+11
