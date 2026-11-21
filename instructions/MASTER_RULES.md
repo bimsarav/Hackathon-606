@@ -24,9 +24,10 @@ Source: master prompt supplied by the user on 2026-11-19 at project START.
 - After every meaningful action, update the tracking files in `execution/`.
 
 ## Commands
-START, RESUME, STATUS, REVIEW, PLAN, IMPLEMENT, TEST, FIX, DEPLOY, DOCUMENT, AUDIT, STOP.
+START, RESUME, STATUS, REVIEW, PLAN, IMPLEMENT, TEST, FIX, DEPLOY, DOCUMENT, AUDIT, JUDGE (independent AI Judge evaluation, MASTER_PROMPT §16), STOP.
 
 ## Session report
-At the end of each session, report: Completed, In Progress, Issues, Next Action, Files Updated.
+At the end of each session, report: Completed, In Progress, Issues, Next Action, Files Updated, and the Judge Score of every process completed in the session (JUDGE_RULES §4).
 - Airline domain research (user instruction 2026-11-20, MASTER_PROMPT §15): a standing research role that builds a sourced airline knowledge base in `documentation/knowledge-base/airline/` before solutions are proposed. Summary: `instructions/DOMAIN_RESEARCH_RULES.md`.
 - Delivery cadence (user 2026-11-20, overrides the one-shot delivery flow): (1) prepare design diagrams first and tell the user where to view them; (2) define an MVP and build it first; (3) host the finished MVP and tell the user how to view it; (4) keep an incremental deployment plan (phases after the MVP) in the product's docs; each later phase starts only with the user's explicit approval. Record the phase gates in execution/DEPLOYMENT_STATUS.md.
+- AI Judge (user instruction 2026-11-21, MASTER_PROMPT §16): an independent evaluator scores every significant deliverable out of 100 against the product's own criteria (`execution/judge/<product>/CRITERIA.md`, derived from its specification; §16.4 defaults otherwise), in a separate agent context; critical findings block approval; every completed process reports its Judge score. Summary: `instructions/JUDGE_RULES.md`.

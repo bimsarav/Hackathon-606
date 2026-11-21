@@ -1,3 +1,4 @@
+# T-640 (2026-11-21) DONE: AI Judge (MASTER_PROMPT §16, JUDGE_RULES.md, execution/judge/); first eval 80/100 APPROVED WITH IMPROVEMENTS, fixes applied, re-evaluation pending; disruption-advisor has no baseline evaluation yet (criteria ready); NOT committed
 # T-636 (2026-11-21) DONE: prod ports UI :8080, API :8888 direct (ADR 0015), verified smoke 15/15 + Playwright 11/11; rollback pre-202611211805; NOT committed. Open: Confluence/deck still show :8888 as UI URL
 # T-635 (2026-11-21) DONE: product source on v1.0.0 has no build-process traces (cleanup committed c54d50b; App.tsx login comment fixed after af96bc2, NOT committed); gate PASS; Confluence ADR 0001 row reverted
 # RESUME (updated 2026-11-21) — T-624: pulled 238f949 + crew FDP alerts (T-620/623) on local, gate 134+38, smoke 11/11, e2e 9+2 skip; NOT committed/deployed. Other session T-621 live-delay WIP kept OUT of tree: stash@{0} + execution/logs/output/T-621-other-session-wip
