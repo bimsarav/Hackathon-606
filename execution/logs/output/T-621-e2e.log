@@ -1,0 +1,61 @@
+      46 |   await nav.getByRole("button", { name: "Model Card" }).click();
+      47 |   await expect(page.getByRole("heading", { name: "Model overview" })).toBeVisible();
+    > 48 |   await page.getByRole("button", { name: /Calibration/ }).click();
+         |                                                           ^
+      49 |   await expect(page.getByRole("table", { name: "Calibration" })).toBeVisible();
+      50 |   await page.getByRole("button", { name: /Alert cut-offs/ }).click();
+      51 |   await expect(page.getByRole("table", { name: /Operating points/ }).first()).toBeVisible();
+        at /e2e/tests/evaluator.spec.ts:48:59
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/evaluator-the-evaluator-re-527fb-alyses-one-and-removes-them-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/evaluator-the-evaluator-re-527fb-alyses-one-and-removes-them-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/evaluator-the-evaluator-re-527fb-alyses-one-and-removes-them-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/evaluator-the-evaluator-re-527fb-alyses-one-and-removes-them-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: locator.click: Error: strict mode violation: getByRole('button', { name: /Calibration/ }) resolved to 2 elements:
+        1) <button type="button" aria-expanded="false" class="decision-trigger">…</button> aka getByRole('button', { name: 'Calibration Raw LightGBM' })
+        2) <button type="button" aria-expanded="false" class="expand-trigger link">▸ Calibration: does a 20% chance mean 20%?</button> aka getByRole('button', { name: '▸ Calibration: does a 20%' })
+
+    Call log:
+      - waiting for getByRole('button', { name: /Calibration/ })
+
+
+      46 |   await nav.getByRole("button", { name: "Model Card" }).click();
+      47 |   await expect(page.getByRole("heading", { name: "Model overview" })).toBeVisible();
+    > 48 |   await page.getByRole("button", { name: /Calibration/ }).click();
+         |                                                           ^
+      49 |   await expect(page.getByRole("table", { name: "Calibration" })).toBeVisible();
+      50 |   await page.getByRole("button", { name: /Alert cut-offs/ }).click();
+      51 |   await expect(page.getByRole("table", { name: /Operating points/ }).first()).toBeVisible();
+        at /e2e/tests/evaluator.spec.ts:48:59
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/evaluator-the-evaluator-re-527fb-alyses-one-and-removes-them-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/evaluator-the-evaluator-re-527fb-alyses-one-and-removes-them-chromium-retry1/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/evaluator-the-evaluator-re-527fb-alyses-one-and-removes-them-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/evaluator-the-evaluator-re-527fb-alyses-one-and-removes-them-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › tests/advisor.spec.ts:54:1 › scenario B: a cancellation ranks passengers by tier and re-runs with new weights 
+    [chromium] › tests/evaluator.spec.ts:40:1 › the evaluator reads the model evidence, uploads two flights, analyses one and removes them 
+  9 passed (5.6m)
+== e2e finished 09:37:59

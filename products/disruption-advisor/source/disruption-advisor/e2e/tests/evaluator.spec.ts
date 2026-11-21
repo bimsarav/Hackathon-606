@@ -45,17 +45,17 @@ test("the evaluator reads the model evidence, uploads two flights, analyses one 
 
   await nav.getByRole("button", { name: "Model Card" }).click();
   await expect(page.getByRole("heading", { name: "Model overview" })).toBeVisible();
-  await page.getByRole("button", { name: /Calibration/ }).click();
+  await page.getByRole("button", { name: /Calibration: does a 20% chance mean 20%/ }).click();
   await expect(page.getByRole("table", { name: "Calibration" })).toBeVisible();
-  await page.getByRole("button", { name: /Alert cut-offs/ }).click();
+  await page.getByRole("button", { name: /Alert cut-offs: true and false alarms/ }).click();
   await expect(page.getByRole("table", { name: /Operating points/ }).first()).toBeVisible();
-  await page.getByRole("button", { name: /Month-by-month/ }).click();
+  await page.getByRole("button", { name: /Month-by-month results/ }).click();
   await expect(page.getByRole("table", { name: "Month by month" })).toBeVisible();
   await page.getByRole("button", { name: /Model comparison and tuning \(delay model\)/ }).click();
   await expect(page.getByRole("cell", { name: "0.703" }).first()).toBeVisible();
   await page.getByRole("button", { name: /Reward preference model/ }).click();
   await expect(page.getByText(/Trained on SIMULATED redemption history/)).toBeVisible();
-  await page.getByRole("button", { name: /Cascade check/ }).click();
+  await page.getByRole("button", { name: /Cascade check \(knock-on formula\)/ }).click();
   await expect(page.getByRole("table", { name: "Cascade check summary" })).toBeVisible();
 
   await nav.getByRole("button", { name: "Test data" }).click();
@@ -76,7 +76,9 @@ test("the evaluator reads the model evidence, uploads two flights, analyses one 
     await expect(page.getByRole("heading", { name: "Recovery options compared" })).toBeVisible();
     await expect(page.locator("h1")).toContainText("G9981");
   } finally {
+    // Always leave the system as found: wait for the page to say what is loaded, then remove it.
     await nav.getByRole("button", { name: "Test data" }).click();
+    await expect(page.getByText(/Test data loaded|No test data is loaded/).first()).toBeVisible();
     const remove = page.getByRole("button", { name: "Remove test data" });
     if (await remove.count()) await remove.click();
     await expect(page.getByText(/No test data is loaded/)).toBeVisible();

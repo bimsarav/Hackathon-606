@@ -175,3 +175,4 @@
 2026-11-21T12:50Z | T-617 | DONE | test data upload (evaluator adds flights via UI): backend, UI, tests, ADR 0013; local only, not committed or deployed | docs/architecture/adr/0013-test-data-upload.md
 2026-11-21T09:25Z | T-619 | DONE | production deploy of test-data upload + roles + saved delay model; smoke 11/11, roles + upload verified; Playwright FAILED (stale selectors, 1/8); rollback pre-202611210904 | output/T-619-*.log
 2026-11-21T10:10Z | T-620 | DONE | Model Card view: all model analysis sections (evaluator only); local verify only, not deployed | frontend/src/ModelAnalysis.tsx
+2026-11-21T09:50Z | T-621 | DONE | production deploy of 2b9d87f: Model Card sections, cascade panel restored, Playwright rewritten (11/11 on the server), stale unit tests fixed; rollback pre-202611210927 | output/T-621-*.log

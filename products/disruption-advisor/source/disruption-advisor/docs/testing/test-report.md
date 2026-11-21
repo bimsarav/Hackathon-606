@@ -220,3 +220,14 @@ The new Playwright tests have not been run locally (no Playwright or Docker on t
 - `backend/tests/test_model_docs.py` (4): the bundled write-ups in `app/data/model_docs` equal `docs/testing/*selection.md`, markdown to blocks, the real tables parse, evaluator-only access.
   `frontend/src/ModelAnalysis.test.tsx` (2). Checked against the real local data: model-docs 14 and 15 blocks, reward card AUC 0.702, model card carries all fields. Not looked at in a browser.
 - Keep the copies in sync: edit `docs/testing/model-selection.md` or `reward-model-selection.md`, then copy to `backend/app/data/model_docs/` (`delay-model-selection.md`, `reward-model-selection.md`); the test fails if they differ.
+
+## Production check, Model Card release and Playwright rewrite (21 Nov 2026, 09:32Z, heshawa 2b9d87f)
+- Smoke 11/11. `/risk/model-docs` and `/risk/reward-model` answer 200 to the evaluator and 403 to OCC; `/risk/cascade` is open to both.
+- **Playwright on the server: 11/11 passed (1.6 min).** The spec was rewritten for the redesigned UI (sidebar buttons instead of tabs, passenger detail behind "Show passenger detail",
+  strategy cards instead of buttons, "Details" instead of "Why & message", "Show rewards & compensation") and `e2e/tests/evaluator.spec.ts` was added (OCC cannot see or call the
+  Model Card and Test data; the evaluator reads the model sections, uploads two flights, analyses one and removes them; a bad sheet is rejected with row and column). `scripts/e2e.sh` passes the
+  evaluator account from `DEMO_USERS`. The evaluator test always removes the test data it added.
+- Earlier runs of the same day: 1 of 8 passed on the old spec (stale selectors); after the rewrite 9 of 11, then the two remaining failures were a selector that matched two buttons ("Calibration") and
+  a renamed button ("Why & message"); a failed run left test flights on the live site once, they were removed by hand and the test's clean-up now waits for the page before removing.
+- Regression found by the browser tests' neighbours, not by a test: my merge of the redesigned `App.tsx` dropped the cascade panel from the watchlist page (live 09:10Z to 09:32Z). Restored; `phase 2: the 7-day page shows last month's cascade check` now guards it.
+- Frontend unit tests: 35/35 (the 4 stale tests were rewritten for the banners and strategy cards). Backend suite not run against Postgres here (no Docker); the SQLite scratch run shows the same 9 environment-only failures as before.

@@ -1,0 +1,7 @@
+
+Running 1 test using 1 worker
+
+  ✓  1 [chromium] › tests/evaluator.spec.ts:40:1 › the evaluator reads the model evidence, uploads two flights, analyses one and removes them (10.9s)
+
+  1 passed (11.7s)
+== finished 09:41:59

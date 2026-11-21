@@ -65,8 +65,8 @@ test("scenario B: a cancellation ranks passengers by tier and re-runs with new w
   await page.getByRole("button", { name: "Re-run with these weights" }).click();
   await expect(page.locator("table.pax tbody tr").first().locator(".tier")).toHaveText("Care");
 
-  await page.getByRole("button", { name: "Why & message" }).first().click();
-  await expect(page.locator("tr.detail")).toContainText("Tier 1");
+  await page.getByRole("button", { name: /Details/ }).first().click();
+  await expect(page.locator("tr.detail")).toContainText("Priority score");
   await expect(page.locator("tr.detail .message")).toContainText("Dear customer");
   await page.getByRole("button", { name: "Approve rebooking plan" }).click();
   await expect(page.locator(".audit").last()).toContainText("APPROVE");

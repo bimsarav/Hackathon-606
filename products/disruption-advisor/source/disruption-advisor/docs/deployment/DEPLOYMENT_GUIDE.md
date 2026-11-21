@@ -65,7 +65,8 @@ This guide covers the target host, how the MVP and phase 2 (Predict) are deploye
 - `DEMO_USERS` in the server `settings.env` needs an entry with role `EVALUATOR` (`user:password:EVALUATOR`); only that role sees the Model Card and Test data views and the server refuses the others (403). Use hex passwords (no colon or comma).
 - Compose has a `test-data` volume (`/testdata` in the api) for the evaluator's uploaded flights; the api image creates and owns the folder.
 - The first ingest after this release retrains the delay model once (minutes) and saves it in `ops/delay_model`; without it, uploaded flights are added without risk figures.
-- `scripts/e2e.sh` needs a spec that matches the current UI; the 2026-11-21 spec is stale (see the test report).
+- `scripts/e2e.sh` runs 11 Playwright tests (about 2 minutes); it signs in with the first `DEMO_USERS` entry and, for the evaluator tests, with the `EVALUATOR` entry. The evaluator test adds two flights and removes them; if a run is killed, check `Test data` and press Remove (or `DELETE /api/v1/test-data`).
+- After merging a UI redesign, check that every page still renders what the tests expect (the cascade panel was lost once in a merge).
 
 ## Known limitations
 - **No HTTPS yet (phase 6).** Do not reuse the demo passwords anywhere else.
