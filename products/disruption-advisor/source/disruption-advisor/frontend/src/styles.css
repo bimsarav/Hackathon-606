@@ -1763,52 +1763,16 @@ tr.clickable.selected {
 .preset-list.preset-chips li { display: inline-flex; }
 .preset-list.preset-chips li .preset.preset-chip { flex: 0 0 auto; width: auto; flex-direction: row; text-align: left; white-space: nowrap; }
 
-/* Login: split screen - brand story on the left, sign-in card on the right */
-.login.login-split { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); place-items: stretch; padding: 0; min-height: 100vh; }
-.login-hero { position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 2rem; padding: 2.5rem 3rem;
-  color: #fff; overflow: hidden;
-  background: radial-gradient(120% 90% at 0% 0%, #2a6fd6 0%, #1255b4 45%, #0b2f6b 100%); }
-.login-hero::after { content: ""; position: absolute; inset: auto -20% -40% auto; width: 70%; aspect-ratio: 1; border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 1, 65, 0.22), transparent 60%); pointer-events: none; }
-.login-hero-brand { display: flex; align-items: center; gap: 0.7rem; position: relative; z-index: 1; }
+/* Login logo tile (used by the live-ops login) */
 .login-hero-logo { width: 42px; height: 42px; display: grid; place-items: center; background: #fff; border-radius: 10px; }
 .login-hero-logo img { height: 26px; }
-.login-hero-name { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.01em; }
-.login-hero-copy { position: relative; z-index: 1; max-width: 34rem; }
-.login-hero-eyebrow { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.75rem; opacity: 0.8; margin: 0 0 0.75rem; }
-.login-hero-title { font-size: clamp(1.8rem, 3.2vw, 2.6rem); line-height: 1.15; margin: 0 0 1rem; color: #fff; }
-.login-hero-lead { font-size: 1.02rem; line-height: 1.55; opacity: 0.92; margin: 0 0 1.5rem; }
-.login-hero-points { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.85rem; }
-.login-hero-points li { display: flex; gap: 0.8rem; align-items: flex-start; line-height: 1.45; }
-.login-hero-points li > span { flex: 0 0 2rem; height: 2rem; display: grid; place-items: center; border-radius: 8px;
-  background: rgba(255, 255, 255, 0.14); font-size: 1rem; }
-.login-hero-route { position: relative; z-index: 1; width: 100%; max-width: 34rem; height: auto; }
-.login-hero-route path { stroke: rgba(255, 255, 255, 0.55); stroke-width: 2; }
-.login-hero-route circle { fill: #fff; }
-.login-hero-route text { fill: rgba(255, 255, 255, 0.85); font-size: 13px; font-weight: 600; font-family: var(--font); }
-.login-hero-route g path { stroke: #fff; stroke-width: 2.5; fill: none; stroke-linecap: round; }
-.login-hero-foot { position: relative; z-index: 1; font-size: 0.8rem; opacity: 0.75; margin: 0; }
-.login-panel { display: grid; place-items: center; padding: 2rem 1.25rem; background: var(--bg); }
-.login-form-card { width: min(400px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
-  padding: 2.2rem 2rem; box-shadow: 0 12px 32px rgba(15, 30, 60, 0.12); }
-.login-form-card h1 { margin: 0 0 0.25rem; font-size: 1.6rem; }
-.login-form-card form { display: flex; flex-direction: column; gap: 0.45rem; margin-top: 1.25rem; }
-.login-form-card input { padding: 0.65rem 0.75rem; font-size: 1rem; }
 .login-secret { display: flex; align-items: stretch; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); }
 .login-secret:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(18, 85, 180, 0.15); }
 .login-secret input { flex: 1; border: 0; background: transparent; outline: none; }
 .login-reveal { border: 0; background: transparent; color: var(--accent); font-weight: 600; padding: 0 0.85rem; cursor: pointer; }
 .login-submit { margin-top: 0.9rem; padding: 0.7rem; font-size: 1rem; }
-.login-roles { margin: 1.25rem 0 0; line-height: 1.5; border-top: 1px solid var(--line); padding-top: 1rem; }
-@media (max-width: 880px) {
-  .login.login-split { grid-template-columns: 1fr; }
-  .login-hero { padding: 1.75rem 1.25rem; gap: 1.25rem; }
-  .login-hero-route, .login-hero-foot, .login-hero-lead, .login-hero-points { display: none; }
-  .login-hero-title { font-size: 1.5rem; margin: 0; }
-}
 
-/* Login variants (compare: ?login=ops | board | photo | minimal) */
-/* 1 · Live ops backdrop */
+/* Login: live operations backdrop */
 .login.login-ops { position: relative; min-height: 100vh; display: grid; place-items: center; padding: 1rem; overflow: hidden;
   background: radial-gradient(90% 70% at 50% 40%, #13254d 0%, #0a1430 60%, #060c1e 100%); }
 .login-ops-map { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -1830,46 +1794,3 @@ tr.clickable.selected {
 .login-glass .login-secret input { background: transparent; }
 .login-glass .login-submit { margin-top: 0.9rem; }
 @media (prefers-reduced-motion: reduce) { .ops-plane { display: none; } }
-
-/* 2 · Departure board */
-.login-board-panel { display: flex; flex-direction: column; justify-content: space-between; gap: 2rem; padding: 2.5rem 3rem; color: #fff;
-  background: linear-gradient(160deg, #111827 0%, #0b1220 100%); }
-.login-board-table { font-family: var(--mono); background: #05080f; border: 1px solid #1f2a3d; border-radius: 10px; padding: 1rem; }
-.login-board-head, .login-board-row { display: grid; grid-template-columns: 6rem 1fr 7.5rem; gap: 0.75rem; padding: 0.5rem 0.6rem; }
-.login-board-head { color: #fbbf24; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; border-bottom: 1px solid #1f2a3d; }
-.login-board-row { font-size: 1.05rem; letter-spacing: 0.06em; text-transform: uppercase; color: #f3f4f6; border-bottom: 1px solid #111a2b;
-  animation: board-flip 0.6s ease both; transform-origin: top; }
-.login-board-status { font-weight: 700; }
-.s-delayed { color: #f87171; } .s-recovered { color: #34d399; } .s-on-time { color: #e5e7eb; } .s-boarding { color: #fbbf24; }
-@keyframes board-flip { from { transform: rotateX(90deg); opacity: 0; } to { transform: rotateX(0); opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .login-board-row { animation: none; } }
-
-/* 3 · Photo hero (dusk sky and wing drawn in CSS/SVG, no external image) */
-.login.login-photo { position: relative; min-height: 100vh; display: grid; grid-template-columns: 1fr minmax(320px, 400px); align-items: center;
-  gap: 2rem; padding: 2rem clamp(1.25rem, 5vw, 5rem); overflow: hidden; }
-.login-sky { position: absolute; inset: 0; background: linear-gradient(180deg, #0f1b3d 0%, #2b3f7a 38%, #b4588a 68%, #f59e6b 86%, #fcd59a 100%); }
-.login-sun { position: absolute; left: 22%; bottom: 14%; width: 220px; height: 220px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 236, 190, 0.95) 0%, rgba(255, 196, 140, 0.45) 40%, transparent 70%); }
-.login-wing { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 55%; }
-.login-wing path { fill: #0b1226; }
-.login-wing .login-wing-tip { fill: #ff0141; }
-.login-photo-copy { position: relative; z-index: 1; color: #fff; align-self: start; padding-top: 2vh; }
-.login-photo-copy .login-hero-title { font-size: clamp(2.2rem, 5vw, 3.6rem); margin: 2rem 0 0.5rem; text-shadow: 0 2px 20px rgba(0, 0, 0, 0.35); }
-.login-photo-copy .login-hero-lead { opacity: 0.92; }
-.login-photo-card { position: relative; z-index: 1; background: #fff; color: #1f2124; border-radius: 16px; padding: 2.2rem 2rem;
-  box-shadow: 0 24px 60px rgba(8, 15, 40, 0.45); }
-.login-photo-card h1 { margin: 0; color: #1f2124; }
-.login-photo-card form { display: flex; flex-direction: column; gap: 0.45rem; margin-top: 1.25rem; }
-.login-photo-card label { color: #3c4043; }
-.login-photo-card input { background: #fff; color: #1f2124; }
-@media (max-width: 880px) { .login.login-photo { grid-template-columns: 1fr; } .login-photo-copy .login-hero-title { margin-top: 1rem; } }
-
-/* 4 · Minimal centred */
-.login.login-minimal { min-height: 100vh; display: grid; place-items: center; padding: 1rem; background: var(--bg); }
-.login-minimal-card { width: min(380px, 100%); text-align: center; }
-.login-minimal-logo { display: inline-grid; place-items: center; width: 64px; height: 64px; border-radius: 16px; background: var(--panel);
-  border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
-.login-minimal-logo img { height: 38px; }
-.login-minimal-card h1 { margin: 1rem 0 0.25rem; font-size: 1.7rem; }
-.login-minimal-card form { display: flex; flex-direction: column; gap: 0.45rem; margin-top: 1.5rem; text-align: left; background: var(--panel);
-  border: 1px solid var(--line); border-radius: 14px; padding: 1.5rem; box-shadow: 0 10px 30px rgba(15, 30, 60, 0.08); }

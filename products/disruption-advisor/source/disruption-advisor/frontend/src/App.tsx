@@ -92,12 +92,6 @@ export function App() {
   );
 }
 
-/** Default login look until one is chosen ("split" | "ops" | "board" | "photo" | "minimal"). */
-const LOGIN_VARIANT = "split";
-const BOARD_ROWS: [string, string, string][] = [
-  ["G9519", "Dhaka", "Delayed"], ["G9148", "Jeddah", "Recovered"], ["G9502", "Colombo", "On time"],
-  ["G9449", "Trivandrum", "Boarding"], ["G9283", "Istanbul", "On time"], ["G9251", "Almaty", "Recovered"],
-];
 // Sharjah hub and a few G9 stations, roughly placed (x, y in a 1000 x 600 map).
 const OPS_HUB: [number, number] = [520, 330];
 const OPS_STATIONS: [string, number, number][] = [
@@ -151,8 +145,6 @@ function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
   }
 
   const [reveal, setReveal] = useState(false);
-  // Login look (four styles to compare): ?login=ops | board | photo | minimal; default = split.
-  const variant = new URLSearchParams(window.location.search).get("login") ?? LOGIN_VARIANT;
   const form = (
     <form onSubmit={onSubmit} aria-describedby={error ? "login-error" : undefined}>
       <label htmlFor="username">User name</label>
@@ -178,103 +170,15 @@ function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
     <span className="login-hero-logo"><img src="/brand/air-arabia-tail.svg" alt="Air Arabia" /></span>
   );
 
-  if (variant === "ops") {
-    return (
-      <main id="main" className="login login-ops">
-        <OpsMap />
-        <section className="login-glass" aria-labelledby="login-title">
-          <div className="login-glass-brand">{logo}<span>aeroRecovery</span></div>
-          <h1 id="login-title">Sign in</h1>
-          <p className="login-glass-line">Disruption recovery for OCC and PCU</p>
-          {form}
-        </section>
-      </main>
-    );
-  }
-  if (variant === "board") {
-    return (
-      <main id="main" className="login login-split login-board">
-        <section className="login-board-panel" aria-label="aeroRecovery">
-          <div className="login-hero-brand">{logo}<span className="login-hero-name">aeroRecovery</span></div>
-          <div className="login-board-table" aria-hidden="true">
-            <div className="login-board-head"><span>Flight</span><span>Destination</span><span>Status</span></div>
-            {BOARD_ROWS.map(([flight, dest, status], i) => (
-              <div key={flight} className="login-board-row" style={{ animationDelay: `${i * 0.12}s` }}>
-                <span>{flight}</span><span>{dest}</span><span className={`login-board-status s-${status.toLowerCase().replace(" ", "-")}`}>{status}</span>
-              </div>
-            ))}
-          </div>
-          <p className="login-hero-lead">Recover the day before the delay spreads.</p>
-        </section>
-        <section className="login-panel" aria-labelledby="login-title">
-          <div className="login-form-card"><h1 id="login-title">Sign in</h1>{form}</div>
-        </section>
-      </main>
-    );
-  }
-  if (variant === "photo") {
-    return (
-      <main id="main" className="login login-photo">
-        <div className="login-sky" aria-hidden="true">
-          <div className="login-sun" />
-          <svg className="login-wing" viewBox="0 0 1200 400" preserveAspectRatio="none" focusable="false">
-            <path d="M0 360 L1080 300 L1100 312 L0 400 Z" />
-            <path className="login-wing-tip" d="M1072 302 L1112 250 L1124 252 L1096 314 Z" />
-          </svg>
-        </div>
-        <div className="login-photo-copy">
-          <div className="login-hero-brand">{logo}<span className="login-hero-name">aeroRecovery</span></div>
-          <h2 className="login-hero-title">Recover the day.</h2>
-          <p className="login-hero-lead">Disruption recovery for OCC and PCU.</p>
-        </div>
-        <section className="login-photo-card" aria-labelledby="login-title">
-          <h1 id="login-title">Sign in</h1>
-          {form}
-        </section>
-      </main>
-    );
-  }
-  if (variant === "minimal") {
-    return (
-      <main id="main" className="login login-minimal">
-        <section className="login-minimal-card" aria-labelledby="login-title">
-          <span className="login-minimal-logo"><img src="/brand/air-arabia-tail.svg" alt="Air Arabia" /></span>
-          <h1 id="login-title">aeroRecovery</h1>
-          <p className="muted">Disruption recovery for OCC and PCU</p>
-          {form}
-        </section>
-      </main>
-    );
-  }
-
+  // Login: live operations backdrop (user 2026-11-21 chose it from four styles).
   return (
-    <main id="main" className="login login-split">
-      {/* Left: what the product does, at a glance */}
-      <section className="login-hero" aria-label="aeroRecovery">
-        <div className="login-hero-brand">
-          <span className="login-hero-logo"><img src="/brand/air-arabia-tail.svg" alt="Air Arabia" /></span>
-          <span className="login-hero-name">aeroRecovery</span>
-        </div>
-        <div className="login-hero-copy">
-          <p className="login-hero-eyebrow">Disruption management · OCC &amp; PCU</p>
-          <h2 className="login-hero-title">Recover the day before the delay spreads.</h2>
-          <p className="login-hero-lead">Predict, compare and protect: every decision approved by a person.</p>
-        </div>
-        <svg className="login-hero-route" viewBox="0 0 600 160" aria-hidden="true" focusable="false">
-          <path d="M20 140 C 180 20, 420 20, 580 120" fill="none" strokeDasharray="6 8" />
-          <circle cx="20" cy="140" r="6" /><circle cx="580" cy="120" r="6" />
-          <text x="20" y="128" textAnchor="middle">SHJ</text>
-          <text x="580" y="108" textAnchor="middle">KHI</text>
-          <g transform="translate(300 52) rotate(8)"><path d="M-14 0 L14 0 M0 -3 L6 0 L0 3 M-8 0 L-12 -6 M-8 0 L-12 6" /></g>
-        </svg>
-      </section>
-
-      {/* Right: sign in */}
-      <section className="login-panel" aria-labelledby="login-title">
-        <div className="login-form-card">
-          <h1 id="login-title">Sign in</h1>
-          {form}
-        </div>
+    <main id="main" className="login login-ops">
+      <OpsMap />
+      <section className="login-glass" aria-labelledby="login-title">
+        <div className="login-glass-brand">{logo}<span>aeroRecovery</span></div>
+        <h1 id="login-title">Sign in</h1>
+        <p className="login-glass-line">Disruption recovery for OCC and PCU</p>
+        {form}
       </section>
     </main>
   );
