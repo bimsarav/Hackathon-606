@@ -94,6 +94,7 @@ def meta(request: Request, user: CurrentUser) -> dict[str, Any]:
         "user": {"username": user.username, "role": user.role},
         "now_utc": s.now_utc,
         "horizon_days": s.horizon_days,
+        "min_turn_minutes": {"default": s.min_turn_minutes, "by_station": s.min_turn_by_station},
         "ai_enabled": ctx.explainer.enabled,
         "ai_model": s.ai_model,
         "default_weights": DEFAULT_WEIGHTS,

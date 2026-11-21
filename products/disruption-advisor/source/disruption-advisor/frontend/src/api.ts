@@ -33,6 +33,8 @@ export interface Meta {
   user: { username: string; role: Role };
   now_utc: string;
   horizon_days: number;
+  /** Minimum ground time between two flights of one aircraft (optional for older APIs). */
+  min_turn_minutes?: { default: number; by_station: Record<string, number> };
   ai_enabled: boolean;
   ai_model: string;
   default_weights: Weights;

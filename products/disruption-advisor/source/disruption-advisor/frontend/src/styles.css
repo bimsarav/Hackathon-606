@@ -660,3 +660,34 @@ tr.clickable.selected {
     grid-template-columns: 1fr;
   }
 }
+
+/* Rotation board: before/after Gantt of the aircraft an option touches (flight-watch style) */
+.rb-head { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; justify-content: space-between; }
+.rb-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; color: var(--muted); }
+.rb-sw { display: inline-block; width: 20px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+.rb-block { display: grid; gap: 4px; margin-top: 8px; }
+.rb-title { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.rb-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; padding: 1px 8px; border-radius: 3px; }
+.rb-tag.before { background: var(--head); color: var(--head-ink); }
+.rb-tag.after { background: var(--bad); color: #fff; }
+.rb-board { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
+.rb-grid { position: relative; }
+.rb-hdr { position: relative; height: 36px; border-bottom: 1px solid var(--line); }
+.rb-date { position: absolute; top: 2px; font: 600 11px var(--mono); color: var(--muted); padding-left: 3px; border-left: 1px solid var(--line); }
+.rb-hour { position: absolute; top: 18px; font: 11px var(--mono); color: var(--ink); transform: translateX(-50%); }
+.rb-row { position: relative; height: 52px; border-bottom: 1px solid var(--line); }
+.rb-ac { position: sticky; left: 0; z-index: 3; width: 120px; height: 100%; box-sizing: border-box; display: flex; align-items: center;
+  padding-left: 10px; background: var(--panel); border-right: 1px solid var(--line); font: 600 13px var(--mono); }
+.rb-hdr .rb-ac { position: absolute; font-weight: 400; color: var(--muted); }
+.rb-ac.hit { color: var(--bad); }
+.rb-bar { position: absolute; top: 9px; height: 34px; box-sizing: border-box; border-radius: 3px; padding: 2px 6px; overflow: hidden;
+  white-space: nowrap; font-size: 11px; line-height: 1.25; z-index: 2; }
+.rb-bar .rb-fn { display: block; } .rb-bar .rb-rt { font-weight: 700; }
+.rb-bar.planned, .rb-sw.planned { background: var(--warn-bg); border: 1px solid var(--warn); color: var(--ink); }
+.rb-bar.disrupted, .rb-sw.disrupted { background: var(--bad-bg); border: 2px solid var(--bad); color: var(--ink); }
+.rb-bar.late, .rb-sw.late { background: var(--warn-bg); border: 2px solid var(--bad); color: var(--ink); }
+.rb-bar.moved, .rb-sw.moved { background: var(--warn-bg); border: 2px solid var(--accent); color: var(--ink); }
+.rb-badge { position: absolute; top: 0; right: 0; background: var(--bad); color: #fff; font: 700 10px var(--mono); padding: 0 4px; border-radius: 0 2px 0 3px; }
+.rb-gnd { position: absolute; top: 9px; height: 34px; box-sizing: border-box; border: 1px dashed var(--muted); border-radius: 2px;
+  display: flex; justify-content: space-between; align-items: flex-end; padding: 1px 3px; font: 600 10px var(--mono); color: var(--muted); z-index: 1; }
+.rb-gnd.short { border-color: var(--bad); color: var(--bad); }

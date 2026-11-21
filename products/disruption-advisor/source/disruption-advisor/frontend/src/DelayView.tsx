@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api, type DelayResult, errorText, type Meta, type RecoveryOption, type Scenario } from "./api";
 import { aed, hhmm, minutes, num, utc } from "./format";
+import { RotationBoard } from "./RotationBoard";
 import { Assumptions, DecisionBar, Explanation, PassengerTable, WeightsPanel } from "./Shared";
 
 interface Props {
@@ -122,6 +123,8 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
         <DecisionBar scenario={scenario} target={`option:${shown.key}`}
           label={override ? "selected option (override)" : "recommended option"} requireComment={override} />
       </section>
+
+      <RotationBoard option={shown} disruptedId={result.flight.flight_id} meta={meta} />
 
       <section aria-labelledby="legs-title">
         <h2 id="legs-title">Flights affected: {shown.label}</h2>
