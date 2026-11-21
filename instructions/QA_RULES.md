@@ -13,7 +13,11 @@ Requirements, specifications, acceptance criteria, Q&A, **delivery reports and r
 ## 3. How QA tests (§17.3, §17.4)
 - Real UI through browser automation (Claude in Chrome): navigate, click, fill forms, submit, refresh and revisit, follow full user journeys. API calls, logs, console and network are supplementary diagnostics only.
 - Activities every cycle: functional · UI & usability · regression (changed features + foreseeable impact, reusable suite) · negative & boundary · end-to-end business workflows · per role. Responsive/cross-browser where the tools allow; say so when they do not.
-- **Sign-in:** the QA agent never types or reads a real password. On a hosted environment the user signs in with the role to test and QA uses that session, one role after another. Test credentials only where the safety rules allow (local development host, the project's own test values).
+- **Environments and sign-in (user 2026-11-22):**
+  - **QA tests run on the local environment** (the product's local stack, e.g. http://localhost:8080): feature QA phases, bug-fix verification and the fix-and-retest loop. The QA agent signs in **by itself** with the test accounts in `input/secrets/qa-logins/<product>.md` (git-ignored, mode 600, filled in by the user) and continues without the user.
+  - **Regression tests run on production**, after deployment. The user signs in on the agent's behalf: the agent tells the user which role is needed, waits until the user confirms that role is signed in, tests it, then asks for the next role. The agent never types passwords on production (safety rules).
+  - A hosted environment other than these is used only when the user names it; self sign-in there only if its host name marks it as a test environment (safety rules).
+  - Credential values are never written to reports, logs, screenshots or chat.
 - **Side effects on shared/production systems:** state-changing actions (approve/reject, uploads, edits, deletes) only with the user's consent for that cycle, using synthetic test data, and cleaned up afterwards; otherwise mark those cases NOT TESTED with the reason.
 - No fabricated results or screenshots; no passwords, tokens or personal passenger data in evidence.
 
@@ -31,7 +35,7 @@ Requirements, specifications, acceptance criteria, Q&A, **delivery reports and r
 | Routine low-risk change (small UI/doc/config fix) | Targeted retest of the change + short regression of the affected journeys |
 
 **Fix-and-retest loop (user 2026-11-22).** Implementation and testing alternate in numbered cycles until QA finds no open bug in scope:
-1. Implement (feature or fixes) → automated gate → deploy where the product is tested.
+1. Implement (feature or fixes) → automated gate → rebuild the **local** stack.
 2. QA cycle (independent agent): verify the scope above; record new bugs.
 3. If QA finds bugs, including new bugs caused by the changes (regressions), fix them and go back to step 1; QA again tests the fixes and their related areas.
 4. Stop when QA finds no open bug in scope. Stop and ask the user instead if the same bug fails its retest 3 times, if a fix needs a product decision, or if a bug is outside the current scope (record it in DEFECTS.md, don't chase it).
@@ -53,5 +57,5 @@ Summary (loop end)           cycles: <n> · bugs fixed and verified: <IDs> · op
 - On resume, read `execution/qa/<product>/DEFECTS.md` with the other tracking files.
 
 ## 7. Integration (§17.10, §17.13)
-- Order for a significant delivery: automated gate → **QA cycle on the local/test environment** → Judge pre-deployment evaluation → deploy + §13.9 checks → **QA cycle on the deployed system** (regression + changed features, each role) → fixes + QA retest → **Judge** production-readiness / release evaluation (assesses QA coverage and evidence; QA PASS is evidence, not proof). For a hotfix already deployed, the deployed-system cycle alone is enough.
+- Order for a significant delivery: automated gate → **QA on the local environment** (fix-and-retest loop until clean) → Judge pre-deployment evaluation → deploy + §13.9 checks → **regression tests on production** (each role, user signs in per role) → any production bug goes back into the loop (fix → local QA → deploy → production regression) → **Judge** release evaluation (assesses QA coverage and evidence; QA PASS is evidence, not proof).
 - Definition of Done: a significant feature is verified only after manual UI testing, regression, documented defects, release-blocking defects fixed and retested, and the QA report recorded. QA recommends; release decisions stay with the user.
