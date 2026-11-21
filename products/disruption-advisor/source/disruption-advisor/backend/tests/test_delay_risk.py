@@ -28,6 +28,21 @@ def test_auc_and_brier_match_textbook_values() -> None:
     assert dr.brier(y, np.array([0.0, 0.0, 1.0, 1.0])) == 0.0
 
 
+def test_confusion_matrix_counts_and_rates() -> None:
+    y = np.array([1, 1, 1, 0, 0, 0, 0, 0])
+    p = np.array([0.9, 0.6, 0.2, 0.7, 0.3, 0.1, 0.1, 0.05])
+    m = dr.confusion(y, p, 0.5)
+    assert (m["true_positive"], m["false_positive"], m["false_negative"], m["true_negative"]) == (2, 1, 1, 4)
+    assert m["precision"] == pytest.approx(2 / 3, abs=1e-4)
+    assert m["recall"] == pytest.approx(2 / 3, abs=1e-4)
+    assert m["f1"] == pytest.approx(2 / 3, abs=1e-4)
+    assert m["accuracy"] == 0.75
+    assert m["specificity"] == 0.8
+    assert dr.confusion(y, p, 0.99)["precision"] is None  # nothing flagged
+    top = dr._top_share(y, p, share=0.25)  # the 2 riskiest flights: one late, one not
+    assert (top["flights"], top["late_rate"], top["lift"]) == (2, 0.5, round(0.5 / 0.375, 2))
+
+
 def test_planning_delay_is_exceeded_with_20_percent_chance() -> None:
     assert dr.planning_delay(CURVE) == 60
     assert dr.planning_delay([0.1, 0.05, 0.02, 0.01, 0.0, 0.0]) is None
@@ -57,6 +72,15 @@ def test_model_learns_the_planted_pattern_and_writes_outputs(ops: Path) -> None:
     card = json.loads((ops / "model_card.json").read_text())
     assert card["evaluation"]["metrics_by_threshold"]["60"]["auc"] > 0.8
     assert card["evaluation"]["connection_backtest"]
+    classification = card["evaluation"]["classification"]
+    assert set(classification) == {"departure_15", "departure_60", "arrival_15", "arrival_60"}
+    high = classification["departure_60"]["operating_points"][0]
+    tested = sum(high[k] for k in ("true_positive", "false_positive", "false_negative", "true_negative"))
+    assert tested == int(card["evaluation"]["test"].split("(")[1].split()[0])
+    assert len(classification["departure_15"]["sweep"]) == len(dr.SWEEP_CUTOFFS)
+    rolling = card["evaluation"]["rolling_monthly"]
+    assert rolling
+    assert all("15" in fold and "60" in fold for fold in rolling)
     row = con.execute(f"SELECT reasons FROM '{ops}/flight_risk.parquet' WHERE flight_id = ?", [F1]).fetchone()
     assert row is not None
     reasons = json.loads(row[0])

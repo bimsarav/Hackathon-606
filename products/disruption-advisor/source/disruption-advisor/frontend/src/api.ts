@@ -290,6 +290,34 @@ export interface ModelMetrics {
   climatology_brier: number;
 }
 
+export interface ConfusionPoint {
+  label?: string;
+  cutoff: number;
+  true_positive: number;
+  false_positive: number;
+  false_negative: number;
+  true_negative: number;
+  precision: number | null;
+  recall: number | null;
+  f1: number;
+  accuracy: number | null;
+  specificity: number | null;
+  flagged_share: number | null;
+}
+
+export interface Classification {
+  operating_points: ConfusionPoint[];
+  sweep: Pick<ConfusionPoint, "cutoff" | "precision" | "recall" | "f1" | "flagged_share">[];
+  top_10_percent: { share: number; flights: number; late_rate: number; overall_rate: number; lift: number | null };
+}
+
+export interface RollingFold {
+  month: string;
+  train_flights: number;
+  test_flights: number;
+  [threshold: string]: ModelMetrics | string | number;
+}
+
 export interface ModelCard {
   model: string;
   trained_at: string;
@@ -300,6 +328,8 @@ export interface ModelCard {
     test: string;
     metrics_by_threshold: Record<string, ModelMetrics>;
     connection_backtest: { slack: string; pairs: number; predicted: number; observed: number }[];
+    classification?: Record<string, Classification>;
+    rolling_monthly?: RollingFold[];
   };
   assumptions: string[];
 }

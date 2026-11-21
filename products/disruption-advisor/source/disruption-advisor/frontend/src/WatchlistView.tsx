@@ -1,5 +1,15 @@
 import { Fragment, useEffect, useState } from "react";
-import { api, type ConnectionRisk, errorText, type ModelCard, type RiskFlight, type Watchlist } from "./api";
+import {
+  api,
+  type Classification,
+  type ConnectionRisk,
+  errorText,
+  type ModelCard,
+  type ModelMetrics,
+  type RiskFlight,
+  type RollingFold,
+  type Watchlist,
+} from "./api";
 import { Kpi } from "./DelayView";
 import { minutes, num, utc } from "./format";
 
@@ -259,6 +269,10 @@ function ModelPanel() {
           </tbody>
         </table>
       </div>
+      {card.evaluation.classification && <ConfusionTables classification={card.evaluation.classification} />}
+      {card.evaluation.rolling_monthly && card.evaluation.rolling_monthly.length > 0 && (
+        <RollingTable folds={card.evaluation.rolling_monthly} />
+      )}
       <h3>Missed connections: predicted vs what happened</h3>
       <div className="table-wrap">
         <table aria-label="Missed-connection check">
@@ -292,5 +306,143 @@ function ModelPanel() {
         {card.model}. Trained {utc(card.trained_at.replace("Z", ""))}.
       </p>
     </details>
+  );
+}
+
+const CLASSIFICATION_ORDER = ["departure_15", "departure_60", "arrival_15", "arrival_60"];
+const rate = (v: number | null): string => (v === null ? "—" : pct(v));
+
+/** Confusion matrices at the cut-offs the app uses, plus precision / recall at other cut-offs. */
+function ConfusionTables({ classification }: { classification: Record<string, Classification> }) {
+  const points = CLASSIFICATION_ORDER.flatMap((key) => classification[key]?.operating_points ?? []);
+  const top = classification["departure_60"]?.top_10_percent;
+  const sweep60 = classification["departure_60"]?.sweep ?? [];
+  return (
+    <>
+      <h3>Flagging accuracy on the test weeks (confusion matrices)</h3>
+      <p className="small muted">
+        Each row treats the prediction as a yes/no flag at the stated cut-off. Precision: of the flights flagged, how
+        many were really late. Recall: of the late flights, how many were flagged. Specificity: of the on-time flights,
+        how many were correctly left alone.
+      </p>
+      <div className="table-wrap">
+        <table aria-label="Confusion matrices">
+          <thead>
+            <tr>
+              <th scope="col">Question and cut-off</th>
+              <th scope="col" className="num">Caught</th>
+              <th scope="col" className="num">False alarms</th>
+              <th scope="col" className="num">Missed</th>
+              <th scope="col" className="num">Correctly not flagged</th>
+              <th scope="col" className="num">Precision</th>
+              <th scope="col" className="num">Recall</th>
+              <th scope="col" className="num">F1</th>
+              <th scope="col" className="num">Accuracy</th>
+              <th scope="col" className="num">Specificity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {points.map((m) => (
+              <tr key={`${m.label}-${m.cutoff}`}>
+                <td>{m.label}</td>
+                <td className="num">{num(m.true_positive)}</td>
+                <td className="num">{num(m.false_positive)}</td>
+                <td className="num">{num(m.false_negative)}</td>
+                <td className="num">{num(m.true_negative)}</td>
+                <td className="num">{rate(m.precision)}</td>
+                <td className="num">{rate(m.recall)}</td>
+                <td className="num">{m.f1.toFixed(2)}</td>
+                <td className="num">{rate(m.accuracy)}</td>
+                <td className="num">{rate(m.specificity)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {top && (
+        <p>
+          Of the {num(top.flights)} flights the model rated riskiest (top 10%), {pct(top.late_rate)} left 60+ minutes
+          late, against {pct(top.overall_rate)} of all flights{top.lift ? ` (${top.lift.toFixed(1)} times as often)` : ""}.
+        </p>
+      )}
+      {sweep60.length > 0 && (
+        <>
+          <h3>60+ min delay: choosing a different cut-off</h3>
+          <div className="table-wrap">
+            <table aria-label="Precision and recall by cut-off">
+              <thead>
+                <tr>
+                  <th scope="col">Flag when the chance is at least</th>
+                  <th scope="col" className="num">Flights flagged</th>
+                  <th scope="col" className="num">Precision</th>
+                  <th scope="col" className="num">Recall</th>
+                  <th scope="col" className="num">F1</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sweep60
+                  .filter((s) => s.cutoff <= 0.6 && Math.round(s.cutoff * 100) % 10 === 0)
+                  .map((s) => (
+                    <tr key={s.cutoff}>
+                      <td>{pct(s.cutoff)}</td>
+                      <td className="num">{rate(s.flagged_share)}</td>
+                      <td className="num">{rate(s.precision)}</td>
+                      <td className="num">{rate(s.recall)}</td>
+                      <td className="num">{s.f1.toFixed(2)}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+    </>
+  );
+}
+
+/** Walk-forward check: each month predicted by a model trained only on the months before it. */
+function RollingTable({ folds }: { folds: RollingFold[] }) {
+  const metric = (fold: RollingFold, t: string): ModelMetrics | null => {
+    const m = fold[t];
+    return typeof m === "object" ? m : null;
+  };
+  return (
+    <>
+      <h3>Month by month (each month predicted from the months before it)</h3>
+      <div className="table-wrap">
+        <table aria-label="Monthly walk-forward results">
+          <thead>
+            <tr>
+              <th scope="col">Month</th>
+              <th scope="col" className="num">Flights</th>
+              <th scope="col" className="num">15+ min late</th>
+              <th scope="col" className="num">AUC 15 (model / route × hour)</th>
+              <th scope="col" className="num">60+ min late</th>
+              <th scope="col" className="num">AUC 60 (model / route × hour)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {folds.map((f) => {
+              const m15 = metric(f, "15");
+              const m60 = metric(f, "60");
+              return (
+                <tr key={f.month}>
+                  <td>{f.month}</td>
+                  <td className="num">{num(f.test_flights)}</td>
+                  <td className="num">{m15 ? pct(m15.observed_rate) : "—"}</td>
+                  <td className="num">
+                    {m15?.auc?.toFixed(2) ?? "—"} / {m15?.baseline_auc?.toFixed(2) ?? "—"}
+                  </td>
+                  <td className="num">{m60 ? pct(m60.observed_rate) : "—"}</td>
+                  <td className="num">
+                    {m60?.auc?.toFixed(2) ?? "—"} / {m60?.baseline_auc?.toFixed(2) ?? "—"}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }

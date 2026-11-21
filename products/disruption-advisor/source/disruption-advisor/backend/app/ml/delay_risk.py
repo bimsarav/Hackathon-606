@@ -165,14 +165,19 @@ def _floats(column: Any) -> np.ndarray:
     return np.array([np.nan if v is None else float(v) for v in column], dtype=float)
 
 
+def _recency_weights(frame: Frame, train: np.ndarray, as_of: np.datetime64) -> np.ndarray:
+    """A flight's weight halves every HALF_LIFE_DAYS days of age before `as_of`."""
+    age_days = ((as_of - frame.std[train]) / np.timedelta64(1, "D")).astype(float)
+    return np.asarray(0.5 ** (np.clip(age_days, 0, None) / HALF_LIFE_DAYS), dtype=float)
+
+
 class DelayCurve:
     """Calibrated P(delay >= t) for each threshold, monotone in t."""
 
     def __init__(self, frame: Frame, train: np.ndarray, as_of: np.datetime64, arrival: bool = False) -> None:
         self.boosters: dict[int, lgb.Booster] = {}
         cat = list(range(len(CATEGORICAL)))
-        age_days = ((as_of - frame.std[train]) / np.timedelta64(1, "D")).astype(float)
-        weight = 0.5 ** (np.clip(age_days, 0, None) / HALF_LIFE_DAYS)
+        weight = _recency_weights(frame, train, as_of)
         label = frame.arr_delay if arrival else frame.delay
         known = train & ~np.isnan(label)
         weight = weight[known[train]]
@@ -338,6 +343,93 @@ def _reliability(y: np.ndarray, p: np.ndarray, bins: int = 10) -> list[dict[str,
     return out
 
 
+# Cut-offs the app uses (risk bands) plus a plain 50% rule, for the confusion matrices.
+OPERATING_POINTS: tuple[tuple[str, int, float, str], ...] = (
+    ("departure", 15, 0.50, "Departure 15+ min late, flagged when the chance is 50% or more"),
+    ("departure", 60, BANDS[0][0], "Departure 60+ min late, flagged as High (30% or more)"),
+    ("departure", 60, BANDS[1][0], "Departure 60+ min late, flagged as Medium or High (15% or more)"),
+    ("arrival", 15, 0.50, "Arrival 15+ min late, flagged when the chance is 50% or more"),
+    ("arrival", 60, BANDS[0][0], "Arrival 60+ min late, flagged when the chance is 30% or more"),
+)
+SWEEP_CUTOFFS = tuple(round(c, 2) for c in np.arange(0.05, 0.951, 0.05))
+ROLLING_THRESHOLDS = (15, 60)
+ROLLING_MONTHS = 5
+
+
+def confusion(y: np.ndarray, p: np.ndarray, cutoff: float) -> dict[str, Any]:
+    """Confusion matrix and the usual rates for 'flag when p >= cutoff'."""
+    actual, flagged = np.asarray(y, dtype=bool), np.asarray(p) >= cutoff
+    tp, fp = int((actual & flagged).sum()), int((~actual & flagged).sum())
+    fn, tn = int((actual & ~flagged).sum()), int((~actual & ~flagged).sum())
+    precision = tp / (tp + fp) if tp + fp else None
+    recall = tp / (tp + fn) if tp + fn else None
+    f1 = 2 * precision * recall / (precision + recall) if precision and recall else 0.0
+    return {
+        "cutoff": cutoff,
+        "true_positive": tp,
+        "false_positive": fp,
+        "false_negative": fn,
+        "true_negative": tn,
+        "precision": None if precision is None else round(precision, 4),
+        "recall": None if recall is None else round(recall, 4),
+        "f1": round(f1, 4),
+        "accuracy": round((tp + tn) / len(actual), 4) if len(actual) else None,
+        "specificity": round(tn / (tn + fp), 4) if tn + fp else None,
+        "flagged_share": round(float(flagged.mean()), 4) if len(actual) else None,
+    }
+
+
+def _sweep(y: np.ndarray, p: np.ndarray) -> list[dict[str, Any]]:
+    """Precision, recall and F1 for every cut-off from 5% to 95%."""
+    out = []
+    for c in SWEEP_CUTOFFS:
+        m = confusion(y, p, c)
+        out.append({k: m[k] for k in ("cutoff", "precision", "recall", "f1", "flagged_share")})
+    return out
+
+
+def _top_share(y: np.ndarray, p: np.ndarray, share: float = 0.10) -> dict[str, Any]:
+    """How often the riskiest `share` of flights were really late, against the overall rate (lift)."""
+    k = max(int(len(y) * share), 1)
+    top = np.argsort(-np.asarray(p), kind="mergesort")[:k]
+    hit, base = float(np.mean(y[top])), float(np.mean(y))
+    return {"share": share, "flights": k, "late_rate": round(hit, 4), "overall_rate": round(base, 4),
+            "lift": round(hit / base, 2) if base else None}  # fmt: skip
+
+
+def _classification(y: np.ndarray, p: np.ndarray, cutoffs: list[tuple[float, str]]) -> dict[str, Any]:
+    return {
+        "operating_points": [{"label": label, **confusion(y, p, c)} for c, label in cutoffs],
+        "sweep": _sweep(y, p),
+        "top_10_percent": _top_share(y, p),
+    }
+
+
+def _rolling(frame: Frame, hist: np.ndarray) -> list[dict[str, Any]]:
+    """Monthly walk-forward check: for each of the last ROLLING_MONTHS months, train on everything before the
+    month (same recipe) and test on that month. Less tied to the single 28-day test period used for tuning."""
+    months = np.unique(frame.std[hist].astype("datetime64[M]"))[-ROLLING_MONTHS:]
+    cat = list(range(len(CATEGORICAL)))
+    folds = []
+    for month in months:
+        start = month.astype("datetime64[m]")
+        stop = (month + np.timedelta64(1, "M")).astype("datetime64[m]")
+        train, test = hist & (frame.std < start), hist & (frame.std >= start) & (frame.std < stop)
+        if not train.any() or not test.any():
+            continue
+        weight = _recency_weights(frame, train, start)
+        fold: dict[str, Any] = {"month": str(month), "train_flights": int(train.sum()), "test_flights": int(test.sum())}
+        for t in ROLLING_THRESHOLDS:
+            y = (frame.delay >= t).astype(int)
+            booster = lgb.train(
+                PARAMS, lgb.Dataset(frame.x[train], y[train], weight=weight, categorical_feature=cat), ROUNDS
+            )
+            p = np.asarray(booster.predict(frame.x[test]))
+            fold[str(t)] = _metrics(y[test], p, _baseline(frame, train, test, t))
+        folds.append(fold)
+    return folds
+
+
 def _baseline(frame: Frame, train: np.ndarray, rows: np.ndarray, threshold: int) -> np.ndarray:
     """Route x departure-hour historical rate in the training data (smoothed toward the overall rate)."""
     y = (frame.delay[train] >= threshold).astype(float)
@@ -481,6 +573,15 @@ def run(ops: Path, default_mct: int = 50) -> dict[str, Any]:
         for j, t in enumerate(THRESHOLDS)
         if t in (15, 60)
     }
+    classification: dict[str, Any] = {}
+    for kind, t in sorted({(k, t) for k, t, _, _ in OPERATING_POINTS}):
+        if kind == "departure":
+            y_k, p_k = (frame.delay[test_e] >= t).astype(int), p_test[:, THRESHOLDS.index(t)]
+        else:
+            y_k, p_k = (frame.arr_delay[known_arr] >= t).astype(int), a_test[:, THRESHOLDS.index(t)]
+        cutoffs = [(c, label) for k, tt, c, label in OPERATING_POINTS if (k, tt) == (kind, t)]
+        classification[f"{kind}_{t}"] = _classification(y_k, p_k, cutoffs)
+    rolling = _rolling(frame, hist)
     test_rows = np.flatnonzero(test_e)
     connection_check = _connection_backtest(
         con, ops, frame, test_rows, arrival_eval.predict(frame.x[test_rows]), p_test, default_mct
@@ -531,6 +632,8 @@ def run(ops: Path, default_mct: int = 50) -> dict[str, Any]:
             "reliability_60": reliability,
             "arrival_model_metrics": arrival_metrics,
             "connection_backtest": connection_check,
+            "classification": classification,
+            "rolling_monthly": rolling,
             "baseline": "historical rate of the same route and local departure hour (smoothed)",
         },
         "production": {

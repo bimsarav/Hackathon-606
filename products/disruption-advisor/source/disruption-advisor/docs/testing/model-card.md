@@ -59,6 +59,42 @@ AUC is the chance that a late flight is ranked above an on-time one (0.5 = coin 
 
 At verification the watchlist held 1,491 flights in the next 7 days: 18 high and 140 medium risk.
 
+## Flagging accuracy (confusion matrices, test weeks 21 Oct – 18 Nov, 5,956 flights)
+Computed on every retrain and stored in `model_card.json` (`evaluation.classification`); shown in the app under "How good are these predictions?". Production run of 21 Nov 2026 01:46Z:
+
+| Question and cut-off | Caught | False alarms | Missed | Correct no | Precision | Recall | F1 | Accuracy | Specificity |
+|---|---|---|---|---|---|---|---|---|---|
+| Departure 15+ min, flag at 50% | 1,532 | 750 | 812 | 2,862 | 0.67 | 0.65 | 0.66 | 0.74 | 0.79 |
+| Departure 60+ min, High (30%) | 180 | 569 | 343 | 4,864 | 0.24 | 0.34 | 0.28 | 0.85 | 0.90 |
+| Departure 60+ min, Medium or High (15%) | 354 | 1,553 | 169 | 3,880 | 0.19 | 0.68 | 0.29 | 0.71 | 0.71 |
+| Arrival 15+ min, flag at 50% | 1,576 | 748 | 948 | 2,684 | 0.68 | 0.62 | 0.65 | 0.72 | 0.78 |
+| Arrival 60+ min, flag at 30% | 161 | 538 | 363 | 4,894 | 0.23 | 0.31 | 0.26 | 0.85 | 0.90 |
+
+**Top 10% riskiest flights:** 25.7% left 60+ min late against 8.8% overall (lift 2.9); 81.9% left 15+ min late against 39.4% (lift 2.1).
+
+**Choosing another cut-off (departure 60+ min):**
+
+| Flag at | Flights flagged | Precision | Recall | F1 |
+|---|---|---|---|---|
+| 10% | 43% | 0.16 | 0.78 | 0.26 |
+| 20% | 24% | 0.20 | 0.54 | 0.29 |
+| 30% (High) | 13% | 0.24 | 0.34 | 0.28 |
+| 40% | 6% | 0.28 | 0.20 | 0.23 |
+| 50% | 3% | 0.35 | 0.11 | 0.17 |
+
+## Month by month (walk-forward, `evaluation.rolling_monthly`)
+Each month is predicted by a model trained (same recipe) only on the months before it. This is a fairer view than the single test period above, which was also used to choose the recency half-life and to drop the isotonic step.
+
+| Month | Flights | 15+ late | AUC 15 model / baseline | 60+ late | AUC 60 model / baseline |
+|---|---|---|---|---|---|
+| Jul 2026 | 6,993 | 40.1% | 0.73 / 0.64 | 13.7% | 0.67 / 0.54 |
+| Aug 2026 | 7,517 | 40.3% | 0.71 / 0.69 | 11.5% | 0.69 / 0.70 |
+| Sep 2026 | 6,873 | 33.1% | 0.71 / 0.71 | 6.9% | 0.73 / 0.71 |
+| Oct 2026 | 6,934 | 44.8% | 0.77 / 0.74 | 12.3% | 0.73 / 0.73 |
+| Nov 2026 (1–18) | 3,766 | 38.5% | 0.83 / 0.76 | 8.4% | 0.78 / 0.72 |
+
+**Reading:** the model is never clearly worse than the route × hour baseline, and it is better in July and November. From August to October its ranking is about the same as the baseline (AUC difference 0.00–0.03), and its Brier score is slightly worse in July and September (seasonal level shifts). The headline test numbers come from the model's best period. Expect an AUC of about 0.71–0.83 for 15+ min and 0.67–0.78 for 60+ min.
+
 ## Calibration decision
 LightGBM's own probabilities are used. An isotonic calibration step, fitted on a separate later month, was tested and **dropped**: it made calibration worse on the test weeks, because delay levels shift from month to month. Recency weighting handles the drift better. This also removed scikit-learn as a dependency.
 
