@@ -102,11 +102,16 @@ def _frame(
     ops: Path,
     extra: pa.Table | None = None,
     levels: dict[str, list[str]] | None = None,
+    exclude: list[str] | None = None,
 ) -> Frame:
     """Features of every flight. ``extra``: more flights to score (uploaded test flights, part 'extra'), using the
     same history. ``levels``: category codes of a saved model (unseen values get -1, which LightGBM treats as missing);
     without it the codes are the ranks of the values in this data, which is what training uses."""
     extra_sql = ""
+    window_where = ""
+    if exclude:  # window flights scored from ``extra`` instead (evaluator edits): left out of the window part
+        con.register("exclude_in", pa.table({"flight_id": pa.array(exclude, type=pa.string())}))
+        window_where = " WHERE flight_id NOT IN (SELECT flight_id FROM exclude_in)"
     if extra is not None:
         con.register("extra_in", extra)
         extra_sql = """
@@ -123,7 +128,7 @@ def _frame(
         UNION ALL
         SELECT flight_id, tail, origin, destination, std, sta, aircraft_model, capacity, booked_pax,
                NULL::DOUBLE, NULL::DOUBLE, 'window'
-        FROM '{ops}/flights.parquet'{extra_sql}""")
+        FROM '{ops}/flights.parquet'{window_where}{extra_sql}""")
     con.execute(f"""
         CREATE OR REPLACE TEMP TABLE feat AS
         WITH b AS (
@@ -840,24 +845,32 @@ def load_models(ops: Path) -> tuple[DelayCurve, DelayCurve, dict[str, Any]] | No
     return curves[0], curves[1], dict(meta)
 
 
-def score_test_flights(ops: Path, test_dir: Path, default_mct: int | None = None) -> dict[str, Any]:
-    """Score the uploaded test flights with the saved model and write test_dir/flight_risk.parquet and
-    connection_risk.parquet (same columns as the ops files). History, real flights and model are only read."""
-    flights_file = test_dir / "flights.parquet"
+def _score_extra(
+    ops: Path,
+    extra: pa.Table,
+    real_risk: pa.Table,
+    pax_src: str,
+    flight_src: str,
+    default_mct: int | None,
+    exclude: list[str] | None = None,
+    tables: dict[str, pa.Table] | None = None,
+) -> tuple[pa.Table, pa.Table] | None:
+    """Score ``extra`` flights with the saved model: their flight_risk rows (with connecting_pax and
+    expected_misconnects) and their connecting passengers' connection_risk rows. ``real_risk``: the risk of every
+    other flight (a passenger may connect onto it). ``pax_src`` / ``flight_src``: SQL sources for the connections;
+    ``tables`` are registered under their names first. None when no model is saved or nothing is scored."""
     loaded = load_models(ops)
     if loaded is None:
-        return {"scored": 0, "connections": 0, "reason": "no saved model: run the ingest once"}
+        return None
     departure, arrival, meta = loaded
     mct = int(meta["default_mct"]) if default_mct is None else default_mct
     con = duckdb.connect()
-    extra = con.execute(
-        f"""SELECT flight_id, tail, origin, destination, std, sta, aircraft_model, capacity, booked_pax
-            FROM '{flights_file}'"""
-    ).to_arrow_table()
-    frame = _frame(con, ops, extra=extra, levels=meta["levels"])
+    for name, table in (tables or {}).items():
+        con.register(name, table)
+    frame = _frame(con, ops, extra=extra, levels=meta["levels"], exclude=exclude)
     rows = np.flatnonzero(frame.part == "extra")
     if len(rows) == 0:
-        return {"scored": 0, "connections": 0, "reason": "no flights"}
+        return None
     p_rows, a_rows = departure.predict(frame.x[rows]), arrival.predict(frame.x[rows])
     contrib = departure.contributions(frame.x[rows])
     j60 = THRESHOLDS.index(REASON_THRESHOLD)
@@ -871,25 +884,14 @@ def score_test_flights(ops: Path, test_dir: Path, default_mct: int | None = None
             "reasons": [json.dumps(reasons(frame, int(i), contrib[k])) for k, i in enumerate(rows)],
         }
     )
-    # Real flights' risk is needed too: a test passenger may connect onto a real flight.
-    real = con.execute(
-        f"SELECT flight_id, {', '.join(f'p_{t}, a_{t}' for t in THRESHOLDS)} FROM '{ops}/flight_risk.parquet'"
-    )
+    ids = {str(frame.flight_id[i]) for i in rows}
+    curves = ["flight_id", *[f"{k}_{t}" for t in THRESHOLDS for k in "pa"]]
+    keep = [v not in ids for v in real_risk.column("flight_id").to_pylist()]
     both = pa.concat_tables(
-        [real.to_arrow_table(), risk.select(["flight_id", *[f"{k}_{t}" for t in THRESHOLDS for k in "pa"]])]
-    )
-    pax_src = (
-        f"(SELECT pnr, customer_key, passenger_id, flight_id, origin, destination, pax_type "
-        f"FROM '{ops}/pax_segments.parquet' "
-        f"UNION ALL BY NAME SELECT pnr, customer_key, passenger_id, flight_id, origin, destination, pax_type "
-        f"FROM '{test_dir}/pax_segments.parquet')"
-    )
-    flight_src = (
-        f"(SELECT flight_id, std, sta, flight_number FROM '{ops}/flights.parquet' "
-        f"UNION ALL BY NAME SELECT flight_id, std, sta, flight_number FROM '{flights_file}')"
+        [real_risk.select(curves).filter(pa.array(keep, type=pa.bool_())), risk.select(curves)],
+        promote_options="permissive",
     )
     connections = _connections(con, ops, both, mct, pax_src=pax_src, flight_src=flight_src)
-    ids = {str(frame.flight_id[i]) for i in rows}
     mask = [v in ids for v in connections.column("inbound_flight_id").to_pylist()]
     connections = connections.filter(pa.array(mask, type=pa.bool_()))
     con.register("risk_t", risk)
@@ -900,9 +902,64 @@ def score_test_flights(ops: Path, test_dir: Path, default_mct: int | None = None
         FROM risk_t r LEFT JOIN (SELECT inbound_flight_id, count(*) AS n, sum(misconnect_risk) AS expected
                                  FROM conn_t GROUP BY 1) c ON c.inbound_flight_id = r.flight_id
         ORDER BY r.flight_id""").to_arrow_table()
+    return risk, connections
+
+
+def score_test_flights(ops: Path, test_dir: Path, default_mct: int | None = None) -> dict[str, Any]:
+    """Score the uploaded test flights with the saved model and write test_dir/flight_risk.parquet and
+    connection_risk.parquet (same columns as the ops files). History, real flights and model are only read."""
+    flights_file = test_dir / "flights.parquet"
+    if load_models(ops) is None:
+        return {"scored": 0, "connections": 0, "reason": "no saved model: run the ingest once"}
+    con = duckdb.connect()
+    extra = con.execute(
+        f"""SELECT flight_id, tail, origin, destination, std, sta, aircraft_model, capacity, booked_pax
+            FROM '{flights_file}'"""
+    ).to_arrow_table()
+    # Real flights' risk is needed too: a test passenger may connect onto a real flight.
+    real = con.execute(
+        f"SELECT flight_id, {', '.join(f'p_{t}, a_{t}' for t in THRESHOLDS)} FROM '{ops}/flight_risk.parquet'"
+    ).to_arrow_table()
+    pax_src = (
+        f"(SELECT pnr, customer_key, passenger_id, flight_id, origin, destination, pax_type "
+        f"FROM '{ops}/pax_segments.parquet' "
+        f"UNION ALL BY NAME SELECT pnr, customer_key, passenger_id, flight_id, origin, destination, pax_type "
+        f"FROM '{test_dir}/pax_segments.parquet')"
+    )
+    flight_src = (
+        f"(SELECT flight_id, std, sta, flight_number FROM '{ops}/flights.parquet' "
+        f"UNION ALL BY NAME SELECT flight_id, std, sta, flight_number FROM '{flights_file}')"
+    )
+    scored = _score_extra(ops, extra, real, pax_src, flight_src, default_mct)
+    if scored is None:
+        return {"scored": 0, "connections": 0, "reason": "no flights"}
+    risk, connections = scored
     pq.write_table(risk, test_dir / "flight_risk.parquet")
     pq.write_table(connections, test_dir / "connection_risk.parquet")
     return {"scored": risk.num_rows, "connections": connections.num_rows, "reason": None}
+
+
+def score_edited_flights(
+    ops: Path, flights: pa.Table, pax: pa.Table, real_risk: pa.Table, edited: list[str], default_mct: int | None = None
+) -> tuple[pa.Table, pa.Table] | None:
+    """Re-score evaluator-edited flights from the edited data (schedule, aircraft, seats, passengers).
+    ``flights``: every flight as the store sees it now; ``pax``: the segments of the passengers on the edited
+    flights (with their onward flights); ``real_risk``: the current risk of every flight."""
+    wanted = set(edited)
+    mask = [v in wanted for v in flights.column("flight_id").to_pylist()]
+    extra = flights.filter(pa.array(mask, type=pa.bool_())).select(
+        ["flight_id", "tail", "origin", "destination", "std", "sta", "aircraft_model", "capacity", "booked_pax"]
+    )
+    return _score_extra(
+        ops,
+        extra,
+        real_risk,
+        "edited_pax",
+        "edited_flights",
+        default_mct,
+        exclude=edited,
+        tables={"edited_pax": pax, "edited_flights": flights.select(["flight_id", "std", "sta", "flight_number"])},
+    )
 
 
 def default_mct_from_env(value: str | None) -> int:
@@ -919,6 +976,7 @@ __all__ = [
     "planning_delay",
     "run",
     "save_models",
+    "score_edited_flights",
     "score_test_flights",
     "survival",
 ]

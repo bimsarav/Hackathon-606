@@ -129,7 +129,7 @@ def test_edit_api_changes_the_scenario_and_reset_restores_it(
     }
     bad = {**body, "flight": {**body["flight"], "booked_seats": body["flight"]["capacity"] + 1}}
     assert client.put(url, json=bad, headers=evaluator_auth).status_code == 422
-    assert client.put(url, json=body, headers=evaluator_auth).json() == {"saved": True, "flight_id": F1}
+    assert client.put(url, json=body, headers=evaluator_auth).json()["saved"] is True
     assert client.get(url, headers=evaluator_auth).json()["edited"] is True
     assert client.get("/api/v1/test-data/edits", headers=evaluator_auth).json()[0]["flight_id"] == F1
     assert misses() == 0  # nobody left to miss a connection
@@ -200,3 +200,38 @@ def test_a_second_save_keeps_earlier_removals_and_added_passengers(
     assert sum(p["pnr"] == "EVAL01" for p in second.values()) == 1  # the added passenger is still there, once
     assert len(second) == len(keys) - 1
     client.delete(url, headers=evaluator_auth)
+
+
+def test_edits_are_rescored_for_the_7_day_prediction(client: TestClient, evaluator_auth: dict[str, str]) -> None:
+    url = f"/api/v1/test-data/flights/{F1}"
+    risk_url = f"/api/v1/risk/flights/{F1}?limit=500"
+    before = client.get(risk_url, headers=evaluator_auth).json()
+    assert before["connections"], "the fixture flight has connecting passengers"
+    on_board = {c["pnr"] for c in before["connections"]}
+    view = client.get(url, headers=evaluator_auth).json()
+    f = view["flight"]
+    body = {
+        "flight": {"std": f["std_hhmm"], "sta": f["sta_hhmm"], "tail": f["tail"], "capacity": f["capacity"],
+                   "booked_seats": f["booked_seats"]},
+        "passengers": [
+            {"customer_key": p["customer_key"], "pnr": p["pnr"], "pax_type": p["pax_type"],
+             "fare_family": p["fare_family"] or "Basic", "fare": float(p["fare"] or 0),
+             "loyalty_tier": p["loyalty_tier"], "frequency": p["frequency"], "ssr": p["ssr"] or None,
+             "remove": p["pnr"] in on_board}
+            for p in view["passengers"]
+        ],
+    }  # fmt: skip
+    saved = client.put(url, json=body, headers=evaluator_auth).json()
+    assert saved["rescored"] == 1
+    after = client.get(risk_url, headers=evaluator_auth).json()
+    assert after["connections"] == []  # the connecting passengers were taken off the flight
+    assert after["flight"]["connecting_pax"] == 0
+    assert after["flight"]["expected_misconnects"] == 0
+    watch = client.get("/api/v1/risk/watchlist?days=7&band=all&limit=200", headers=evaluator_auth).json()
+    row = next(r for r in watch["flights"] if r["flight_id"] == F1)
+    assert row["connecting_pax"] == 0
+
+    client.delete(url, headers=evaluator_auth)  # reset: the precomputed risk is back
+    back = client.get(risk_url, headers=evaluator_auth).json()
+    assert {c["pnr"] for c in back["connections"]} == on_board
+    assert back["flight"]["connecting_pax"] == before["flight"]["connecting_pax"]

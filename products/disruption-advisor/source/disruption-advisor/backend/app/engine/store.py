@@ -83,6 +83,7 @@ class OpsStore:
             for table in RISK_TABLES:
                 self._con.execute(f"CREATE TABLE {table} AS SELECT * FROM read_parquet('{ops_dir / table}.parquet')")
             self._add_test_data(test_dir, sample_data.RISK_TABLES)
+            flight_edits.apply_risk(self._con, test_dir)  # edited flights' re-scored 7-day risk
             self._con.execute("CREATE INDEX idx_conn_in ON connection_risk (inbound_flight_id)")
         card = ops_dir / "model_card.json"
         self.model_card: dict[str, Any] = json.loads(card.read_text()) if card.exists() else {}
@@ -179,6 +180,14 @@ class OpsStore:
             rel = cur.execute(sql, params or [])
             cols = [d[0] for d in rel.description]
             return [dict(zip(cols, row, strict=True)) for row in rel.fetchall()]
+        finally:
+            cur.close()
+
+    def arrow(self, sql: str, params: list[Any] | None = None) -> Any:
+        """A query result as an Arrow table (for re-scoring edited flights)."""
+        cur = self._con.cursor()
+        try:
+            return cur.execute(sql, params or []).to_arrow_table()
         finally:
             cur.close()
 
