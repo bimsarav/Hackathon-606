@@ -416,3 +416,31 @@ sequenceDiagram
   - an agent run page: live steps, recommendation, open scenario
 
 - Details: [ADR 0010](adr/0010-tool-using-agent.md), [ADR 0011](adr/0011-cancel-consolidate-and-strategies.md).
+
+## 12. Phase 5 and the 7-day tab (21 Nov 2026)
+
+### 12.1 Passenger rewards
+```mermaid
+flowchart LR
+    A[Scenario<br/>delay or cancellation] --> B[Passengers of the flight]
+    B --> C[Severity 0-100<br/>rules]
+    B --> D[Value 0-100<br/>priority rank]
+    B --> E[Chance of acceptance<br/>LightGBM, proxy rules as fallback]
+    C --> F[Target AED]
+    D --> F
+    F --> G[Eligible options<br/>no repeat of care]
+    E --> H[Utility = severity x value x P x sqrt cost]
+    G --> H
+    H --> I[Fit the budget<br/>downgrade least-loss steps]
+    I --> J[Reward plan<br/>approve via decisions]
+```
+- **Stage 4 of the ingest** (`app/ml/reward_pref.py`) simulates the offer history, trains the model and writes `reward_model.txt`, `reward_model_card.json` and `reward_history_synthetic.parquet` into the ops volume. The API loads the model at start-up; without the file it uses the proxy rules.
+- **API:** `POST /api/v1/scenarios/{id}/rewards` with `{"budget_aed": n}` returns the plan, computed on request and not stored. Approval uses the existing `/decisions` endpoint with target `rewards:<budget>`.
+- **UI:** one passenger panel with two tabs in the delay and cancellation views: connection passengers, and rewards / compensation (budget box, summary, table of passenger, recommended reward and value, with "More data" per row).
+- Details and every rule: [REWARDS_DESIGN.md](REWARDS_DESIGN.md), [ADR 0012](adr/0012-passenger-reward-recommendation.md).
+
+### 12.2 Cascade formula check (7-day tab)
+- **Stage 3b of the ingest** (`app/cascade_check.py`) tests the simple knock-on rule *next departure = max(scheduled departure, previous arrival + 40 min)* against the real departures of the last 30 days of punctuality history: consecutive flights of the same aircraft, the second leaving from where the first arrived, scheduled gap up to 24 h, where the rule predicts a knock-on. Extreme outliers (360 minutes or more of knock-on) are listed apart.
+- It writes `cascade_check.json` (six figures, histogram, all pairs). `GET /api/v1/risk/cascade` serves it.
+- **UI:** on the 7-day tab the sidebar shows six boxes (cascade pairs, mean delta, within +-15 min, within +-30 min, underestimates, overestimates) and "Expand the full view" opens the scatter, the delta histogram and the filterable table of pairs. On this tab the scenario launcher and recent scenarios are hidden.
+- It is a read-only check of an assumption; it does not change any recommendation.

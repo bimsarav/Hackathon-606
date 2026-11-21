@@ -141,3 +141,34 @@ New tests in this phase:
 | Reboot test | **Not run** for phase 3 |
 
 The e2e folder's `tsconfig.json` needs `@types/node` in the e2e `devDependencies` for a standalone `tsc` check; this predates phase 3 and does not affect the Playwright run. No Trivy scan is recorded for the phase 3 images.
+
+## Phase 5, the 7-day tab and the model tuning (21 Nov 2026)
+
+### What was added
+| Test file | Tests | What it checks |
+|---|---|---|
+| `backend/tests/test_rewards.py` | 17 (20 runs: the budget test has four budgets) | severity grows with delay, connection, wait and vulnerability; proxy preferences follow the booking clues; eligibility; a zero budget gives nothing and a large one the full plan; the plan never exceeds the budget and its spend matches its rows; a tighter budget never rewards more and keeps the most affected; non-revenue passengers are excluded; **a reward never repeats what the care plan gives**; the synthetic history is deterministic and labelled; the model beats both baselines on held-out passengers and learns who takes which reward; the plan uses the model; ingest stage 4 on the small fixture writes a labelled model and history; the **reward API** stays within the budget, never repeats care, validates input and needs a sign-in, and an approval goes to the audit log |
+| `backend/tests/test_cascade_check.py` | 3 | the formula and the six figures on a hand-made history (cascade pair, no pair when the buffer absorbs it, over-estimate, extreme outlier listed apart, different-station repositioning is not a pair); pairs older than a month are left out; the **cascade API** serves a consistent check and needs a sign-in |
+| `backend/tests/test_delay_risk.py` | 9 | includes the last-week replay (kept; the panel was removed from the UI) |
+| `frontend/src/App.test.tsx` | 11 | the reward table (passenger, reward, value; the rest under "More data"); the two-tab passenger panel; the cascade panel (six boxes, full view with both charts, outlier note, filter, Escape closes) |
+| `e2e/tests/advisor.spec.ts` | 8 | adds: the 7-day tab shows the cascade panel and its full view instead of the launcher; a budget gives a reward plan from the preference model and the plan can be approved |
+
+### Results
+| Check | Result |
+|---|---|
+| Backend, without Docker | **73 passed**; 26 more need the PostgreSQL container (21 earlier tests plus the 5 new API tests) |
+| The 5 new API tests and the existing API tests, on SQLite in a scratch copy | all passed except the Alembic migrations check, which needs PostgreSQL |
+| Backend lint, format, strict types | clean |
+| Frontend type check, unit tests, production build | clean, **24 passed**, built |
+| Local stack on the merged tree (bundled PostgreSQL, Vite) | all four ingest stages ran (3, 3b, 4 and the rest); every GET endpoint 200; delay and cancellation scenarios created; reward plans computed and approved (201); every frontend module compiles in the dev server |
+| Negative budget on the local stack | 500, because the local run uses Python 3.12 and `HTTPStatus.UNPROCESSABLE_CONTENT` needs 3.13+; the server (Python 3.14) returned 422 on the same request |
+
+### Model results
+- Delay model tuning and comparison (nine candidates): [model-selection.md](model-selection.md), including the check of the teammates' `month` and `route_freq` features.
+- Reward preference model (eight candidates, grouped folds, oracle bound): [reward-model-selection.md](reward-model-selection.md) and [reward-model-card.md](reward-model-card.md). The outcomes are simulated.
+
+### Server check before another deployment replaced the build (2026-11-21 03:35 UTC)
+Smoke test 11/11; the new endpoints answered correctly; Playwright ran 7 passed and 1 failed (the reward-approval assertion in the new test, fixed afterwards and not rerun on the server). Another deployment replaced the build minutes later, so these results do not describe the server's current state.
+
+### Not run
+The new Playwright tests have not been run locally (no Playwright or Docker on this machine) and not on the server since the fix. The 26 PostgreSQL-backed tests ran only in the SQLite scratch copy.

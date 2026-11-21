@@ -110,6 +110,25 @@ If a run fails, **Try again** starts it with the same inputs. You can have one r
 
 Agent details: `docs/testing/agent-card.md`; design: `docs/architecture/SYSTEM_ARCHITECTURE.md` §11 and ADRs 0010–0011.
 
+## Phase 5: passenger rewards and the 7-day tab (21 Nov 2026)
+**What it does.** After a delay or cancellation, a planner enters a goodwill budget in AED and the system recommends a reward for each passenger of the flight: a meal voucher, gift voucher, lounge pass, loyalty miles or a free ticket. It is recommend-only: the plan is approved through the audit log and nothing is sent to passengers.
+
+**How the recommendation is built.**
+1. **Disruption severity (0 to 100) per passenger:** from the delay (up to 50 points for 4 hours), a cancellation (60), a missed connection (+25), the wait for the next flight (up to 15) and a vulnerable passenger (+10).
+2. **Passenger value (0 to 100):** the passenger's recovery-priority score (loyalty, frequency, fare, extras, journey, family) as a rank among the flight's passengers.
+3. **Target amount:** up to AED 600, scaled by severity and value.
+4. **Allowed rewards:** a meal voucher only for 60+ minutes and when the care plan gives no meals; a lounge pass only for 120+ minutes and no hotel; miles for loyalty members only; a free ticket for severe cases; everything within the target. Care (meals, hotel, transport, refund option) stays separate and is never repeated.
+5. **Chance of acceptance:** a LightGBM model trained on **simulated** redemption history (no real history exists), with proxy rules as the fallback. It scores AUC 0.70 on held-out passengers against 0.665 for the rules and 0.615 for the reward type's average; the best possible on the simulated data is 0.74.
+6. **Choosing and fitting the budget:** utility = severity x value x chance of acceptance x square root of the cost. If the plan is over budget, the cheapest-to-lose steps are scaled down until it fits. The plan never exceeds the budget.
+
+**Screen.** The delay and cancellation views have one passenger panel with two tabs: connection passengers, and rewards / compensation. The reward table shows the passenger, the recommended reward and its value; "More data" shows severity, value, target, the chance of acceptance and the reasons.
+
+**7-day tab.** The tab now shows last month's cascade check in the sidebar (the scenario launcher is hidden there): the formula *next departure = max(scheduled departure, previous arrival + 40 min)* against real departures, as six boxes (1,656 pairs, mean delta +10 min, 75% within 15 minutes, 93% within 30 minutes, 412 under- and 1 over-estimates for 19 Oct to 18 Nov). "Expand the full view" opens the scatter, the delta histogram and the table of all pairs.
+
+**Models tuned.** The delay model and the reward model were both tuned with Optuna and compared with other models on time-ordered or grouped validation; the tuning of the reward model gained almost nothing. A teammate's extra delay feature `month` raises ranking slightly but lowers the validation score, so it is flagged for a decision.
+
+**Limits.** The reward preferences come from simulated data and the reward values and weights are assumptions to confirm with the airline. Details: `docs/architecture/REWARDS_DESIGN.md`, `docs/testing/reward-model-card.md`, `docs/testing/reward-model-selection.md`.
+
 ## Architecture
 ```
  Browser (OCC / PCU)
@@ -207,6 +226,8 @@ scripts/smoke.sh <base-url>     # post-deployment smoke test
 | GET /api/v1/risk/watchlist | 7-day delay watchlist (phase 2) |
 | GET /api/v1/risk/flights/{flight_id} | One flight's delay risk, reasons and connecting passengers at risk |
 | GET /api/v1/risk/model | Model card: data, features, test results |
+| GET /api/v1/risk/cascade | Last month's cascade formula check (read-only) |
+| POST /api/v1/scenarios/{id}/rewards | Goodwill reward plan within a budget (phase 5); approve through /decisions |
 | POST /api/v1/agent/runs | Start an agent run on a flight (optional delay, strategy, note); returns at once (phase 3) |
 | GET /api/v1/agent/runs/{id}, GET /api/v1/agent/runs | One run with its steps and recommendation; recent runs |
 | /api/docs | OpenAPI documentation |
@@ -221,8 +242,8 @@ scripts/smoke.sh <base-url>     # post-deployment smoke test
 ## Test results (phase 1: 20 Nov 2026; phases 2 and 3: 21 Nov 2026)
 | Test | Result |
 |---|---|
-| Backend unit and API tests (incl. PostgreSQL via Testcontainers) | 69 passed (phase 3) |
-| Frontend unit tests | 19 passed (phase 3) |
+| Backend unit and API tests (incl. PostgreSQL via Testcontainers) | 69 passed (phase 3); phase 5 adds 30 tests: 73 passed locally without Docker, 26 need the PostgreSQL container (the new API tests also passed on SQLite) |
+| Frontend unit tests | 24 passed (phase 5 and the 7-day tab; local) |
 | Playwright end-to-end on the demo server | 6 passed (phase 3, incl. "strategies switch the recommendation" and "the agent investigates a flight and its recommendation opens for approval"); phase 2: 4; phase 1: 3 |
 | Smoke test on the demo server | 11 of 11 passed (phases 1, 2 and 3) |
 | Agent run on the demo server | Flight G9901 (22 Nov): AI source, 7 steps in 25 s, recommended the swap with A6-AOH under "protect passengers" |

@@ -62,7 +62,7 @@ Every long-running service restarts by itself, including after a server reboot.
 
 ## Tests
 ```bash
-scripts/check.sh                 # backend lint, format, strict types, 69 tests (Testcontainers PostgreSQL); frontend type check, 19 tests, build
+scripts/check.sh                 # backend lint, format, strict types, 99 tests (26 of them use Testcontainers PostgreSQL); frontend type check, 24 tests, build
 scripts/e2e.sh                   # Playwright end-to-end tests against the running stack (E2E_BASE_URL to target a server)
 scripts/smoke.sh [base-url]      # post-deployment smoke test against a running stack (read-mostly)
 scripts/check.sh lock            # after editing dependencies: refresh uv.lock / package-lock.json
@@ -79,6 +79,8 @@ Logs are written to `logs/`.
 | `/api/v1/risk/watchlist` | Flights in the next 1–7 days by risk band, ranked by expected missed connections or by delay risk (read-only) |
 | `/api/v1/risk/flights/{flight_id}` | One flight's delay risk and reasons, with its connecting passengers ranked by missed-connection risk |
 | `/api/v1/risk/model` | Model card: training data, features, test metrics against the baseline |
+| `/api/v1/risk/cascade` | The last month's cascade check: the knock-on formula against real departures, with all pairs (read-only) |
+| `/api/v1/scenarios/{id}/rewards` | Goodwill reward plan for the passengers of the scenario's flight within a budget (phase 5, [design](docs/architecture/REWARDS_DESIGN.md)); computed on request, approved through `/decisions` |
 | `/api/v1/scenarios/{id}/strategy` | Switch a delay scenario's strategy (lowest cost, protect passengers, least delay); the recommendation follows (phase 3) |
 | `/api/v1/agent/runs` (+ `/{id}`) | Start an agent run on a flight and follow its steps; the result is saved as a scenario for approval (phase 3, [agent card](docs/testing/agent-card.md)) |
 | `/api/openapi.json`, `/api/docs` | OpenAPI schema and Swagger UI |

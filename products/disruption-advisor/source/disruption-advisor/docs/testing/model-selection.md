@@ -37,3 +37,16 @@ Tool: `backend/tools/model_selection.py` (offline; needs lightgbm, xgboost, catb
 - **Class weights** were tried and rejected: they distort the probabilities (score -0.47). Cut-offs are chosen on the unweighted probabilities instead (cut-off sweep in the model card).
 - The earlier figures (AUC 60 = 0.757) were measured on a period that had also been used to pick the half-life; the table above is the honest comparison.
 - Not yet redeployed: the production server still runs the old settings until the user approves the redeploy.
+
+## Merged feature check: `month` and `route_freq` (local, 2026-11-21)
+A teammate's change added two features to the delay model, `month` and `route_freq` (route flights per day). After the merge the model uses the tuned settings above with these two extra features, a combination nobody had validated. It was checked on the same time-ordered protocol (three validation blocks, then the final 28 days):
+
+| Features | Validation score | Final AUC 15 | Final AUC 60 | Final Brier 15 | Final Brier 60 |
+|---|---|---|---|---|---|
+| 8 (the tuned model above) | 0.0531 | 0.798 | 0.760 | 0.1800 | 0.0753 |
+| 9 (+ `route_freq`) | 0.0541 | 0.798 | 0.760 | 0.1800 | 0.0753 |
+| 10 (+ `month`, `route_freq`) | **0.0118** | 0.801 | 0.770 | 0.1806 | 0.0737 |
+
+- `route_freq` changes nothing.
+- `month` raises ranking a little (AUC 60: 0.760 to 0.770) but **lowers the validation score from 0.053 to 0.012**, the metric this project selects on, because every validation block lies in a month the model has not seen, and the trees lean on the latest months' rates. It is a seasonal extrapolation risk: its gain on the final test (also an unseen month) is real but smaller than the loss in calibration on the earlier blocks.
+- **Status:** the merged code keeps both features. The evidence above favours dropping `month` and keeping `route_freq`; the decision belongs to the model owners.
