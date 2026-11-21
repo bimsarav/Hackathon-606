@@ -1,0 +1,35 @@
+PASS backend-sync
+PASS backend-lint
+PASS backend-format
+PASS backend-types
+PASS backend-tests
+105 passed in 14.50s
+PASS frontend-install
+PASS frontend-typecheck
+FAIL frontend-tests (see logs/check-frontend-tests.log)
+                [0mAircraft delay[0m
+              [36m</dt>[39m
+              [36m<dd>[39m
+                [0m2 h 30 min[0m
+              [36m</dd>...
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/Phase3.test.tsx:132:19
+    130|     const scenario = delayScenario({ passengers: [pax, { ...pax, custo…
+    131|     render(<DelayView scenario={scenario} result={scenario.result as D…
+    132|     expect(screen.getByText("Flight cancelled")).toBeInTheDocument();
+       |                   ^
+    133|     expect(screen.getByText("Missed connection")).toBeInTheDocument();
+    134|     expect(screen.getByRole("heading", { name: /missed connections and…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 2 passed (4)
+      Tests  2 failed | 22 passed (24)
+   Start at  07:17:41
+   Duration  3.59s (environment 46%, tests 30%, setup 10%, transform 10%, import 3%)
+
+rc=1
