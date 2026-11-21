@@ -106,6 +106,10 @@ class MessageDraft(BaseModel):
     source: str
 
 
+class RewardRequest(Strict):
+    budget_aed: float = Field(ge=0, le=1_000_000)
+
+
 class AgentRunCreate(Strict):
     flight_id: str = Field(min_length=6, max_length=40, pattern=r"^[A-Z0-9]{2,8}_\d{12}$")
     delay_minutes: int | None = Field(default=None, ge=15, le=1440)

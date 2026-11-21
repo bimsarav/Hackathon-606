@@ -1,4 +1,4 @@
-# RESUME (updated 2026-11-21) — disruption-advisor PHASE 3 DONE and live (T-607 fix); merge with teammate extracts-db loader committed + pushed (T-608). WAITING: phase 6 approval, reboot test, Trivy scans
+# RESUME (updated 2026-11-21) — T-611: pulled d53bfe5 + local WIP (loyalty, teammate rewards); local stack on :8888 for user review. OPEN: two competing T-511 model tunings (kept prod params + pulled features, team to decide); NOT committed; prod not yet on d53bfe5
 Product: esm-hub (R = products/esm-hub/source/esm-hub) · Status: COMPLETED by user instruction, NOT deployed
 Verified locally: clean build 253 tests; frontend lint + 18 tests; compose stack healthy; API smoke (output/T-005.2-smoke.log); Playwright 6/6 (output/T-005.2-e2e-run3.log)
 Cloud: OCI VM discovered + read-only dry run passed (R/docs/deployment/CLOUD_ENVIRONMENT.md, execution/DEPLOYMENT_STATUS.md); nothing deployed

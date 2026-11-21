@@ -232,7 +232,13 @@ scripts/smoke.sh <base-url>     # post-deployment smoke test
 | Delay scenario time with the phase 3 options (real data) | 0.6 to 7 s per scenario |
 
 ## Known limitations and open decisions
-- **Synthetic fields:** loyalty tier, fare family and most special-assistance codes are synthetic (labelled), because the extracts do not contain them.
+- **Synthetic fields:** fare family and most special-assistance codes are synthetic (labelled), because the extracts do not contain them.
+- **Loyalty (modelled on the airline's loyalty sample):**
+  - **Membership** is real (the booking flag).
+  - **Tier and priority:** Basic, Silver, Gold and Platinum, with recovery priority Lowest, Low, Medium and High, as in the sample.
+  - **Synthetic account per member:** a loyalty ID and a points balance. The tier comes from real flights flown in the last 12 months.
+  - **Family accounts:** a booking travelling with children or infants becomes a family account under a head of family. Everyone on it travels on the head's tier, so a child or a non-member partner is not ranked below the head.
+  - **Screen:** the passenger list shows the tier, its priority and "family account" or "head of family".
 - **Assumed rules:** costs and the 50-minute default MCT (lowest real SHJ rule) are assumptions; turn times are measured. All are configurable.
 - **Carriers:** G9 flights only; partner and other carriers in the extracts are excluded (future enhancement).
 - **Crew:** legality is not checked; no crew data was supplied.

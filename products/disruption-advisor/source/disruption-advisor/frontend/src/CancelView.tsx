@@ -1,6 +1,7 @@
 import type { CancelResult, Meta, Scenario } from "./api";
 import { Kpi } from "./DelayView";
 import { aed, num, utc } from "./format";
+import { RewardPanel } from "./RewardPanel";
 import { Assumptions, DecisionBar, Explanation, PassengerTable, WeightsPanel } from "./Shared";
 
 interface Props {
@@ -94,6 +95,7 @@ export function CancelView({ scenario, result, meta, onUpdate }: Props) {
         <DecisionBar scenario={scenario} target="rebooking" label="rebooking plan" />
       </section>
 
+      <RewardPanel scenario={scenario} />
       <Assumptions items={result.assumptions} />
     </article>
   );

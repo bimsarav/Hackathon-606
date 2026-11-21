@@ -107,8 +107,13 @@ Design: SYSTEM_ARCHITECTURE §11, ADR 0010 (agent), ADR 0011 (cancel, consolidat
 - Replace synthetic data with real loyalty, SSR, fare-family and aircraft files as they arrive.
 - CI/CD deployment, monitoring and alerting, and the full §14 operations baseline.
 
+## Phase 5 — Passenger rewards (approved by the user 2026-11-21)
+- Disruption severity per passenger and passenger value, from which a goodwill reward is set in AED.
+- A budget field in the scenario screen: the system recommends a reward type and amount per passenger (meal voucher, shopping voucher, lounge pass, miles, free ticket) that fits the budget.
+- Preferences are proxy rules (meal and seat bought, sales channel, fare family, loyalty, frequency, family booking), labelled as assumptions. A trained preference model replaces them if redemption data arrives.
+- Recommend-only: the plan is approved through the decisions audit log; nothing is sent to passengers. Design: `docs/architecture/REWARDS_DESIGN.md`, ADR 0012.
+
 ## Phase 6 — Secure and protect (needs approval; moved from phase 2 by the user, 2026-11-21)
-No phase 5 is defined yet.
 - HTTPS through Caddy and Let's Encrypt on a free sslip.io hostname, with `:8888` kept (design: ADR 0009).
 - Nightly PostgreSQL backup with a restore test (design: ADR 0009).
 

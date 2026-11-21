@@ -9,7 +9,9 @@ Outputs:
   aircraft.parquet        registration → model and seats (inventory-exact or assumed A320/174)
   flights.parquet         every rotation leg in the window, with tail, times (UTC), capacity, booked, available
   booking_classes.parquet booking code → revenue type and fare family (synthetic)
-  customers.parquet       one row per passenger key: 12-month travel history (real) and loyalty tier (synthetic)
+  customers.parquet       one row per passenger key: 12-month travel history (real), loyalty membership (real) and
+                          a synthetic loyalty account modelled on the airline's loyalty sample (tier, priority,
+                          loyalty ID, points; LOYALTY_* below)
   pax_segments.parquet    active passenger-segments in the window with enrichment and SSRs
   mct.parquet             hub connection times
   history_flights.parquet G9 flights 1 Jan 2026 to the window start with actual times, aircraft chain, bookings
@@ -53,6 +55,18 @@ DEFAULT_WINDOW = Window(datetime(2026, 11, 20), datetime(2026, 11, 19), datetime
 # Scope (user decision 2026-11-21): only the airline's own flights. Partner and other carriers in the extracts
 # (3L, 3O, E5, 9P, 4P) are excluded from the operating picture; including them is a future enhancement.
 DEFAULT_CARRIERS: tuple[str, ...] = ("G9",)
+
+
+# Loyalty (user 2026-11-21: use the given "Loyalty_Sample Data.xlsx"). The sample defines the tier ladder and its
+# recovery priority (Basic Lowest, Silver Low, Gold Medium, Platinum High), points balances (Basic adult 10,000,
+# Basic child 3,000, Silver 60,000) and family accounts with a head of family. It cannot be joined to the bookings
+# (it holds e-mail IDs and names, the bookings are name-free), so every member gets a synthetic account built the
+# same way: tier from real 12-month flights flown, points from tier + flights, family accounts from bookings that
+# travel with children or infants. No names or e-mail addresses are generated.
+LOYALTY_PRIORITY = {"Basic": "Lowest", "Silver": "Low", "Gold": "Medium", "Platinum": "High"}
+LOYALTY_POINTS_BASE = {"Basic": 2000, "Silver": 40000, "Gold": 100000, "Platinum": 250000}
+LOYALTY_POINTS_PER_FLIGHT = 1500
+LOYALTY_FAMILY_MAX = 9  # people on a booking for it to count as a family account (larger = a group)
 
 
 def _months(start: datetime, end: datetime) -> str:
@@ -154,11 +168,13 @@ def build(
               AND (substr(flight_number, 1, 2) IN {in_scope} OR starts_with(flight_number, '02')))
         WHERE rn = 1""")
 
-    # Customer profiles (Q4): real 12-month history by customer key (hash of the name);
-    # synthetic tier for loyalty members.
+    # Customer profiles (Q4): real 12-month history and membership by customer key; synthetic loyalty account.
+    priority_case = " ".join(f"WHEN '{t}' THEN '{p}'" for t, p in LOYALTY_PRIORITY.items())
+    points_case = " ".join(f"WHEN '{t}' THEN {b}" for t, b in LOYALTY_POINTS_BASE.items())
     counts["customers"] = out(
         "customers",
         f"""
+        WITH prof AS (
         WITH hist AS (
             SELECT customer_key, count(*) AS flown_12m,
                    count(DISTINCT pnr) AS pnrs_12m, bool_or(is_lms_member) AS member_hist
@@ -172,14 +188,47 @@ def build(
                coalesce(h.flown_12m, 0) AS flown_segments_12m, coalesce(h.pnrs_12m, 0) AS bookings_12m,
                coalesce(h.pnrs_12m, 0) > {AMBIGUOUS_NAME_PNRS} AS ambiguous_common_name,
                CASE WHEN NOT (coalesce(p.member_now, FALSE) OR coalesce(h.member_hist, FALSE)) THEN NULL
-                    WHEN coalesce(h.pnrs_12m, 0) > {AMBIGUOUS_NAME_PNRS} THEN 'Blue'
+                    WHEN coalesce(h.pnrs_12m, 0) > {AMBIGUOUS_NAME_PNRS} THEN 'Basic'
                     WHEN coalesce(h.flown_12m, 0) >= 24 THEN 'Platinum' WHEN coalesce(h.flown_12m, 0) >= 12 THEN 'Gold'
-                    WHEN coalesce(h.flown_12m, 0) >= 6 THEN 'Silver' ELSE 'Blue' END AS loyalty_tier_synthetic,
+                    WHEN coalesce(h.flown_12m, 0) >= 6 THEN 'Silver' ELSE 'Basic' END AS loyalty_tier_synthetic,
                CASE WHEN coalesce(h.pnrs_12m, 0) > {AMBIGUOUS_NAME_PNRS} THEN 'unknown'
                     WHEN coalesce(h.flown_12m, 0) >= 12 THEN 'frequent'
                     WHEN coalesce(h.flown_12m, 0) >= 4 THEN 'regular' ELSE 'occasional' END AS travel_frequency_band
-        FROM people p LEFT JOIN hist h USING (customer_key)""",
+        FROM people p LEFT JOIN hist h USING (customer_key))
+        SELECT *,
+               CASE loyalty_tier_synthetic {priority_case} END AS loyalty_priority,
+               -- unique and deterministic: members numbered in the order of a salted hash of their key
+               CASE WHEN is_loyalty_member
+                    THEN 'G9' || lpad(CAST(row_number() OVER (
+                             PARTITION BY is_loyalty_member ORDER BY md5('loyalty-id|' || customer_key), customer_key)
+                         AS VARCHAR), 9, '0')
+               END AS loyalty_id_synthetic,
+               -- flights of ambiguous common names are unreliable (tier capped at Basic): no accrual from them
+               CASE WHEN is_loyalty_member
+                    THEN CAST(round((CASE loyalty_tier_synthetic {points_case} END
+                                     + {LOYALTY_POINTS_PER_FLIGHT}
+                                       * least(CASE WHEN ambiguous_common_name THEN 0 ELSE flown_segments_12m END, 100)
+                                     + {_u("customer_key", "loyalty-points")} * 5000) / 10) * 10 AS INTEGER)
+               END AS available_points_synthetic
+        FROM prof""",
     )
+
+    # Family accounts (loyalty sample: "Family / Ind", "Head of family"): a booking in the window of at most
+    # LOYALTY_FAMILY_MAX people that travels with children or infants and holds a member adult. Its head is the
+    # member adult who flew most (ties: customer key); everyone on that booking travels on the head's tier.
+    c.execute(f"""
+        CREATE OR REPLACE TEMP TABLE family AS
+        SELECT pnr, customer_key AS head_key, loyalty_tier_synthetic AS family_tier, loyalty_priority AS family_priority
+        FROM (
+            SELECT s.pnr, s.customer_key, cu.loyalty_tier_synthetic, cu.loyalty_priority,
+                   row_number() OVER (PARTITION BY s.pnr ORDER BY cu.flown_segments_12m DESC, s.customer_key) AS n
+            FROM (SELECT DISTINCT pnr, customer_key, pax_type FROM seg) s
+            JOIN customers cu USING (customer_key)
+            WHERE s.pax_type = 'AD' AND cu.is_loyalty_member
+              AND s.pnr IN (SELECT pnr FROM seg WHERE pax_type IN ('CH', 'IN'))
+              -- a family, not a tour group: at most LOYALTY_FAMILY_MAX people on the booking
+              AND s.pnr IN (SELECT pnr FROM seg GROUP BY 1 HAVING count(DISTINCT customer_key) <= {LOYALTY_FAMILY_MAX}))
+        WHERE n = 1""")
 
     ssr_case = "\n".join(
         f"WHEN s.pax_type = 'AD' AND {_u('s.pnr || s.customer_key', 'ssr')} < {rate} THEN '{code}'"
@@ -213,9 +262,14 @@ def build(
                CASE WHEN s.pax_type = 'IN' THEN 'data' ELSE 'synthetic' END AS ssr_source,
                CASE WHEN s.pax_type = 'IN' THEN substr(sha256(a.customer_key), 1, 16) END AS infant_with_customer_key,
                -- synthetic identity, supplied with the bookings (stage 1, app.ingest.convert)
-               s.passenger_id, s.passport_number_synthetic, s.national_id_synthetic, s.identity_rule
+               s.passenger_id, s.passport_number_synthetic, s.national_id_synthetic, s.identity_rule,
+               -- synthetic family loyalty account (see "family" above)
+               fa.pnr IS NOT NULL AS family_account_synthetic,
+               coalesce(fa.head_key = s.customer_key, FALSE) AS family_head_synthetic,
+               fa.family_tier AS family_tier_synthetic, fa.family_priority AS family_priority_synthetic
         FROM seg s
         JOIN pnr p ON p.pnr = s.pnr
+        LEFT JOIN family fa ON fa.pnr = s.pnr
         LEFT JOIN booking_classes bc ON bc.booking_code = coalesce(s.booking_code, '(blank)')
         LEFT JOIN inf i ON i.pnr = s.pnr AND i.customer_key = s.customer_key
         LEFT JOIN ad a ON a.pnr = s.pnr AND a.n = ((i.n - 1) % greatest(p.adults, 1)) + 1

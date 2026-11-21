@@ -168,6 +168,14 @@ export interface PassengerRow {
   non_revenue: boolean;
   reason: string;
   loyalty_tier: string | null;
+  /** Phase 3 loyalty (airline loyalty sample): optional for scenarios saved before it. */
+  loyalty_priority?: string | null;
+  loyalty_effective_tier?: string | null;
+  loyalty_effective_priority?: string | null;
+  loyalty_via_family?: boolean;
+  loyalty_points?: number | null;
+  family_account?: boolean;
+  family_head?: boolean;
   frequency: string | null;
   fare: number;
   fare_family: string | null;
@@ -198,14 +206,6 @@ export interface PassengerRow {
   message: string;
   /** Delay scenarios (phase 3): why the passenger needs a new flight. */
   group?: "missed_connection" | "cancelled";
-  // Phase 5: loyalty sample fields (synthetic where not in airline extract)
-  loyalty_effective_tier?: string | null;
-  loyalty_effective_priority?: string | number | null;
-  loyalty_priority?: string | number | null;
-  family_account?: boolean;
-  family_head?: boolean;
-  loyalty_via_family?: boolean;
-  loyalty_points?: number | null;
 }
 
 export interface Alternative {
@@ -337,6 +337,68 @@ export interface ConnectionRisk {
   misconnect_risk: number;
 }
 
+export interface LastWeekRow {
+  flight_id: string;
+  flight_number: string | null;
+  origin: string;
+  destination: string;
+  std: string;
+  p_15: number;
+  p_60: number;
+  band: "high" | "medium" | "low";
+  actual_delay_minutes: number;
+  outcome: "hit" | "false_alarm" | "missed";
+}
+
+export interface LastWeek {
+  from: string;
+  to: string;
+  trained_on: string;
+  flights: number;
+  late_15_rate: number;
+  late_60_rate: number;
+  auc_15: number | null;
+  auc_60: number | null;
+  brier_60: number;
+  flag_60: ConfusionPoint;
+  flag_15: ConfusionPoint;
+  high_band: { flights: number; late_60: number };
+  rows: LastWeekRow[];
+  rows_total: number;
+}
+
+export interface RewardRow {
+  pnr: string;
+  customer_key: string;
+  passenger_id: string | null;
+  route: string;
+  tier: number;
+  severity: number;
+  severity_reasons: string[];
+  value: number;
+  target_aed: number;
+  reward: { type: string; label: string; detail: string; cost_aed: number; acceptance?: number } | null;
+  preferred: { type: string; label: string; score: number }[];
+  why: string[];
+  downgraded_for_budget: boolean;
+  note: string;
+}
+
+export interface RewardPlan {
+  budget_aed: number;
+  planned_spend_aed: number;
+  left_aed: number;
+  ideal_spend_aed: number;
+  budget_covers_share: number;
+  passengers: number;
+  rewarded: number;
+  by_type: Record<string, { passengers: number; spend_aed: number }>;
+  disruption: { score: number; label: string };
+  preference_model?: { kind: string; synthetic_training_data: boolean; auc?: number; baseline_proxy_rules_auc?: number };
+  assumptions: string[];
+  rows: RewardRow[];
+}
+
 // --- Phase 3: agent runs (app/agent_api.py) ---
 export interface AgentStep {
   n: number;
@@ -450,68 +512,6 @@ export interface ModelCard {
   assumptions: string[];
 }
 
-// --- Phase 5: rewards (app/rewards.py) ---
-export interface RewardPlan {
-  budget_aed: number;
-  planned_spend_aed: number;
-  left_aed: number;
-  ideal_spend_aed: number;
-  budget_covers_share: number;
-  rewarded: number;
-  passengers: number;
-  disruption: { label: string; score: number };
-  by_type: Record<string, { passengers: number; spend_aed: number }>;
-  preference_model?: {
-    kind: string;
-    synthetic_training_data: boolean;
-    auc: number;
-    baseline_proxy_rules_auc: number;
-  };
-  rows: {
-    pnr: string;
-    customer_key: string;
-    passenger_id: string | null;
-    route: string;
-    severity: number;
-    severity_reasons: string[];
-    value: number;
-    reward: { detail: string; cost_aed: number } | null;
-    downgraded_for_budget: boolean;
-    why: string[];
-  }[];
-  assumptions: string[];
-}
-
-// --- Phase 5: last-week backtest (app/risk.py) ---
-interface LastWeekFlag {
-  true_positive: number;
-  false_positive: number;
-  false_negative: number;
-  true_negative: number;
-  accuracy: number | null;
-  recall: number | null;
-  precision: number | null;
-}
-export interface LastWeek {
-  from: string;
-  to: string;
-  flights: number;
-  trained_on: string;
-  auc_60: number | null;
-  auc_15: number | null;
-  flag_60: LastWeekFlag;
-  flag_15: LastWeekFlag;
-  rows: {
-    flight_id: string;
-    flight_number: string;
-    origin: string;
-    destination: string;
-    p_60: number;
-    actual_delay_minutes: number;
-    outcome: "hit" | "missed" | "false_alarm";
-  }[];
-}
-
 let token: string | null = null;
 export const setToken = (value: string | null): void => {
   token = value;
@@ -563,10 +563,10 @@ export const api = {
     request<Watchlist>(`/api/v1/risk/watchlist?days=7&band=${band}&sort=${sort}&limit=60`),
   flightRisk: (flightId: string) =>
     request<{ flight: RiskFlight; connections: ConnectionRisk[] }>(`/api/v1/risk/flights/${encodeURIComponent(flightId)}?limit=30`),
-  modelCard: () => request<ModelCard>("/api/v1/risk/model"),
-  lastWeek: () => request<LastWeek>("/api/v1/risk/lastweek"),
   rewards: (id: string, budgetAed: number) =>
     post<RewardPlan>(`/api/v1/scenarios/${id}/rewards`, { budget_aed: budgetAed }),
+  lastWeek: () => request<LastWeek>("/api/v1/risk/last-week"),
+  modelCard: () => request<ModelCard>("/api/v1/risk/model"),
   message: (id: string, customerKey: string) =>
     post<{ text: string; source: string }>(`/api/v1/scenarios/${id}/messages`, { customer_key: customerKey }),
 };

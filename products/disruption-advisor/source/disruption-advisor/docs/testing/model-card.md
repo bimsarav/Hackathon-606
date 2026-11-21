@@ -38,14 +38,19 @@ Only information known 7 days ahead. No actual times of the day itself are used.
 | `station_rate`, `route_rate`, `network_rate` | Share of flights 15+ min late at the station, on the route and in the whole network, over days 35 to 7 before the flight |
 
 ## Training
-- LightGBM 4.7, binary objective, 300 rounds, 31 leaves, at least 50 rows per leaf, fixed seed and deterministic mode, so the same data gives the same model.
-- **Recency weights:** a flight's weight halves every 60 days of age. Delay levels change a lot by season (16% of flights 15+ min late in June, 45% in October), so recent months count more.
+- LightGBM 4.7, binary objective, tuned settings (T-511: 120 rounds, 11 leaves, at least 60 rows per leaf, learning rate 0.039, L2 17, row sampling 0.86), fixed seed and deterministic mode, so the same data gives the same model. How they were chosen: [model-selection.md](model-selection.md).
+- **Recency weights:** a flight's weight halves every 109 days of age. Delay levels change a lot by season (16% of flights 15+ min late in June, 45% in October), so recent months count more.
 - **Retraining:** every ingest run that rebuilds the operating picture (ingest stage 3). A new data drop retrains and rescores. There is no separate training service.
 
 ## Validation (time-ordered, never random)
 - **Evaluation model:** trained on all history before the last 28 days, tested on the last 28 days.
 - **Production model:** the same recipe on all history. It scores the window.
 - **Baseline:** the historical rate of the same route at the same local departure hour, smoothed toward the overall rate.
+
+> The results below are from the production run before tuning (T-510). The tuned model's numbers are in [model-selection.md](model-selection.md) and replace these at the next redeploy.
+
+## Last-week check
+The watchlist tab shows the last 7 days of flights predicted by a model trained only on the flights before that week, against what really happened (`last_week.json`, `GET /api/v1/risk/last-week`).
 
 ## Results (production run on the server, verified 2026-11-21)
 Train 2026-01-01 .. 2026-10-21 (57,104 flights); test 2026-10-21 .. 2026-11-18 (5,956 flights).

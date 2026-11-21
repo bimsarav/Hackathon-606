@@ -86,6 +86,12 @@ def _pax(fid: str, pnr: str, key: str, ptype: str, o: str, d: str, dep: datetime
         "infants": 0,
         "ssr_code": None,
         "ssr_source": "synthetic",
+        "sales_channel": "Web",
+        # PNRB travels with an infant and its head b0000001 is a Silver member: a family account (loyalty sample)
+        "family_account_synthetic": pnr == "PNRB",
+        "family_head_synthetic": key == "b0000001",
+        "family_tier_synthetic": "Silver" if pnr == "PNRB" else None,
+        "family_priority_synthetic": "Low" if pnr == "PNRB" else None,
     }
     row.update(kw)
     return row
@@ -116,11 +122,23 @@ PAX = [
     *[_pax(F3, f"RTC{i}", f"u000000{i}", "AD", "LHE", "SHJ", t(14, 30)) for i in range(1, 5)],
 ]
 
+LOYALTY = {"g": ("Gold", "Medium", 132000), "b0000001": ("Silver", "Low", 61500)}  # key prefix or key
+
+
+def _loyalty(k: str) -> tuple[str, str, int] | None:
+    if k == "b0000001":
+        return LOYALTY[k]
+    return LOYALTY["g"] if k.startswith("g") else None
+
+
 CUSTOMERS = [
     {
         "customer_key": k,
-        "is_loyalty_member": k.startswith("g"),
-        "loyalty_tier_synthetic": "Gold" if k.startswith("g") else None,
+        "is_loyalty_member": _loyalty(k) is not None,
+        "loyalty_tier_synthetic": (_loyalty(k) or (None,))[0],
+        "loyalty_priority": (_loyalty(k) or (None, None))[1],
+        "loyalty_id_synthetic": f"G9{sum(map(ord, k)) * 104729 % 10**9:09d}" if _loyalty(k) else None,
+        "available_points_synthetic": (_loyalty(k) or (None, None, None))[2],
         "travel_frequency_band": "frequent" if k.startswith("g") else "occasional",
         "flown_segments_12m": 14 if k.startswith("g") else 1,
         "ambiguous_common_name": False,

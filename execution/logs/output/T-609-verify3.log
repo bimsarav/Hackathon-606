@@ -1,0 +1,10 @@
+ Image disruption-advisor-api:latest Built 
+ Container disruption-advisor-api-1 Healthy 
+ Container disruption-advisor-web-1 Started 
+ingest-1  | 2026-11-21 04:11:32,105 INFO reward preference model (synthetic history): AUC 0.7008 vs proxy rules 0.6654
+ingest-1  | 2026-11-21 04:11:32,171 INFO stage 4 done: {"offers": 300000, "auc": 0.7008}
+family accounts / pax / max size: [(3297, 11154, 9)]
+ids unique: [(True,)]
+export: [(44813, 8680, 3198)]
+== smoke 11/11
+  8 passed (1.3m)

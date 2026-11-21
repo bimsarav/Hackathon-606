@@ -1,0 +1,13 @@
+members/customers: [(44813, 174747)]
+tier | priority | members | points min/median/max
+   ('Basic', 'Lowest', 30847, 2000, 7000, 157000)
+   ('Silver', 'Low', 5314, 49000, 53990, 61500)
+   ('Gold', 'Medium', 3613, 109000, 126650, 139480)
+   ('Platinum', 'High', 5039, 277000, 317340, 404890)
+ids unique & format: [(False, True)]
+family accounts (bookings) / passengers in them / heads: [(3329, 11984, 3329)]
+family tier mix: [('Basic', 2302), ('Silver', 407), ('Platinum', 367), ('Gold', 253)]
+non-members lifted by family tier: [(2933,)]
+export rows: [(44813, 8778)]
+[('G9000019380', 'Infant', 'Family', False, 'Basic', 8530, 'Lowest', 4), ('G9000033465', 'Adult', 'Family', False, 'Basic', 6610, 'Lowest', 1), ('G9000093661', 'Child', 'Family', False, 'Basic', 7640, 'Lowest', 1)]
+-rw-r--r--. 1 opc opc 3028069 Nov 21 03:53 /tmp/loyalty_accounts_synthetic.csv

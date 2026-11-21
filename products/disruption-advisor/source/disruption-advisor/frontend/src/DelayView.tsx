@@ -3,6 +3,7 @@ import { api, type ConnectionRisk, type DelayResult, errorText, type Meta, type 
 import { aed, hhmm, minutes, num, utc } from "./format";
 import { AgentRecommendationPanel } from "./AgentRunView";
 import { RotationBoard } from "./RotationBoard";
+import { RewardPanel } from "./RewardPanel";
 import { OptionKindInfo, StrategyPanel } from "./StrategyPanel";
 import { Assumptions, DecisionBar, Explanation, PassengerTable, WeightsPanel } from "./Shared";
 
@@ -206,6 +207,8 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
         <PassengerTable scenario={scenario} rows={result.passengers} meta={meta} />
         {result.passengers.length > 0 && <DecisionBar scenario={scenario} target="rebooking" label="rebooking plan" />}
       </section>
+
+      <RewardPanel scenario={scenario} />
 
       <Assumptions items={result.assumptions} />
     </article>

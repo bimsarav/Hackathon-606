@@ -15,6 +15,8 @@ from typing import Any
 
 import duckdb
 
+from app.ml.reward_pref import RewardModel
+
 TABLES = ("flights", "pax_segments", "customers", "aircraft", "mct", "airports", "booking_classes")
 RISK_TABLES = ("flight_risk", "connection_risk")  # phase 2 (ingest stage 3); optional so older data still loads
 
@@ -68,6 +70,9 @@ class OpsStore:
             self._con.execute("CREATE INDEX idx_conn_in ON connection_risk (inbound_flight_id)")
         card = ops_dir / "model_card.json"
         self.model_card: dict[str, Any] = json.loads(card.read_text()) if card.exists() else {}
+        self.reward_model = RewardModel.load(ops_dir)  # phase 5 preference model; None = proxy rules
+        week = ops_dir / "last_week.json"
+        self.last_week: dict[str, Any] = json.loads(week.read_text()) if week.exists() else {}
         report = ops_dir / "ingest_report.json"
         self.report: dict[str, Any] = json.loads(report.read_text()) if report.exists() else {}
 
@@ -141,8 +146,11 @@ class OpsStore:
         "p.flight_id, p.pnr, p.customer_key, p.pax_type, p.origin, p.destination, "
         "p.dep_utc, p.booking_code, p.revenue_type, p.fare_family_synthetic, p.fare, p.ancillaries, "
         "p.baggage_kg, p.has_meal, p.has_seat, p.pnr_size, p.adults, p.children, p.infants, p.ssr_code, "
-        "p.ssr_source, p.passenger_id, p.passport_number_synthetic, p.national_id_synthetic, p.identity_rule, "
-        "c.is_loyalty_member, c.loyalty_tier_synthetic, c.travel_frequency_band, "
+        "p.ssr_source, p.sales_channel, p.passenger_id, "
+        "p.passport_number_synthetic, p.national_id_synthetic, p.identity_rule, "
+        "p.family_account_synthetic, p.family_head_synthetic, p.family_tier_synthetic, "
+        "c.is_loyalty_member, c.loyalty_tier_synthetic, c.loyalty_priority, c.loyalty_id_synthetic, "
+        "c.available_points_synthetic, c.travel_frequency_band, "
         "c.flown_segments_12m, c.ambiguous_common_name"
     )
 

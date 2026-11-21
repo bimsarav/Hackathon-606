@@ -1,6 +1,7 @@
 """Phase 2 delay-risk model (ADR 0008): curve maths, learning a planted pattern, outputs and the risk API."""
 
 import json
+from datetime import timedelta
 from pathlib import Path
 
 import duckdb
@@ -105,6 +106,32 @@ def test_training_is_deterministic(ops: Path, tmp_path: Path) -> None:
     assert first == second
 
 
+def test_last_week_replays_unseen_flights_and_matches_the_actuals(ops: Path) -> None:
+    week = json.loads((ops / "last_week.json").read_text())
+    con = duckdb.connect()
+    latest = con.execute(
+        f"SELECT max(std) FROM '{ops}/history_flights.parquet' WHERE operated AND NOT coalesce(diverted, FALSE)"
+    ).fetchone()
+    assert latest is not None
+    end = latest[0]
+    start = end - timedelta(days=dr.LAST_WEEK_DAYS)
+    counts = con.execute(
+        f"""SELECT count(*), count(*) FILTER (WHERE date_diff('minute', std, atd) >= 60)
+            FROM '{ops}/history_flights.parquet'
+            WHERE operated AND NOT coalesce(diverted, FALSE) AND std >= ?""",
+        [start],
+    ).fetchone()
+    assert counts is not None
+    n, late = counts
+    assert week["flights"] == n  # every flight of the week, no more
+    flag = week["flag_60"]
+    assert flag["true_positive"] + flag["false_negative"] == late  # the real 60+ minute delays, all accounted for
+    assert sum(flag[k] for k in ("true_positive", "false_positive", "false_negative", "true_negative")) == n
+    assert week["rows_total"] == flag["true_positive"] + flag["false_positive"] + flag["false_negative"]
+    assert {r["outcome"] for r in week["rows"]} <= {"hit", "false_alarm", "missed"}
+    assert all((r["band"] == "low") == (r["outcome"] == "missed") for r in week["rows"])
+
+
 def test_watchlist_and_flight_risk_api(client: TestClient, auth: dict[str, str]) -> None:
     body = client.get("/api/v1/risk/watchlist?band=all&sort=delay", headers=auth).json()
     assert body["flights"]
@@ -121,3 +148,7 @@ def test_watchlist_and_flight_risk_api(client: TestClient, auth: dict[str, str])
     assert client.get("/api/v1/risk/flights/G9999_202611210000", headers=auth).status_code == 404
     assert client.get("/api/v1/risk/flights/bad id", headers=auth).status_code == 422
     assert client.get("/api/v1/risk/watchlist").status_code == 401
+    week = client.get("/api/v1/risk/last-week", headers=auth).json()
+    assert week["flights"] > 0
+    assert "flag_60" in week
+    assert client.get("/api/v1/risk/last-week").status_code == 401

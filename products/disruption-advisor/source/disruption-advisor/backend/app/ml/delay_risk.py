@@ -40,30 +40,32 @@ log = logging.getLogger("ingest.delay_risk")
 THRESHOLDS = (5, 15, 30, 60, 120, 180)
 REASON_THRESHOLD = 60  # reasons explain the risk of a delay of an hour or more
 TEST_DAYS = 28
-HALF_LIFE_DAYS = 60
+HALF_LIFE_DAYS = 109  # tuned (T-511, docs/testing/model-selection.md)
+LAST_WEEK_DAYS = 7
 LAG_FROM, LAG_TO = 35, 7  # recent delay rates: days [flight - 35, flight - 7], so they are known 7 days ahead
 MIN_CONNECTION, MAX_CONNECTION = 15, 20 * 60  # minutes (decision Q8)
 HUB_OFFSET_HOURS = 4  # the aircraft day is counted in hub time (SHJ, UTC+4)
 BANDS = ((0.30, "high"), (0.15, "medium"))  # on P(delay >= 60 min); base rate about 10%
-# Hyperparameters tuned with Optuna (60 trials, T-511, 2026-11-21).
-# Primary metric: AUC on 60-min threshold (the main operational band).
-# Result: AUC-60 0.7677 → 0.7887 (+2.1 pp) over the previous defaults.
-PARAMS: dict[str, Any] = {
+PARAMS: dict[
+    str, Any
+] = {  # tuned with Optuna on time-ordered validation blocks (T-511, docs/testing/model-selection.md)
     "objective": "binary",
-    "learning_rate": 0.0137,
-    "num_leaves": 93,
-    "min_data_in_leaf": 184,
-    "feature_fraction": 0.562,
-    "lambda_l2": 0.164,
-    "bagging_fraction": 0.576,
-    "bagging_freq": 4,
+    "learning_rate": 0.0391,
+    "num_leaves": 11,
+    "min_data_in_leaf": 60,
+    "feature_fraction": 0.99,
+    "bagging_fraction": 0.856,
+    "bagging_freq": 1,
+    "lambda_l2": 17.25,
+    "cat_smooth": 14.7,
+    "min_data_per_group": 79,
     "seed": 7,
     "deterministic": True,
     "force_row_wise": True,
     "num_threads": 4,
     "verbose": -1,
 }
-ROUNDS = 401
+ROUNDS = 120
 CATEGORICAL = ("origin", "destination", "prev_origin", "aircraft_model")
 NUMERIC = (
     "hour_local",
@@ -556,6 +558,66 @@ def _connection_backtest(
     return out
 
 
+def _last_week(con: duckdb.DuckDBPyConnection, ops: Path, frame: Frame, hist: np.ndarray) -> dict[str, Any]:
+    """Replay of the last LAST_WEEK_DAYS days of history: a model trained only on the flights before that week
+    predicts each flight (features known 7 days ahead, as in production), then the predictions are compared with
+    what really happened. Honest by construction: the model never saw these flights or their delay rates."""
+    end = frame.std[hist].max()
+    start = end - np.timedelta64(LAST_WEEK_DAYS, "D")
+    train, test = hist & (frame.std < start), hist & (frame.std >= start)
+    p = DelayCurve(frame, train, start).predict(frame.x[test])
+    j15, j60 = THRESHOLDS.index(15), THRESHOLDS.index(60)
+    delay = frame.delay[test]
+    y15, y60 = (delay >= 15).astype(int), (delay >= REASON_THRESHOLD).astype(int)
+    p15, p60 = p[:, j15], p[:, j60]
+    band = np.array([_band(float(v)) for v in p60])
+    flagged = band != "low"
+    names = dict(con.execute(f"SELECT flight_id, flight_number FROM '{ops}/history_flights.parquet'").fetchall())
+    rows: list[dict[str, Any]] = []
+    for k, i in enumerate(np.flatnonzero(test)):
+        outcome = (
+            ("hit" if y60[k] else "false_alarm") if flagged[k] else ("missed" if y60[k] else None)
+        )  # None: correctly quiet
+        if outcome is None:
+            continue
+        fid = str(frame.flight_id[i])
+        rows.append(
+            {
+                "flight_id": fid,
+                "flight_number": names.get(fid),
+                "origin": str(frame.raw["origin"][i]),
+                "destination": str(frame.raw["destination"][i]),
+                "std": str(frame.std[i]),
+                "p_15": round(float(p15[k]), 3),
+                "p_60": round(float(p60[k]), 3),
+                "band": str(band[k]),
+                "actual_delay_minutes": int(delay[k]),
+                "outcome": outcome,
+            }
+        )
+    rows.sort(key=lambda r: (-r["actual_delay_minutes"], r["flight_id"]))
+    two = 0 < y60.sum() < len(y60)
+    return {
+        "from": str(start.astype("datetime64[D]")),
+        "to": str(end.astype("datetime64[D]")),
+        "trained_on": f"flights before {start.astype('datetime64[D]')!s} ({int(train.sum())})",
+        "flights": int(test.sum()),
+        "late_15_rate": round(float(y15.mean()), 4),
+        "late_60_rate": round(float(y60.mean()), 4),
+        "auc_15": round(float(auc(y15, p15)), 4) if 0 < y15.sum() < len(y15) else None,
+        "auc_60": round(float(auc(y60, p60)), 4) if two else None,
+        "brier_60": round(float(brier(y60, p60)), 4),
+        "flag_60": {"label": "flagged = high or medium band", **confusion(y60, p60, BANDS[1][0])},
+        "flag_15": {"label": "flagged = 50% or more chance of 15+ min", **confusion(y15, p15, 0.5)},
+        "high_band": {
+            "flights": int((band == "high").sum()),
+            "late_60": int(((band == "high") & (y60 == 1)).sum()),
+        },
+        "rows": rows[:150],
+        "rows_total": len(rows),
+    }
+
+
 def run(ops: Path, default_mct: int = 50) -> dict[str, Any]:
     """Train, evaluate, score the window; write flight_risk, connection_risk and the model card."""
     con = duckdb.connect()
@@ -593,6 +655,8 @@ def run(ops: Path, default_mct: int = 50) -> dict[str, Any]:
         cutoffs = [(c, label) for k, tt, c, label in OPERATING_POINTS if (k, tt) == (kind, t)]
         classification[f"{kind}_{t}"] = _classification(y_k, p_k, cutoffs)
     rolling = _rolling(frame, hist)
+    last_week = _last_week(con, ops, frame, hist)
+    (ops / "last_week.json").write_text(json.dumps(last_week, indent=2))
     test_rows = np.flatnonzero(test_e)
     connection_check = _connection_backtest(
         con, ops, frame, test_rows, arrival_eval.predict(frame.x[test_rows]), p_test, default_mct
@@ -629,7 +693,8 @@ def run(ops: Path, default_mct: int = 50) -> dict[str, Any]:
 
     card = {
         "model": (
-            f"LightGBM binary classifier per threshold, recency-weighted (half-life {HALF_LIFE_DAYS} days), ADR 0008"
+            f"LightGBM binary classifier per threshold, recency-weighted (half-life {HALF_LIFE_DAYS} days), "
+            "hyperparameters tuned (ADR 0008)"
         ),
         "versions": {"lightgbm": lgb.__version__},
         "trained_at": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),

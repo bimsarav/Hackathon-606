@@ -75,7 +75,7 @@ test("phase 2: delay watchlist ranks flights, shows reasons and opens a delay sc
   await signIn(page);
   await page.getByRole("button", { name: /Delay watchlist/ }).click();
   await expect(page.getByRole("heading", { name: /Delay watchlist/ })).toBeVisible();
-  await page.getByLabel("Risk").selectOption("all");
+  await page.getByRole("combobox", { name: /^Risk/ }).selectOption("all");
   const table = page.getByRole("table", { name: "Watchlist flights" });
   await expect(table).toBeVisible();
   await table.locator("tbody tr.clickable").first().locator("button.link").click();
@@ -117,4 +117,32 @@ test("phase 3: the agent investigates a flight and its recommendation opens for 
   await page.getByRole("button", { name: "Open scenario to review and approve" }).click();
   await expect(page.getByRole("heading", { name: "Recovery options compared" })).toBeVisible();
   await expect(page.getByRole("heading", { name: /Agent recommendation/ })).toBeVisible();
+});
+
+test("phase 2: the 7-day tab shows last week's predictions against what happened, instead of the scenario launcher", async ({
+  page,
+}) => {
+  await signIn(page);
+  await expect(page.getByRole("heading", { name: "New scenario" })).toBeVisible();
+  await page.getByRole("button", { name: /Delay watchlist/ }).click();
+  await expect(page.getByRole("heading", { name: "Last week: predicted vs actual" })).toBeVisible();
+  await expect(page.getByText(/of flights called right/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "New scenario" })).toBeHidden();
+  await expect(page.getByRole("heading", { name: "Recent scenarios" })).toBeHidden();
+  await page.getByRole("button", { name: "Scenario", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "New scenario" })).toBeVisible();
+});
+
+test("phase 5: a budget gives a reward plan from the preference model, and the plan can be approved", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("tab", { name: "A · Delay" }).click();
+  await page.locator(".preset-list .preset").first().click();
+  await expect(page.getByRole("heading", { name: "Passenger rewards (goodwill)" })).toBeVisible();
+  await page.getByLabel("Budget (AED)").fill("4000");
+  await page.getByRole("button", { name: "Recommend rewards" }).click();
+  await expect(page.getByText(/trained on simulated redemption history/)).toBeVisible();
+  await expect(page.getByText(/Planned spend/)).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: /Recommended reward/ })).toBeVisible();
+  await page.getByRole("button", { name: /Approve reward plan/ }).click();
+  await expect(page.locator("section.rewards .audit")).toContainText("APPROVE");
 });

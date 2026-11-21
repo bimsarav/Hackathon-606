@@ -1,0 +1,24 @@
+synced
+rollback tag: pre-202611210350
+-rw-r--r--. 1 opc opc 1579214 Nov 21 03:50 /home/opc/backups/disruption-advisor/pre-202611210350.dump
+ Image disruption-advisor-api:latest Built 
+ Image disruption-advisor-web:latest Built 
+== up 03:51:37
+ Container disruption-advisor-api-1 Waiting 
+ Container disruption-advisor-api-1 Healthy 
+ Container disruption-advisor-web-1 Starting 
+ Container disruption-advisor-web-1 Started 
+== state 03:52:43
+api Up 6 seconds (healthy)
+db Up 8 hours (healthy)
+extracts-db Exited (0) 5 seconds ago
+ingest Exited (0) 6 seconds ago
+migrate Exited (0) 39 seconds ago
+web Up Less than a second (health: starting)
+ingest-1  | 2026-11-21 03:52:09,778 INFO stage 2 done: {"airports": 142, "aircraft": 81, "booking_classes": 388, "customers": 174723, "pax_segments": 299417, "flights": 2614, "history_flights": 63322, "mct": 39}
+ingest-1  | 2026-11-21 03:52:10,175 INFO demo scenario added: {"demo_flights": 9, "demo_pax_segments": 48, "demo_customers": 24, "demo_mct": 1}
+ingest-1  | 2026-11-21 03:52:32,719 INFO delay risk: test AUC(60) 0.7596 vs baseline 0.6765
+ingest-1  | 2026-11-21 03:52:32,752 INFO stage 3 done: {"scored": 2623, "connections": 88434, "auc_60": 0.7596}
+ingest-1  | 2026-11-21 03:52:36,947 INFO reward preference model (synthetic history): AUC 0.7008 vs proxy rules 0.6654
+ingest-1  | 2026-11-21 03:52:37,011 INFO stage 4 done: {"offers": 300000, "auc": 0.7008}
+exit=0
