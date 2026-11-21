@@ -1,0 +1,13 @@
+== tag pre-202611211820 (dump pre-202611211754 still current: no schema change)
+tagged
+== ship 18:20:26 (git b69d5da)
+extracted
+ Container disruption-advisor-ingest-1 Started 
+ Container disruption-advisor-api-1 Healthy 
+ Container disruption-advisor-extracts-db-1 Started 
+ Container disruption-advisor-web-1 Started 
+== up 18:20:38
+disruption-advisor-web-1 80/tcp, 0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp Up 2 seconds (health: starting)
+disruption-advisor-api-1 0.0.0.0:8888->8000/tcp, [::]:8888->8000/tcp Up 11 minutes (healthy)
+disruption-advisor-db-1 5432/tcp Up 8 hours (healthy)
+15

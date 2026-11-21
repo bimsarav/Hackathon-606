@@ -1,0 +1,8 @@
+occ GET edit: 403
+evaluator GET: 200 168 edited False
+before (100, 127350.0)
+save (200, {'saved': True, 'flight_id': 'G9519_202611210200'})
+after (60, 112550.0)
+reset (200, {'reset': True, 'flight_id': 'G9519_202611210200'})
+after reset (100, 127350.0)
+edits left []

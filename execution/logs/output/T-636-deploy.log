@@ -24,3 +24,20 @@ settings.env.example local=a50dfbf5bb2f server=a50dfbf5bb2f
 disruption-advisor-api-1 Up 31 seconds (healthy) 0.0.0.0:8888->8000/tcp, [::]:8888->8000/tcp
 disruption-advisor-db-1 Up 8 hours (healthy) 5432/tcp
 disruption-advisor-web-1 Up 25 seconds (healthy) 80/tcp, 0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
+== ship 17:57:35 (git b9f6486)
+extracted
+ Container disruption-advisor-migrate-1 Started 
+ Container disruption-advisor-ingest-1 Started 
+ Container disruption-advisor-extracts-db-1 Started 
+ Container disruption-advisor-api-1 Started 
+ Container disruption-advisor-api-1 Healthy 
+ Container disruption-advisor-web-1 Started 
+ingest-1  | 2026-11-21 17:59:17,571 INFO stage 2: building the operating picture
+ingest-1  | 2026-11-21 17:59:21,616 INFO stage 2 done: {"airports": 142, "aircraft": 81, "sold_connections": 10413, "booking_classes": 388, "booking_class_levels": 84, "customers": 174723, "pax_segments": 299417, "flights": 2614, "history_flights": 63322, "mct": 39, "crew_flights": 11107, "crew_fdp_estimates": 391, "crew_duties_analysed": 35021}
+ingest-1  | 2026-11-21 17:59:53,680 INFO stage 3 done: {"scored": 2623, "connections": 88434, "auc_60": 0.7699}
+ingest-1  | 2026-11-21 17:59:53,756 INFO stage 3b done: {"pairs": 1656, "excluded": 3}
+ingest-1  | 2026-11-21 17:59:58,691 INFO stage 4 done: {"offers": 300000, "auc": 0.7018}
+== up 18:00:05
+disruption-advisor-api:latest 2026-11-21 17:58:17 +0000 GMT
+disruption-advisor-web:latest 2026-11-21 17:57:56 +0000 GMT
+11

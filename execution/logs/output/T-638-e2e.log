@@ -1,0 +1,17 @@
+
+Running 11 tests using 1 worker
+
+  ✓   1 [chromium] › tests/advisor.spec.ts:14:1 › wrong password is rejected and the API needs a token (510ms)
+  ✓   2 [chromium] › tests/advisor.spec.ts:23:1 › scenario A: a delay is assessed, options compared, recommendation approved (20.2s)
+  ✓   3 [chromium] › tests/advisor.spec.ts:54:1 › scenario B: a cancellation ranks passengers by tier and re-runs with new weights (3.7s)
+  ✓   4 [chromium] › tests/advisor.spec.ts:76:1 › phase 2: delay watchlist ranks flights, shows reasons and opens a delay scenario (8.0s)
+  ✓   5 [chromium] › tests/advisor.spec.ts:89:1 › phase 3: strategies switch the recommendation (14.7s)
+  ✓   6 [chromium] › tests/advisor.spec.ts:106:1 › phase 3: the agent investigates a flight and its recommendation opens for approval (27.0s)
+  ✓   7 [chromium] › tests/advisor.spec.ts:122:1 › phase 2: the 7-day page shows last month's cascade check and no scenario launcher (743ms)
+  ✓   8 [chromium] › tests/advisor.spec.ts:138:1 › phase 5: a budget gives a reward plan from the preference model, and the plan can be approved (6.5s)
+  ✓   9 [chromium] › tests/evaluator.spec.ts:27:1 › the OCC role does not see the Model Card and Test data views, and the API refuses them (377ms)
+  ✓  10 [chromium] › tests/evaluator.spec.ts:40:1 › the evaluator reads the model evidence, uploads two flights, analyses one and removes them (12.4s)
+  ✓  11 [chromium] › tests/evaluator.spec.ts:94:1 › a bad flights sheet is rejected with the row and column, and nothing is added (3.6s)
+
+  11 passed (1.6m)
+== finished 18:34:56
