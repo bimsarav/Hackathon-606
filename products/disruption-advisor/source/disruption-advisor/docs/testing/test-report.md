@@ -234,7 +234,7 @@ The new Playwright tests have not been run locally (no Playwright or Docker on t
 
 ## Production check, UI polish release (21 Nov 2026, 10:49Z, heshawa 12454fb)
 - Smoke 11/11; public address 200; OCC and PCU get 403 on `/risk/model`, `/risk/model-docs`, `/risk/reward-model` and `/test-data`, the evaluator 200.
-- **Playwright on the server: 11/11 passed (1.8 min)**, against the renamed headings ('Recovery options', 'Why?'), the launcher that folds its lists away after a flight is chosen, and the teammates' breadcrumb and Recent Searches navigation.
+- **Playwright on the server: 11/11 passed (1.7 min, finished 10:51:27Z)**, against the renamed headings ('Recovery options', 'Why?'), the launcher that folds its lists away after a flight is chosen, and the teammates' breadcrumb and Recent Searches navigation.
   The evaluator test left no test data behind.
 - Frontend unit tests 40/40 before the deploy (Launcher fold, role views, Model Card sections, test data page). Backend unit tests were not run against Postgres here (no Docker).
 - The server had been redeployed by a teammate at 10:19Z (a63dc8d, crew duty check); it matched the repository exactly, so nothing was lost. Redeploys by several people keep landing on this one server: compare the server tree with the repository first (DEPLOYMENT_GUIDE).
