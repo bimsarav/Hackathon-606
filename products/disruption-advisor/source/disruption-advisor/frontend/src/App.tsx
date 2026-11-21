@@ -124,15 +124,7 @@ function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
         <div className="login-hero-copy">
           <p className="login-hero-eyebrow">Disruption management · OCC &amp; PCU</p>
           <h2 className="login-hero-title">Recover the day before the delay spreads.</h2>
-          <p className="login-hero-lead">
-            See the knock-on effect along the whole rotation, compare every recovery option by cost and protect the
-            passengers who need it most. A person approves every decision.
-          </p>
-          <ul className="login-hero-points">
-            <li><span aria-hidden="true">◎</span><div><strong>Predict</strong> delay risk for every flight in the next 7 days, with reasons</div></li>
-            <li><span aria-hidden="true">⇄</span><div><strong>Compare</strong> swaps, cancellations and holds side by side, by cost and passengers</div></li>
-            <li><span aria-hidden="true">✚</span><div><strong>Protect</strong> care passengers, connections and crew duty limits; rebook within real seats</div></li>
-          </ul>
+          <p className="login-hero-lead">Predict, compare and protect: every decision approved by a person.</p>
         </div>
         <svg className="login-hero-route" viewBox="0 0 600 160" aria-hidden="true" focusable="false">
           <path d="M20 140 C 180 20, 420 20, 580 120" fill="none" strokeDasharray="6 8" />
@@ -141,14 +133,12 @@ function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
           <text x="580" y="108" textAnchor="middle">KHI</text>
           <g transform="translate(300 52) rotate(8)"><path d="M-14 0 L14 0 M0 -3 L6 0 L0 3 M-8 0 L-12 -6 M-8 0 L-12 6" /></g>
         </svg>
-        <p className="login-hero-foot">Recommend-only · decisions are recorded with who and when</p>
       </section>
 
       {/* Right: sign in */}
       <section className="login-panel" aria-labelledby="login-title">
         <div className="login-form-card">
           <h1 id="login-title">Sign in</h1>
-          <p className="muted">Use your operations account.</p>
           <form onSubmit={onSubmit} aria-describedby={error ? "login-error" : undefined}>
             <label htmlFor="username">User name</label>
             <input id="username" autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} required autoFocus />
@@ -168,10 +158,6 @@ function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
               {busy ? "Signing in…" : "Sign in"}
             </button>
           </form>
-          <p className="login-roles small muted">
-            Roles: <strong>OCC</strong> and <strong>PCU</strong> analyse and approve; <strong>Evaluator</strong> also sees the
-            Model Card and Test data.
-          </p>
         </div>
       </section>
     </main>
