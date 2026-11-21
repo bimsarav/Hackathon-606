@@ -13,8 +13,8 @@ import {
 import { CancelView } from "./CancelView";
 import { DelayView } from "./DelayView";
 import { Launcher } from "./Launcher";
-import { CascadePanel } from "./CascadePanel";
 import { ModelCardView } from "./ModelCardView";
+import { RewardPanel } from "./RewardPanel";
 import { WatchlistView } from "./WatchlistView";
 
 const STORAGE_KEY = "disruption-advisor-session";
@@ -429,7 +429,7 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
           {/* ── Delay Watchlist ───────────────────────────── */}
           {view === "watchlist" && (
             <>
-              <LastWeekPanel />
+              {scenario && <RewardPanel scenario={scenario} />}
               {meta && (
                 <WatchlistView
                   busy={busy}

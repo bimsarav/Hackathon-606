@@ -69,6 +69,18 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
   const [searchPageSize, setSearchPageSize] = useState<number>(5);
   const [presetPage, setPresetPage] = useState(0);
   const [presetPageSize, setPresetPageSize] = useState<number>(5);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
+  function inRange(std: string): boolean {
+    const day = std.slice(0, 10); // YYYY-MM-DD in UTC
+    if (fromDate && day < fromDate) return false;
+    if (toDate && day > toDate) return false;
+    return true;
+  }
+
+  function handleFromDate(v: string) { setFromDate(v); setSearchPage(0); setPresetPage(0); }
+  function handleToDate(v: string)   { setToDate(v);   setSearchPage(0); setPresetPage(0); }
 
   // Keep the slider in step with the scenario on screen (e.g. one reopened from history).
   useEffect(() => {
@@ -118,12 +130,27 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
           onChange={(e) => setQuery(e.target.value.replace(/[^A-Za-z0-9-]/g, ""))} />
         <button type="submit">Search</button>
       </form>
+      {/* Departure date range filter */}
+      <div className="date-range-row">
+        <span className="date-range-label">Departure (UTC)</span>
+        <label className="visually-hidden" htmlFor="dep-from">From</label>
+        <input id="dep-from" type="date" value={fromDate} onChange={(e) => handleFromDate(e.target.value)} />
+        <span className="date-range-sep">–</span>
+        <label className="visually-hidden" htmlFor="dep-to">To</label>
+        <input id="dep-to" type="date" value={toDate} onChange={(e) => handleToDate(e.target.value)} />
+        {(fromDate || toDate) && (
+          <button type="button" className="date-range-clear" onClick={() => { handleFromDate(""); handleToDate(""); }}>✕</button>
+        )}
+      </div>
+
       {searchError && <p className="error">{searchError}</p>}
       {results && results.length === 0 && <p className="muted small">No flights match.</p>}
-      {results && results.length > 0 && (
+      {results && results.length > 0 && (() => {
+        const filtered = results.filter((f) => inRange(f.std));
+        return (
         <>
           <ul className="preset-list">
-            {results.slice(searchPage * searchPageSize, (searchPage + 1) * searchPageSize).map((f) => (
+            {filtered.slice(searchPage * searchPageSize, (searchPage + 1) * searchPageSize).map((f) => (
               <li key={f.flight_id}>
                 <button type="button" className="preset" disabled={busy} onClick={() => start(f.flight_id)}>
                   <span className="preset-title">
@@ -137,10 +164,12 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
               </li>
             ))}
           </ul>
-          <Paginator total={results.length} page={searchPage} pageSize={searchPageSize}
+          <Paginator total={filtered.length} page={searchPage} pageSize={searchPageSize}
             onPage={setSearchPage} onPageSize={setSearchPageSize} />
+          {filtered.length === 0 && <p className="muted small">No flights in that date range.</p>}
         </>
-      )}
+        );
+      })()}
 
       {!hideTabNav && (
         <div className="tabs" role="tablist" aria-label="Disruption type" style={{ marginTop: "0.75rem" }}>
@@ -220,7 +249,7 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
       {presetError && <p className="error">{presetError}</p>}
       {!presets && !presetError && <p className="muted small">Finding suitable flights…</p>}
       {presets && tab !== "CANCEL" && (() => {
-        const items = presets.delay;
+        const items = presets.delay.filter((p) => inRange(p.std));
         const page = presetPage;
         const ps = presetPageSize;
         return (
@@ -247,7 +276,7 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
         );
       })()}
       {presets && tab === "CANCEL" && (() => {
-        const items = presets.cancel;
+        const items = presets.cancel.filter((p) => inRange(p.std));
         const page = presetPage;
         const ps = presetPageSize;
         return (
