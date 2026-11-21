@@ -1,7 +1,7 @@
 import { type FormEvent, useState } from "react";
 import { api, errorText, type RewardPlan, type Scenario } from "./api";
 import { aed, num } from "./format";
-import { DecisionBar } from "./Shared";
+import { DecisionBar, TIER_LABEL } from "./Shared";
 
 const TYPE_ICON: Record<string, string> = { MEAL: "Meal", VOUCHER: "Voucher", LOUNGE: "Lounge", MILES: "Miles", TICKET: "Ticket" };
 
@@ -12,6 +12,7 @@ export function RewardPanel({ scenario }: { scenario: Scenario }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
+  const [open, setOpen] = useState<string | null>(null);
 
   async function run(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -87,34 +88,76 @@ export function RewardPanel({ scenario }: { scenario: Scenario }) {
             <p className="muted">No passenger qualifies at this budget.</p>
           ) : (
             <div className="table-wrap">
-              <table>
+              <table className="pax">
+                <caption className="visually-hidden">Recommended goodwill reward per passenger</caption>
                 <thead>
                   <tr>
+                    <th scope="col">#</th>
                     <th scope="col">Passenger</th>
-                    <th scope="col" className="num">Severity</th>
-                    <th scope="col" className="num">Value</th>
                     <th scope="col">Recommended reward</th>
-                    <th scope="col" className="num">AED</th>
-                    <th scope="col">Why (chance they accept)</th>
+                    <th scope="col" className="num">Reward value (AED)</th>
+                    <th scope="col">
+                      <span className="visually-hidden">Details</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {shown.map((r) => (
-                    <tr key={`${r.pnr}-${r.customer_key}`}>
-                      <td>
-                        {r.passenger_id ?? r.customer_key}
-                        <div className="small muted">{r.route}</div>
-                      </td>
-                      <td className="num" title={r.severity_reasons.join("; ")}>{r.severity}</td>
-                      <td className="num">{r.value}</td>
-                      <td>
-                        {r.reward?.detail}
-                        {r.downgraded_for_budget && <div className="small muted">scaled down to fit the budget</div>}
-                      </td>
-                      <td className="num">{num(r.reward?.cost_aed ?? 0)}</td>
-                      <td className="small">{r.why.length ? r.why.join(", ") : "best fit for the amount"}</td>
-                    </tr>
-                  ))}
+                  {shown.map((r, i) => {
+                    const key = `${r.pnr}:${r.customer_key}`;
+                    return [
+                      <tr key={key}>
+                        <td className="num">{i + 1}</td>
+                        <td>
+                          <strong>{r.passenger_id ?? r.customer_key}</strong>
+                          <span className="small muted block">
+                            {r.pnr} · {r.route}
+                          </span>
+                        </td>
+                        <td>
+                          <strong>{r.reward?.label}</strong>
+                          <span className="small muted block">{r.reward?.detail}</span>
+                        </td>
+                        <td className="num">
+                          <strong>{num(r.reward?.cost_aed ?? 0)}</strong>
+                        </td>
+                        <td>
+                          <button type="button" className="link" aria-expanded={open === key} onClick={() => setOpen(open === key ? null : key)}>
+                            {open === key ? "Hide" : "More data"}
+                          </button>
+                        </td>
+                      </tr>,
+                      open === key && (
+                        <tr key={`${key}-detail`} className="detail">
+                          <td colSpan={5}>
+                            <p>
+                              <span className={`tier tier-${r.tier}`}>{TIER_LABEL[r.tier] ?? r.tier}</span> Disruption severity{" "}
+                              <span className="score">
+                                <span className="score-bar" style={{ width: `${Math.min(r.severity, 100)}%` }} />
+                                <span className="score-num">{r.severity}</span>
+                              </span>{" "}
+                              · passenger value <strong>{r.value}</strong>/100 · target <strong>{aed(r.target_aed)}</strong>
+                              {r.reward?.acceptance != null && (
+                                <>
+                                  {" "}
+                                  · chance they accept <strong>{Math.round(r.reward.acceptance * 100)}%</strong>
+                                </>
+                              )}
+                            </p>
+                            <ul className="contrib">
+                              {r.severity_reasons.map((x) => (
+                                <li key={x}>{x}</li>
+                              ))}
+                            </ul>
+                            <p className="small muted">
+                              Why this reward: {r.why.length ? r.why.join(", ") : "best fit for the amount"}.
+                              {r.preferred.length > 0 && ` Likeliest to take: ${r.preferred.map((x) => `${x.label} ${Math.round(x.score * 100)}%`).join(", ")}.`}
+                              {r.downgraded_for_budget ? " Scaled down to fit the budget." : ""}
+                            </p>
+                          </td>
+                        </tr>
+                      ),
+                    ];
+                  })}
                 </tbody>
               </table>
             </div>

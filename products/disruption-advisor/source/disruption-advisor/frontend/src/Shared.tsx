@@ -146,7 +146,7 @@ export function WeightsPanel({ meta, scenario, onUpdate }: { meta: Meta; scenari
   );
 }
 
-const TIER_LABEL: Record<number, string> = { 1: "Care", 2: "Urgent", 3: "Standard" };
+export const TIER_LABEL: Record<number, string> = { 1: "Care", 2: "Urgent", 3: "Standard" };
 
 export function PassengerTable({ scenario, rows, meta }: { scenario: Scenario; rows: PassengerRow[]; meta: Meta }) {
   const [open, setOpen] = useState<string | null>(null);

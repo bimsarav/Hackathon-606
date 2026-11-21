@@ -200,8 +200,12 @@ describe("WatchlistView", () => {
     render(<RewardPanel scenario={{ id: "s1", flight_id: "G9519_202611210200", kind: "DELAY", delay_minutes: 120, weights: {}, result: {}, created_by: "x", created_at: "" } as unknown as Scenario} />);
     await userEvent.click(screen.getByRole("button", { name: "Recommend rewards" }));
     expect(await screen.findByText("AED 200 shopping voucher")).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "Reward value (AED)" })).toBeInTheDocument();
     expect(screen.getByText(/covers 42% of the full plan/)).toBeInTheDocument();
-    expect(screen.getByText("books online or in the app")).toBeInTheDocument();
+    expect(screen.queryByText(/books online or in the app/)).not.toBeInTheDocument(); // behind "More data"
+    await userEvent.click(screen.getByRole("button", { name: "More data" }));
+    expect(screen.getByText(/books online or in the app/)).toBeInTheDocument();
+    expect(screen.getByText(/passenger value/)).toBeInTheDocument();
   });
 
   it("switches one panel between the connection passengers and the rewards", async () => {
