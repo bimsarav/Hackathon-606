@@ -247,3 +247,7 @@ The new Playwright tests have not been run locally (no Playwright or Docker on t
 ## Production check, Flight Delay page redesign (21 Nov 2026, 14:54Z, heshawa d56398b)
 - Smoke 11/11; the served bundle contains the new layout; **Playwright 11/11 (1.6 min)**; frontend unit tests 45/45 (glance tiles, folding, passenger boxes, crew section, compact search).
 - Crew FDP data: the roster covers 1 Oct to 20 Nov 2026, so roster-checked flights in the operating window are on 20 Nov only (217 flights); later flights use an estimated duty where possible; the synthetic demo flights (G99xx) have none and now say "no crew data for this flight". G9502 (20 Nov 18:35) with a 30 to 420 minute delay shows a roster breach.
+
+## Production check, search redesign (21 Nov 2026, 15:17Z, heshawa 7c990a9)
+- Smoke 11/11; served bundle checked; **Playwright 11/11 (1.7 min)**; frontend 46 passed, 1 skipped (advanced search is hidden for now; its test is skipped until it returns).
+- The build of b677204 failed on the server: a test used a Playwright-only option (`exact`) in Testing Library, which the type check in `npm run build` rejects. The site kept the previous build; fixed in 7c990a9. Always run `tsc --noEmit` after editing tests, not only `vitest`.

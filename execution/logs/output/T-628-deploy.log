@@ -1,0 +1,10 @@
+== ship 15:16:56 (git 7c990a9)
+extracted
+ Container disruption-advisor-migrate-1 Started 
+ Container disruption-advisor-ingest-1 Started 
+ Container disruption-advisor-api-1 Healthy 
+ Container disruption-advisor-extracts-db-1 Started 
+ Container disruption-advisor-web-1 Started 
+== up 15:17:06
+disruption-advisor-web:latest 2026-11-21 15:17:02 +0000 GMT
+11
