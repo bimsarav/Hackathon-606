@@ -56,6 +56,22 @@ describe("test data page", () => {
     expect(screen.getByRole("button", { name: "Add to system" })).toBeDisabled();
   });
 
+  it("offers two options, add new flights and edit an existing flight, one shown at a time", async () => {
+    stub((url) => (url.endsWith("/spec") ? spec : url.includes("/edits") ? [] : { loaded: false }));
+    render(<TestDataPanel />);
+    const options = screen.getByRole("group", { name: "Test data options" });
+    const add = within(options).getByRole("button", { name: /Add new flights/ });
+    const edit = within(options).getByRole("button", { name: /Edit an existing flight/ });
+    expect(add).toHaveAttribute("aria-pressed", "true");
+    expect(await screen.findByRole("heading", { name: "Flights sheet" })).toBeInTheDocument();
+    await userEvent.click(edit);
+    expect(edit).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByLabelText("Flight number")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Flights sheet" })).not.toBeInTheDocument();
+    await userEvent.click(add);
+    expect(screen.getByRole("heading", { name: "Flights sheet" })).toBeInTheDocument();
+  });
+
   it("checks both files, then adds them only after a clean check", async () => {
     const user = userEvent.setup();
     const fetchFn = stub((url, init) => {
