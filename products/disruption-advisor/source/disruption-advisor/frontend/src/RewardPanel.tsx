@@ -60,7 +60,7 @@ export function RewardPanel({ scenario }: { scenario: Scenario }) {
               Planned spend <strong>{aed(plan.planned_spend_aed)}</strong> of {aed(plan.budget_aed)} (left {aed(plan.left_aed)})
             </li>
             <li>
-              <strong>{num(plan.rewarded)}</strong> of {num(plan.passengers)} passengers rewarded
+              <strong>{num(plan.rewarded)}</strong> of {num(plan.passengers)} passengers on the passenger list rewarded
             </li>
             <li>
               {plan.budget_covers_share >= 1

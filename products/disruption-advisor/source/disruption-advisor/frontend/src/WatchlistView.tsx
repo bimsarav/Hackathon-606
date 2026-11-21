@@ -23,10 +23,12 @@ interface Props {
   /** Phase 3: asks the agent to investigate the flight (delay: the planning delay, or null to let it decide). */
   onAgent?: (flightId: string, delay: number | null) => void;
   busy: boolean;
+  /** Shows the model-quality panel; only the evaluator role may read the model card (the server refuses others). */
+  showModel?: boolean;
 }
 
 /** Phase 2: flights likely to be late in the next 7 days, ranked by expected missed connections, with reasons. */
-export function WatchlistView({ onAnalyse, onAgent, busy }: Props) {
+export function WatchlistView({ onAnalyse, onAgent, busy, showModel = false }: Props) {
   const [band, setBand] = useState<"all" | "medium" | "high">("medium");
   const [sort, setSort] = useState<"misconnects" | "delay">("misconnects");
   const [data, setData] = useState<Watchlist | null>(null);
@@ -151,7 +153,7 @@ export function WatchlistView({ onAnalyse, onAgent, busy }: Props) {
           </table>
         </div>
       )}
-      <ModelPanel />
+      {showModel && <ModelPanel />}
     </article>
   );
 }

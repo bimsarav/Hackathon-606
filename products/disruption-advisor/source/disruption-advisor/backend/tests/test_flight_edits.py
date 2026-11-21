@@ -1,6 +1,7 @@
 """Evaluator edits of existing flights: saved edits change what the analysis sees, reset restores the real flight."""
 
 from pathlib import Path
+from typing import Any
 
 from fastapi.testclient import TestClient
 
@@ -9,7 +10,7 @@ from app.engine.store import OpsStore
 from tests.ops_fixture import F1, X1, write_ops
 
 
-def _edit_body(store: OpsStore, flight_id: str) -> dict:
+def _edit_body(store: OpsStore, flight_id: str) -> dict[str, Any]:
     f = store.query("SELECT std, sta, tail, capacity, booked_seats FROM flights WHERE flight_id = ?", [flight_id])[0]
     pax = store.query(
         """SELECT p.customer_key, p.pnr, p.pax_type, p.fare_family_synthetic AS fare_family, p.fare, p.ssr_code AS ssr,
@@ -104,7 +105,7 @@ def test_edit_api_changes_the_scenario_and_reset_restores_it(
 
     before = misses()
     assert before > 0
-    body = {
+    body: dict[str, Any] = {
         "flight": {
             "std": view["flight"]["std_hhmm"],
             "sta": view["flight"]["sta_hhmm"],
@@ -144,7 +145,7 @@ def test_a_second_save_keeps_earlier_removals_and_added_passengers(
 ) -> None:
     url = f"/api/v1/test-data/flights/{F1}"
 
-    def body(view: dict, remove: set[str], add: bool = False) -> dict:
+    def body(view: dict[str, Any], remove: set[str], add: bool = False) -> dict[str, Any]:
         pax = [
             {
                 "customer_key": p["customer_key"],

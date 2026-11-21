@@ -2,6 +2,7 @@
 
 from datetime import timedelta
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -143,7 +144,7 @@ def test_the_ai_wording_comes_after_the_analysis(ctx: Context) -> None:
     class Writer(Explainer):
         calls = 0
 
-        def _ask(self, instruction: str, facts: dict, max_tokens: int) -> str | None:
+        def _ask(self, instruction: str, facts: dict[str, Any], max_tokens: int) -> str | None:
             Writer.calls += 1
             return f"AI text for {facts.get('late_flight') or facts.get('cancelled_flight')}"
 
@@ -179,3 +180,33 @@ def test_selected_option_drives_the_passenger_plan(ctx: Context) -> None:
     assert chosen["selected_key"] == other
     assert chosen["recommended_key"] == base["recommended_key"]
     assert "not the recommendation" in chosen["explanation"]["text"]
+
+
+def test_passenger_message_without_time_zone_falls_back_to_template() -> None:
+    """A drafted time without its zone can be read as local time, so that draft is replaced by the template."""
+
+    class Writer(Explainer):
+        def __init__(self, reply: str) -> None:
+            super().__init__("", "model", "low", 1)
+            self.reply = reply
+
+        def _ask(self, instruction: str, facts: dict[str, Any], max_tokens: int) -> str | None:
+            return self.reply
+
+    facts = {
+        "flight": "G9519",
+        "origin": "SHJ",
+        "destination": "KTM",
+        "event": "missed connection",
+        "late_inbound_flight": "G9502",
+        "new_flight": "G9539",
+        "new_departure": "21 Nov 08:30 UTC",
+        "care_while_waiting": "meal voucher",
+        "waiting_hours": 6,
+        "can_choose_refund_and_free_return_to_origin_or_date_change": True,
+        "travelling_with_infant": False,
+        "special_assistance": None,
+    }
+    assert Writer("Dear customer, your new flight G9539 leaves at 08:30.").passenger_message(facts).source == "template"
+    kept = Writer("Dear customer, your new flight G9539 leaves 21 Nov 08:30 UTC.").passenger_message(facts)
+    assert kept.source == "ai:model"

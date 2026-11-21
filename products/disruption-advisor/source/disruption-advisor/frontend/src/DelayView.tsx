@@ -270,7 +270,7 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
             stats={result.rebooking ? [
               { label: "rebooked within 24 h", value: num(result.rebooking.protected) },
               { label: "without a seat", value: num(result.rebooking.unprotected) },
-              ...(result.rebooking.hotel_rooms ? [{ label: "hotel rooms", value: num(result.rebooking.hotel_rooms) }] : []),
+              ...(result.rebooking.hotel_rooms ? [{ label: "hotel rooms (1 per passenger)", value: num(result.rebooking.hotel_rooms) }] : []),
             ] : [{ label: "passengers", value: num(result.passengers.length) }]} />
           <PeopleBox kind="Goodwill & EU261" title="Rewards & compensation" active={people === "rewards"} onOpen={() => openPeople("rewards")}
             stats={[
@@ -292,7 +292,7 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
               <p className="muted">
                 {num(result.rebooking.protected)} rebooked on later flights within 24 h ·{" "}
                 <strong>{num(result.rebooking.unprotected)}</strong> without a seat (next day + hotel, or refund)
-                {result.rebooking.hotel_rooms ? ` · ${num(result.rebooking.hotel_rooms)} hotel rooms` : ""}
+                {result.rebooking.hotel_rooms ? ` · ${num(result.rebooking.hotel_rooms)} hotel rooms (one per passenger)` : ""}
                 {result.rebooking.care_cost_aed ? ` · care ${aed(result.rebooking.care_cost_aed)}` : ""}.
               </p>
             )}
@@ -553,12 +553,18 @@ const CREW_STATUS: Record<string, { label: string; chip: string }> = {
 };
 
 /** The selected option's crew check: for each flight, the tightest crew member's duty headroom after the new delay. */
-function CrewSection({ option }: { option: RecoveryOption }) {
+export function CrewSection({ option }: { option: RecoveryOption }) {
   const crew = option.crew;
   return (
     <section aria-labelledby="crew-title">
       <h2 id="crew-title">Crew duty (FDP)</h2>
-      {!crew || crew.flights.length === 0 ? (
+      {crew && crew.flights.length === 0 && crew.flights_checked > 0 ? (
+        <p>
+          All {num(crew.flights_checked)} delayed flight(s) checked are within the duty limits
+          {crew.worst && <> (tightest: {crew.worst.flight_number}, {num(crew.worst.minutes_left)} min left{crew.worst.source === "estimated" ? ", estimated duty" : ""})</>}.
+          {crew.estimated > 0 && ` ${num(crew.estimated)} flight(s) use an estimated duty (no roster match).`}
+        </p>
+      ) : !crew || crew.flights.length === 0 ? (
         <p className="muted">
           No crew data for the flights of this option (no rostered crew and no duty estimate, for example a synthetic demo
           flight), so their duty time cannot be checked. The roster covers 1 Oct to 20 Nov 2026; later flights use an estimate where possible.

@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { CrewCheck, RecoveryOption } from "./api";
 import { CrewFdpAlerts } from "./CrewFdpAlerts";
+import { CrewSection } from "./DelayView";
 
 const over = {
   flight_id: "G9294_202611210830", flight_number: "G9294", origin: "SHJ", destination: "TBS",
@@ -38,5 +39,19 @@ describe("CrewFdpAlerts", () => {
     render(<CrewFdpAlerts options={[swap, absorb]} selectedKey={swap.key} />);
     expect(screen.getByRole("alert")).toHaveTextContent("1 of 2 options would take a crew past");
     expect(screen.getByText("Absorb the delay on A6-ARD")).toBeInTheDocument();
+  });
+});
+
+describe("CrewSection", () => {
+  it("says all checked flights are within limits when none is tight (same statement as the tile)", () => {
+    render(<CrewSection option={swap} />);
+    expect(screen.getByText(/All 3 delayed flight\(s\) checked are within the duty limits/)).toBeInTheDocument();
+    expect(screen.getByText(/tightest: G9294, 97 min left, estimated duty/)).toBeInTheDocument();
+    expect(screen.queryByText(/No crew data/)).not.toBeInTheDocument();
+  });
+
+  it("says there is no crew data only when no flight could be checked", () => {
+    render(<CrewSection option={option("x", "X", check({ status: "unknown", flights_checked: 0, estimated: 0, worst: null, flights: [] }))} />);
+    expect(screen.getByText(/No crew data for the flights of this option/)).toBeInTheDocument();
   });
 });

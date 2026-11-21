@@ -1,5 +1,5 @@
 import { type FormEvent, Fragment, useCallback, useEffect, useState } from "react";
-import { AgentRunsList, AgentRunView, agentStartError } from "./AgentRunView";
+import { AgentRunsList, AgentRunView, agentStartError, flightLabel } from "./AgentRunView";
 import {
   type AgentRunRequest,
   api,
@@ -13,6 +13,7 @@ import {
 import { CancelView } from "./CancelView";
 import { CascadePanel } from "./CascadePanel";
 import { DelayView } from "./DelayView";
+import { minutes, utc } from "./format";
 import { Launcher } from "./Launcher";
 import { ModelCardView } from "./ModelCardView";
 import { TestDataPanel } from "./TestDataPanel";
@@ -267,6 +268,14 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
     return saved && VIEWS.includes(saved) && (isEvaluator || !EVALUATOR_VIEWS.includes(saved)) ? saved : "delay";
   });
   useEffect(() => remember(VIEW_KEY, view), [view]);
+  // Each page opens at its top (the previous page's scroll position is not carried over).
+  useEffect(() => {
+    try {
+      window.scrollTo({ top: 0 });
+    } catch {
+      /* not available (tests) */
+    }
+  }, [view, visit]);
   const [agentRunId, setAgentRunId] = useState<string | null>(() => recall(AGENT_KEY));
   const [agentStart, setAgentStart] = useState<Load>({ kind: "idle" });
   const [agentStatus, setAgentStatus] = useState<string | null>(null);
@@ -526,6 +535,7 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
               {meta && (
                 <WatchlistView
                   busy={busy}
+                  showModel={isEvaluator}
                   onAnalyse={(flightId, delay) =>
                     run("delay", `Analysing a ${delay}-minute delay…`, () =>
                       api.createScenario({ kind: "DELAY", flight_id: flightId, delay_minutes: delay, weights: meta.default_weights })
@@ -565,8 +575,10 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
                       <span className={`recent-badge ${h.kind === "DELAY" ? "recent-badge-delay" : "recent-badge-cancel"}`}>
                         {h.kind === "DELAY" ? "Flight Delay" : "Cancellation"}
                       </span>
-                      <span className="recent-flight">{h.flight_id.split("_")[0]}</span>
-                      <span className="recent-kind muted small">{h.kind === "DELAY" ? "Delay scenario" : "Cancellation"}</span>
+                      <span className="recent-flight">{flightLabel(h.flight_id)}</span>
+                      <span className="recent-kind muted small">
+                        {h.kind === "DELAY" ? `Delay ${minutes(h.delay_minutes)}` : "Cancellation"} · run {utc(h.created_at)}
+                      </span>
                     </button>
                   </li>
                 ))}

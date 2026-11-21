@@ -1,0 +1,35 @@
+== T-642 deploy 202611211946 (base d1d5042 + uncommitted T-642 changes; diff sha d81a84791faf)
+Error response from daemon: No such image: sha256:139b1ab188e1572d100d1ff971754d620749cffcb5776911b2ffd5d602ad299d
+extracted
+
+#18 resolving provenance for metadata file
+#18 DONE 0.0s
+ Image disruption-advisor-web:latest Built 
+ Container disruption-advisor-api-1 Waiting 
+ Container disruption-advisor-api-1 Healthy 
+ Container disruption-advisor-web-1 Starting 
+ Container disruption-advisor-web-1 Started 
+api Up 42 minutes (healthy)
+db Up 10 hours (healthy)
+web Up 20 seconds (healthy)
+== backup (redo; first attempt failed at tagging: running api image untagged)
+42c6090cc191 12 hours ago
+1ee177939a88 21 hours ago
+61951f6f98e3 22 hours ago
+58f2fe4c6449 22 hours ago
+283bf3f20016 22 hours ago
+dangling-web=42c6090cc191
+-rw-r--r--. 1 opc opc 1262715270 Nov 21 19:50 /home/opc/backups/disruption-advisor/pre-202611211946.dump
+compose.yml
+scripts
+== api build + restart
+#21 DONE 0.0s
+ Image disruption-advisor-api:latest Built 
+ Container disruption-advisor-api-1 Recreated 
+ Container disruption-advisor-api-1 Starting 
+ Container disruption-advisor-api-1 Started 
+api=healthy
+api disruption-advisor-api:latest Up 12 seconds (healthy)
+db postgres:18.7-alpine Up 10 hours (healthy)
+web disruption-advisor-web:latest Up 5 minutes (healthy)
+1

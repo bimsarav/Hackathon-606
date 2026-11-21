@@ -134,7 +134,7 @@ export function AgentRunView({ runId, onOpenScenario, onRetry, onStatus, pollMs 
   return (
     <article className="result agent-run">
       <header className="result-head">
-        <p className="eyebrow">Phase 3 · Agent</p>
+        <p className="eyebrow">AI agent · recommends, a person approves</p>
         <h1>
           Agent: {flightLabel(run.flight_id)}{" "}
           <span className={`chip ${STATUS_CHIP[run.status]}`} data-status={run.status}>

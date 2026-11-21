@@ -102,10 +102,14 @@ class Explainer:
             "customer'. Say what happened to their journey (if a late inbound flight made them miss their "
             "connection, say exactly that), their new flight and time if they have one, the care while they wait "
             "(hotel, transport, meals) and, if allowed, that they may choose a refund with a free return to origin or "
-            "a date change. Mention special assistance only if listed.",
+            "a date change. Mention special assistance only if listed. Write the new departure exactly as given in "
+            "new_departure, including its time zone (UTC).",
             facts,
             1000,
         )
+        # A time without its zone can be read as local time: such a draft falls back to the template wording.
+        if ai and facts.get("new_departure") and "UTC" not in ai:
+            ai = None
         return Text(ai, f"ai:{self.model}") if ai else Text(template_message(facts), "template")
 
 
