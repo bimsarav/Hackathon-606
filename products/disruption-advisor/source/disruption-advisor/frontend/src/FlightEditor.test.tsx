@@ -19,6 +19,7 @@ function stub() {
     if (url.includes("/test-data/edits")) body = [];
     else if (url.includes("/test-data/flights/") && init?.method === "PUT") body = { saved: true };
     else if (url.includes("/test-data/flights/")) body = editable;
+    else if (url.includes("/flights?q=ZZ")) body = [];
     else if (url.includes("/flights?")) body = [{ ...editable.flight, airline: "G9", booked_pax: 168, aircraft_model: "A320", capacity_source: "x" }];
     return new Response(JSON.stringify(body), { status: 200 });
   });
@@ -41,7 +42,9 @@ describe("edit an existing flight", () => {
     await userEvent.selectOptions(within(table).getAllByLabelText("Loyalty tier")[0] as HTMLElement, "Platinum");
     await userEvent.type(within(table).getAllByLabelText("Special service")[0] as HTMLElement, "wchr");
     await userEvent.click(screen.getByLabelText("Remove EF34GH"));
+    expect(screen.getByLabelText("Seats sold")).toHaveValue(173);
     await userEvent.click(screen.getByRole("button", { name: "Add passenger" }));
+    expect(screen.getByLabelText("Seats sold")).toHaveValue(174);
     expect(screen.getByText(/2 passengers kept of 3 listed \(incl\. added\)/)).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: "Save changes" }));
@@ -52,5 +55,16 @@ describe("edit an existing flight", () => {
     expect(body.passengers[0]).toMatchObject({ customer_key: "k1", loyalty_tier: "Platinum", ssr: "WCHR", remove: false });
     expect(body.passengers[1]).toMatchObject({ customer_key: "k2", remove: true });
     expect(body.passengers[2]).toMatchObject({ customer_key: null, pnr: "NEW01" });
+  });
+
+  it("has a Search button, a hint to pick the date, and says when nothing matches", async () => {
+    stub();
+    render(<FlightEditor />);
+    await userEvent.type(screen.getByLabelText("Flight number"), "G9519");
+    await userEvent.click(screen.getByRole("button", { name: "Search" }));
+    expect(await screen.findByText("Pick the date to open the flight:")).toBeInTheDocument();
+    await userEvent.clear(screen.getByLabelText("Flight number"));
+    await userEvent.type(screen.getByLabelText("Flight number"), "ZZ99{Enter}");
+    expect(await screen.findByText(/No flights found for “ZZ99”/)).toBeInTheDocument();
   });
 });
