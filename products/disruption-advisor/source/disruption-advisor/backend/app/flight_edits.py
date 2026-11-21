@@ -170,6 +170,28 @@ def apply(con: duckdb.DuckDBPyConnection, directory: Path | None) -> int:
     return done
 
 
+def merge_passengers(
+    flight_id: str, previous: dict[str, Any] | None, sent: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """A save replaces the flight's edit, but the editor only lists the passengers the analysis sees now. So keep
+    what earlier saves did: passengers removed before stay removed, and passengers added before (shown with the key
+    apply() gave them) stay added instead of pointing at a real row that does not exist."""
+    if not previous:
+        return sent
+    old = previous.get("passengers", [])
+    added = {_new_key(flight_id, p["pnr"], i): p for i, p in enumerate(old) if not p.get("customer_key")}
+    out: list[dict[str, Any]] = []
+    for p in sent:
+        if p.get("customer_key") in added:
+            if p.get("remove"):
+                continue  # an added passenger taken off again: simply not added
+            p = {**p, "customer_key": None}
+        out.append(p)
+    listed = {p.get("customer_key") for p in sent}
+    out += [p for p in old if p.get("customer_key") and p.get("remove") and p["customer_key"] not in listed]
+    return out
+
+
 # --- API -------------------------------------------------------------------------------------------------------
 class FlightFields(BaseModel):
     std: str
@@ -274,7 +296,7 @@ def save_flight(
     edits = load(directory)
     edits[flight_id] = {
         "flight": payload.flight.model_dump(),
-        "passengers": [p.model_dump() for p in payload.passengers],
+        "passengers": merge_passengers(flight_id, edits.get(flight_id), [p.model_dump() for p in payload.passengers]),
         "saved_by": f"{user.username} ({user.role})",
         "saved_at": datetime.now(UTC).isoformat(timespec="seconds"),
     }
