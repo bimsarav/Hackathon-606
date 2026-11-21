@@ -16,7 +16,7 @@ from typing import Any
 import duckdb
 import numpy as np
 
-from app import sample_data
+from app import flight_edits, sample_data
 from app.ml import live_delay
 from app.ml.live_delay import LiveModels
 from app.ml.reward_pref import RewardModel
@@ -75,6 +75,7 @@ class OpsStore:
         for table in TABLES:
             self._con.execute(f"CREATE TABLE {table} AS SELECT * FROM read_parquet('{ops_dir / table}.parquet')")
         self.test_version = self._add_test_data(test_dir)
+        self.flights_edited = flight_edits.apply(self._con, test_dir)  # evaluator edits of existing flights
         self._con.execute("CREATE INDEX idx_pax_flight ON pax_segments (flight_id)")
         self._con.execute("CREATE INDEX idx_pax_pnr ON pax_segments (pnr)")
         self.has_risk = all((ops_dir / f"{t}.parquet").exists() for t in RISK_TABLES)

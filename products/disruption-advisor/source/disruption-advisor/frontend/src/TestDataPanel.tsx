@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { FlightEditor } from "./FlightEditor";
 import {
   api,
   errorText,
@@ -232,6 +233,8 @@ export function TestDataPanel() {
           {spec.notes.map((n) => <li key={n}>{n}</li>)}
         </ul>
       )}
+
+      <FlightEditor />
     </section>
   );
 }

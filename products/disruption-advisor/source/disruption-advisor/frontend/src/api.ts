@@ -682,6 +682,27 @@ export interface RewardModelCard {
   };
 }
 
+/** Evaluator edits of an existing flight (backend app/flight_edits.py). */
+export interface EditablePassenger {
+  customer_key: string | null;
+  pnr: string;
+  passenger_id?: string | null;
+  pax_type: "AD" | "CH" | "IN";
+  fare_family: string | null;
+  fare: number | null;
+  ssr: string | null;
+  loyalty_tier: "none" | "Basic" | "Silver" | "Gold" | "Platinum";
+  frequency: "occasional" | "regular" | "frequent" | "unknown";
+  remove?: boolean;
+}
+export interface EditableFlight {
+  flight: { flight_id: string; flight_number: string; origin: string; destination: string; std: string; sta: string;
+    std_hhmm: string; sta_hhmm: string; tail: string; capacity: number; booked_seats: number };
+  passengers: EditablePassenger[];
+  edited: boolean;
+}
+export interface FlightEditSummary { flight_id: string; flight_number: string; saved_by: string; saved_at: string; passengers_edited: number }
+
 export interface TestDataField {
   name: string;
   required: boolean;
@@ -793,6 +814,13 @@ export const api = {
   uploadTestData: (flightsCsv: string, passengersCsv: string, commit: boolean) =>
     post<TestDataReport>("/api/v1/test-data", { flights_csv: flightsCsv, passengers_csv: passengersCsv, commit }),
   removeTestData: () => request<TestDataStatus>("/api/v1/test-data", { method: "DELETE" }),
+  flightEdits: () => request<FlightEditSummary[]>("/api/v1/test-data/edits"),
+  editableFlight: (id: string) => request<EditableFlight>(`/api/v1/test-data/flights/${encodeURIComponent(id)}`),
+  saveFlightEdit: (id: string, body: { flight: { std: string; sta: string; tail: string; capacity: number; booked_seats: number };
+    passengers: EditablePassenger[] }) =>
+    request<{ saved: boolean }>(`/api/v1/test-data/flights/${encodeURIComponent(id)}`, { method: "PUT", body: JSON.stringify(body) }),
+  resetFlightEdit: (id: string) =>
+    request<{ reset: boolean }>(`/api/v1/test-data/flights/${encodeURIComponent(id)}`, { method: "DELETE" }),
   crewFdp: () => request<CrewFdp>("/api/v1/crew/fdp"),
   message: (id: string, customerKey: string) =>
     post<{ text: string; source: string }>(`/api/v1/scenarios/${id}/messages`, { customer_key: customerKey }),
