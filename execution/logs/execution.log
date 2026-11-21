@@ -135,3 +135,8 @@
 2026-11-21T01:47Z | T-510 | DONE | prod redeployed (rollback tag pre-202611210144, pg_dump ~/backups/disruption-advisor/pre-202611210144.dump); stage 3 retrained in 35 s, same test AUC 0.7566; smoke 11/11, e2e 4/4; model card now has confusion matrices, sweep, lift, monthly walk-forward (output/T-510-*); walk-forward shows Aug-Oct AUC about equal to baseline (documented in model-card.md). NOT committed
 2026-11-21T02:13Z | T-511 | DONE | UI rebrand to Air Arabia (user: images from aeromart-thin-air GA client, UI-only): logo + tail in header/login/favicon (frontend/public/brand), theme tokens (brand #FF0141 decorative, accent #D6002F / dark #FF4D6D, neutral greys), header white with brand line; gate 48+9; web-only deploy (rollback web:pre-202611210211); prod smoke 11/11, e2e 4/4 (output/T-511-*). NOT committed
 2026-11-21T02:19Z | T-512 | DONE | carrier tail mark next to flight numbers in suggested/search lists (+ aircraft registration in cancellation suggestions); UI only; web-only deploy (rollback web:pre-202611210218); smoke + e2e (output/T-512-*). NOT committed
+2026-11-21T02:05Z | T-511 | STARTED | hyperparameter tuning + model comparison (MASTER_PROMPT 9.23.7) for delay-risk model
+2026-11-21T02:10Z | T-511 | PROGRESS | selection script written + smoke ok; full run (40 lgb / 25 xgb trials) running
+2026-11-21T02:41Z | T-511 | DONE | tuned LightGBM adopted, model-selection.md, last-week panel (backend+frontend+tests); not deployed
+2026-11-21T03:14Z | T-512 | DONE | phase 5 reward recommendation MVP (engine, API, UI, docs, tests); local only
+2026-11-21T03:23Z | T-513 | DONE | reward preference model on synthetic history (ingest stage 4, plan integration, UI, docs, tests); local only
