@@ -204,3 +204,4 @@
 2026-11-21T14:50Z | T-623 | DONE | merged live delay models from prod server into git, deployed 9e4d051; Playwright 11/11; rollback pre-202611211430 | output/T-623-*.log
 2026-11-21T15:00Z | T-626 | DONE | Flight Delay page redesign deployed (d56398b); smoke 11/11, Playwright 11/11; rollback pre-202611211453 | output/T-624..626-*.log
 2026-11-21T15:25Z | T-628 | DONE | search redesign + option name once deployed (7c990a9); smoke 11/11, Playwright 11/11; one failed build (b677204, type check) fixed | output/T-627..628-*.log
+2026-11-21T15:30Z | T-629 | DONE | cancellation page compact layout deployed (cda0fd7); smoke 11/11, Playwright 11/11 | output/T-629-*.log
