@@ -1181,10 +1181,19 @@ tr.clickable.selected {
   border-radius: 10px;
   padding: 0.7rem 0.9rem;
   min-width: 0;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.strategy-card:hover:not(.strategy-card-busy) {
+  border-color: var(--accent);
 }
 .strategy-card.active {
   border: 2px solid var(--accent);
   background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+.strategy-card-busy {
+  cursor: wait;
+  opacity: 0.7;
 }
 .strategy-name {
   margin: 0;

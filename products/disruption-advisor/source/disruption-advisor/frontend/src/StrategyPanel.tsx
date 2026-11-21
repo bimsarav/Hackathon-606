@@ -52,26 +52,21 @@ export function StrategyPanel({ scenario, result, onUpdate }:
     <section aria-labelledby="strategies-title" className="strategies">
       <h2 id="strategies-title">Strategies compared</h2>
       <p className="small muted">
-        Each strategy picks its best option from the same list. Switching the strategy changes which option is
-        recommended, not the numbers.
+        Each strategy picks its best option from the same list. Click a card to apply that strategy.
       </p>
-      <div className="segmented" role="group" aria-label="Strategy">
-        {ordered.map((p) => (
-          <button key={p.key} type="button" aria-pressed={p.key === active} disabled={busy !== null}
-            className={p.key === active ? "active" : ""} onClick={() => switchTo(p.key)}>
-            {busy === p.key ? "Switching…" : (p.label || STRATEGY_LABEL[p.key])}
-          </button>
-        ))}
-      </div>
       <div className="strategy-cards">
         {ordered.map((p) => {
           const o = byKey.get(p.pick);
+          const isActive = p.key === active;
           return (
-            <div key={p.key} data-strategy={p.key} className={`strategy-card ${p.key === active ? "active" : ""}`}
-              aria-current={p.key === active ? "true" : undefined}>
+            <div key={p.key} data-strategy={p.key}
+              className={`strategy-card${isActive ? " active" : ""}${busy ? " strategy-card-busy" : ""}`}
+              role="button" tabIndex={0} aria-pressed={isActive}
+              onClick={() => switchTo(p.key)}
+              onKeyDown={(e) => e.key === "Enter" && switchTo(p.key)}>
               <p className="strategy-name">
-                {p.label || STRATEGY_LABEL[p.key]}
-                {p.key === active && <span className="chip chip-ok">Active</span>}
+                {busy === p.key ? "Switching…" : (p.label || STRATEGY_LABEL[p.key])}
+                {isActive && <span className="chip chip-ok">Active</span>}
               </p>
               <p className="strategy-pick">{o?.label ?? p.pick}</p>
               {o && <StrategyKpis option={o} />}
