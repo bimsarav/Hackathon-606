@@ -9,6 +9,7 @@ options or the build code changed.
 OPERATING_CARRIERS (default G9) limits the picture to those carriers.
 DEMO_SCENARIO=true appends the labelled synthetic demo scenario (app/ingest/demo.py).
 Stage 3 (phase 2) trains the delay-risk model and scores the window (app/ml/delay_risk.py, ~30 s on the server).
+Stage 4 (phase 5) trains the reward preference model on simulated redemption history (app/ml/reward_pref.py).
 """
 
 import argparse
@@ -20,7 +21,7 @@ import sys
 from pathlib import Path
 
 from app.ingest import build, convert, demo
-from app.ml import delay_risk
+from app.ml import delay_risk, reward_pref
 
 log = logging.getLogger("ingest")
 
@@ -52,9 +53,9 @@ def main() -> int:
     raw_marker, ops_marker = data_dir / "ingest_fingerprint.txt", data_dir / "ops_fingerprint.txt"
     inputs = fingerprint(input_dir)
     # stage 2 also reruns when its code changes (build rules, synthetic data), so a deploy picks up new logic
-    code = hashlib.sha256(b"".join(Path(m.__file__ or "").read_bytes() for m in (build, demo, delay_risk))).hexdigest()[
-        :16
-    ]
+    code = hashlib.sha256(
+        b"".join(Path(m.__file__ or "").read_bytes() for m in (build, demo, delay_risk, reward_pref))
+    ).hexdigest()[:16]
     ops_key = f"{inputs}|demo={with_demo}|carriers={','.join(carriers)}|code={code}"
 
     # bookings must be in the current layout: name-free, by departure month (an older dep_year layout is rebuilt)
@@ -83,6 +84,8 @@ def main() -> int:
         log.info("stage 3 done: %s", json.dumps(delay_risk.run(data_dir / "ops", default_mct=mct)))
     else:
         log.warning("stage 3 skipped: no history_flights.parquet")
+    # stage 4 (phase 5): reward preference model, trained on simulated redemption history (app/ml/reward_pref.py)
+    log.info("stage 4 done: %s", json.dumps(reward_pref.run(data_dir / "ops")))
     ops_marker.write_text(ops_key)
     return 0
 

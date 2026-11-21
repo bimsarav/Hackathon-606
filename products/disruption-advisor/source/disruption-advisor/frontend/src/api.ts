@@ -281,6 +281,68 @@ export interface ConnectionRisk {
   misconnect_risk: number;
 }
 
+export interface LastWeekRow {
+  flight_id: string;
+  flight_number: string | null;
+  origin: string;
+  destination: string;
+  std: string;
+  p_15: number;
+  p_60: number;
+  band: "high" | "medium" | "low";
+  actual_delay_minutes: number;
+  outcome: "hit" | "false_alarm" | "missed";
+}
+
+export interface LastWeek {
+  from: string;
+  to: string;
+  trained_on: string;
+  flights: number;
+  late_15_rate: number;
+  late_60_rate: number;
+  auc_15: number | null;
+  auc_60: number | null;
+  brier_60: number;
+  flag_60: ConfusionPoint;
+  flag_15: ConfusionPoint;
+  high_band: { flights: number; late_60: number };
+  rows: LastWeekRow[];
+  rows_total: number;
+}
+
+export interface RewardRow {
+  pnr: string;
+  customer_key: string;
+  passenger_id: string | null;
+  route: string;
+  tier: number;
+  severity: number;
+  severity_reasons: string[];
+  value: number;
+  target_aed: number;
+  reward: { type: string; label: string; detail: string; cost_aed: number; acceptance?: number } | null;
+  preferred: { type: string; label: string; score: number }[];
+  why: string[];
+  downgraded_for_budget: boolean;
+  note: string;
+}
+
+export interface RewardPlan {
+  budget_aed: number;
+  planned_spend_aed: number;
+  left_aed: number;
+  ideal_spend_aed: number;
+  budget_covers_share: number;
+  passengers: number;
+  rewarded: number;
+  by_type: Record<string, { passengers: number; spend_aed: number }>;
+  disruption: { score: number; label: string };
+  preference_model?: { kind: string; synthetic_training_data: boolean; auc?: number; baseline_proxy_rules_auc?: number };
+  assumptions: string[];
+  rows: RewardRow[];
+}
+
 export interface ModelMetrics {
   observed_rate: number;
   auc: number | null;
@@ -379,6 +441,9 @@ export const api = {
     request<Watchlist>(`/api/v1/risk/watchlist?days=7&band=${band}&sort=${sort}&limit=60`),
   flightRisk: (flightId: string) =>
     request<{ flight: RiskFlight; connections: ConnectionRisk[] }>(`/api/v1/risk/flights/${encodeURIComponent(flightId)}?limit=30`),
+  rewards: (id: string, budgetAed: number) =>
+    post<RewardPlan>(`/api/v1/scenarios/${id}/rewards`, { budget_aed: budgetAed }),
+  lastWeek: () => request<LastWeek>("/api/v1/risk/last-week"),
   modelCard: () => request<ModelCard>("/api/v1/risk/model"),
   message: (id: string, customerKey: string) =>
     post<{ text: string; source: string }>(`/api/v1/scenarios/${id}/messages`, { customer_key: customerKey }),

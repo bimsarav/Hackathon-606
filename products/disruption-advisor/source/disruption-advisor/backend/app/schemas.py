@@ -96,3 +96,7 @@ class MessageRequest(Strict):
 class MessageDraft(BaseModel):
     text: str
     source: str
+
+
+class RewardRequest(Strict):
+    budget_aed: float = Field(ge=0, le=1_000_000)

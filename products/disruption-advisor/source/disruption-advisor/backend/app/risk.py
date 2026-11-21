@@ -46,6 +46,17 @@ def model_card(request: Request, _: CurrentUser) -> dict[str, Any]:
     return _store(request).model_card
 
 
+@router.get("/last-week")
+def last_week(request: Request, _: CurrentUser) -> dict[str, Any]:
+    """The last 7 days of flights predicted by a model that had not seen them, next to what really happened."""
+    check = _store(request).last_week
+    if not check:
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE, "The last-week check is not available yet (run the ingest)"
+        )
+    return check
+
+
 @router.get("/watchlist")
 def watchlist(
     request: Request,

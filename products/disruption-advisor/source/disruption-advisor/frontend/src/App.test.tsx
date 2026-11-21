@@ -6,6 +6,8 @@ import { App } from "./App";
 import { CancelView } from "./CancelView";
 import { CarrierTail } from "./CarrierTail";
 import { DelayView } from "./DelayView";
+import { LastWeekPanel } from "./LastWeekPanel";
+import { RewardPanel } from "./RewardPanel";
 import { WatchlistView } from "./WatchlistView";
 import { aed, minutes, utc } from "./format";
 
@@ -170,6 +172,35 @@ describe("WatchlistView", () => {
     expect(await screen.findByText("37%")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: /Analyse a 45 min delay/ }));
     expect(onAnalyse).toHaveBeenCalledWith(flight.flight_id, 45);
+  });
+
+  it("shows last week's predictions against what really happened", async () => {
+    const point = { cutoff: 0.15, true_positive: 8, false_positive: 12, false_negative: 2, true_negative: 178,
+      precision: 0.4, recall: 0.8, f1: 0.53, accuracy: 0.93, specificity: 0.94, flagged_share: 0.1 };
+    stubFetch(() => ({ from: "2026-11-11", to: "2026-11-18", trained_on: "flights before 2026-11-11 (60000)", flights: 200,
+      late_15_rate: 0.3, late_60_rate: 0.05, auc_15: 0.79, auc_60: 0.75, brier_60: 0.05, flag_60: point,
+      flag_15: { ...point, accuracy: 0.71 }, high_band: { flights: 5, late_60: 4 }, rows_total: 2,
+      rows: [{ flight_id: "G9519_202611150200", flight_number: "G9519", origin: "MCT", destination: "SHJ",
+        std: "2026-11-15T02:00:00", p_15: 0.5, p_60: 0.33, band: "high", actual_delay_minutes: 140, outcome: "hit" }] }));
+    render(<LastWeekPanel />);
+    expect(await screen.findByText("93%")).toBeInTheDocument();
+    expect(screen.getByText("80%")).toBeInTheDocument();
+    expect(screen.getByText("G9519 MCT→SHJ")).toBeInTheDocument();
+    expect(screen.getByText(/actual 140 min/)).toBeInTheDocument();
+  });
+
+  it("recommends rewards within a budget and shows what the plan costs", async () => {
+    stubFetch((url) => url.includes("/decisions") ? [] : ({ budget_aed: 5000, planned_spend_aed: 4950, left_aed: 50, ideal_spend_aed: 12000, budget_covers_share: 0.417,
+      passengers: 200, rewarded: 60, by_type: { MEAL: { passengers: 40, spend_aed: 2000 }, VOUCHER: { passengers: 20, spend_aed: 2950 } },
+      disruption: { score: 38, label: "moderate" }, assumptions: ["Preferences are proxy rules."],
+      rows: [{ pnr: "ABC123", customer_key: "1b6e33fd55c8236f", passenger_id: "PAX1", route: "SHJ-CAI", tier: 2, severity: 63, severity_reasons: [],
+        value: 80, target_aed: 300, reward: { type: "VOUCHER", label: "Shopping voucher", detail: "AED 200 shopping voucher", cost_aed: 200 },
+        preferred: [], why: ["books online or in the app"], downgraded_for_budget: false, note: "" }] }));
+    render(<RewardPanel scenario={{ id: "s1", flight_id: "G9519_202611210200", kind: "DELAY", delay_minutes: 120, weights: {}, result: {}, created_by: "x", created_at: "" } as unknown as Scenario} />);
+    await userEvent.click(screen.getByRole("button", { name: "Recommend rewards" }));
+    expect(await screen.findByText("AED 200 shopping voucher")).toBeInTheDocument();
+    expect(screen.getByText(/covers 42% of the full plan/)).toBeInTheDocument();
+    expect(screen.getByText("books online or in the app")).toBeInTheDocument();
   });
 
   it("shows the API error when the risk data is not available", async () => {

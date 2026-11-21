@@ -14,6 +14,7 @@ from sqlalchemy import select
 
 from app.auth import CurrentUser, authenticate, issue_token
 from app.db import SessionDep
+from app.engine import rewards
 from app.engine.priority import DEFAULT_WEIGHTS, LABELS
 from app.engine.scenarios import Context, ScenarioError, analyse_cancellation, analyse_delay, presets
 from app.models import Decision, Scenario
@@ -25,6 +26,7 @@ from app.schemas import (
     MessageDraft,
     MessageRequest,
     Reprioritise,
+    RewardRequest,
     ScenarioCreate,
     ScenarioRead,
     ScenarioSummary,
@@ -261,3 +263,38 @@ def draft_message(
     }
     draft = request.app.state.explainer.passenger_message(facts)
     return MessageDraft(text=draft.text, source=draft.source)
+
+
+@router.post("/scenarios/{scenario_id}/rewards")
+def recommend_rewards(
+    scenario_id: uuid.UUID, payload: RewardRequest, request: Request, session: SessionDep, _: CurrentUser
+) -> dict[str, Any]:
+    """Goodwill reward plan for the passengers of the scenario's flight within a budget (phase 5, ADR 0010).
+
+    Computed on request and not stored; a person approves it through the decisions endpoint."""
+    scenario = _get(session, scenario_id)
+    ctx = _context(request)
+    people = rewards.people_for(
+        ctx.store.passengers_on([scenario.flight_id]),
+        scenario.result,
+        scenario.kind,
+        scenario.delay_minutes,
+        scenario.weights,
+        ctx.store.reward_model,
+    )
+    plan = rewards.recommend(people, payload.budget_aed)
+    model = ctx.store.reward_model
+    plan["preference_model"] = model.summary() if model else {"kind": "proxy rules", "synthetic_training_data": False}
+    plan["disruption"] = rewards.flight_severity(scenario.delay_minutes, scenario.kind == "CANCEL")
+    plan["assumptions"] = [
+        (
+            "Preferences come from a model trained on SIMULATED redemption history (no real history exists): it "
+            "reproduces assumed behaviour, not real customer choices."
+            if model
+            else "Preferences are proxy rules (meal and seat bought, sales channel, fare family, loyalty, frequency, "
+            "family booking), not stated preferences: no redemption history exists."
+        ),
+        "Reward values (AED) and the severity weights are assumed defaults to confirm with the airline.",
+        "Statutory care (meals and hotel under the care rules, EU261 where it applies) is not paid from this budget.",
+    ]
+    return plan

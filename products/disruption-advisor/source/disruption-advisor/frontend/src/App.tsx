@@ -3,6 +3,7 @@ import { api, errorText, type Meta, type Scenario, type ScenarioSummary, type Se
 import { CancelView } from "./CancelView";
 import { DelayView } from "./DelayView";
 import { Launcher } from "./Launcher";
+import { LastWeekPanel } from "./LastWeekPanel";
 import { WatchlistView } from "./WatchlistView";
 import { utc } from "./format";
 
@@ -211,45 +212,49 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
               {metaError}
             </p>
           )}
-          {meta && (
-            <Launcher
-              meta={meta}
-              busy={load.kind === "busy"}
-              active={scenario && scenario.kind === "DELAY" && scenario.delay_minutes
-                ? { flightId: scenario.flight_id, flightNumber: scenario.result.flight.flight_number, delay: scenario.delay_minutes }
-                : null}
-              onDelay={(flightId, delay) =>
-                run(`Analysing a ${delay}-minute delay…`, () =>
-                  api.createScenario({ kind: "DELAY", flight_id: flightId, delay_minutes: delay, weights: meta.default_weights }),
-                )
-              }
-              onCancel={(flightId) =>
-                run("Ranking passengers and rebooking…", () =>
-                  api.createScenario({ kind: "CANCEL", flight_id: flightId, weights: meta.default_weights }),
-                )
-              }
-            />
-          )}
-          <section className="history" aria-labelledby="history-title">
-            <h2 id="history-title">Recent scenarios</h2>
-            {history.length === 0 ? (
-              <p className="muted">None yet.</p>
-            ) : (
-              <ul>
-                {history.map((h) => (
-                  <li key={h.id}>
-                    <button type="button" className="link" onClick={() => run("Opening scenario…", () => api.scenario(h.id))}>
-                      {h.kind === "DELAY" ? `Delay +${h.delay_minutes} min` : "Cancellation"} · {h.flight_id.split("_")[0]}
-                    </button>
-                    <span className="muted small">
-                      {" "}
-                      {h.created_by}, {utc(h.created_at)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+          {view === "watchlist" && <LastWeekPanel />}
+          {/* Hidden, not unmounted, on the 7-day view: the slider and suggestions keep their state. */}
+          <div hidden={view === "watchlist"}>
+            {meta && (
+              <Launcher
+                meta={meta}
+                busy={load.kind === "busy"}
+                active={scenario && scenario.kind === "DELAY" && scenario.delay_minutes
+                  ? { flightId: scenario.flight_id, flightNumber: scenario.result.flight.flight_number, delay: scenario.delay_minutes }
+                  : null}
+                onDelay={(flightId, delay) =>
+                  run(`Analysing a ${delay}-minute delay…`, () =>
+                    api.createScenario({ kind: "DELAY", flight_id: flightId, delay_minutes: delay, weights: meta.default_weights }),
+                  )
+                }
+                onCancel={(flightId) =>
+                  run("Ranking passengers and rebooking…", () =>
+                    api.createScenario({ kind: "CANCEL", flight_id: flightId, weights: meta.default_weights }),
+                  )
+                }
+              />
             )}
-          </section>
+            <section className="history" aria-labelledby="history-title">
+              <h2 id="history-title">Recent scenarios</h2>
+              {history.length === 0 ? (
+                <p className="muted">None yet.</p>
+              ) : (
+                <ul>
+                  {history.map((h) => (
+                    <li key={h.id}>
+                      <button type="button" className="link" onClick={() => run("Opening scenario…", () => api.scenario(h.id))}>
+                        {h.kind === "DELAY" ? `Delay +${h.delay_minutes} min` : "Cancellation"} · {h.flight_id.split("_")[0]}
+                      </button>
+                      <span className="muted small">
+                        {" "}
+                        {h.created_by}, {utc(h.created_at)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </div>
         </aside>
         <main id="main" aria-live="polite" aria-busy={load.kind === "busy"}>
           <nav className="tabs view-tabs" aria-label="Views">

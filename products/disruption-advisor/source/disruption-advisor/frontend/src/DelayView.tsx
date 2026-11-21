@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api, type DelayResult, errorText, type Meta, type RecoveryOption, type Scenario } from "./api";
 import { aed, hhmm, minutes, num, utc } from "./format";
 import { RotationBoard } from "./RotationBoard";
+import { RewardPanel } from "./RewardPanel";
 import { Assumptions, DecisionBar, Explanation, PassengerTable, WeightsPanel } from "./Shared";
 
 interface Props {
@@ -185,6 +186,8 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
         <PassengerTable scenario={scenario} rows={result.passengers} meta={meta} />
         {result.passengers.length > 0 && <DecisionBar scenario={scenario} target="rebooking" label="rebooking plan" />}
       </section>
+
+      <RewardPanel scenario={scenario} />
 
       <Assumptions items={result.assumptions} />
     </article>

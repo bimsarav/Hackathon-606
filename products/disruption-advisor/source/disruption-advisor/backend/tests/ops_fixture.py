@@ -81,6 +81,7 @@ def _pax(fid: str, pnr: str, key: str, ptype: str, o: str, d: str, dep: datetime
         "infants": 0,
         "ssr_code": None,
         "ssr_source": "synthetic",
+        "sales_channel": "Web",
     }
     row.update(kw)
     return row
