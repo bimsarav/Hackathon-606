@@ -1,0 +1,291 @@
+{
+  "results": [
+    {
+      "model": "Route\u00d7Hour Baseline",
+      "auc_60": 0.6765,
+      "brier_60": 0.078,
+      "baseline_auc_60": "\u2014",
+      "auc_15": 0.7411,
+      "baseline_auc_15": "\u2014",
+      "op_high_30pct": {
+        "precision": 0.235,
+        "recall": 0.038,
+        "f1": 0.066,
+        "accuracy": 0.905,
+        "flagged_pct": 1.4
+      },
+      "op_med_15pct": {
+        "precision": 0.167,
+        "recall": 0.432,
+        "f1": 0.241,
+        "accuracy": 0.761,
+        "flagged_pct": 22.7
+      }
+    },
+    {
+      "model": "LightGBM (defaults)",
+      "auc_60": 0.7677,
+      "brier_60": 0.0816,
+      "baseline_auc_60": 0.6765,
+      "auc_15": 0.8006,
+      "baseline_auc_15": 0.7411,
+      "op_high_30pct": {
+        "precision": 0.25,
+        "recall": 0.436,
+        "f1": 0.318,
+        "accuracy": 0.836,
+        "flagged_pct": 15.3
+      },
+      "op_med_15pct": {
+        "precision": 0.191,
+        "recall": 0.652,
+        "f1": 0.296,
+        "accuracy": 0.728,
+        "flagged_pct": 29.9
+      }
+    },
+    {
+      "model": "XGBoost (defaults)",
+      "auc_60": 0.781,
+      "brier_60": 0.0818,
+      "baseline_auc_60": 0.6765,
+      "auc_15": 0.8111,
+      "baseline_auc_15": 0.7411,
+      "op_high_30pct": {
+        "precision": 0.235,
+        "recall": 0.514,
+        "f1": 0.322,
+        "accuracy": 0.81,
+        "flagged_pct": 19.2
+      },
+      "op_med_15pct": {
+        "precision": 0.179,
+        "recall": 0.776,
+        "f1": 0.292,
+        "accuracy": 0.669,
+        "flagged_pct": 38.0
+      }
+    },
+    {
+      "model": "HistGBM/sklearn (defaults)",
+      "auc_60": 0.7628,
+      "brier_60": 0.079,
+      "baseline_auc_60": 0.6765,
+      "auc_15": 0.7971,
+      "baseline_auc_15": 0.7411,
+      "op_high_30pct": {
+        "precision": 0.268,
+        "recall": 0.392,
+        "f1": 0.318,
+        "accuracy": 0.852,
+        "flagged_pct": 12.9
+      },
+      "op_med_15pct": {
+        "precision": 0.2,
+        "recall": 0.591,
+        "f1": 0.299,
+        "accuracy": 0.756,
+        "flagged_pct": 26.0
+      }
+    },
+    {
+      "model": "Random Forest",
+      "auc_60": 0.7843,
+      "brier_60": 0.0741,
+      "baseline_auc_60": 0.6765,
+      "auc_15": 0.799,
+      "baseline_auc_15": 0.7411,
+      "op_high_30pct": {
+        "precision": 0.319,
+        "recall": 0.208,
+        "f1": 0.252,
+        "accuracy": 0.891,
+        "flagged_pct": 5.7
+      },
+      "op_med_15pct": {
+        "precision": 0.187,
+        "recall": 0.73,
+        "f1": 0.298,
+        "accuracy": 0.698,
+        "flagged_pct": 34.2
+      }
+    },
+    {
+      "model": "Logistic Regression",
+      "auc_60": 0.6887,
+      "brier_60": 0.0808,
+      "baseline_auc_60": 0.6765,
+      "auc_15": 0.7506,
+      "baseline_auc_15": 0.7411,
+      "op_high_30pct": {
+        "precision": 0.181,
+        "recall": 0.134,
+        "f1": 0.154,
+        "accuracy": 0.871,
+        "flagged_pct": 6.5
+      },
+      "op_med_15pct": {
+        "precision": 0.153,
+        "recall": 0.539,
+        "f1": 0.238,
+        "accuracy": 0.697,
+        "flagged_pct": 30.9
+      }
+    },
+    {
+      "model": "LightGBM (Optuna tuned)",
+      "auc_60": 0.7887,
+      "brier_60": 0.077,
+      "baseline_auc_60": 0.6765,
+      "auc_15": 0.8064,
+      "baseline_auc_15": 0.7411,
+      "op_high_30pct": {
+        "precision": 0.273,
+        "recall": 0.474,
+        "f1": 0.347,
+        "accuracy": 0.843,
+        "flagged_pct": 15.2
+      },
+      "op_med_15pct": {
+        "precision": 0.189,
+        "recall": 0.742,
+        "f1": 0.301,
+        "accuracy": 0.698,
+        "flagged_pct": 34.5
+      }
+    },
+    {
+      "model": "XGBoost (Optuna tuned)",
+      "auc_60": 0.7863,
+      "brier_60": 0.0756,
+      "baseline_auc_60": 0.6765,
+      "auc_15": 0.8084,
+      "baseline_auc_15": 0.7411,
+      "op_high_30pct": {
+        "precision": 0.265,
+        "recall": 0.411,
+        "f1": 0.323,
+        "accuracy": 0.848,
+        "flagged_pct": 13.6
+      },
+      "op_med_15pct": {
+        "precision": 0.196,
+        "recall": 0.709,
+        "f1": 0.307,
+        "accuracy": 0.719,
+        "flagged_pct": 31.8
+      }
+    }
+  ],
+  "best_lgb_params": {
+    "15": {
+      "lr": 0.025215741800023745,
+      "nl": 67,
+      "mdl": 151,
+      "ff": 0.7429126143544483,
+      "l2": 0.6843805939872544,
+      "bag": 0.6717682648521792,
+      "bf": 4,
+      "rounds": 250
+    },
+    "60": {
+      "lr": 0.01368848214896067,
+      "nl": 93,
+      "mdl": 184,
+      "ff": 0.5617493252351051,
+      "l2": 0.1635310690884751,
+      "bag": 0.5760440691374918,
+      "bf": 4,
+      "rounds": 401
+    }
+  },
+  "best_xgb_params": {
+    "15": {
+      "md": 7,
+      "eta": 0.06938757430436748,
+      "ss": 0.9572450035235563,
+      "cst": 0.9775349305534284,
+      "ra": 3.993492971574918,
+      "rl": 0.3562939671240477,
+      "mcw": 9,
+      "rounds": 193
+    },
+    "60": {
+      "md": 6,
+      "eta": 0.0482367684918279,
+      "ss": 0.8927224228461792,
+      "cst": 0.7816086698097523,
+      "ra": 3.3832370125409543,
+      "rl": 3.904142125176518,
+      "mcw": 7,
+      "rounds": 286
+    }
+  },
+  "feature_importances": [
+    [
+      "network_rate",
+      22532.505282998085
+    ],
+    [
+      "route_rate",
+      14864.591672182083
+    ],
+    [
+      "hour_local",
+      12276.541088104248
+    ],
+    [
+      "month",
+      11635.859441831708
+    ],
+    [
+      "station_rate",
+      11083.88223195076
+    ],
+    [
+      "sched_turn",
+      11079.383156955242
+    ],
+    [
+      "origin",
+      10625.99573931098
+    ],
+    [
+      "load_factor",
+      8008.510222643614
+    ],
+    [
+      "destination",
+      7941.067655801773
+    ],
+    [
+      "turn_buffer",
+      7640.463732287288
+    ],
+    [
+      "prev_origin",
+      7096.498687744141
+    ],
+    [
+      "weekday",
+      5321.214658915997
+    ],
+    [
+      "route_freq",
+      5154.060037910938
+    ],
+    [
+      "leg_of_day",
+      3027.5168571174145
+    ],
+    [
+      "aircraft_model",
+      2581.1523223519325
+    ]
+  ],
+  "new_features_added": [
+    "month",
+    "sched_turn",
+    "route_freq"
+  ]
+}

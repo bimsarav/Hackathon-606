@@ -61,7 +61,7 @@ PARAMS: dict[
 CATEGORIES: dict[str, tuple[str, ...]] = {
     "fare_family": ("Basic", "Value", "Ultimate", "Other", "Staff/ID", "Bus"),
     "sales_channel": ("TravelAgent", "APIAgencies", "SITECORE", "LCC", "Web", "IOS", "ANDROID", "GOQUO"),
-    "loyalty_tier": ("none", "Blue", "Silver", "Gold", "Platinum"),
+    "loyalty_tier": ("none", "Basic", "Silver", "Gold", "Platinum"),  # airline loyalty sample ladder
     "frequency": ("occasional", "regular", "frequent", "unknown"),
     "reward_type": (rw.MEAL, rw.VOUCHER, rw.LOUNGE, rw.MILES, rw.TICKET),
 }

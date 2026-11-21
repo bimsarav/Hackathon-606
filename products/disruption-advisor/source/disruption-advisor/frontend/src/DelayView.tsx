@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api, type DelayResult, errorText, type Meta, type RecoveryOption, type Scenario } from "./api";
+import { api, type ConnectionRisk, type DelayResult, errorText, type Meta, type PassengerRow, type RecoveryOption, type Scenario } from "./api";
 import { aed, hhmm, minutes, num, utc } from "./format";
 import { AgentRecommendationPanel } from "./AgentRunView";
 import { RotationBoard } from "./RotationBoard";
@@ -183,6 +183,12 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
         )}
       </section>
 
+      <ConnectionDrillDown
+        misconnections={result.misconnections}
+        passengers={result.passengers}
+        flightId={result.flight.flight_id}
+      />
+
       <PassengerTabs
         scenario={scenario}
         passengersLabel={cancelledPax ? `Passengers to rebook (${num(result.passengers.length)})` : `Connection passengers (${num(result.misconnections.length)})`}
@@ -219,5 +225,154 @@ export function Kpi({ label, value, sub }: { label: string; value: string; sub?:
       <span className="kpi-value">{value}</span>
       {sub && <span className="kpi-sub">{sub}</span>}
     </div>
+  );
+}
+
+type MisconnRow = DelayResult["misconnections"][number] & {
+  hub?: string;
+  misconnect_risk?: number;
+  default_mct_flag?: boolean;
+  assigned_flight: string | null;
+  new_departure: string | null;
+  onward_ok: boolean | null;
+};
+
+function slackClass(slack: number) {
+  if (slack <= 0) return "text-bad";
+  if (slack <= 20) return "text-warn";
+  return "text-ok";
+}
+
+function RebookingStatus({ row }: { row: MisconnRow }) {
+  if (row.assigned_flight)
+    return <span className="chip chip-ok">{row.assigned_flight}{row.new_departure ? ` ${hhmm(row.new_departure)}` : ""}</span>;
+  if (row.onward_ok === true)
+    return <span className="chip chip-ok">Connection held</span>;
+  if (row.onward_ok === false)
+    return <span className="chip chip-bad">No seat found</span>;
+  return <span className="muted">—</span>;
+}
+
+function ConnectionDrillDown({
+  misconnections,
+  passengers,
+  flightId,
+}: {
+  misconnections: DelayResult["misconnections"];
+  passengers: PassengerRow[];
+  flightId: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [riskMap, setRiskMap] = useState<Record<string, ConnectionRisk>>({});
+  const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  if (misconnections.length === 0) return null;
+
+  async function expand() {
+    setOpen(true);
+    if (Object.keys(riskMap).length > 0) return;
+    setLoading(true);
+    setFetchError(null);
+    try {
+      const { connections } = await api.flightRisk(flightId);
+      setRiskMap(Object.fromEntries(connections.map((c) => [c.pnr, c])));
+    } catch (e: unknown) {
+      setFetchError(errorText(e, "Could not load misconnect risk data."));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const paxByPnr = Object.fromEntries(
+    passengers.filter((p) => p.group === "missed_connection").map((p) => [p.pnr, p]),
+  );
+
+  const hasRisk = Object.keys(riskMap).length > 0;
+
+  const rows: MisconnRow[] = misconnections.map((m) => ({
+    ...m,
+    hub: riskMap[m.pnr]?.hub,
+    misconnect_risk: riskMap[m.pnr]?.misconnect_risk,
+    default_mct_flag: riskMap[m.pnr]?.default_mct,
+    assigned_flight: paxByPnr[m.pnr]?.assigned_flight ?? null,
+    new_departure: paxByPnr[m.pnr]?.new_departure ?? null,
+    onward_ok: paxByPnr[m.pnr]?.onward_ok ?? null,
+  }));
+
+  return (
+    <section aria-labelledby="conn-drill-title">
+      <h2 id="conn-drill-title">Connecting passengers at risk ({num(misconnections.length)})</h2>
+      <p className="small muted">
+        Each passenger has an onward flight departing from the hub. Slack = connection time − MCT.
+      </p>
+      {!open ? (
+        <button type="button" className="primary" onClick={() => void expand()}>
+          Show connecting passenger detail
+        </button>
+      ) : (
+        <>
+          <button type="button" className="link" style={{ marginBottom: "0.75rem", display: "inline-block" }}
+            onClick={() => setOpen(false)}>
+            Hide detail
+          </button>
+          {loading && <p className="muted small">Loading connection risk…</p>}
+          {fetchError && <p className="error" role="alert">{fetchError}</p>}
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">PNR</th>
+                  <th scope="col">Onward flight</th>
+                  <th scope="col">Via</th>
+                  <th scope="col">Destination</th>
+                  <th scope="col" className="num">Planned conn.</th>
+                  <th scope="col" className="num">New conn.</th>
+                  <th scope="col" className="num">MCT</th>
+                  <th scope="col" className="num">Slack</th>
+                  {hasRisk && <th scope="col" className="num">Miss risk</th>}
+                  <th scope="col">Rebooking</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r) => {
+                  const connTime = r.new_minutes ?? r.planned_minutes;
+                  const slack = connTime - r.mct_minutes;
+                  return (
+                    <tr key={r.pnr} className={r.onward_ok === false ? "unprotected" : ""}>
+                      <td className="mono">{r.pnr}</td>
+                      <td>{r.outbound_flight_number}</td>
+                      <td>{r.hub ?? <span className="muted">—</span>}</td>
+                      <td>{r.final_destination}</td>
+                      <td className="num">{r.planned_minutes} min</td>
+                      <td className="num">
+                        {r.new_minutes !== null
+                          ? <span className={r.new_minutes < r.planned_minutes ? "text-bad" : ""}>{r.new_minutes} min</span>
+                          : <span className="muted">—</span>}
+                      </td>
+                      <td className="num">
+                        {r.mct_minutes} min
+                        {r.default_mct_flag && <span className="chip small">est.</span>}
+                      </td>
+                      <td className={`num ${slackClass(slack)}`}>
+                        {slack > 0 ? `+${slack}` : slack} min
+                      </td>
+                      {hasRisk && (
+                        <td className="num">
+                          {r.misconnect_risk !== undefined
+                            ? `${Math.round(r.misconnect_risk * 100)}%`
+                            : <span className="muted">—</span>}
+                        </td>
+                      )}
+                      <td><RebookingStatus row={r} /></td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+    </section>
   );
 }

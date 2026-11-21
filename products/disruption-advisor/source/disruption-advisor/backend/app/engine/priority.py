@@ -7,6 +7,11 @@ Tier order (Q12, UC5: rights and mandatory assistance are respected independentl
   3 Everyone else.
 Non-revenue passengers come after all revenue passengers. The weighted score only orders passengers within the
 same tier, so commercial value can never move someone across a tier.
+
+Loyalty follows the airline's loyalty sample (user 2026-11-21): tiers Basic < Silver < Gold < Platinum carry the
+recovery priority Lowest < Low < Medium < High; enrolment alone (Basic) already counts above a non-member; and a
+family account travels on the head of family's tier, so a child or a non-member spouse on the family booking is not
+ranked below the head (the better of the person's own tier and the family tier is used).
 """
 
 from __future__ import annotations
@@ -16,7 +21,10 @@ from typing import Any
 
 # Unaccompanied minors (UMNR) are out of scope (user decision 2026-11-21; future enhancement).
 CARE_SSRS = frozenset({"WCHR", "WCHS", "WCHC", "BLND", "DEAF", "MEDA", "PREG"})
-TIER_VALUE = {None: 0.0, "Blue": 0.25, "Silver": 0.5, "Gold": 0.75, "Platinum": 1.0}
+LOYALTY_PRIORITY = {"Basic": "Lowest", "Silver": "Low", "Gold": "Medium", "Platinum": "High"}  # airline sample
+PRIORITY_VALUE = {"Lowest": 0.25, "Low": 0.5, "Medium": 0.75, "High": 1.0}
+TIER_VALUE: dict[str | None, float] = {None: 0.0}
+TIER_VALUE.update({tier: PRIORITY_VALUE[prio] for tier, prio in LOYALTY_PRIORITY.items()})
 FREQUENCY_VALUE = {"occasional": 0.2, "regular": 0.6, "frequent": 1.0, "unknown": 0.3}
 FAMILY_VALUE = {"Basic": 0.2, "Value": 0.5, "Ultimate": 1.0, "Other": 0.4, "Staff/ID": 0.0, "Bus": 0.2}
 
@@ -84,6 +92,15 @@ def rank(
 
     out: list[Ranked] = []
     for p in passengers:
+        own = p.get("loyalty_tier_synthetic")
+        family = p.get("family_tier_synthetic") if p.get("family_account_synthetic") else None
+        tier_name = max((x for x in (own, family) if x in LOYALTY_PRIORITY), key=TIER_VALUE.__getitem__, default=None)
+        p = {
+            **p,
+            "loyalty_effective_tier": tier_name,
+            "loyalty_effective_priority": LOYALTY_PRIORITY.get(tier_name or ""),
+            "loyalty_via_family": bool(tier_name and tier_name != own),
+        }
         if p["pax_type"] == "IN":
             continue
         key = (p["pnr"], p["customer_key"])
@@ -91,7 +108,7 @@ def rank(
         tier, reason = _tier(p, has_onward, segs)
         family = p.get("children", 0) + p.get("infants", 0) > 0
         values = {
-            "loyalty": TIER_VALUE.get(p.get("loyalty_tier_synthetic"), 0.0),
+            "loyalty": TIER_VALUE.get(tier_name, 0.0),
             "frequency": FREQUENCY_VALUE.get(str(p.get("travel_frequency_band") or "occasional"), 0.2),
             "fare_value": 0.7 * fare_pct(p["fare"]) + 0.3 * FAMILY_VALUE.get(str(p.get("fare_family_synthetic")), 0.4),
             "ancillaries": min((p.get("ancillaries") or 0.0) / 150.0, 1.0),
@@ -117,4 +134,9 @@ def explain(r: Ranked) -> str:
     top = sorted(((v, a) for a, v in r.contributions.items() if v > 0), reverse=True)[:3]
     parts = ", ".join(f"{LABELS[a]} +{v:g}" for v, a in top) or "no weighted factors"
     nonrev = " Non-revenue: placed after revenue passengers." if r.non_revenue else ""
-    return f"Tier {r.tier} ({r.tier_reason}). Score {r.score:g}/100: {parts}.{nonrev}"
+    p = r.passenger
+    loyalty = ""
+    if p.get("loyalty_effective_tier"):
+        via = " via the family account" if p.get("loyalty_via_family") else ""
+        loyalty = f" Loyalty {p['loyalty_effective_tier']} (priority {p['loyalty_effective_priority']}){via}."
+    return f"Tier {r.tier} ({r.tier_reason}). Score {r.score:g}/100: {parts}.{loyalty}{nonrev}"

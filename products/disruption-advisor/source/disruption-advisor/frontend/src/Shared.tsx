@@ -218,7 +218,7 @@ export function PassengerTable({ scenario, rows, meta }: { scenario: Scenario; r
                   </span>
                 </td>
                 <td className="small">
-                  {p.loyalty_tier ? `${p.loyalty_tier}*` : "Not a member"} · {p.frequency ?? "—"}
+                  <LoyaltyCell p={p} /> · {p.frequency ?? "—"}
                   <span className="block muted">
                     {p.fare_family ?? "—"}* · fare {num(Math.round(p.fare))} · extras {num(Math.round(p.ancillaries))}
                   </span>
@@ -302,5 +302,26 @@ export function Assumptions({ items }: { items: string[] }) {
         ))}
       </ul>
     </details>
+  );
+}
+
+/** Loyalty as in the airline's loyalty sample: tier and its recovery priority, family account, points (synthetic). */
+export function LoyaltyCell({ p }: { p: PassengerRow }) {
+  const tier = p.loyalty_effective_tier ?? p.loyalty_tier;
+  if (!tier) return <>Not a member</>;
+  const priority = p.loyalty_effective_priority ?? p.loyalty_priority;
+  const family = p.family_account ? (p.family_head ? "head of family" : "family account") : null;
+  const title = [
+    priority ? `Recovery priority ${priority}` : null,
+    p.loyalty_via_family ? `Travels on the family account's ${tier} tier` : null,
+    p.loyalty_points != null ? `${num(p.loyalty_points)} points` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  return (
+    <span title={title || undefined}>
+      {tier}*{priority ? ` (${priority})` : ""}
+      {family ? <span className="chip small loyalty-family">{family}</span> : null}
+    </span>
   );
 }

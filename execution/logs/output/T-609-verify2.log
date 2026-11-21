@@ -1,0 +1,11 @@
+ Container disruption-advisor-web-1 Started 
+== smoke 11/11
+  ✓  1 [chromium] › tests/advisor.spec.ts:14:1 › wrong password is rejected and the API needs a token (345ms)
+  ✓  2 [chromium] › tests/advisor.spec.ts:23:1 › scenario A: a delay is assessed, options compared, recommendation approved (18.8s)
+  ✓  3 [chromium] › tests/advisor.spec.ts:54:1 › scenario B: a cancellation ranks passengers by tier and re-runs with new weights (4.0s)
+  ✓  4 [chromium] › tests/advisor.spec.ts:74:1 › phase 2: delay watchlist ranks flights, shows reasons and opens a delay scenario (7.0s)
+  ✓  5 [chromium] › tests/advisor.spec.ts:87:1 › phase 3: strategies switch the recommendation (13.3s)
+  ✓  6 [chromium] › tests/advisor.spec.ts:106:1 › phase 3: the agent investigates a flight and its recommendation opens for approval (27.0s)
+  ✓  7 [chromium] › tests/advisor.spec.ts:122:1 › phase 2: the 7-day tab shows last week's predictions against what happened, instead of the scenario launcher (477ms)
+  ✓  8 [chromium] › tests/advisor.spec.ts:136:1 › phase 5: a budget gives a reward plan from the preference model, and the plan can be approved (7.1s)
+  8 passed (1.3m)

@@ -76,6 +76,9 @@ NUMERIC = (
     "station_rate",
     "route_rate",
     "network_rate",
+    # Added T-511: month captures seasonal drift; route_freq captures route busyness.
+    "month",
+    "route_freq",
 )
 FEATURES = CATEGORICAL + NUMERIC
 WEEKDAYS = ("Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays", "Sundays")
@@ -125,7 +128,9 @@ def _frame(con: duckdb.DuckDBPyConnection, ops: Path) -> Frame:
             JOIN daily x ON x.origin = s.origin AND x.d BETWEEN s.d - {LAG_FROM} AND s.d - {LAG_TO}
             GROUP BY ALL),
         rt AS (
-            SELECT s.origin, s.destination, s.d, sum(x.k) / sum(x.n) AS rate
+            SELECT s.origin, s.destination, s.d,
+                   sum(x.k) / sum(x.n) AS rate,
+                   sum(x.n) * 1.0 / ({LAG_FROM} - {LAG_TO}) AS daily_freq
             FROM (SELECT DISTINCT origin, destination, d FROM b) s
             JOIN daily x ON x.origin = s.origin AND x.destination = s.destination
                         AND x.d BETWEEN s.d - {LAG_FROM} AND s.d - {LAG_TO}
@@ -142,6 +147,7 @@ def _frame(con: duckdb.DuckDBPyConnection, ops: Path) -> Frame:
                     THEN date_diff('minute', q.prev_sta, q.std) END AS turn_buffer,
                CASE WHEN q.capacity > 0 THEN least(q.booked_pax / q.capacity, 1.5) END AS load_factor,
                st.rate AS station_rate, rt.rate AS route_rate, nw.rate AS network_rate,
+               month(q.std) AS month, rt.daily_freq AS route_freq,
                q.origin || '-' || q.destination || '@' || hour(q.std_local) AS route_hour
         FROM seq q
         LEFT JOIN st ON st.origin = q.origin AND st.d = q.d

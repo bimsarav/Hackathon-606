@@ -48,3 +48,4 @@ input/secrets/
 
 # Runtime settings with secrets (API keys) - never commit (2026-11-21)
 products/**/settings.env
+input/data/disruption-uc5/*.csv

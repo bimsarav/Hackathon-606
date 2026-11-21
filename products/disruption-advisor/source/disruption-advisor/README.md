@@ -52,7 +52,13 @@ Every long-running service restarts by itself, including after a server reboot.
 
   Capacity comes from the inventory allocation (curtail/oversell) where available, otherwise from the aircraft layout inferred from the data.
 - **Stage 3 (`app/ml/delay_risk.py`, phase 2):** trains the delay-risk model on the 2026 history (LightGBM, features known 7 days ahead) and scores the window. Writes `flight_risk.parquet`, `connection_risk.parquet` and `model_card.json` to `<data>/ops`. It reruns with stage 2, so every new data drop retrains the model. Details: [docs/testing/model-card.md](docs/testing/model-card.md).
-- **Synthetic fields:** the extracts have no loyalty tier, fare family or special-service codes, so these are synthetic, deterministic and labelled in the UI. The data quality report is in `<data>/ops/ingest_report.json`.
+- **Synthetic fields:** the extracts have no loyalty tier, fare family or special-service codes, so these are synthetic, deterministic and labelled in the UI.
+- **Loyalty, modelled on the airline's loyalty sample:**
+  - Membership is the real booking flag.
+  - Tiers are Basic, Silver, Gold and Platinum, with recovery priority Lowest, Low, Medium and High.
+  - Each member gets a synthetic loyalty ID and points.
+  - Bookings travelling with children or infants form family accounts; family members use the better of their own tier and the head of family's tier.
+  - Rules: `LOYALTY_*` in `backend/app/ingest/build.py` and `backend/app/engine/priority.py`. The data quality report is in `<data>/ops/ingest_report.json`.
 
 ## Tests
 ```bash

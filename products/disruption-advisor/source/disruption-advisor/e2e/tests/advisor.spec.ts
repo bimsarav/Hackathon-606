@@ -76,7 +76,7 @@ test("phase 2: delay watchlist ranks flights, shows reasons and opens a delay sc
   await page.getByRole("button", { name: /Delay watchlist/ }).click();
   await expect(page.getByRole("heading", { name: /Delay watchlist/ })).toBeVisible();
   await page.getByRole("combobox", { name: /^Risk/ }).selectOption("all");
-  const table = page.getByRole("table", { name: "Flights at risk" });
+  const table = page.getByRole("table", { name: "Watchlist flights" });
   await expect(table).toBeVisible();
   await table.locator("tbody tr.clickable").first().locator("button.link").click();
   await expect(page.getByRole("heading", { name: "Why this flight" })).toBeVisible();

@@ -150,7 +150,9 @@ class OpsStore:
         "p.baggage_kg, p.has_meal, p.has_seat, p.pnr_size, p.adults, p.children, p.infants, p.ssr_code, "
         "p.ssr_source, p.sales_channel, p.passenger_id, "
         "p.passport_number_synthetic, p.national_id_synthetic, p.identity_rule, "
-        "c.is_loyalty_member, c.loyalty_tier_synthetic, c.travel_frequency_band, "
+        "p.family_account_synthetic, p.family_head_synthetic, p.family_tier_synthetic, "
+        "c.is_loyalty_member, c.loyalty_tier_synthetic, c.loyalty_priority, c.loyalty_id_synthetic, "
+        "c.available_points_synthetic, c.travel_frequency_band, "
         "c.flown_segments_12m, c.ambiguous_common_name"
     )
 

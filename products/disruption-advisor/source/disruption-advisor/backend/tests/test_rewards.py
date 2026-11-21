@@ -134,7 +134,7 @@ def _passengers(n: int = 20000) -> list[dict[str, Any]]:
                 "children": rnd.choice([0, 0, 0, 1]),
                 "infants": 0,
                 "is_loyalty_member": member,
-                "loyalty_tier_synthetic": rnd.choice(["Blue", "Silver", "Gold", "Platinum"]) if member else None,
+                "loyalty_tier_synthetic": rnd.choice(["Basic", "Silver", "Gold", "Platinum"]) if member else None,
                 "travel_frequency_band": rnd.choice(["occasional", "regular", "frequent"]),
                 "flown_segments_12m": rnd.randint(0, 40),
             }
@@ -179,10 +179,14 @@ def test_model_learns_who_takes_which_reward(trained: tuple[Any, dict[str, Any],
     seat = base | {"has_seat": True, "fare_family_synthetic": "Ultimate"}
     q = model.accept([base, seat], [(rw.LOUNGE, 120.0, 60.0)] * 2)
     assert q[1] > q[0] + 0.1
-    casual = base | {"is_loyalty_member": True, "loyalty_tier_synthetic": "Blue", "travel_frequency_band": "occasional"}
+    casual = base | {
+        "is_loyalty_member": True,
+        "loyalty_tier_synthetic": "Basic",
+        "travel_frequency_band": "occasional",
+    }
     loyal = base | {"is_loyalty_member": True, "loyalty_tier_synthetic": "Gold", "travel_frequency_band": "frequent"}
     r = model.accept([casual, loyal], [(rw.MILES, 200.0, 60.0)] * 2)
-    assert r[1] > r[0] + 0.05  # a frequent Gold member takes miles more often than a casual Blue one
+    assert r[1] > r[0] + 0.05  # a frequent Gold member takes miles more often than a casual Basic one
 
 
 def test_plan_uses_the_model_and_still_respects_the_budget(trained: tuple[Any, dict[str, Any], Any]) -> None:

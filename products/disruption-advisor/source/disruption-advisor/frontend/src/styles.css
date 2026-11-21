@@ -122,6 +122,10 @@ h3 {
 .block {
   display: block;
 }
+.text-ok   { color: var(--ok); }
+.text-warn { color: var(--warn); }
+.text-bad  { color: var(--bad); font-weight: 600; }
+.mono { font-family: var(--mono); font-size: 0.85em; }
 .eyebrow {
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -1041,3 +1045,95 @@ tr.clickable.selected {
   border-radius: 6px;
   padding: 0.5rem 0.75rem;
 }
+
+.feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.75rem;
+}
+.feature-list li {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.2rem 0.55rem;
+}
+/* Model card — accordion decisions */
+.decisions-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.decision-row {
+  border-bottom: 1px solid var(--line);
+}
+.decision-row:last-child {
+  border-bottom: none;
+}
+.decision-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 0.9rem;
+  background: var(--panel);
+  border: none;
+  border-radius: 0;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ink);
+}
+.decision-trigger:hover {
+  background: var(--surface);
+}
+.decision-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  flex: 0 0 auto;
+}
+.decision-summary {
+  font-size: 0.82rem;
+  flex: 1;
+}
+.decision-chevron {
+  font-size: 0.7rem;
+  color: var(--dim);
+  flex-shrink: 0;
+}
+.decision-detail {
+  margin: 0;
+  padding: 0.6rem 0.9rem 0.9rem 0.9rem;
+  background: var(--surface);
+  color: var(--muted);
+  line-height: 1.6;
+  border-top: 1px solid var(--line);
+}
+.chip-decision {
+  background: rgba(0,196,222,0.10);
+  color: var(--accent);
+  border-color: rgba(0,196,222,0.20);
+  font-size: 0.68rem;
+  padding: 0.1rem 0.45rem;
+  flex-shrink: 0;
+  margin-left: 0;
+}
+/* Expandable sections */
+.expand-section {
+  margin-bottom: 0.5rem;
+}
+.expand-trigger {
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+  display: block;
+}
+.expand-body {
+  padding: 0.75rem 0 0.5rem;
+}
+
+/* Loyalty: family-account chip next to the tier (airline loyalty sample) */
+.loyalty-family { margin-left: 4px; }

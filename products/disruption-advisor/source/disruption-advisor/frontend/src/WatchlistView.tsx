@@ -88,7 +88,7 @@ export function WatchlistView({ onAnalyse, onAgent, busy }: Props) {
       {data && data.flights.length === 0 && <p className="muted">No flights match this filter.</p>}
       {data && data.flights.length > 0 && (
         <div className="table-wrap">
-          <table aria-label="Flights at risk">
+          <table aria-label="Watchlist flights">
             <thead>
               <tr>
                 <th scope="col">Flight</th>

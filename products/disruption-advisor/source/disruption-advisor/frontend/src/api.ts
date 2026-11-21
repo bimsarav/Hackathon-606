@@ -168,6 +168,14 @@ export interface PassengerRow {
   non_revenue: boolean;
   reason: string;
   loyalty_tier: string | null;
+  /** Phase 3 loyalty (airline loyalty sample): optional for scenarios saved before it. */
+  loyalty_priority?: string | null;
+  loyalty_effective_tier?: string | null;
+  loyalty_effective_priority?: string | null;
+  loyalty_via_family?: boolean;
+  loyalty_points?: number | null;
+  family_account?: boolean;
+  family_head?: boolean;
   frequency: string | null;
   fare: number;
   fare_family: string | null;
@@ -491,14 +499,23 @@ export interface ModelCard {
   trained_at: string;
   thresholds_minutes: number[];
   features: string[];
+  target?: string;
+  versions?: Record<string, string>;
   evaluation: {
     train: string;
     test: string;
+    baseline?: string;
     metrics_by_threshold: Record<string, ModelMetrics>;
     connection_backtest: { slack: string; pairs: number; predicted: number; observed: number }[];
     classification?: Record<string, Classification>;
     rolling_monthly?: RollingFold[];
   };
+  production?: {
+    train: string;
+    scored_flights: number;
+    bands_on_p60: { high: number; medium: number };
+  };
+  connections?: { pairs: number; default_mct_minutes: number };
   assumptions: string[];
 }
 

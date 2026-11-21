@@ -23,6 +23,8 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from app.ingest.build import LOYALTY_POINTS_BASE, LOYALTY_POINTS_PER_FLIGHT, LOYALTY_PRIORITY
+
 DAY = datetime(2026, 11, 22)
 
 
@@ -46,7 +48,7 @@ FLIGHTS = [  # (flight number, tail, origin, destination, std, sta, booked seats
 # (pnr, first, last, pax type, ssr, fare, ancillaries, booking code, fare family, revenue, loyalty tier, frequency)
 PAX = [
     ("DMOA01", "Ahmed", "Raza", "AD", "WCHR", 420.0, 0.0, "E24", "Basic", "REVENUE", None, "occasional"),
-    ("DMOA02", "Fatima", "Khan", "AD", None, 510.0, 60.0, "E30", "Value", "REVENUE", "Blue", "regular"),
+    ("DMOA02", "Fatima", "Khan", "AD", None, 510.0, 60.0, "E30", "Value", "REVENUE", "Basic", "regular"),
     ("DMOA02", "Imran", "Khan", "AD", None, 510.0, 60.0, "E30", "Value", "REVENUE", None, "regular"),
     ("DMOA02", "Zara", "Khan", "IN", "INFT", 60.0, 0.0, "E30", "Value", "REVENUE", None, "occasional"),
     ("DMOA04", "Omar", "Siddiqui", "AD", None, 1450.0, 220.0, "E43", "Ultimate", "REVENUE", "Platinum", "frequent"),
@@ -64,7 +66,7 @@ PAX = [
     ("DMOA10", "Faisal", "Aslam", "AD", None, 480.0, 25.0, "E27", "Value", "REVENUE", None, "occasional"),
     ("DMOA11", "Kashif", "Noor", "AD", None, 300.0, 0.0, "E15", "Basic", "REVENUE", None, "occasional"),
     ("DMOA12", "Mariam", "Saeed", "AD", "PREG", 520.0, 35.0, "E30", "Value", "REVENUE", None, "occasional"),
-    ("DMOA13", "Waqas", "Ali", "AD", None, 610.0, 120.0, "E33", "Value", "REVENUE", "Blue", "regular"),
+    ("DMOA13", "Waqas", "Ali", "AD", None, 610.0, 120.0, "E33", "Value", "REVENUE", "Basic", "regular"),
     ("DMOA14", "Sana", "Farooq", "AD", None, 395.0, 0.0, "E20", "Basic", "REVENUE", None, "occasional"),
     ("DMOA14", "Adeel", "Farooq", "AD", None, 395.0, 0.0, "E20", "Basic", "REVENUE", None, "occasional"),
     ("DMOA15", "Zubair", "Hameed", "AD", None, 275.0, 0.0, "E13", "Basic", "REVENUE", None, "occasional"),
@@ -171,6 +173,11 @@ def add_demo_scenario(ops: Path) -> dict[str, int]:
                 "bookings_12m": max(flown // 2, 1),
                 "ambiguous_common_name": False,
                 "loyalty_tier_synthetic": tier,
+                "loyalty_priority": LOYALTY_PRIORITY.get(tier or ""),
+                "loyalty_id_synthetic": f"G9{int(key[:8], 16) % 10**9:09d}" if tier else None,
+                "available_points_synthetic": (
+                    LOYALTY_POINTS_BASE[tier] + LOYALTY_POINTS_PER_FLIGHT * flown if tier else None
+                ),
                 "travel_frequency_band": freq,
             }
         )

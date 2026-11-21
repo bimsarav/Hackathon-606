@@ -1,0 +1,68 @@
+ Image disruption-advisor-api:latest Built 
+ Container disruption-advisor-api-1 Waiting 
+ Container disruption-advisor-api-1 Healthy 
+api Up 5 seconds (healthy)
+db Up 8 hours (healthy)
+extracts-db Exited (0) 5 seconds ago
+ingest Exited (0) 6 seconds ago
+migrate Exited (0) 38 seconds ago
+web Up 4 minutes (healthy)
+ingest-1  | 2026-11-21 03:56:45,860 INFO stage 3 done: {"scored": 2623, "connections": 88434, "auc_60": 0.7593}
+ingest-1  | 2026-11-21 03:56:50,100 INFO reward preference model (synthetic history): AUC 0.7008 vs proxy rules 0.6654
+ingest-1  | 2026-11-21 03:56:50,167 INFO stage 4 done: {"offers": 300000, "auc": 0.7008}
+   ('Basic', 'Lowest', 30847, 2000, 6440, 14500)
+   ('Silver', 'Low', 5314, 49000, 53990, 61500)
+   ('Gold', 'Medium', 3613, 109000, 126650, 139480)
+   ('Platinum', 'High', 5039, 277000, 317340, 404890)
+ids unique: [(True, 44813)]
+export: [(44813, 8778, 3230)]
+== smoke 4/11
+  ✘  1 [chromium] › tests/advisor.spec.ts:14:1 › wrong password is rejected and the API needs a token (30.3s)
+  ✘  2 [chromium] › tests/advisor.spec.ts:14:1 › wrong password is rejected and the API needs a token (retry #1) (30.3s)
+  ✘  3 [chromium] › tests/advisor.spec.ts:23:1 › scenario A: a delay is assessed, options compared, recommendation approved (30.3s)
+  ✘  4 [chromium] › tests/advisor.spec.ts:23:1 › scenario A: a delay is assessed, options compared, recommendation approved (retry #1) (30.3s)
+  ✘  5 [chromium] › tests/advisor.spec.ts:54:1 › scenario B: a cancellation ranks passengers by tier and re-runs with new weights (30.3s)
+  ✘  6 [chromium] › tests/advisor.spec.ts:54:1 › scenario B: a cancellation ranks passengers by tier and re-runs with new weights (retry #1) (30.3s)
+  ✘  7 [chromium] › tests/advisor.spec.ts:74:1 › phase 2: delay watchlist ranks flights, shows reasons and opens a delay scenario (30.3s)
+  ✘  8 [chromium] › tests/advisor.spec.ts:74:1 › phase 2: delay watchlist ranks flights, shows reasons and opens a delay scenario (retry #1) (30.3s)
+  ✘  9 [chromium] › tests/advisor.spec.ts:87:1 › phase 3: strategies switch the recommendation (30.3s)
+  ✘  10 [chromium] › tests/advisor.spec.ts:87:1 › phase 3: strategies switch the recommendation (retry #1) (30.3s)
+  ✘  11 [chromium] › tests/advisor.spec.ts:106:1 › phase 3: the agent investigates a flight and its recommendation opens for approval (30.3s)
+  ✘  12 [chromium] › tests/advisor.spec.ts:106:1 › phase 3: the agent investigates a flight and its recommendation opens for approval (retry #1) (30.3s)
+  ✘  13 [chromium] › tests/advisor.spec.ts:122:1 › phase 2: the 7-day tab shows last week's predictions against what happened, instead of the scenario launcher (30.3s)
+  ✘  14 [chromium] › tests/advisor.spec.ts:122:1 › phase 2: the 7-day tab shows last week's predictions against what happened, instead of the scenario launcher (retry #1) (30.3s)
+  ✘  15 [chromium] › tests/advisor.spec.ts:136:1 › phase 5: a budget gives a reward plan from the preference model, and the plan can be approved (30.3s)
+  ✘  16 [chromium] › tests/advisor.spec.ts:136:1 › phase 5: a budget gives a reward plan from the preference model, and the plan can be approved (retry #1) (30.3s)
+    Error: expect(locator).toContainText(expected) failed
+    test-results/advisor-wrong-password-is-rejected-and-the-API-needs-a-token-chromium/test-failed-1.png
+    Error: expect(locator).toContainText(expected) failed
+    test-results/advisor-wrong-password-is-rejected-and-the-API-needs-a-token-chromium-retry1/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/advisor-scenario-A-a-delay-c6bd0-red-recommendation-approved-chromium/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/advisor-scenario-A-a-delay-c6bd0-red-recommendation-approved-chromium-retry1/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/advisor-scenario-B-a-cance-a1431-nd-re-runs-with-new-weights-chromium/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/advisor-scenario-B-a-cance-a1431-nd-re-runs-with-new-weights-chromium-retry1/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/advisor-phase-2-delay-watc-02588--and-opens-a-delay-scenario-chromium/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/advisor-phase-2-delay-watc-02588--and-opens-a-delay-scenario-chromium-retry1/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/advisor-phase-3-strategies-switch-the-recommendation-chromium/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/advisor-phase-3-strategies-switch-the-recommendation-chromium-retry1/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/advisor-phase-3-the-agent--48a55-endation-opens-for-approval-chromium/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/advisor-phase-3-the-agent--48a55-endation-opens-for-approval-chromium-retry1/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/advisor-phase-2-the-7-day--58f31-ad-of-the-scenario-launcher-chromium/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/advisor-phase-2-the-7-day--58f31-ad-of-the-scenario-launcher-chromium-retry1/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/advisor-phase-5-a-budget-g-9c2ee-nd-the-plan-can-be-approved-chromium/test-failed-1.png
+    Error: expect(locator).toBeVisible() failed
+    test-results/advisor-phase-5-a-budget-g-9c2ee-nd-the-plan-can-be-approved-chromium-retry1/test-failed-1.png
+  8 failed

@@ -128,7 +128,7 @@ story += [table([
     ["Travel frequency (real counts)", "Flown segments in the 12 months before 20 Nov 2026, by customer key. Names in more than 60 "
      "bookings a year are flagged 'unknown' (common or placeholder names)", "5,197 frequent travellers who are not loyalty members",
      "UC5 asks to recognise frequent travellers without membership. Real counts, synthetic identity."],
-    ["Loyalty tier", "Members only: 24+ segments Platinum, 12+ Gold, 6+ Silver, else Blue", "Blue 30,845 · Silver 5,312 · Gold 3,611 · "
+    ["Loyalty tier", "Members only (real flag): 24+ segments Platinum, 12+ Gold, 6+ Silver, else Basic; ladder and recovery priority from the airline loyalty sample (Basic Lowest, Silver Low, Gold Medium, Platinum High); family accounts travel on the head of family's tier", "Basic 30,845 · Silver 5,312 · Gold 3,611 · "
      "Platinum 5,038 · non-members 129,917", "Tier names and thresholds are assumptions [ASSUMPTION]. Replace with the airline's tier file."],
     ["Fare family", "Booking classes E9...E45 ordered by average fare; cheapest 50% of passengers Basic, next 35% Value, top 15% "
      "Ultimate; other codes 'Other'", "Basic 109,800 · Value 112,732 · Ultimate 29,362 · Other 46,433 segments",
@@ -223,7 +223,7 @@ story += [p("7.2 Weighted score inside a tier (simple additive weighting)", H2),
     "user-adjustable weight w<sub>k</sub> (defaults: loyalty 20, frequency 15, fare value 20, ancillaries 10, journey 20, family/group 15):")]
 story += [p("score = 100 x &Sigma;<sub>k</sub> w<sub>k</sub> v<sub>k</sub> / &Sigma;<sub>k</sub> w<sub>k</sub><br/>"
             "contribution<sub>k</sub> = 100 x w<sub>k</sub> v<sub>k</sub> / &Sigma; w     (shown per passenger)<br/>"
-            "v_loyalty: none 0, Blue .25, Silver .5, Gold .75, Platinum 1<br/>"
+            "v_loyalty: none 0, Basic (Lowest) .25, Silver (Low) .5, Gold (Medium) .75, Platinum (High) 1; family members use the better of own and family tier<br/>"
             "v_frequency: occasional .2, regular .6, frequent 1, unknown .3<br/>"
             "v_fare = .7 x percentile rank of fare + .3 x family value (Basic .2, Value .5, Ultimate 1)<br/>"
             "v_ancillaries = min(ancillaries / 150, 1);  v_journey = min(.6 x onward + .2 x extra sectors, 1)<br/>"
