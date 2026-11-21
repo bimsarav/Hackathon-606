@@ -16,13 +16,11 @@ export function Explanation({ text, source }: { text: string; source: string }) 
   const ai = source.startsWith("ai:");
   return (
     <section className="explanation" aria-labelledby="why-title">
-      <h2 id="why-title">
-        Why this recommendation{" "}
-        <span className={`chip ${ai ? "chip-ok" : ""}`}>{ai ? `Written by ${source.slice(3)}` : "Template text"}</span>
-      </h2>
+      <h2 id="why-title">Why?</h2>
       <p>{text}</p>
       <p className="small muted">
-        The numbers come from the recovery engine; the language model only words them. It never decides.
+        The numbers come from the recovery engine; the language model only words them. It never decides.{" "}
+        {ai ? `Text written by ${source.slice(3)}.` : "Template text."}
       </p>
     </section>
   );

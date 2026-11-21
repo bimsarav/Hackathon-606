@@ -27,7 +27,7 @@ test("scenario A: a delay is assessed, options compared, recommendation approved
   await expect(page.getByRole("heading", { name: "Recovery options", exact: true })).toBeVisible();
   const recommended = page.locator("tr.recommended");
   await expect(recommended).toHaveCount(1);
-  await expect(page.getByRole("heading", { name: /Why this recommendation/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Why?", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: /Flights affected/ })).toBeVisible();
   await page.getByRole("button", { name: "Approve recommended option" }).click();
   await expect(page.locator(".audit").first()).toContainText("APPROVE");

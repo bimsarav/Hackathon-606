@@ -154,7 +154,7 @@ describe("result views", () => {
     render(<DelayView scenario={scenario} result={scenario.result as never} meta={meta} onUpdate={() => {}} />);
     expect(screen.getAllByText("Swap: A6-ARI takes over G9520").length).toBeGreaterThan(0);
     expect(screen.getByText("saves AED 151,725 vs worst option")).toBeInTheDocument();
-    expect(screen.getByText("Template text")).toBeInTheDocument();
+    expect(screen.getByText(/Template text\./)).toBeInTheDocument();
   });
 
   it("lists cancelled-flight passengers with tier and recommended flight", async () => {
