@@ -1,0 +1,53 @@
+Unable to find image 'mcr.microsoft.com/playwright:v1.65.1' locally
+v1.65.1: Pulling from playwright
+26538842dfbf: Pulling fs layer
+a41e11046077: Pulling fs layer
+9e0eed0efbea: Pulling fs layer
+6802dea8d812: Pulling fs layer
+16013128adc1: Pulling fs layer
+47752f912df1: Pulling fs layer
+80e9d9e1b5bb: Pulling fs layer
+6802dea8d812: Waiting
+16013128adc1: Waiting
+47752f912df1: Waiting
+9e0eed0efbea: Verifying Checksum
+9e0eed0efbea: Download complete
+26538842dfbf: Verifying Checksum
+26538842dfbf: Download complete
+26538842dfbf: Pull complete
+a41e11046077: Verifying Checksum
+a41e11046077: Download complete
+a41e11046077: Pull complete
+9e0eed0efbea: Pull complete
+47752f912df1: Verifying Checksum
+47752f912df1: Download complete
+16013128adc1: Verifying Checksum
+16013128adc1: Download complete
+6802dea8d812: Verifying Checksum
+6802dea8d812: Download complete
+80e9d9e1b5bb: Verifying Checksum
+80e9d9e1b5bb: Download complete
+6802dea8d812: Pull complete
+16013128adc1: Pull complete
+47752f912df1: Pull complete
+80e9d9e1b5bb: Pull complete
+Digest: sha256:1507cbfc550a63a6b7396791ca4f00df17beb56342d2447b3f106c306f525579
+Status: Downloaded newer image for mcr.microsoft.com/playwright:v1.65.1
+
+Running 11 tests using 1 worker
+
+  ✓   1 [chromium] › tests/advisor.spec.ts:14:1 › wrong password is rejected and the API needs a token (730ms)
+  ✓   2 [chromium] › tests/advisor.spec.ts:23:1 › scenario A: a delay is assessed, options compared, recommendation approved (24.0s)
+  ✓   3 [chromium] › tests/advisor.spec.ts:54:1 › scenario B: a cancellation ranks passengers by tier and re-runs with new weights (2.6s)
+  ✓   4 [chromium] › tests/advisor.spec.ts:76:1 › phase 2: delay watchlist ranks flights, shows reasons and opens a delay scenario (8.4s)
+  ✓   5 [chromium] › tests/advisor.spec.ts:89:1 › phase 3: strategies switch the recommendation (13.7s)
+  ✓   6 [chromium] › tests/advisor.spec.ts:106:1 › phase 3: the agent investigates a flight and its recommendation opens for approval (22.9s)
+  ✓   7 [chromium] › tests/advisor.spec.ts:122:1 › phase 2: the 7-day page shows last month's cascade check and no scenario launcher (608ms)
+  ✓   8 [chromium] › tests/advisor.spec.ts:138:1 › phase 5: a budget gives a reward plan from the preference model, and the plan can be approved (5.9s)
+  ✓   9 [chromium] › tests/evaluator.spec.ts:27:1 › the OCC role does not see the Model Card and Test data views, and the API refuses them (305ms)
+  -  10 [chromium] › tests/evaluator.spec.ts:40:1 › the evaluator reads the model evidence, uploads two flights, analyses one and removes them
+  -  11 [chromium] › tests/evaluator.spec.ts:94:1 › a bad flights sheet is rejected with the row and column, and nothing is added
+
+  2 skipped
+  9 passed (1.3m)
+e2e exit 0

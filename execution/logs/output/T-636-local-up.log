@@ -1,0 +1,37 @@
+Sat Nov 21 05:53:10 PM UTC 2026
+#33 DONE 2.0s
+
+#3 [migrate internal] load metadata for docker.io/library/python:3.14.10-slim-trixie
+#3 ...
+
+#34 [web stage-1 4/4] COPY --from=build /web/dist /usr/share/nginx/html
+#34 DONE 0.0s
+
+#19 [web] exporting to image
+#19 exporting layers 0.1s done
+#19 writing image sha256:c8f8527ede091250a2ac4af690afd7ada975f158c57fb7478af57439031ce5e7 done
+#19 naming to docker.io/library/disruption-advisor-web:latest done
+#19 DONE 4.1s
+
+#3 [migrate internal] load metadata for docker.io/library/python:3.14.10-slim-trixie
+build exit 0
+ Container disruption-advisor-ingest-1  Waiting
+ Container disruption-advisor-migrate-1  Waiting
+ Container disruption-advisor-ingest-1  Waiting
+ Container disruption-advisor-migrate-1  Exited
+ Container disruption-advisor-db-1  Healthy
+ Container disruption-advisor-ingest-1  Exited
+ Container disruption-advisor-api-1  Starting
+ Container disruption-advisor-ingest-1  Exited
+ Container disruption-advisor-extracts-db-1  Starting
+ Container disruption-advisor-extracts-db-1  Started
+ Container disruption-advisor-api-1  Started
+ Container disruption-advisor-api-1  Waiting
+ Container disruption-advisor-api-1  Healthy
+ Container disruption-advisor-web-1  Starting
+ Container disruption-advisor-web-1  Started
+up exit 0
+disruption-advisor-api-1 Up 15 seconds (healthy) 0.0.0.0:8888->8000/tcp, :::8888->8000/tcp
+disruption-advisor-db-1 Up About a minute (healthy) 5432/tcp
+disruption-advisor-web-1 Up Less than a second (health: starting) 80/tcp, 0.0.0.0:8080->8080/tcp, :::8080->8080/tcp
+Sat Nov 21 05:56:12 PM UTC 2026

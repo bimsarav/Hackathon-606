@@ -264,6 +264,8 @@ flowchart LR
 - Secrets live only in the server's `.env` (mode 600), never in git.
 - The incremental plan (MVP, then the later phases, each needing approval) is in [../delivery/MVP_AND_INCREMENTAL_PLAN.md](../delivery/MVP_AND_INCREMENTAL_PLAN.md).
 
+**Published ports now (ADR 0015, `docs/architecture/adr/0015-published-ports-ui-8080-api-8888.md`):** the UI is on `http://92.5.154.198:8080` (`web`, nginx; its own `/api` calls go to `api:8000` inside Compose) and the API is published directly on `http://92.5.154.198:8888/api/...`. Both are plain HTTP. The diagrams above show the original MVP design with a single port 8888.
+
 ## 9. Cross-cutting concerns
 - **Security:**
   - Login with two demo roles (OCC, PCU); credentials come from server secrets (ADR 0004).

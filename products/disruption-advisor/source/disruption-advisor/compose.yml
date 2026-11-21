@@ -106,6 +106,8 @@ services:
       db: { condition: service_healthy }
       migrate: { condition: service_completed_successfully }
       ingest: { condition: service_completed_successfully }
+    ports:
+      - "${API_PORT:-8888}:8000"  # API published directly (http://<host>:8888/api/...); no TLS, no rate limit (ADR 0015)
     restart: unless-stopped
     mem_limit: 3g
     logging: *logging
@@ -114,7 +116,7 @@ services:
     build: ./frontend
     image: disruption-advisor-web:latest
     ports:
-      - "${WEB_PORT:-8080}:8080"
+      - "${UI_PORT:-8080}:8080"  # web UI (its own /api calls go through nginx to api:8000)
     depends_on:
       api: { condition: service_healthy }
     restart: unless-stopped

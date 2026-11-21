@@ -1,0 +1,26 @@
+== Sat Nov 21 06:05:37 PM UTC 2026 rollback point pre-202611211805
+-rw-r--r--. 1 opc opc 1261459465 Nov 21 18:08 /home/opc/backups/disruption-advisor/pre-202611211805.dump
+
+/home/opc/backups/disruption-advisor/pre-202611211805/:
+total 24
+drwxr-xr-x. 2 opc opc   83 Nov 21 18:05 .
+drwxr-xr-x. 3 opc opc 4096 Nov 21 18:05 ..
+-rw-r--r--. 1 opc opc 4558 Nov 21 18:05 compose.yml
+-rwxr-xr-x. 1 opc opc 1329 Nov 21 18:05 e2e.sh
+-rw-r--r--. 1 opc opc 1841 Nov 21 18:05 settings.env.example
+-rwxr-xr-x. 1 opc opc 2576 Nov 21 18:05 smoke.sh
+== upload
+compose.yml local=57fae64a3916 server=57fae64a3916
+scripts/smoke.sh local=cac1b24a04ae server=cac1b24a04ae
+scripts/e2e.sh local=7331433bb923 server=7331433bb923
+settings.env.example local=a50dfbf5bb2f server=a50dfbf5bb2f
+== recreate api + web only
+ Container disruption-advisor-api-1 Starting 
+ Container disruption-advisor-api-1 Started 
+ Container disruption-advisor-api-1 Waiting 
+ Container disruption-advisor-api-1 Healthy 
+ Container disruption-advisor-web-1 Starting 
+ Container disruption-advisor-web-1 Started 
+disruption-advisor-api-1 Up 31 seconds (healthy) 0.0.0.0:8888->8000/tcp, [::]:8888->8000/tcp
+disruption-advisor-db-1 Up 8 hours (healthy) 5432/tcp
+disruption-advisor-web-1 Up 25 seconds (healthy) 80/tcp, 0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp

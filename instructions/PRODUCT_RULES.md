@@ -68,7 +68,7 @@ Content that can be pasted straight into a Confluence page (the Markdown paste o
 - Suggested sections: Overview · Business problem and goals · Scope and features · Architecture (services, Kafka topics, data stores) · Technology stack · Environments and deployment · How to build, run and test · API summary · Security · Test results · Known limitations and open decisions · Roadmap · Contacts/ownership (placeholders).
 
 ## 7. No build-process traces in client deliverables (user instruction 2026-11-21)
-The product solution and its Confluence pages are shared with the client. They must never mention how the product was built with the AI assistant: no "approved by the user", "(user 2026-11-21)", "user decision / request / instruction"; no task or decision IDs (T-511, D-028); no `execution/` paths or log files; no MASTER_PROMPT or engineering-standards section numbers; no stack-profile, toolkit or technology-selection-checkpoint notes; no "teammate" or session remarks. Provenance stays in `execution/` only.
+The product solution and its Confluence pages are shared with the client. They must never mention how the product was built with the AI assistant: no "approved by the user", "(user 2026-11-21)", "user decision / request / instruction / approval"; no task or decision IDs (T-511, D-028); no `execution/` paths or log files; no MASTER_PROMPT or engineering-standards section numbers; no stack-profile, toolkit or technology-selection-checkpoint notes; no "teammate" or session remarks. Provenance stays in `execution/` only.
 
 **Do not write traces in the first place.** New docs, ADRs, code comments, tests and commit-ready files state neutral facts ("Accepted (2026-11-21)", "Scope: G9 only", "skipped by decision", "product-owner decision Q8").
 

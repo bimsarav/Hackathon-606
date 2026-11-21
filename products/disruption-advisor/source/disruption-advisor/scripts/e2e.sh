@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Playwright end-to-end tests in Docker against a running stack.
-#   scripts/e2e.sh                       → http://localhost:${WEB_PORT} (from settings.env)
-#   E2E_BASE_URL=http://host:8888 scripts/e2e.sh
+#   scripts/e2e.sh                       → http://localhost:${UI_PORT} (from settings.env)
+#   E2E_BASE_URL=http://host:8080 scripts/e2e.sh
 # Signs in with the first DEMO_USERS entry from settings.env (or E2E_USER / E2E_PASSWORD).
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -12,7 +12,7 @@ REST="${FIRST#*:}"; E2E_PASSWORD="${E2E_PASSWORD:-${REST%%:*}}"
 EVAL="$(printf '%s' "${DEMO_USERS:-}" | tr ',' '\n' | grep -i ':EVALUATOR$' | head -1 || true)"  # none: the evaluator tests skip
 E2E_EVAL_USER="${E2E_EVAL_USER:-${EVAL%%:*}}"
 EVREST="${EVAL#*:}"; E2E_EVAL_PASSWORD="${E2E_EVAL_PASSWORD:-${EVREST%%:*}}"
-BASE="${E2E_BASE_URL:-http://localhost:${WEB_PORT:-8080}}"
+BASE="${E2E_BASE_URL:-http://localhost:${UI_PORT:-8080}}"
 mkdir -p logs
 docker run --rm --network host --ipc host -u "$(id -u):$(id -g)" -e HOME=/tmp -e CI=1 \
   -e E2E_BASE_URL="$BASE" -e E2E_USER="$E2E_USER" -e E2E_PASSWORD="$E2E_PASSWORD" \

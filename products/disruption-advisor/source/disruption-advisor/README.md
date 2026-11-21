@@ -33,7 +33,7 @@ scripts/init-settings.sh  # creates settings.env (visible, mode 600) and the lin
 # then edit settings.env: INPUT_DIR, passwords, DEMO_USERS, TOKEN_SECRET (and optionally ANTHROPIC_API_KEY)
 docker compose up -d --build
 ```
-Then open `http://localhost:${WEB_PORT}`. The API docs are at `/api/docs`.
+Then open the UI at `http://localhost:${UI_PORT}` (default 8080). The API is published on `http://localhost:${API_PORT}` (default 8888), e.g. `/api/v1/...`; its docs are at `/api/docs` on either port. Ports and their risks: ADR 0015 (`docs/architecture/adr/0015-published-ports-ui-8080-api-8888.md`).
 
 Start-up runs in this order:
 1. `db`

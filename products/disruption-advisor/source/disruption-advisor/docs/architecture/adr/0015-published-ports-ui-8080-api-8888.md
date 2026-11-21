@@ -1,0 +1,22 @@
+# ADR-0015: Published ports: web UI on 8080, API directly on 8888 (HTTP)
+
+- **Status:** Accepted (2026-11-21)
+- **Context:**
+  - Until now one port was published: `8888` on the `web` container (nginx), which served the React app and passed `/api/` calls to the API. The API container was reachable only on the Compose network.
+  - The product owner asked for the UI on port 8080 and the API on port 8888, both over plain HTTP, with no reverse proxy, no redirects, no HTTPS on 443, and no change to the server's settings or firewall (8080 and 8888 are already open there).
+- **Decision:**
+  - `web` publishes `${UI_PORT:-8080}:8080`. The React app keeps calling its own `/api/...`; nginx in the `web` container forwards those calls to `api:8000`, so the UI needs no cross-origin (CORS) setup.
+  - `api` publishes `${API_PORT:-8888}:8000`. API clients call `http://<host>:8888/api/v1/...`; the OpenAPI documentation is at `http://<host>:8888/api/docs`. Nothing else is served on 8888 and nothing redirects.
+  - New variables `UI_PORT` and `API_PORT` (see `settings.env.example`). An older `WEB_PORT` value in an existing `settings.env` is ignored, so a server needs no settings change.
+  - `scripts/smoke.sh <ui-url> <api-url>` checks both ports.
+- **Known risks (deviations from the security baseline, accepted for the demo):**
+  - **No TLS:** sign-in and data travel unencrypted on both ports. HTTPS remains planned in ADR 0009 (`docs/architecture/adr/0009-https-and-backups.md`).
+  - **No sign-in rate limit on 8888:** the limit of 10 sign-ins per minute is set in the `web` container's nginx (`frontend/nginx.conf`) and applies to the UI port only.
+  - **Forwarded headers:** uvicorn trusts `X-Forwarded-For` from any client (`backend/app/serve.py`), which was safe behind nginx. On 8888 a client can set the address that the API logs.
+  - **Internal service exposed:** the API container is reachable from outside, not only the web entry point.
+- **Alternatives considered:**
+  - **API on 8888 through nginx:** keeps the rate limit and headers, but a reverse proxy in front of the API was not wanted.
+  - **HTTPS on 443 with Caddy (ADR 0009):** not wanted at this stage.
+- **Consequences:**
+  - Links to `http://<host>:8888` for the UI stop working; the UI address is `http://<host>:8080`.
+  - Closing the risks above needs an application change (a sign-in limit in the API and trusted proxy addresses only) or a proxy in front of the API.

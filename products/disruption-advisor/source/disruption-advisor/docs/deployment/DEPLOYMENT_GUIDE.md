@@ -6,20 +6,20 @@ This guide covers the target host, how the MVP and phase 2 (Predict) are deploye
 | Item | Value |
 |---|---|
 | Host | OCI VM (eu-frankfurt-1), x86_64, 8 vCPU, 62 GiB, Oracle Linux 10, Docker 29 + Compose v5, firewalld |
-| URL | `http://<server>:8888`. HTTP only; HTTPS is planned for phase 6 (needs approval) |
-| Published ports | 8888 (`web`) only. PostgreSQL and the API are reachable only on the Compose network |
+| URL | UI `http://<server>:8080`; API `http://<server>:8888/api/...` (docs: `/api/docs`). HTTP only; HTTPS is planned in ADR 0009 (`docs/architecture/adr/0009-https-and-backups.md`) |
+| Published ports | 8080 (`web`, UI) and 8888 (`api`, directly). PostgreSQL is reachable only on the Compose network. Decision and risks: ADR 0015 (`docs/architecture/adr/0015-published-ports-ui-8080-api-8888.md`) |
 | Paths on the host | Code: `~/apps/disruption-advisor` · extracts (read-only mount): `~/disruption-advisor-input` (mode 700) · secrets: `~/apps/disruption-advisor/settings.env` (mode 600; `.env` is a link to it for Docker Compose) |
 | Data | Docker volumes `disruption-advisor_db-data` (PostgreSQL: scenarios, decisions) and `disruption-advisor_ops-data` (Parquet built by `ingest`, including the phase 2 delay-risk outputs) |
 
 ## First deployment
 1. **Copy the repository** to the host. Exclude `settings.env`, `.env`, `node_modules`, `logs` and build output.
 2. **Copy the extracts** to the input folder (`scp`).
-3. **Create `settings.env`** with `scripts/init-settings.sh` and fill it with new random values: database password, `TOKEN_SECRET`, `DEMO_USERS` passwords, `ANTHROPIC_API_KEY`. Set `WEB_PORT=8888` and `INPUT_DIR` to the input folder, (the script sets mode 600).
+3. **Create `settings.env`** with `scripts/init-settings.sh` and fill it with new random values: database password, `TOKEN_SECRET`, `DEMO_USERS` passwords, `ANTHROPIC_API_KEY`. Set `INPUT_DIR` to the input folder (the ports default to `UI_PORT=8080` and `API_PORT=8888`), (the script sets mode 600).
 4. **Build and start:** `docker compose build && docker compose up -d`. The first `ingest` takes about 4 minutes.
    - Ingest **stage 3** (phase 2) trains the delay-risk model and scores the window. It takes about 30 s on the server and writes `flight_risk.parquet`, `connection_risk.parquet` and `model_card.json` into the ops volume. It reruns whenever stage 2 reruns (new extracts, options or build code), so every data drop retrains the model. Without these files the risk endpoints answer 503 and the rest of the app works as before.
 5. **Verify**:
-   - `scripts/smoke.sh http://<server>:8888`
-   - `E2E_BASE_URL=http://<server>:8888 scripts/e2e.sh`, run from a workstation with Docker
+   - `scripts/smoke.sh http://<server>:8080 http://<server>:8888` (UI port, then API port)
+   - `E2E_BASE_URL=http://<server>:8080 scripts/e2e.sh`, run from a workstation with Docker
    - `docker compose ps` shows `api` and `web` as healthy
    - `docker compose logs ingest` shows `stage 3 done`, and the "Delay watchlist (7 days)" tab lists flights
    - `docker compose logs api` shows no errors
@@ -31,7 +31,7 @@ This guide covers the target host, how the MVP and phase 2 (Predict) are deploye
 - **Limits:**
   - memory: `db` 1 GB, `api` 3 GB, `ingest` 8 GB, `web` 256 MB;
   - JSON logs rotate at 10 MB × 5 files per container.
-- **Phase 2 reboot test: not done yet** (pending user approval). Until it passes, phase 2 is reported as deployed with operational verification pending. Use the steps below.
+- **Phase 2 reboot test: not done yet** (pending approval). Until it passes, phase 2 is reported as deployed with operational verification pending. Use the steps below.
 - **Reboot test, 2026-11-20 (PASSED, phase 1 stack):**
   - `sudo systemctl reboot` at 19:55:41Z; SSH was back after about 50 s.
   - Docker was active, and `db`, `api` and `web` were healthy 30 s after boot with no manual action.
@@ -59,7 +59,7 @@ This guide covers the target host, how the MVP and phase 2 (Predict) are deploye
 - **The server can hold changes that are not in git.** Before copying the tree, compare it with the repository (a checksum of every tracked file; for files that differ, check whether the server copy is just an older repository state). On 2026-11-21 this found a production fix to `frontend/nginx.conf` (re-resolving the API address through Docker DNS) that existed only on the server; it was committed first so the update could not overwrite it.
 - **Copying with `tar` adds and overwrites but never deletes.** A file removed from the repository stays on the server and can break the build (a removed panel left its old source file, and the web build failed on it). After copying, list the server's source files that are not tracked (`frontend/src`, `backend/app`, `backend/tests`, `e2e/tests`, `scripts`) and remove the stale ones.
 - **Ingest stages after an update:** stage 2 (operating picture), 3 (delay risk), 3b (cascade check) and 4 (reward preference model, simulated history) all rerun because their code is part of the ingest's change check; about 40 seconds in total on the server.
-- **Checks after the update:** `scripts/smoke.sh`, `E2E_BASE_URL=http://localhost:8888 scripts/e2e.sh` on the server (8 tests), and the new endpoints (`/api/v1/risk/cascade`, `/api/v1/scenarios/{id}/rewards`).
+- **Checks after the update:** `scripts/smoke.sh`, `E2E_BASE_URL=http://localhost:8080 scripts/e2e.sh` on the server (8 tests), and the new endpoints (`/api/v1/risk/cascade`, `/api/v1/scenarios/{id}/rewards`).
 
 ### Roles, test data and the saved model (added 2026-11-21)
 - `DEMO_USERS` in the server `settings.env` needs an entry with role `EVALUATOR` (`user:password:EVALUATOR`); only that role sees the Model Card and Test data views and the server refuses the others (403). Use hex passwords (no colon or comma).

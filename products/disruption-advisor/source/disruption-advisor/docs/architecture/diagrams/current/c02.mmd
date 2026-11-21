@@ -1,5 +1,6 @@
 flowchart LR
-  browser([Browser]) -->|HTTP :8888<br/>HTTPS in phase 6| web
+  browser([Browser]) -->|UI: HTTP :8080| web
+  client([API clients]) -->|API: HTTP :8888| api
   subgraph host [Server: Docker Compose, restart unless-stopped, log rotation]
     web[web<br/>nginx: React SPA + /api proxy<br/>CSP, security headers, login rate limit]
     api[api<br/>FastAPI + uvicorn, 2 workers<br/>recovery engine, risk, agent, rewards, crew]

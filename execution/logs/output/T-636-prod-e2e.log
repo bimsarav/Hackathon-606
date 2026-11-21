@@ -1,0 +1,6 @@
+  ✓   8 [chromium] › tests/advisor.spec.ts:138:1 › phase 5: a budget gives a reward plan from the preference model, and the plan can be approved (8.0s)
+  ✓   9 [chromium] › tests/evaluator.spec.ts:27:1 › the OCC role does not see the Model Card and Test data views, and the API refuses them (377ms)
+  ✓  10 [chromium] › tests/evaluator.spec.ts:40:1 › the evaluator reads the model evidence, uploads two flights, analyses one and removes them (10.4s)
+  ✓  11 [chromium] › tests/evaluator.spec.ts:94:1 › a bad flights sheet is rejected with the row and column, and nothing is added (2.1s)
+
+  11 passed (1.6m)
