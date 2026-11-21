@@ -36,7 +36,7 @@ Delivery cadence: design first, MVP first, host the MVP, then incremental phases
    - A deterministic template is used if the API is unavailable.
    - No names or contact details are sent to the API.
 7. **Human in the loop:** approve or reject each recommendation; every decision is audited in PostgreSQL.
-8. **Access:** login with two demo roles (OCC, PCU).
+8. **Access:** login with two demo roles (OCC, PCU). As of now, across all phases, OCC and PCU have the same views and permissions; the only distinct role is **Evaluator** (added with the test-data release: Model Card and Test data views). See README.md, section Roles.
 9. **Hosting:**
    - OCI server, `http://92.5.154.198:8888`.
    - Docker Compose with `restart: unless-stopped`, Docker enabled at boot.
@@ -118,7 +118,7 @@ Design: SYSTEM_ARCHITECTURE §11, ADR 0010 (agent), ADR 0011 (cancel, consolidat
 - Nightly PostgreSQL backup with a restore test (design: ADR 0009).
 
 ## Deployment procedure (every phase)
-1. Plan the phase and get user approval.
+1. Plan the phase and get approval.
 2. Build and run `scripts/check.sh`.
 3. Run Playwright locally.
 4. Run the Trivy scans.

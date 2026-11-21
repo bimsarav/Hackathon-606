@@ -268,7 +268,7 @@ flowchart LR
 
 ## 9. Cross-cutting concerns
 - **Security:**
-  - Login with two demo roles (OCC, PCU); credentials come from server secrets (ADR 0004).
+  - Login with demo roles; credentials come from server secrets (ADR 0004). As of now the distinct roles are **OCC** and **Evaluator** (Model Card and Test data views); **PCU** has the same access as OCC. Details: README.md, section Roles.
   - Strict input validation; RFC 9457 errors; CSP and security headers at nginx; non-root containers.
   - Passenger data is treated as real (Q3): no names or contact details go to the LLM, only the minimum fields per message.
 - **Explainability:** every option, score and assignment carries machine-readable reasons (attribute contributions, binding constraints), which the UI shows. The LLM only rewrites these into prose and never decides.

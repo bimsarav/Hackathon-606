@@ -1,5 +1,5 @@
 // aeroRecovery hackathon deck: slides 1-9 = UC5 acceptance criteria, slides 10-13 = extra features.
-// Screenshots: production (http://92.5.154.198:8888) via Chrome, 21 Nov 2026.
+// Screenshots: production via Chrome, 21 Nov 2026. UI http://92.5.154.198:8080, API http://92.5.154.198:8888.
 const pptxgen = require("pptxgenjs");
 const path = require("path");
 const sz = require("image-size");
@@ -7,7 +7,7 @@ const imageSize = sz.imageSize || sz.default || sz;
 const { applyTheme } = require(process.env.APPLY_THEME);
 
 const D = __dirname;
-const SH = (n) => path.join(D, "shots2", n + ".png");
+const SH = (n) => path.join(D, "shots", n + ".png");
 const OUT = process.env.OUT || path.join(D, "aeroRecovery-deck.pptx");
 
 const THEME = {
@@ -123,7 +123,7 @@ const SEC1 = "UC5 acceptance criteria";
   T(s, "Turns a flight disruption into an explained, approved recovery plan before its impact cascades across the network.", { x: 0.7, y: 4.45, w: 5.9, h: 0.9, fontSize: 16, italic: true, color: HEX.accent6 });
   T(s, [
     { text: "ISA Hackathon 606 · UC5 Flight & Passenger Disruption Management", options: { breakLine: true } },
-    { text: "Live on the provided VM: http://92.5.154.198:8888", options: { bold: true, color: C.background1 } },
+    { text: "Live on the provided VM: UI http://92.5.154.198:8080 · API :8888", options: { bold: true, color: C.background1 } },
   ], { x: 0.7, y: 6.1, w: 6.3, h: 0.7, fontSize: 13, color: "8C9AB8" });
   shot(s, "d-top", 7.2, 1.6, 5.55, 3.2, { alt: "Delay analysis for G9519 with recommendation, KPIs and three strategies" });
   T(s, "Production: G9519 DAC→SHJ 195 min late, real schedule and bookings", { x: 7.2, y: 3.85, w: 5.55, h: 0.3, fontSize: 11, color: "8C9AB8" });
@@ -272,7 +272,7 @@ const SEC1 = "UC5 acceptance criteria";
     [B("AI agent "), { text: "investigates a flight with read-only engine tools and proposes one option" }],
     [B("Messages: "), { text: "template per passenger, optional AI personalisation" }],
   ], { x: 8.6, y: cb, w: 4.15, h: 6.75 - cb, fontSize: 13 });
-  s.addNotes("One screen holds the KPIs, the strategies, the options, the crew alert, the rotation, the affected flights and the passengers. Claude writes the explanation from engine facts only. Nothing changes in airline systems: a person approves or overrides, and the audit trail records it. Two roles share the scenario: OCC for aircraft and PCU for passengers.");
+  s.addNotes("One screen holds the KPIs, the strategies, the options, the crew alert, the rotation, the affected flights and the passengers. Claude writes the explanation from engine facts only. Nothing changes in airline systems: a person approves or overrides, and the audit trail records it. As of now the distinct roles are OCC and Evaluator; the PCU role has the same access as OCC.");
 }
 
 // 9. AI techniques, delivery, benefits
@@ -291,7 +291,7 @@ const SEC1 = "UC5 acceptance criteria";
     T(s, h, { x: 0.78, y, w: 1.7, h: 0.58, fontSize: 13, bold: true, color: C.accent1, valign: "middle" });
     T(s, b, { x: 2.5, y, w: 4.0, h: 0.58, fontSize: 12, valign: "middle" });
   });
-  card(s, 0.6, 5.1, 6.0, 1.65, "Delivered on the provided VM", "Docker Compose (nginx + React, FastAPI, PostgreSQL, Parquet + DuckDB). Smoke 11/11 and Playwright 11/11 on the live server; 134 backend + 38 frontend tests; rollback tag and DB dump before each deploy.", { bodySize: 12 });
+  card(s, 0.6, 5.1, 6.0, 1.65, "Delivered on the provided VM", "Docker Compose: UI on :8080 (nginx + React), API on :8888 (FastAPI), PostgreSQL, Parquet + DuckDB. Smoke 15/15 and Playwright 11/11 on the live server; 136 backend + 46 frontend tests; rollback point before each deploy.", { bodySize: 12 });
   card(s, 6.9, 1.62, 5.85, 2.35, "Business benefits", "", { fill: "E7F4EC", headColor: C.accent3 });
   bullets(s, [
     "One shared picture for OCC and PCU instead of three",
@@ -383,7 +383,7 @@ const SEC2 = "Beyond UC5";
   const m = shot(s, "e-model", 7.35, 1.65, 5.4, 1.2, { alt: "Model Card overview: AUC 0.770 at +60 min, +9.3 pp vs baseline" });
   const q = shot(s, "e-perf", 7.35, m.b + 0.2, 5.4, 1.75, { alt: "Model performance by delay threshold vs baseline" });
   bullets(s, [
-    [B("Three roles: "), { text: "OCC and PCU see Scenario, Watchlist, Agent; Evaluator also sees Model Card and Test data (enforced by the server)" }],
+    [B("Roles today: "), { text: "OCC and Evaluator are the distinct roles; Evaluator also sees Model Card and Test data (enforced by the server). PCU has the same access as OCC" }],
     [B("Your own flights: "), { text: "two CSV sheets from the template; Check files stores nothing, Add to system makes them searchable in seconds" }],
     [B("Scored, not retrained; "), { text: "Remove test data restores the real data" }],
     [B("Model Card: "), { text: "performance by threshold, calibration, alert cut-offs, model comparison and tuning, reward model, cascade check, crew FDP analysis" }],

@@ -13,6 +13,17 @@ Disruption Advisor helps an airline's Operations Control Centre (OCC) and Passen
 Stack: Python 3.14 · FastAPI · DuckDB over Parquet · Google OR-Tools (CP-SAT) · LightGBM · Anthropic Claude API · SQLAlchemy 2 · Alembic · PostgreSQL 18 · React 19 + TypeScript + Vite · nginx · Docker Compose · Playwright.
 Details: [docs/architecture/SYSTEM_ARCHITECTURE.md](docs/architecture/SYSTEM_ARCHITECTURE.md) (diagrams) · [docs/delivery/MVP_AND_INCREMENTAL_PLAN.md](docs/delivery/MVP_AND_INCREMENTAL_PLAN.md) · [docs/deployment/DEPLOYMENT_GUIDE.md](docs/deployment/DEPLOYMENT_GUIDE.md).
 
+## Roles
+
+As of now there are **two distinct roles**:
+
+| Role | What it can do |
+|---|---|
+| **OCC** (operations user) | Flight Delay, Cancellation, Predict the Flight Delay, Delay Watchlist, Agent and Recent Searches; approve, override or reject recovery options, rebooking plans, care, rewards and passenger messages. |
+| **Evaluator** | Everything the OCC role can do, plus the **Model Card** and **Test data** views. The API refuses those views to every other role (HTTP 403). |
+
+The **PCU** role exists as a login role (`DEMO_USERS`), but **as of now it has exactly the same views and permissions as OCC**; nothing differs except the role name that the audit trail records with each decision ("occ (OCC)", "pcu (PCU)"). A split between aircraft decisions (OCC) and passenger decisions (PCU) is not built. Where the role checks are: `backend/app/auth.py` (`evaluator_only`) and `frontend/src/App.tsx` (`EVALUATOR_VIEWS`).
+
 ## Prerequisites
 - Docker Engine 20.10+ with Compose v2.21+. Python, uv, Node and every other tool runs inside containers.
 - The airline extracts in one folder:
@@ -98,7 +109,7 @@ Logs are written to `logs/`.
 
 ## Configuration
 Everything is set in **`settings.env`** (template: `settings.env.example`). Docker Compose reads it through the link `.env`, because Compose only looks for a file with that name.
-- **Data and access:** `INPUT_DIR`, `DEMO_USERS` (roles `OCC`, `PCU`, `EVALUATOR`; only the evaluator sees the Model and Test data tabs), `TOKEN_SECRET`, `ANTHROPIC_API_KEY`, `AI_MODEL`.
+- **Data and access:** `INPUT_DIR`, `DEMO_USERS` (roles `OCC`, `PCU`, `EVALUATOR`; PCU has the same access as OCC; only the evaluator sees the Model Card and Test data views; see [Roles](#roles)), `TOKEN_SECRET`, `ANTHROPIC_API_KEY`, `AI_MODEL`.
 - **Agent (phase 3):** `AGENT_EFFORT` (default `medium`), `AGENT_MAX_TOOL_CALLS` (12), `AGENT_TIMEOUT_SECONDS` (120). Without `ANTHROPIC_API_KEY` the rule-based planner answers every agent run.
 - **Rule and cost defaults:** `MIN_TURN_MINUTES`, `DEFAULT_MCT_MINUTES`, `REBOOKING_WINDOW_HOURS`, `COST_DELAY_PER_MINUTE`, `COST_HOTEL_PER_NIGHT`, `COST_MEAL_VOUCHER`, `COST_REBOOKING_HANDLING`, `NOW_UTC` (demo clock).
 
