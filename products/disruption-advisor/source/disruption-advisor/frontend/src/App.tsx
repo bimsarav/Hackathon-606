@@ -170,7 +170,7 @@ function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
     <span className="login-hero-logo"><img src="/brand/air-arabia-tail.svg" alt="Air Arabia" /></span>
   );
 
-  // Login: live operations backdrop (user 2026-11-21 chose it from four styles).
+  // Login: live operations backdrop (chosen from four candidate styles).
   return (
     <main id="main" className="login login-ops">
       <OpsMap />

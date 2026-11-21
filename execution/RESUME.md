@@ -1,3 +1,4 @@
+# T-635 (2026-11-21) DONE: product source on v1.0.0 has no build-process traces (cleanup committed c54d50b; App.tsx login comment fixed after af96bc2, NOT committed); gate PASS; Confluence ADR 0001 row reverted
 # RESUME (updated 2026-11-21) — T-624: pulled 238f949 + crew FDP alerts (T-620/623) on local, gate 134+38, smoke 11/11, e2e 9+2 skip; NOT committed/deployed. Other session T-621 live-delay WIP kept OUT of tree: stash@{0} + execution/logs/output/T-621-other-session-wip
 T-630 (2026-11-21 15:43Z) DEPLOYED heshawa 7addde6: suggestions always chips, crew section after Flight Board. Smoke 11/11, PLAYWRIGHT 11/11. Rollback pre-202611211543.
 T-629 (2026-11-21 15:24Z) DEPLOYED heshawa cda0fd7: Cancellation page compact layout. Smoke 11/11, PLAYWRIGHT 11/11. Rollback pre-202611211524.
