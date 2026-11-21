@@ -79,6 +79,7 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
   const [advDeparture, setAdvDeparture] = useState<number | null>(null);
   // Once a flight is chosen (or one is already on screen) the lists fold away to save space; one click brings them back.
   const [listHidden, setListHidden] = useState(Boolean(active));
+  const [chosen, setChosen] = useState<string | null>(active?.flightNumber ?? null);
 
   function inRange(std: string, origin?: string, destination?: string): boolean {
     const day = std.slice(0, 10);
@@ -137,6 +138,7 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
 
   function start(flightId: string) {
     setListHidden(true);
+    setChosen(flightId.split("_")[0] ?? flightId);
     if (tab === "DELAY") onDelay(flightId, delay);
     else if (tab === "CANCEL") onCancel(flightId);
     else onAgent?.({ flight_id: flightId, delay_minutes: agentDelay, strategy: agentStrategy, note: agentNote.trim() });
@@ -145,7 +147,27 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
   return (
     <section className="launcher" aria-label="New scenario">
 
+      {/* Once a flight is chosen the search folds to one line (flight, delay slider, change); one click restores it. */}
+      {listHidden && (
+        <div className="filter-card filter-compact">
+          <span className="filter-compact-flight">
+            <span className="small muted">Flight</span> <strong>{active?.flightNumber ?? chosen ?? "chosen"}</strong>
+          </span>
+          {tab === "DELAY" && active && (
+            <div className="filter-compact-delay">
+              <label htmlFor="delay">Delay: <strong>{delay} min</strong></label>
+              <input id="delay" type="range" min={15} max={600} step={15} value={delay} disabled={advanced}
+                onChange={(e) => setDelay(Number(e.target.value))}
+                onPointerUp={commitDelay} onKeyUp={commitDelay} onTouchEnd={commitDelay} />
+              <span className="small muted">{delay === active.delay ? "release to re-run" : `release to re-run with ${delay} min`}</span>
+            </div>
+          )}
+          <button type="button" className="link" onClick={() => setListHidden(false)}>Change flight or search</button>
+        </div>
+      )}
+
       {/* Multi-column filter card */}
+      {!listHidden && (
       <div className="filter-card">
         <form onSubmit={search}>
           {/* Row 1: flight fields + type + dep from */}
@@ -237,6 +259,7 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
           )}
         </form>
       </div>
+      )}
 
       {tab === "AGENT" && onAgent && (
         <div className="agent-form">
@@ -272,13 +295,7 @@ export function Launcher({ busy, active, onDelay, onCancel, onAgent, defaultTab,
         </div>
       )}
 
-      {listHidden ? (
-        <p className="small">
-          <button type="button" className="link" onClick={() => setListHidden(false)}>
-            Show suggested flights
-          </button>
-        </p>
-      ) : (
+      {listHidden ? null : (
         <>
         {searchError && <p className="error">{searchError}</p>}
         {results && results.length === 0 && <p className="muted small">No flights match.</p>}

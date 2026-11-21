@@ -138,7 +138,7 @@ test("phase 5: a budget gives a reward plan from the preference model, and the p
   await signIn(page);
   await page.getByRole("button", { name: "Flight Delay", exact: true }).click();
   await page.locator(".preset-list .preset").first().click();
-  await page.getByRole("button", { name: "Show rewards & compensation" }).click();
+  await page.getByRole("button", { name: /Rewards & compensation: open details/ }).click();
   await expect(page.getByRole("heading", { name: "Passenger rewards (goodwill)" })).toBeVisible();
   await page.getByLabel("Budget (AED)").fill("4000");
   await page.getByRole("button", { name: "Recommend rewards" }).click();

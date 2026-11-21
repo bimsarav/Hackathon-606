@@ -238,3 +238,8 @@ The new Playwright tests have not been run locally (no Playwright or Docker on t
   The evaluator test left no test data behind.
 - Frontend unit tests 40/40 before the deploy (Launcher fold, role views, Model Card sections, test data page). Backend unit tests were not run against Postgres here (no Docker).
 - The server had been redeployed by a teammate at 10:19Z (a63dc8d, crew duty check); it matched the repository exactly, so nothing was lost. Redeploys by several people keep landing on this one server: compare the server tree with the repository first (DEPLOYMENT_GUIDE).
+
+## Production check, live delay merge (21 Nov 2026, 14:35Z, heshawa 9e4d051)
+- The server had been redeployed at 11:32Z with live delay models that were not in git; the tree was saved, merged (3-way, CSS conflict only) and deployed.
+- Smoke 11/11; roles unchanged; `/risk/flights/{id}/predict` answers the planning forecast and, with an inbound delay, the live forecast; **Playwright 11/11 (1.6 min)**.
+- Uploaded test flights: planning forecast only; live inputs answer 409 (backend test added). Frontend 44/44 locally after the page redesign (not deployed yet).

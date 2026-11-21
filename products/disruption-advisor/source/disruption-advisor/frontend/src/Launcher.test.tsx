@@ -33,7 +33,7 @@ describe("launcher flight lists", () => {
     expect(screen.queryByRole("heading", { name: "Suggested flights" })).not.toBeInTheDocument();
     expect(screen.queryByText(/142 connecting/)).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole("button", { name: "Show suggested flights" }));
+    await userEvent.click(screen.getByRole("button", { name: "Change flight or search" }));
     expect(screen.getByRole("heading", { name: "Suggested flights" })).toBeInTheDocument();
     expect(screen.getByText(/142 connecting/)).toBeInTheDocument();
   });
@@ -45,13 +45,17 @@ describe("launcher flight lists", () => {
     await userEvent.click(screen.getByRole("button", { name: "Search" }));
     await userEvent.click(await screen.findByRole("button", { name: /G9520 SHJ→DXB/ }));
     expect(screen.queryByRole("button", { name: /G9520 SHJ→DXB/ })).not.toBeInTheDocument();
+    expect(screen.getByText("G9520")).toBeInTheDocument(); // the search folded to one line naming the flight
+    expect(screen.queryByRole("button", { name: "Search" })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Change flight or search" }));
     await userEvent.click(screen.getByRole("button", { name: "Search" }));
     expect(await screen.findByRole("button", { name: /G9520 SHJ→DXB/ })).toBeInTheDocument();
     unmount();
 
     render(<Launcher meta={meta} busy={false} onDelay={() => {}} onCancel={() => {}} defaultTab="DELAY" hideTabNav
       active={{ flightId: "G9519_202611210200", flightNumber: "G9519", delay: 150 }} />);
-    expect(await screen.findByRole("button", { name: "Show suggested flights" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Change flight or search" })).toBeInTheDocument();
+    expect(screen.getByLabelText(/Delay:/)).toBeInTheDocument(); // the slider stays in the folded line to re-run
     expect(screen.queryByRole("heading", { name: "Suggested flights" })).not.toBeInTheDocument();
   });
 });

@@ -147,10 +147,16 @@ describe("strategy comparison", () => {
     };
     const scenario = delayScenario({ passengers: [pax, { ...pax, customer_key: "k2", name: "Omar Said", group: "missed_connection" }] });
     render(<DelayView scenario={scenario} result={scenario.result as DelayResult} meta={meta} onUpdate={() => {}} />);
-    await userEvent.click(screen.getByRole("button", { name: "Show passenger detail" }));
+    await userEvent.click(screen.getByRole("button", { name: /Passengers (rebooked|to rebook): open details/ }));
     expect(screen.getByText("Cancelled")).toBeInTheDocument();
     expect(screen.getByText("Missed connection")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /missed connections and cancelled flights \(2\)/ })).toBeInTheDocument();
+    // the three passenger boxes: one detail at a time
+    await userEvent.click(screen.getByRole("button", { name: /Rewards & compensation: open details/ }));
+    expect(screen.getByRole("heading", { name: "Passenger rewards (goodwill)" })).toBeInTheDocument();
+    expect(screen.queryByText("Missed connection")).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /Connecting passengers at risk: open details/ }));
+    expect(screen.queryByRole("heading", { name: "Passenger rewards (goodwill)" })).not.toBeInTheDocument();
   });
 
   it("shows the agent's recommendation on a scenario the agent produced", () => {

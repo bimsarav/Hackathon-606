@@ -1,2 +1,27 @@
 == ship 14:34:18 (git 9e4d051)
 extracted
+ Container disruption-advisor-extracts-db-1 Recreated 
+ Container disruption-advisor-api-1 Recreated 
+ Container disruption-advisor-web-1 Recreate 
+ Container disruption-advisor-web-1 Recreated 
+ Container disruption-advisor-db-1 Waiting 
+ Container disruption-advisor-db-1 Healthy 
+ Container disruption-advisor-migrate-1 Starting 
+ Container disruption-advisor-migrate-1 Started 
+ Container disruption-advisor-migrate-1 Waiting 
+ Container disruption-advisor-migrate-1 Exited 
+ Container disruption-advisor-ingest-1 Starting 
+ Container disruption-advisor-ingest-1 Started 
+ Container disruption-advisor-ingest-1 Waiting 
+ Container disruption-advisor-ingest-1 Exited 
+ Container disruption-advisor-extracts-db-1 Starting 
+ Container disruption-advisor-api-1 Starting 
+ Container disruption-advisor-extracts-db-1 Started 
+ Container disruption-advisor-api-1 Started 
+ Container disruption-advisor-api-1 Waiting 
+ Container disruption-advisor-api-1 Healthy 
+ Container disruption-advisor-web-1 Starting 
+ Container disruption-advisor-web-1 Started 
+ingest-1  | 2026-11-21 14:35:32,570 INFO stage 1 skipped: extracts unchanged
+ingest-1  | 2026-11-21 14:35:32,571 INFO stage 2 skipped: operating picture is current
+== up returned 14:35:39

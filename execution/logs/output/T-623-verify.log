@@ -1,0 +1,13 @@
+== verify 14:35:48
+disruption-advisor-api-1 Up 17 seconds (healthy)
+disruption-advisor-db-1 Up 4 hours (healthy)
+disruption-advisor-web-1 Up 11 seconds (healthy)
+/dev/null
+delay_model
+live_model_card.json
+live_models
+11
+OCC {'/api/v1/risk/model-docs': 403, '/api/v1/risk/reward-model': 403, '/api/v1/risk/model': 403, '/api/v1/risk/cascade': 200, '/api/v1/test-data': 403}
+EVALUATOR {'/api/v1/risk/model-docs': 200, '/api/v1/risk/reward-model': 200, '/api/v1/risk/model': 200, '/api/v1/risk/cascade': 200, '/api/v1/test-data': 200}
+{'delay_selection': 14, 'reward_selection': 15}
+predict G9419_202611222330 200 planning 200 live: inbound aircraft delay

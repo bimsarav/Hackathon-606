@@ -4,7 +4,7 @@ import { aed, hhmm, minutes, num, utc } from "./format";
 import { AgentRecommendationPanel } from "./AgentRunView";
 import { CrewFdpAlerts } from "./CrewFdpAlerts";
 import { RotationBoard } from "./RotationBoard";
-import { PassengerTabs } from "./PassengerTabs";
+import { RewardPanel } from "./RewardPanel";
 import { OptionKindInfo, StrategyPanel } from "./StrategyPanel";
 import { Assumptions, DecisionBar, Explanation, PassengerTable, WeightsPanel } from "./Shared";
 
@@ -35,6 +35,12 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
       if (details) details.open = true;
       el?.scrollIntoView?.({ behavior: "smooth", block: "start" });
     }, 0);
+  };
+  const [people, setPeople] = useState<People | null>(null);
+  const openPeople = (box: People) => setPeople((p) => (p === box ? null : box));
+  const showPeople = (box: People) => {
+    setPeople(box);
+    window.setTimeout(() => document.getElementById("sec-people")?.scrollIntoView?.({ behavior: "smooth", block: "start" }), 0);
   };
   const best = result.options.find((o) => o.key === result.recommended_key) ?? result.options[0];
   if (!best) return <p className="error">No recovery option could be computed for this flight.</p>;
@@ -96,9 +102,9 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
         <Tile label="Flight Board" value={`${num(new Set(shown.legs.map((l) => l.operated_by)).size)} aircraft`} sub={`${num(shown.legs.length)} flights in the rotation`} onClick={() => reveal("board")} />
         <Tile label="Flights affected" value={num(shown.legs_delayed)} sub={`delayed of ${num(shown.legs.length)}`} onClick={() => reveal("legs")} />
         <Tile label="Connections at risk" value={num(result.misconnections.length)} sub={`of ${num(shown.connections_checked)} checked`}
-          tone={result.misconnections.length > 0 ? "warn" : undefined} onClick={() => reveal("conn")} />
+          tone={result.misconnections.length > 0 ? "warn" : undefined} onClick={() => showPeople("conn")} />
         <Tile label="Passengers & rewards" value={num(result.passengers.length)}
-          sub={result.rebooking ? `${num(result.rebooking.protected)} rebooked · ${num(result.rebooking.unprotected)} without a seat` : "rebooking and goodwill"} onClick={() => reveal("pax")} />
+          sub={result.rebooking ? `${num(result.rebooking.protected)} rebooked · ${num(result.rebooking.unprotected)} without a seat` : "rebooking and goodwill"} onClick={() => showPeople("pax")} />
         <Tile label="Assumptions" value={num(result.assumptions.length)} sub="data notes" onClick={() => reveal("assumptions")} />
       </nav>
 
@@ -235,40 +241,52 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
       </section>
       </Fold>
 
-      <Fold id="conn" title={`Connecting passengers at risk (${num(result.misconnections.length)})`} summary={`of ${num(shown.connections_checked)} connections checked`}
-        open={openSecs.has("conn")} onToggle={() => toggle("conn")}>
-        <ConnectionDrillDown
-          misconnections={result.misconnections}
-          passengers={result.passengers}
-          flightId={result.flight.flight_id}
-        />
-      </Fold>
-
-      <div id="sec-pax">
-      <PassengerTabs
-        scenario={scenario}
-        passengersLabel={cancelledPax ? `Passengers to rebook (${num(result.passengers.length)})` : `Connection passengers (${num(result.misconnections.length)})`}
-      >
-        <section aria-labelledby="pax-title">
-          <h2 id="pax-title">
-            {cancelledPax
-              ? `Passengers to rebook: missed connections and cancelled flights (${num(result.passengers.length)})`
-              : `Passengers still missing a connection (${num(result.misconnections.length)})`}
-          </h2>
-          {result.rebooking && (
-            <p className="muted">
-              {num(result.rebooking.protected)} rebooked on later flights within 24 h ·{" "}
-              <strong>{num(result.rebooking.unprotected)}</strong> without a seat (next day + hotel, or refund)
-              {result.rebooking.hotel_rooms ? ` · ${num(result.rebooking.hotel_rooms)} hotel rooms` : ""}
-              {result.rebooking.care_cost_aed ? ` · care ${aed(result.rebooking.care_cost_aed)}` : ""}.
-            </p>
-          )}
-          {result.passengers.length > 0 && <WeightsPanel meta={meta} scenario={scenario} onUpdate={onUpdate} />}
-          <PassengerTable scenario={scenario} rows={result.passengers} meta={meta} />
-          {result.passengers.length > 0 && <DecisionBar scenario={scenario} target="rebooking" label="rebooking plan" />}
-        </section>
-      </PassengerTabs>
-      </div>
+      {/* Passengers: three boxes (as in the Model Card); a click opens that box's full detail below them. */}
+      <section id="sec-people" aria-labelledby="people-title" className="people">
+        <h2 id="people-title">Passengers</h2>
+        <div className="model-grid">
+          <PeopleBox kind="Missed-connection risk" title="Connecting passengers at risk" active={people === "conn"} onOpen={() => openPeople("conn")}
+            stats={[
+              { label: "miss their connection", value: num(result.misconnections.length) },
+              { label: "connections checked", value: num(shown.connections_checked) },
+            ]} />
+          <PeopleBox kind="Rebooking plan" title={cancelledPax ? "Passengers to rebook" : "Passengers rebooked"} active={people === "pax"} onOpen={() => openPeople("pax")}
+            stats={result.rebooking ? [
+              { label: "rebooked within 24 h", value: num(result.rebooking.protected) },
+              { label: "without a seat", value: num(result.rebooking.unprotected) },
+              ...(result.rebooking.hotel_rooms ? [{ label: "hotel rooms", value: num(result.rebooking.hotel_rooms) }] : []),
+            ] : [{ label: "passengers", value: num(result.passengers.length) }]} />
+          <PeopleBox kind="Goodwill & EU261" title="Rewards & compensation" active={people === "rewards"} onOpen={() => openPeople("rewards")}
+            stats={[
+              { label: "EU261 for this option", value: `€${num(shown.eu261_compensation_eur)}` },
+              { label: "care cost", value: result.rebooking?.care_cost_aed ? aed(result.rebooking.care_cost_aed) : "—" },
+            ]} />
+        </div>
+        {people === "conn" && (
+          <ConnectionDrillDown misconnections={result.misconnections} passengers={result.passengers} flightId={result.flight.flight_id} />
+        )}
+        {people === "pax" && (
+          <section aria-labelledby="pax-title">
+            <h2 id="pax-title">
+              {cancelledPax
+                ? `Passengers to rebook: missed connections and cancelled flights (${num(result.passengers.length)})`
+                : `Passengers still missing a connection (${num(result.misconnections.length)})`}
+            </h2>
+            {result.rebooking && (
+              <p className="muted">
+                {num(result.rebooking.protected)} rebooked on later flights within 24 h ·{" "}
+                <strong>{num(result.rebooking.unprotected)}</strong> without a seat (next day + hotel, or refund)
+                {result.rebooking.hotel_rooms ? ` · ${num(result.rebooking.hotel_rooms)} hotel rooms` : ""}
+                {result.rebooking.care_cost_aed ? ` · care ${aed(result.rebooking.care_cost_aed)}` : ""}.
+              </p>
+            )}
+            {result.passengers.length > 0 && <WeightsPanel meta={meta} scenario={scenario} onUpdate={onUpdate} />}
+            <PassengerTable scenario={scenario} rows={result.passengers} meta={meta} />
+            {result.passengers.length > 0 && <DecisionBar scenario={scenario} target="rebooking" label="rebooking plan" />}
+          </section>
+        )}
+        {people === "rewards" && <RewardPanel scenario={scenario} />}
+      </section>
 
       <div id="sec-assumptions"><Assumptions items={result.assumptions} /></div>
     </article>
@@ -432,7 +450,8 @@ function ConnectionDrillDown({
   );
 }
 
-type Section = "strategies" | "why" | "options" | "board" | "legs" | "conn" | "pax" | "assumptions";
+type Section = "strategies" | "why" | "options" | "board" | "legs" | "assumptions";
+type People = "conn" | "pax" | "rewards";
 
 function firstSentence(text: string): string {
   const one = text.split(/(?<=[.!?])\s/)[0] ?? text;
@@ -476,5 +495,27 @@ function Fold({ id, title, summary, open, onToggle, children }: {
       </h2>
       <span className="small muted fold-summary">{summary}</span>
     </section>
+  );
+}
+
+/** A passenger box in the Model Card style; the open one is marked and its detail shows below the boxes. */
+function PeopleBox({ kind, title, stats, active, onOpen }: {
+  kind: string; title: string; stats: { label: string; value: string }[]; active: boolean; onOpen: () => void;
+}) {
+  return (
+    <button type="button" className={`model-box${active ? " active" : ""}`} aria-expanded={active} onClick={onOpen}
+      aria-label={`${title}: ${active ? "hide" : "open"} details`}>
+      <span className="eyebrow">{kind}</span>
+      <span className="model-box-title">{title}</span>
+      <span className="model-box-stats">
+        {stats.map((st) => (
+          <span key={st.label} className="model-box-stat">
+            <span className="model-box-value">{st.value}</span>
+            <span className="model-box-label">{st.label}</span>
+          </span>
+        ))}
+      </span>
+      <span className="model-box-open small">{active ? "Hide details ▴" : "Open details →"}</span>
+    </button>
   );
 }
