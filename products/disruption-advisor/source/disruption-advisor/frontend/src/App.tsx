@@ -15,7 +15,6 @@ import { CascadePanel } from "./CascadePanel";
 import { DelayView } from "./DelayView";
 import { Launcher } from "./Launcher";
 import { ModelCardView } from "./ModelCardView";
-import { RewardPanel } from "./RewardPanel";
 import { TestDataPanel } from "./TestDataPanel";
 import { WatchlistView } from "./WatchlistView";
 
@@ -466,7 +465,6 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
           {/* ── Delay Watchlist ───────────────────────────── */}
           {view === "watchlist" && (
             <>
-              {scenario && <RewardPanel scenario={scenario} />}
               <CascadePanel />
               {meta && (
                 <WatchlistView
