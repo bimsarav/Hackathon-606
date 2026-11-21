@@ -1,0 +1,25 @@
+# ADR-0011: Cancel and consolidate as delay-recovery options; strategies as orderings over one option list
+
+- **Status:** Accepted (2026-11-21, phase 3 approved by the user)
+- **Context:**
+  - Phases 1–2 offer two levers for a delay (absorb, swap) and rank them by cost only.
+  - Phase 3 asks for cancel or consolidate with passenger protection, and for a side-by-side comparison of strategies (protect passengers, lowest cost, least delay).
+- **Decision:**
+  - **Cancel a round trip:** consider later pairs X→Y→X on the delayed aircraft within 24 h (up to 3). Cancelling a pair absorbs the delay without another aircraft. Cancelled passengers are ranked and rebooked with the phase 1 rules (tiers, weighted score, CP-SAT, PNRs together), and get care and EU261 estimates.
+  - **Consolidate:** a cancel option is labelled "Consolidate" when every cancelled passenger is rebooked on a same-route flight within 6 h. It is the same computation with a clearer name for operations.
+  - **KPIs for every option:**
+    - cost
+    - aircraft delay minutes
+    - passenger delay minutes (Σ delay × passengers, plus the rebooked arrival delay, plus 24 h per passenger without a seat)
+    - missed connections
+    - cancelled flights and passengers
+    - passengers without a seat
+  - **Strategies:** lexicographic orderings over that one list (SYSTEM_ARCHITECTURE §11.2). "Lowest cost" keeps the existing ranking, so old scenarios and tests keep their recommendation. The strategy is stored with the scenario.
+- **Alternatives considered:**
+  - **One weighted score with user weights:** flexible, but hard to explain and easy to game. Named strategies with a fixed order are clearer for OCC, and the KPI table still shows every number.
+  - **An optimiser over all cancellations in the network:** more powerful, but a different product (network recovery). Phase 4 can revisit it with crew data.
+  - **Cancelling only the delayed flight:** leaves the aircraft at the wrong station, so it is not offered.
+- **Consequences:**
+  - Rebooking runs for every option (about 5–8 CP-SAT runs on small sets), which adds about 1–2 s to a delay scenario.
+  - Revenue loss from a cancellation is not modelled (no fare revenue per flight is supplied). This is stated in the assumptions.
+  - Crew legality of a cancellation or swap is still not checked (no crew data).

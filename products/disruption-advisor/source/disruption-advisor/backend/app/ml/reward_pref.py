@@ -1,4 +1,4 @@
-"""Phase 5: passenger reward preference model (ADR 0010). Runs as ingest stage 4.
+"""Phase 5: passenger reward preference model (ADR 0012). Runs as ingest stage 4.
 
 Question answered: how likely is THIS passenger to accept THIS reward (type and amount) after a disruption of THIS
 severity? The score replaces the proxy rules in app/engine/rewards.py.

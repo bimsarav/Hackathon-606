@@ -1,6 +1,6 @@
 # Phase 5 Design: Passenger Reward Recommendation
 
-Status: design for the MVP (2026-11-21). Decision record: [ADR 0010](adr/0010-passenger-reward-recommendation.md). Code: `backend/app/engine/rewards.py`.
+Status: design for the MVP (2026-11-21). Decision record: [ADR 0012](adr/0012-passenger-reward-recommendation.md). Code: `backend/app/engine/rewards.py`.
 
 ## What it does
 For a disrupted flight (delay or cancellation) the planner enters a **goodwill budget** in AED. The system works out how **severe** the disruption was for each passenger and how **valuable** each passenger is, then recommends a **reward type and amount** per passenger (meal voucher, shopping voucher, lounge pass, miles, free ticket) so that the total stays within the budget. A person reviews and approves; nothing is sent to passengers.

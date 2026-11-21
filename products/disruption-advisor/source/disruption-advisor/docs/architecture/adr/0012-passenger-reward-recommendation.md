@@ -1,4 +1,4 @@
-# ADR-0010: Passenger reward recommendation with proxy preferences and a budget
+# ADR-0012: Passenger reward recommendation with proxy preferences and a budget
 
 - **Status:** Accepted (2026-11-21, phase 5 approved by the user)
 - **Context:** After a disruption the airline can offer goodwill rewards. The planner needs a defensible way to decide who gets what within a budget. The data has passenger value signals (loyalty, frequency, fare, ancillaries) but no record of which rewards customers accepted, so a trained preference model is not possible yet.

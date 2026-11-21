@@ -4,12 +4,13 @@ import threading
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
+import anthropic
 import structlog
 from fastapi import FastAPI
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app import advisor, health, risk
+from app import advisor, agent_api, health, risk
 from app.config import Settings, get_settings
 from app.engine.explain import Explainer
 from app.engine.store import OpsStore
@@ -62,9 +63,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         settings.ai_effort,
         settings.ai_timeout_seconds,
     )
+    key = settings.anthropic_api_key.get_secret_value()
+    # Phase 3 agent: None without a key, and the deterministic planner answers instead (ADR 0010).
+    app.state.agent_client = anthropic.Anthropic(api_key=key, max_retries=2) if key else None
     app.add_middleware(RequestIdMiddleware)
     register_error_handlers(app)
     app.include_router(health.router)
     app.include_router(advisor.router)
     app.include_router(risk.router)
+    app.include_router(agent_api.router)
     return app

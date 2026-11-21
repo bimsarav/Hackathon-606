@@ -1,0 +1,39 @@
+  [  7.3s] 1. flight_status {"flight_id": "G9519_202611210200"} -> G9519 DAC-SHJ 2026-11-21 02:00:00, 168 booked, 60+ min delay risk 16%
+      note: I'll start by pulling the flight's schedule, load and predicted delay risk.
+  [ 15.3s] 2. assess_delay {"flight_id": "G9519_202611210200", "delay_minutes": 56} -> 5 options; picks: Lowest cost: swap:A6-ARI, Protect passengers: swap:A6-ANO, Least delay: swap:A6-ANO
+      note: Planning delay is 56 minutes; running the engine's scenario at that delay.
+  [ 15.3s] 3. aircraft_rotation {"flight_id": "G9519_202611210200"} -> A6-ARD: 9 flights in 48 h
+      note: 
+  [ 17.7s] 4. compare_strategies {} -> lowest_cost: swap:A6-ARI; protect_passengers: swap:A6-ANO; least_delay: swap:A6-ANO
+      note: Two swaps tie on every figure, so I'll compare the strategy picks and check passenger impact for both swaps.
+  [ 23.9s] 5. passenger_impact {"option_key": "swap:A6-ANO"} -> swap:A6-ANO: 15 missed connections, 0 cancelled, 13 rebooked, 2 without a seat
+      note: 
+  [ 30.0s] 6. passenger_impact {"option_key": "swap:A6-ARI"} -> swap:A6-ARI: 15 missed connections, 0 cancelled, 13 rebooked, 2 without a seat
+      note: 
+  [ 37.1s] 7. submit_recommendation {"option_key": "swap:A6-ANO", "strategy": "protect_passengers", "reasons": ["Hav -> recommends swap:A6-ANO (protect_passengers)
+      note: Both swaps have identical figures. I'll recommend A6-ANO because two strategies (protect passengers and least delay) pick it.
+source: ai:claude-opus-5-5 | fallback: None | secs: 37.1 | usage: {'input_tokens': 10, 'output_tokens': 1215, 'cache_read_input_tokens': 9786}
+{
+ "flight_id": "G9519_202611210200",
+ "delay_minutes": 56,
+ "option_key": "swap:A6-ANO",
+ "strategy": "protect_passengers",
+ "reasons": [
+  "Having A6-ANO fly G9294 keeps the 56-minute delay on G9519 only, so the Tbilisi round trip leaves on time and no flights are cancelled.",
+  "It costs AED 23,525 and causes 15 missed connections, compared with AED 61,100 and 36 missed connections if A6-ARD keeps its own schedule and takes the delay.",
+  "It has exactly the same cost and passenger figures as the A6-ARI swap, and it is the choice of both the protect-passengers and least-delay strategies.",
+  "Cancelling G9294/G9295 instead would affect 306 passengers and cost AED 228,595, so it is not worth it."
+ ],
+ "risks": [
+  "15 passengers will still miss connections and need 15 hotel rooms, with care costs of AED 9,950.",
+  "13 passengers are rebooked on G9337 and 2 are left without a seat, so they need help to get rebooked.",
+  "No one has checked whether the crew can legally fly this swap.",
+  "The predicted delay is 56 minutes, but there is a 15.8% chance of 60 minutes or more, which could cause more missed connections."
+ ],
+ "checks": [
+  "Ask crew control to confirm the crew can legally operate G9294/G9295 on A6-ANO.",
+  "Confirm A6-ANO is free and ready at Sharjah for the 08:30 UTC departure of G9294, and that it does not disrupt its own flights.",
+  "Confirm G9337 has seats for the 13 rebooked passengers and find options for the 2 without a seat.",
+  "If A6-ANO is not available, use A6-ARI, which has the same figures."
+ ]
+}

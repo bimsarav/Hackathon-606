@@ -1,4 +1,4 @@
-"""Phase 5 reward recommendation (ADR 0010): severity, proxy preferences, eligibility and the budget fit."""
+"""Phase 5 reward recommendation (ADR 0012): severity, proxy preferences, eligibility and the budget fit."""
 
 from typing import Any
 

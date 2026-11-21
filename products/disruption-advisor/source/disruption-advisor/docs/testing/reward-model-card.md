@@ -1,6 +1,6 @@
 # Model Card: Reward Preference Model (Phase 5)
 
-Code: `backend/app/ml/reward_pref.py` (ingest stage 4). Design: [REWARDS_DESIGN.md](../architecture/REWARDS_DESIGN.md), [ADR 0010](../architecture/adr/0010-passenger-reward-recommendation.md).
+Code: `backend/app/ml/reward_pref.py` (ingest stage 4). Design: [REWARDS_DESIGN.md](../architecture/REWARDS_DESIGN.md), [ADR 0012](../architecture/adr/0012-passenger-reward-recommendation.md).
 
 > **SYNTHETIC TRAINING DATA.** No real reward-redemption history exists. The offers and outcomes are simulated from an assumed behaviour model, so this model reproduces those assumptions, not real customer choices. Retrain on the airline's offer log when it exists (replace `generate_history`; nothing else changes).
 

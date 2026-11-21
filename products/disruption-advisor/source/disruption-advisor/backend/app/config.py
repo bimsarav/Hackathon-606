@@ -57,6 +57,10 @@ class Settings(BaseSettings):
     ai_model: str = "claude-opus-5-5"
     ai_effort: str = "low"  # short texts; thinking cannot be disabled on Opus 5.5, effort controls depth
     ai_timeout_seconds: float = 25.0
+    # Phase 3 agent (ADR 0010): recommend-only tool-use loop; the planner answers when the AI cannot
+    agent_effort: str = "medium"
+    agent_max_tool_calls: int = 12
+    agent_timeout_seconds: float = 120.0
 
 
 @lru_cache

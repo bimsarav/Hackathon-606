@@ -15,10 +15,12 @@ from sqlalchemy import select
 from app.auth import CurrentUser, authenticate, issue_token
 from app.db import SessionDep
 from app.engine import rewards
+from app.engine import strategy as strategies
 from app.engine.priority import DEFAULT_WEIGHTS, LABELS
 from app.engine.scenarios import Context, ScenarioError, analyse_cancellation, analyse_delay, presets
 from app.models import Decision, Scenario
 from app.schemas import (
+    ChooseStrategy,
     DecisionCreate,
     DecisionRead,
     LoginRequest,
@@ -63,12 +65,13 @@ def _analyse(
     delay: int | None,
     weights: dict[str, float],
     selected_key: str | None = None,
+    strategy: str = strategies.DEFAULT,
 ) -> dict[str, Any]:
     try:
         if kind == "DELAY":
             if delay is None:
                 raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "delay_minutes is required for a delay")
-            result = analyse_delay(ctx, flight_id, delay, weights, selected_key)
+            result = analyse_delay(ctx, flight_id, delay, weights, selected_key, strategy)
         else:
             result = analyse_cancellation(ctx, flight_id, weights)
     except ScenarioError as exc:
@@ -124,7 +127,9 @@ def search_flights(
 @router.post("/scenarios", status_code=status.HTTP_201_CREATED)
 def create_scenario(payload: ScenarioCreate, request: Request, session: SessionDep, user: CurrentUser) -> ScenarioRead:
     weights = payload.weights.as_dict()
-    result = _analyse(_context(request), payload.kind, payload.flight_id, payload.delay_minutes, weights)
+    result = _analyse(
+        _context(request), payload.kind, payload.flight_id, payload.delay_minutes, weights, strategy=payload.strategy
+    )
     scenario = Scenario(
         id=uuid.uuid4(),
         kind=payload.kind,
@@ -184,6 +189,7 @@ def reprioritise(
         scenario.delay_minutes,
         weights,
         scenario.result.get("selected_key"),
+        scenario.result.get("strategy", strategies.DEFAULT),
     )
     scenario.weights = weights
     session.commit()
@@ -208,6 +214,30 @@ def select_option(
         scenario.delay_minutes,
         scenario.weights,
         payload.option_key,
+        scenario.result.get("strategy", strategies.DEFAULT),
+    )
+    session.commit()
+    session.refresh(scenario)
+    return _read(scenario)
+
+
+@router.post("/scenarios/{scenario_id}/strategy")
+def choose_strategy(
+    scenario_id: uuid.UUID, payload: ChooseStrategy, request: Request, session: SessionDep, _: CurrentUser
+) -> ScenarioRead:
+    """Switch the strategy of a delay scenario (phase 3). The numbers stay the same; the recommendation becomes the
+    new strategy's pick, and that option is selected."""
+    scenario = _get(session, scenario_id)
+    if scenario.kind != "DELAY":
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Only delay scenarios have strategies")
+    scenario.result = _analyse(
+        _context(request),
+        scenario.kind,
+        scenario.flight_id,
+        scenario.delay_minutes,
+        scenario.weights,
+        None,
+        payload.strategy,
     )
     session.commit()
     session.refresh(scenario)
@@ -269,7 +299,7 @@ def draft_message(
 def recommend_rewards(
     scenario_id: uuid.UUID, payload: RewardRequest, request: Request, session: SessionDep, _: CurrentUser
 ) -> dict[str, Any]:
-    """Goodwill reward plan for the passengers of the scenario's flight within a budget (phase 5, ADR 0010).
+    """Goodwill reward plan for the passengers of the scenario's flight within a budget (phase 5, ADR 0012).
 
     Computed on request and not stored; a person approves it through the decisions endpoint."""
     scenario = _get(session, scenario_id)

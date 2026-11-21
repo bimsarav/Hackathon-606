@@ -108,6 +108,49 @@ export interface RecoveryOption {
   cost_aed: number;
   cost_breakdown: Record<string, number>;
   legs: OptionLeg[];
+  // Phase 3 (ADR 0011); optional so scenarios saved before phase 3 still render.
+  kind?: OptionKind;
+  cancelled_flights?: CancelledFlight[];
+  cancelled_passengers?: number;
+  passengers_rebooked?: number;
+  passengers_without_seat?: number;
+  passenger_delay_minutes?: number;
+  picked_by?: StrategyKey[];
+}
+
+export type OptionKind = "absorb" | "swap" | "cancel" | "consolidate";
+export type StrategyKey = "lowest_cost" | "protect_passengers" | "least_delay";
+export const STRATEGY_KEYS: StrategyKey[] = ["lowest_cost", "protect_passengers", "least_delay"];
+export const STRATEGY_LABEL: Record<StrategyKey, string> = {
+  lowest_cost: "Lowest cost",
+  protect_passengers: "Protect passengers",
+  least_delay: "Least delay",
+};
+
+export interface CancelledFlight {
+  flight_id: string;
+  flight_number: string;
+  origin: string;
+  destination: string;
+  std: string;
+  booked_pax: number;
+}
+
+export interface StrategyPick {
+  key: StrategyKey;
+  label: string;
+  pick: string;
+}
+
+/** The agent's recommendation as attached to the scenario it produced (ADR 0010). */
+export interface AgentNote {
+  run_id: string;
+  source: string;
+  option_key: string;
+  strategy: StrategyKey;
+  reasons: string[];
+  risks: string[];
+  checks: string[];
 }
 
 export interface PassengerRow {
@@ -153,6 +196,8 @@ export interface PassengerRow {
     cost_aed: number;
   };
   message: string;
+  /** Delay scenarios (phase 3): why the passenger needs a new flight. */
+  group?: "missed_connection" | "cancelled";
 }
 
 export interface Alternative {
@@ -189,6 +234,9 @@ export interface DelayResult extends ResultBase {
   options: RecoveryOption[];
   recommended_key: string;
   selected_key?: string;
+  strategy?: StrategyKey;
+  strategies?: StrategyPick[];
+  agent?: AgentNote;
   misconnections: { pnr: string; customer_key: string; outbound_flight_number: string; final_destination: string;
     planned_minutes: number; new_minutes: number | null; mct_minutes: number }[];
 }
@@ -343,6 +391,57 @@ export interface RewardPlan {
   rows: RewardRow[];
 }
 
+// --- Phase 3: agent runs (app/agent_api.py) ---
+export interface AgentStep {
+  n: number;
+  tool: string;
+  input: Record<string, unknown>;
+  summary: string;
+  note: string;
+  error: boolean;
+  ms: number;
+  at: string;
+}
+
+export interface AgentRecommendation {
+  flight_id: string;
+  delay_minutes: number;
+  option_key: string;
+  strategy: StrategyKey;
+  reasons: string[];
+  risks: string[];
+  checks: string[];
+}
+
+export type AgentStatus = "RUNNING" | "DONE" | "FAILED";
+
+export interface AgentRun {
+  id: string;
+  flight_id: string;
+  delay_minutes: number | null;
+  strategy: StrategyKey | null;
+  note: string;
+  status: AgentStatus;
+  source: string | null;
+  fallback_reason: string | null;
+  trace: AgentStep[];
+  recommendation: AgentRecommendation | null;
+  error: string | null;
+  scenario_id: string | null;
+  created_by: string;
+  created_at: string;
+  finished_at: string | null;
+}
+
+export type AgentRunSummary = Omit<AgentRun, "trace" | "note" | "fallback_reason">;
+
+export interface AgentRunRequest {
+  flight_id: string;
+  delay_minutes?: number | null;
+  strategy?: StrategyKey | null;
+  note?: string;
+}
+
 export interface ModelMetrics {
   observed_rate: number;
   auc: number | null;
@@ -427,13 +526,19 @@ export const api = {
   presets: () => request<{ delay: DelayPreset[]; cancel: CancelPreset[] }>("/api/v1/presets"),
   flights: (q: string, day?: string) =>
     request<FlightRow[]>(`/api/v1/flights?q=${encodeURIComponent(q)}${day ? `&day=${day}` : ""}&limit=30`),
-  createScenario: (body: { kind: "DELAY" | "CANCEL"; flight_id: string; delay_minutes?: number; weights: Weights }) =>
+  createScenario: (body: { kind: "DELAY" | "CANCEL"; flight_id: string; delay_minutes?: number; weights: Weights;
+    strategy?: StrategyKey }) =>
     post<Scenario>("/api/v1/scenarios", body),
   scenarios: () => request<ScenarioSummary[]>("/api/v1/scenarios"),
   scenario: (id: string) => request<Scenario>(`/api/v1/scenarios/${id}`),
   reprioritise: (id: string, weights: Weights) => post<Scenario>(`/api/v1/scenarios/${id}/reprioritise`, { weights }),
   selectOption: (id: string, optionKey: string) =>
     post<Scenario>(`/api/v1/scenarios/${id}/select`, { option_key: optionKey }),
+  chooseStrategy: (id: string, strategy: StrategyKey) =>
+    post<Scenario>(`/api/v1/scenarios/${id}/strategy`, { strategy }),
+  startAgent: (body: AgentRunRequest) => post<AgentRun>("/api/v1/agent/runs", body),
+  agentRun: (id: string) => request<AgentRun>(`/api/v1/agent/runs/${encodeURIComponent(id)}`),
+  agentRuns: () => request<AgentRunSummary[]>("/api/v1/agent/runs"),
   decisions: (id: string) => request<Decision[]>(`/api/v1/scenarios/${id}/decisions`),
   decide: (id: string, target: string, action: "APPROVE" | "REJECT", comment = "") =>
     post<Decision>(`/api/v1/scenarios/${id}/decisions`, { target, action, comment }),

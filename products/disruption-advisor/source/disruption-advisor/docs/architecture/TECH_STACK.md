@@ -34,7 +34,7 @@ Requirements: the UC5 use-case document, the briefing transcript, the product-ow
 |---|---|---|---|
 | DuckDB over Apache Parquet (pyarrow, python-calamine for .xls/.xlsx) | 2.0.1 / 26.0.1 / 0.9.1 | Ingest extracts once into typed Parquet; in-memory analytical queries | [0005](adr/0005-parquet-duckdb-analytics-store.md) |
 | Google OR-Tools CP-SAT | 9.15 | Seat-limited re-accommodation (0/1 assignment, PNR groups together) | [0006](adr/0006-or-tools-cp-sat-rebooking.md) |
-| Anthropic Python SDK, model `claude-opus-5-5` (configurable) | 2.12 | Grounded explanations and message drafts; template fallback; server-side refusal fallback | [0007](adr/0007-generative-ai-grounded-explanations.md) |
+| Anthropic Python SDK, model `claude-opus-5-5` (configurable) | 2.12 | Grounded explanations and message drafts; template fallback; server-side refusal fallback. Phase 3: the recommend-only agent (Messages API tool use, manual loop, rule-based planner fallback); same SDK, no new dependency | [0007](adr/0007-generative-ai-grounded-explanations.md), [0010](adr/0010-tool-using-agent.md) |
 | Demo authentication (stdlib HMAC tokens, two roles) + nginx login rate limit | n/a | MVP access control | [0004](adr/0004-authentication.md) |
 | Playwright | 1.65.1 | End-to-end tests (Docker image `mcr.microsoft.com/playwright:v1.65.1`) | n/a (testing standard) |
 | One-shot `ingest` Compose service | n/a | Builds the Parquet operating picture before the API starts | [0005](adr/0005-parquet-duckdb-analytics-store.md) |

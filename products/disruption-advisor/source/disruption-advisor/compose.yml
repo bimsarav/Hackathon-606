@@ -18,6 +18,9 @@ x-api-env: &api-env
   TOKEN_SECRET: ${TOKEN_SECRET:?set TOKEN_SECRET in settings.env}
   ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
   AI_MODEL: ${AI_MODEL:-claude-opus-5-5}
+  AGENT_EFFORT: ${AGENT_EFFORT:-medium}
+  AGENT_MAX_TOOL_CALLS: ${AGENT_MAX_TOOL_CALLS:-12}
+  AGENT_TIMEOUT_SECONDS: ${AGENT_TIMEOUT_SECONDS:-120}
   DEFAULT_MCT_MINUTES: ${DEFAULT_MCT_MINUTES:-50}
 
 services:
@@ -70,6 +73,27 @@ services:
       migrate: { condition: service_completed_successfully }
     restart: "no"
     mem_limit: 8g
+    logging: *logging
+
+  # One-shot, after the ingest: the airline extracts (typed, bookings without names) into PostgreSQL schema
+  # `extracts` for analysts and reports (app/ingest/to_postgres.py). Reloads only tables whose source changed. The
+  # app does not depend on it, so the API starts without waiting for the bookings load (several minutes).
+  extracts-db:
+    image: disruption-advisor-api:latest
+    command: ["python", "-m", "app.ingest.to_postgres"]
+    healthcheck: { disable: true }
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:?}:${POSTGRES_PASSWORD:?}@db:5432/${POSTGRES_DB:?}
+      DATA_DIR: /data
+      EXTRACTS_TO_DB: ${EXTRACTS_TO_DB:-all}
+      INGEST_MEMORY_LIMIT: ${INGEST_MEMORY_LIMIT:-4GB}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - ops-data:/data
+    depends_on:
+      ingest: { condition: service_completed_successfully }
+    restart: "no"
+    mem_limit: 6g
     logging: *logging
 
   api:

@@ -5,7 +5,9 @@ Day 2026-11-21, hub SHJ, times UTC.
   T2 (174 seats): G1 DOH-SHJ 06:00-07:00 · G2 SHJ-BKK 11:00-17:00       (on the ground at SHJ: swap candidate)
   T3 (215 seats): X1 SHJ-CAI 12:00-16:00 (cancellation scenario) · Y1 SHJ-CAI 2026-11-22 09:00-13:00
   T4 (174 seats): H1 SHJ-CAI 11:30-15:30 (onward flight for connecting passengers from F1)
+  T5 (215 seats): L1 SHJ-LHE 13:00-16:00 · L2 LHE-SHJ 17:00-20:00 (same-route flights for T1's F2/F3 round trip)
 Seats: H1 is full, F4 has 2 free, Y1 has 5 free → 7 seats for the 10 seated passengers of X1 (+1 lap infant).
+F2/F3 (SHJ-LHE-SHJ, phase 3 cancel/consolidate) carry 6 + 4 listed passengers; L1 has 10 free, L2 has 15 free.
 """
 
 from datetime import datetime, timedelta
@@ -50,8 +52,11 @@ FLIGHTS = [
     _flight("G9201", "T3", "SHJ", "CAI", t(12), t(16), 215, 10),
     _flight("G9201", "T3", "SHJ", "CAI", t(9, day=22), t(13, day=22), 215, 210),
     _flight("G9301", "T4", "SHJ", "CAI", t(11, 30), t(15, 30), 174, 174),
+    _flight("G9011", "T5", "SHJ", "LHE", t(13), t(16), 215, 205),
+    _flight("G9012", "T5", "LHE", "SHJ", t(17), t(20), 215, 200),
 ]
 F1, X1 = FLIGHTS[0]["flight_id"], FLIGHTS[6]["flight_id"]
+F2, F3 = FLIGHTS[1]["flight_id"], FLIGHTS[2]["flight_id"]
 
 
 def _pax(fid: str, pnr: str, key: str, ptype: str, o: str, d: str, dep: datetime, **kw: Any) -> dict[str, Any]:
@@ -105,6 +110,11 @@ PAX = [
     _pax(X1, "PNRE", "e0000001", "AD", "SHJ", "CAI", t(12), pnr_size=2, adults=2, fare=200.0),
     _pax(X1, "PNRE", "e0000002", "AD", "SHJ", "CAI", t(12), pnr_size=2, adults=2, fare=200.0),
     _pax(X1, "PNRF", "f0000001", "AD", "SHJ", "CAI", t(12), fare=300.0),
+    # Passengers of T1's round trip F2 (SHJ-LHE) / F3 (LHE-SHJ), rebooked when phase 3 cancels the pair.
+    _pax(F2, "RTA", "r0000001", "AD", "SHJ", "LHE", t(10, 45), pnr_size=2, adults=2),
+    _pax(F2, "RTA", "r0000002", "AD", "SHJ", "LHE", t(10, 45), pnr_size=2, adults=2),
+    *[_pax(F2, f"RTB{i}", f"s000000{i}", "AD", "SHJ", "LHE", t(10, 45)) for i in range(1, 5)],
+    *[_pax(F3, f"RTC{i}", f"u000000{i}", "AD", "LHE", "SHJ", t(14, 30)) for i in range(1, 5)],
 ]
 
 CUSTOMERS = [

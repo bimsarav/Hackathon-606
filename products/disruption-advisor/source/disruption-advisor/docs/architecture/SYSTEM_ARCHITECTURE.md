@@ -323,3 +323,96 @@ flowchart LR
 - **HTTPS:** Caddy obtains and renews the certificate itself. sslip.io maps the hostname to the server IP, so no DNS setup is needed. `:8888` stays for the existing links.
 - **Backups** stay on the server disk (no off-site target was supplied); off-site copies are a phase 4 item. The restore test is run after deployment and recorded.
 - Details: [ADR 0008](adr/0008-delay-risk-model.md), [ADR 0009](adr/0009-https-and-backups.md).
+
+## 11. Phase 3: Agent and what-if (approved by the user on 21 Nov 2026)
+Phase 3 adds three things on top of phases 1 and 2. The engine still computes every number, and a person still approves every action.
+1. **Two more recovery levers** for a delay: cancel a downstream round trip, and consolidate (the same, when every passenger fits on other flights on the same route that day).
+2. **Strategies compared side by side.** "Lowest cost", "Protect passengers" and "Least delay" each pick their best option from the same option list.
+3. **A Claude agent** investigates a disruption with read-only engine tools. It explains each step and submits one of the engine's options as its recommendation. A deterministic planner with the same tools runs when the AI is off or fails.
+
+### 11.1 Recovery options for a delay
+```mermaid
+flowchart LR
+  D[delayed flight<br/>+ delay minutes] --> A[absorb<br/>delay runs down the rotation]
+  D --> S[swap<br/>same-type aircraft at the station<br/>up to 3]
+  D --> C[cancel a round trip<br/>X→Y→X later on the same aircraft<br/>within 24 h, up to 3 pairs]
+  C --> R[re-accommodate the cancelled<br/>passengers: priority + CP-SAT<br/>within the rebooking window]
+  R --> K{all passengers on same-route<br/>flights within 6 h?}
+  K -->|yes| CO[label: Consolidate]
+  K -->|no| CA[label: Cancel]
+  A & S & CO & CA --> M[KPIs per option<br/>cost · aircraft delay · passenger delay ·<br/>missed connections · cancelled passengers ·<br/>passengers without a seat]
+```
+- **Why a round trip:** cancelling a pair X→Y→X takes the aircraft out of the rotation for that time and puts it back where it was scheduled to be, so the delay stops spreading without moving another aircraft. Cancelling a single flight would leave the aircraft at the wrong station.
+- **Same treatment for everyone:** passengers of a cancelled flight, and passengers who miss a connection, are ranked and rebooked with the phase 1 rules: strict tiers, weighted score, CP-SAT, PNRs kept together. Care (meals, hotel) and EU261 follow the same rules too.
+- **Rebooking is checked for every option**, not only for the one on screen, so options can be compared fairly on the passengers left without a seat. CP-SAT runs about 5–8 times per scenario, on small passenger sets.
+
+### 11.2 Strategies
+| Strategy | Picks the option with the lowest… (ties broken left to right) |
+|---|---|
+| Lowest cost (default; same as phases 1–2) | estimated cost → missed connections → aircraft delay minutes → flights cancelled → flights moved to another aircraft → option key |
+| Protect passengers | passengers without a seat → passengers disrupted (missed connections + cancelled) → passenger delay minutes → cost → flights cancelled → key |
+| Least delay | passenger delay minutes → cost → flights cancelled → key |
+
+- **Passenger delay minutes** = Σ (delay × passengers) over delayed flights + the arrival delay of every rebooked passenger + 24 h for every passenger without a seat. The 24 h figure is an assumption, stated in the UI.
+- The scenario stores the chosen strategy. "Recommended" means that strategy's pick. Approving another option is still an override with a required reason. Switching the strategy changes no numbers; it only changes which option is recommended.
+- The comparison panel shows each strategy's pick side by side with the same KPIs. The option list is computed once, so the comparison is instant.
+
+### 11.3 Agent loop
+```mermaid
+sequenceDiagram
+  autonumber
+  actor U as OCC / PCU
+  participant W as web
+  participant A as api: agent runner<br/>(background task)
+  participant C as Claude API<br/>(Messages, tool use)
+  participant E as engine tools<br/>(read-only, in-process)
+  participant P as PostgreSQL
+  U->>W: "Ask the agent" on a flight<br/>(goal + optional delay, strategy)
+  W->>A: POST /api/v1/agent/runs
+  A->>P: agent_runs row (status RUNNING)
+  A-->>W: 202 + run id
+  loop up to 12 tool calls, 120 s, then stop
+    A->>C: messages + tool definitions
+    C-->>A: progress note + tool_use
+    A->>E: run tool (inputs validated)
+    E-->>A: result (counts and flight facts only, no names, PNRs or customer keys)
+    A->>P: append step to the trace
+  end
+  C-->>A: submit_recommendation(option, strategy, reasons, checks)
+  A->>A: validate: option exists in the engine's result,<br/>numbers re-read from the engine
+  A->>P: scenario saved + run DONE (or FAILED → planner)
+  W->>A: GET /api/v1/agent/runs/{id} (poll every 2 s)
+  A-->>W: trace + recommendation + scenario id
+  U->>W: open scenario → approve / override (audited)
+```
+**Tools.** All are read-only, and their inputs are validated. Each returns a compact JSON summary.
+
+| Tool | Returns |
+|---|---|
+| `find_flights` | flights matching a number or route on a day (id, times, aircraft, load) |
+| `flight_status` | one flight: schedule, aircraft, booked passengers, connecting passengers, delay risk and reasons (phase 2) |
+| `aircraft_rotation` | the aircraft's flights over the next 24–48 h, with turn buffers |
+| `assess_delay` | the delay scenario for a flight and delay: every option with its KPIs, plus each strategy's pick |
+| `compare_strategies` | the three strategy picks for the assessed scenario, with the trade-offs between them |
+| `passenger_impact` | for one option: missed connections, rebooked, without a seat, care, priority tiers (counts only) |
+| `watchlist` | the phase 2 watchlist: top flights by expected missed connections |
+| `submit_recommendation` | final answer: `option_key`, `strategy`, 2–4 reasons, risks and checks for the controller (strict schema) |
+
+- **Recommend-only.** No tool changes data or approves anything. The agent's result is saved as a normal scenario with its trace attached, and the person approves in the existing flow.
+- **Grounded.** The recommendation must name an option the engine produced. The figures on screen are re-read from the engine result, never taken from the model's text.
+- **Privacy (ADR 0007 rules).** Tool results carry no names, PNRs, contact details or customer keys. Passengers appear only as counts by tier, need or route.
+- **Bounded.** At most 12 tool calls, 120 s and one run at a time per user. On timeout, error, refusal or no API key, the **deterministic planner** runs the same tools in a fixed order: status → assess (given delay, else the predicted planning delay with a 15-minute floor, else 60 min) → compare → impact for the strategy's pick. It writes a template explanation, and the trace shows `source: planner`.
+- **Trace.** Each step stores the model's progress note, the tool, its inputs and a one-line result. The UI shows the steps live while the run is going.
+
+### 11.4 Data and API additions
+- PostgreSQL table `agent_runs` (Alembic 0002): `id`, `flight_id`, `goal`, `strategy`, `status` (RUNNING · DONE · FAILED), `source` (`ai:<model>` or `planner`), `trace` JSONB, `recommendation` JSONB, `scenario_id`, `created_by`, timestamps, token usage.
+- New fields in the scenario result: `strategy`, per-option `strategy_rank`, and `cancelled_flights` / `cancelled_passengers` / `passengers_without_seat` / `passenger_delay_minutes`. Old scenarios are read with defaults.
+- New endpoints:
+  - `POST /api/v1/agent/runs`, `GET /api/v1/agent/runs/{id}`, `GET /api/v1/agent/runs`
+  - `POST /api/v1/scenarios/{id}/strategy` (switch the strategy and recompute the recommendation; the comparison itself is part of every delay scenario result: `strategies`, per-option `picked_by`)
+- UI:
+  - a strategy comparison panel and a strategy switch in the delay view
+  - an "Ask the agent" action on the launcher and the watchlist rows
+  - an agent run page: live steps, recommendation, open scenario
+
+- Details: [ADR 0010](adr/0010-tool-using-agent.md), [ADR 0011](adr/0011-cancel-consolidate-and-strategies.md).

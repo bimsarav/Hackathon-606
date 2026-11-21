@@ -27,7 +27,7 @@ From the organisation's stack profile `python-fastapi`. Every version below was 
 | pyarrow | 26.0.1 | Python 3.11+ | DuckDB 2.0, Parquet zstd | — | API image | Active | No type stubs (mypy override) |
 | python-calamine | 0.9.1 | Python 3.11+ | Reads .xls (BIFF) and .xlsx | — | API image | Active | — |
 | OR-Tools (CP-SAT) | 9.15.6755 | Python 3.9+ (cp314 manylinux wheel) | — | — | API image | Active | Wheel is large (part of the 1 GB API image) |
-| Anthropic Python SDK | 2.12.0 | Python 3.10+ | httpx2 (SDK 1.x+) | — | API image; `ANTHROPIC_API_KEY` secret | Active | Model `claude-opus-5-5`; beta `server-side-fallback-2026-07-01` |
+| Anthropic Python SDK | 2.12.0 | Python 3.10+ | httpx2 (SDK 1.x+) | — | API image; `ANTHROPIC_API_KEY` secret | Active | Model `claude-opus-5-5`; beta `server-side-fallback-2026-07-01`. Phase 3 agent: Messages API tool use with strict schemas, also beta `thinking-display-updates-2026-08-18`; no new package |
 | Playwright | 1.65.1 (`mcr.microsoft.com/playwright:v1.65.1`) | Node (in image) | Chromium bundled | — | `scripts/e2e.sh`, Docker | Active | Test-only |
 | Trivy | 0.76.2 (`aquasec/trivy`), trivy-action v0.36.0 in CI | — | — | — | CI and `scripts/verify-profile.sh` | Active | — |
 | Docker / Compose | Engine 20.10+, Compose v2.21+ | — | — | — | `depends_on: service_completed_successfully` / `service_healthy` | — | — |

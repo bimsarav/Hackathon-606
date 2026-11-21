@@ -53,3 +53,11 @@ Scope (R/docs/delivery/MVP_AND_INCREMENTAL_PLAN.md): delay-risk model (LightGBM,
 - [x] T-504 API: risk per flight, watchlist, misconnect risk per passenger; UI: watchlist page + risk chips; tests + e2e
 - [-] T-505 HTTPS + backup: MOVED to phase 6 by user 2026-11-21 (needs separate approval; design ADR 0009)
 - [x] T-506 deploy (prod phase 2 verified: smoke 11/11, e2e 4/4, risk API; reboot check skipped by user; docs done; NOT committed per user), verify (smoke, e2e, reboot check), docs (Confluence, README, methods PDF), report
+
+## T-600 disruption-advisor Phase 3 "Agent and what-if" (approved by user 2026-11-21: "start phase 3"; phase 6 needs separate approval)
+Scope (R/docs/delivery/MVP_AND_INCREMENTAL_PLAN.md): Claude tool-using agent over the engine modules (recommend-only, explains its reasoning) · cancel / consolidate as recovery options with passenger protection · side-by-side strategy comparison (most passengers protected / lowest cost / least delay)
+- [x] T-601 design: SYSTEM_ARCHITECTURE §11, ADR 0010/0011, plan; page https://claude.ai/artifact/GGysJ3ffhUmWisCqJiYaip
+- [x] T-602 engine: cancel/consolidate, per-option rebooking + KPIs, strategies, API strategy endpoint; 58 tests
+- [x] T-603 agent: tools, loop, planner, agent_runs API + Alembic 0002; 10 tests; live probe OK (output/T-603-live-agent-probe.log)
+- [x] T-604 UI: strategy panel, agent run view; 19 frontend tests; 2 e2e
+- [x] T-605 deployed + verified 02:32Z (smoke 11/11, e2e 6/6, AI agent run on prod); docs done

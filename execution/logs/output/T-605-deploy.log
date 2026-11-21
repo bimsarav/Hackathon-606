@@ -1,0 +1,23 @@
+synced
+rollback tag: pre-202611210231
+-rw-r--r--. 1 opc opc 877732 Nov 21 02:31 /home/opc/backups/disruption-advisor/pre-202611210231.dump
+== build 02:31:06
+#38 DONE 0.0s
+ Image disruption-advisor-api:latest Built 
+ Image disruption-advisor-web:latest Built 
+== up 02:31:57
+ Container disruption-advisor-api-1 Starting 
+ Container disruption-advisor-api-1 Started 
+ Container disruption-advisor-api-1 Waiting 
+ Container disruption-advisor-api-1 Healthy 
+ Container disruption-advisor-web-1 Starting 
+ Container disruption-advisor-web-1 Started 
+== state 02:32:21
+api: Up 6 seconds (healthy)
+db: Up 7 hours (healthy)
+ingest: Exited (0) 6 seconds ago
+migrate: Exited (0) 7 seconds ago
+web: Up Less than a second (health: starting)
+ingest-1  | 2026-11-21 02:32:15,117 INFO stage 1 skipped: extracts unchanged
+ingest-1  | 2026-11-21 02:32:15,117 INFO stage 2 skipped: operating picture is current
+exit=0

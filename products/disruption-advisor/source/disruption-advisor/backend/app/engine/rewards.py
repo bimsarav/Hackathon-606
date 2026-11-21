@@ -1,4 +1,4 @@
-"""Passenger goodwill rewards for a disrupted flight (phase 5, ADR 0010, docs/architecture/REWARDS_DESIGN.md).
+"""Passenger goodwill rewards for a disrupted flight (phase 5, ADR 0012, docs/architecture/REWARDS_DESIGN.md).
 
 For every passenger of the flight:
   severity   0-100  how badly the disruption hit this passenger (delay or cancellation, a missed connection, the

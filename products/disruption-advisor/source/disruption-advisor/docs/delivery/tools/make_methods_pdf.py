@@ -59,7 +59,7 @@ def footer(canvas, doc) -> None:  # noqa: ANN001
     canvas.saveState()
     canvas.setFont("Helvetica", 7.5)
     canvas.setFillColor(MUTED)
-    canvas.drawString(18 * mm, 10 * mm, "Disruption Advisor (UC5) - Methods, theories and justifications - phases 1-2, 21 Nov 2026")
+    canvas.drawString(18 * mm, 10 * mm, "Disruption Advisor (UC5) - Methods, theories and justifications - phases 1-3, 21 Nov 2026")
     canvas.drawRightString(192 * mm, 10 * mm, f"Page {doc.page}")
     canvas.restoreState()
 
@@ -67,12 +67,12 @@ def footer(canvas, doc) -> None:  # noqa: ANN001
 story: list = []
 story += [
     p("Disruption Advisor", TITLE),
-    p("Methods, theories and justifications (MVP and phase 2)", ParagraphStyle("st", parent=H2, textColor=MUTED, fontSize=13)),
-    p("Use case UC5: Flight &amp; Passenger Disruption Management. Version 1.1, 21 November 2026 (adds Section 9, phase 2). "
+    p("Methods, theories and justifications (MVP, phases 2 and 3)", ParagraphStyle("st", parent=H2, textColor=MUTED, fontSize=13)),
+    p("Use case UC5: Flight &amp; Passenger Disruption Management. Version 1.2, 21 November 2026 (adds Section 10, phase 3; Section 9, phase 2, since 1.1). "
       "Audience: OCC and PCU business owners, solution reviewers and judges.", S),
     Spacer(1, 6),
     p("<b>Labels used.</b> [STD] standard or regulation, [PRACTICE] common airline practice, [ACADEMIC] research, "
-      "[ASSUMPTION] our assumption to validate with the airline. Reference numbers like [R4] point to Section 12.", S),
+      "[ASSUMPTION] our assumption to validate with the airline. Reference numbers like [R4] point to Section 13.", S),
 ]
 
 story += [p("1. Summary", H1)]
@@ -85,6 +85,9 @@ story += bullets([
     "<b>Explainable AI (XAI)</b> is built in by design: every number on screen can be traced to a formula and its inputs "
     "(Section 8). Post-hoc XAI (TreeSHAP) is used only for the phase-2 delay-risk model, which ranks flights and never "
     "decides (Section 9).",
+    "Phase 3 adds an <b>AI agent</b> that investigates a disruption with read-only engine tools and recommends one of the "
+    "engine's options; it never computes numbers or approves anything, and a rule-based planner replaces it when the AI is "
+    "unavailable (Section 10).",
     "Gaps in the supplied data were filled with <b>labelled, deterministic synthetic data</b> (Section 3), as instructed by the "
     "user, so that every synthetic value can be replaced by real data without changing the logic.",
 ])
@@ -166,7 +169,7 @@ story += [p(
     "[STD/PRACTICE, R6]; IATA codes 91-96 classify it [STD, R7]. In the supplied G9 punctuality data reactionary codes account for "
     "about 76% of coded delay minutes, so modelling the rotation is the core of impact assessment.")]
 story += [p("For legs i = 1..n of one aircraft, with scheduled departure STD<sub>i</sub>, block time b<sub>i</sub> and minimum "
-            "turn time T (default 40 min, configurable):")]
+            "turn time T (measured from 2026 actual turns: 51 min at SHJ, 36 min elsewhere; configurable):")]
 story += [p("ETD<sub>1</sub> = STD<sub>1</sub> + delay<br/>ETA<sub>i</sub> = ETD<sub>i</sub> + b<sub>i</sub><br/>"
             "ETD<sub>i+1</sub> = max( STD<sub>i+1</sub> , ETA<sub>i</sub> + T )<br/>"
             "knock-on delay<sub>i</sub> = ETD<sub>i</sub> - STD<sub>i</sub>", F)]
@@ -183,11 +186,11 @@ story += [p("6. Recovery options and their cost", H1), p("6.1 Same-type aircraft
 story += [p("6.2 Connection feasibility", H2), p(
     "A connection is the same passenger in the same booking arriving at a station and leaving it 15 minutes to 20 hours later "
     "(user decision Q8). It is missed when the new connection time is below the Minimum Connecting Time: the hub table for that "
-    "origin/hub/destination (50-55 min at SHJ) or a 45-minute default [STD, R8]. Assessing impact per passenger journey matters "
+    "origin/hub/destination (50-55 min at SHJ) or a 50-minute default [STD, R8]. Assessing impact per passenger journey matters "
     "because about half of passenger delay minutes come from cancellations and missed connections [ACADEMIC, R9].")]
 story += [p("6.3 Cost model and ranking", H2), p(
-    "Each option is costed with assumed, configurable rates (user decision Q15) and the cheapest is recommended; ties are broken by "
-    "fewer missed connections. Delay minutes, passengers affected and missed connections are shown beside the cost so the trade-off "
+    "Each option is costed with assumed, configurable rates (user decision Q15) and, under the default strategy, the cheapest is "
+    "recommended; ties are broken by fewer missed connections (other strategies: Section 10.2). Delay minutes, passengers affected and missed connections are shown beside the cost so the trade-off "
     "stays visible (contrastive comparison).")]
 story += [p("cost = 400 AED x delay minutes<br/>"
             "     + 50 AED x passengers on legs delayed &gt;= 120 min      (meal care)<br/>"
@@ -324,7 +327,64 @@ story += [p(
     "weather, so independence is an approximation; delays of 2 h or more are rare and over-estimated (use them to rank); aircraft "
     "type and capacity are inferred for many flights [ASSUMPTION].", S)]
 
-story += [p("10. Generative AI and human oversight", H1)]
+story += [PageBreak(), p("10. Phase 3: more recovery options, strategies and the agent", H1)]
+story += [p("10.1 Round-trip cancellation and consolidation", H2), p(
+    "<b>Theory.</b> Cancellation is a standard aircraft-recovery lever next to delays and swaps [ACADEMIC, R2, R3]. Cancelling a "
+    "single flight would leave the aircraft at the wrong station, so phase 3 cancels a <i>round trip</i>: a later pair X-Y-X on "
+    "the delayed aircraft, departing within 24 h and still delayed if the delay is absorbed (up to 3 pairs). The aircraft skips "
+    "the pair and is back where it was planned to be, so the rest of its rotation is propagated with the formulas of Section 5 "
+    "and the delay stops spreading without another aircraft. The passengers of both cancelled flights are ranked and rebooked "
+    "with the Section 7 method (tiers, weighted score, CP-SAT on other flights of the same route, bookings kept together), with "
+    "care and EU261 estimates. If every cancelled passenger gets a seat on a same-route flight within 6 h, the option is labelled "
+    "<b>Consolidate</b>: the same computation under the name operations use. Rebooking is run for every option, not only the "
+    "one on screen, so options are compared on the same passenger KPIs. <b>Limit.</b> Lost fare revenue is not counted (no "
+    "revenue per flight was supplied) [ASSUMPTION].")]
+story += [p("10.2 Strategies as lexicographic orderings", H2), p(
+    "<b>Theory.</b> As in Section 7.1, a lexicographic order lets one criterion always win and uses the next only to break ties. "
+    "Each strategy is such an order over the same option list; the option with the smallest key is its pick, and the option key "
+    "is the last tie-break so the pick never depends on the order options were produced in. Switching the strategy changes only "
+    "the recommended option, never a number.")]
+story += [table([
+    ["Strategy", "Ordering (lowest first)"],
+    ["Lowest cost (default, phases 1-2 ranking)", "cost, missed connections, aircraft delay minutes, flights cancelled, flights moved "
+     "to another aircraft, option key"],
+    ["Protect passengers", "passengers without a seat, passengers disrupted (missed connections + cancelled), passenger delay "
+     "minutes, cost, flights cancelled, option key"],
+    ["Least delay", "passenger delay minutes, cost, flights cancelled, option key"],
+], [52, 120])]
+story += [p("passenger delay minutes = &Sigma;<sub>delayed legs</sub> delay x booked passengers<br/>"
+            "                        + &Sigma;<sub>rebooked passengers</sub> arrival delay<br/>"
+            "                        + 1,440 x passengers without a seat        (24 h each)", F)]
+story += [p("<b>Justification.</b> A single weighted score would be harder to explain and easy to tune toward a wanted answer; "
+            "three named orders with every KPI shown side by side keep the trade-off visible (contrastive comparison, Section 8). "
+            "The 24 h figure for a passenger without a seat is an assumption, stated in the UI [ASSUMPTION].")]
+story += [p("10.3 The agent: loop, guardrails and planner fallback", H2), p(
+    "<b>Method.</b> A manual tool-use loop on the Anthropic Messages API [R19]: the model (claude-opus-5-5, adaptive thinking, "
+    "effort medium) receives the goal and eight tool definitions with strict JSON schemas, and answers with short progress notes "
+    "and tool calls. The server validates each call's inputs, runs the engine function and returns a compact JSON result; every "
+    "step (note, tool, inputs, one-line result, duration) is stored and shown live. The tools are find_flights, flight_status, "
+    "aircraft_rotation, assess_delay, compare_strategies, passenger_impact, watchlist and submit_recommendation. The run ends "
+    "when submit_recommendation names an option key, a strategy, 2-4 reasons, risks and checks for the controller.")]
+story += bullets([
+    "<b>Recommend-only:</b> every tool is read-only. The result is saved as a normal scenario, and a person approves it or "
+    "overrides it with a reason (audited).",
+    "<b>Grounded:</b> submit_recommendation is accepted only for an option the engine produced in the last assessment; otherwise "
+    "the model receives an error and can correct itself. Figures on screen are re-read from the engine result, never from the "
+    "model's text.",
+    "<b>Data minimisation:</b> tool results contain flight facts and counts only, never names, PNRs, passenger IDs, document "
+    "numbers or customer keys. A unit test checks every request against all of them in the test data.",
+    "<b>Bounded:</b> at most 12 tool calls and 120 s per run, one run in progress per user (configurable).",
+    "<b>Planner fallback:</b> with no API key, or on a refusal, an API error, a time-out or a limit, a deterministic planner runs "
+    "the same tools in a fixed order (flight status, assess the given delay or else the predicted planning delay or else 60 min, "
+    "compare strategies, passenger impact) and recommends the chosen strategy's pick. The AI's steps stay in the trace, and the "
+    "run shows which source answered.",
+])
+story += [p("<b>Evidence.</b> Before the deploy, a live run on server data (G9519, no delay given) used the 56-minute planning "
+            "delay, made 7 tool calls in 37 s and recommended a swap. On the server, a run during the end-to-end test made 7 "
+            "steps in 25 s. Agent output varies between runs; the options and numbers do not. Details: "
+            "<i>docs/testing/agent-card.md</i>.", S)]
+
+story += [p("11. Generative AI and human oversight", H1)]
 story += bullets([
     "<b>Grounded generation:</b> the model (claude-opus-5-5, low effort) gets a fixed system instruction ('use only the facts given') "
     "and a JSON of engine facts. It never chooses an option or a passenger.",
@@ -336,18 +396,19 @@ story += bullets([
     "operator's designated staff [STD, R14]. The tool recommends; approve/reject decisions are recorded with user, role and time.",
 ])
 
-story += [p("11. Limitations and what must be validated", H1)]
+story += [p("12. Limitations and what must be validated", H1)]
 story += bullets([
-    "Costs, the 40-minute turn time, the 45-minute default MCT and the SSR rates are assumptions (configurable) [ASSUMPTION].",
+    "Costs, the measured turn times (51 min SHJ, 36 min elsewhere), the 50-minute default MCT and the SSR rates are assumptions (configurable) [ASSUMPTION].",
     "Crew duty limits are not checked (no crew data): crew control must confirm every swap.",
     "Out of scope (future enhancements): unaccompanied minors, partner and other carriers.",
-    "Only two recovery levers (absorb, same-type swap); cancellation/consolidation and equipment change come in phases 3-4.",
+    "Recovery levers: absorb, same-type swap and (phase 3) round-trip cancellation or consolidation; equipment change is phase 4. "
+    "Lost revenue of a cancellation is not counted.",
     "Seat capacity is inferred for most window flights because the inventory extract covers only 6 of them.",
     "Passenger identity is name-based; travel frequency for common names is unreliable and capped.",
     "EU261 is estimated (no extraordinary-circumstances or rerouting reductions); other regimes use generic care rules.",
 ])
 
-story += [p("12. References", H1)]
+story += [p("13. References", H1)]
 refs = [
     "R1 Davies et al., Decision Support for Schedule Recovery at Lufthansa Group Airlines, INFORMS J. Applied Analytics 56(1), 2026.",
     "R2 Kohl, Larsen, Larsen, Ross, Tiourine, Airline disruption management - perspectives, experiences and outlook, J. Air "
@@ -372,6 +433,7 @@ refs = [
     "R17 Ke et al., LightGBM: A Highly Efficient Gradient Boosting Decision Tree, NeurIPS 2017.",
     "R18 Lundberg et al., From local explanations to global understanding with explainable AI for trees, Nature Machine "
     "Intelligence 2:56-67, 2020.",
+    "R19 Anthropic, Claude API documentation: tool use with the Messages API (docs.claude.com), accessed 21 Nov 2026.",
     "Tools: Google OR-Tools CP-SAT 9.15; DuckDB 2.0; Apache Parquet; LightGBM 4.7; Anthropic Claude API (claude-opus-5-5).",
 ]
 story += [p(r, S) for r in refs]

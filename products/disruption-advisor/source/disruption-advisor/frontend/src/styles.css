@@ -784,3 +784,167 @@ tr.clickable.selected {
   display: grid;
   gap: 0.25rem;
 }
+
+/* Phase 3: strategies compared, option kinds, agent runs */
+.view-tabs {
+  max-width: 40rem;
+}
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  margin: 0.4rem 0 0.8rem;
+}
+.segmented button {
+  border-radius: 0;
+  margin-left: -1px;
+}
+.segmented button:first-child {
+  border-radius: 6px 0 0 6px;
+  margin-left: 0;
+}
+.segmented button:last-child {
+  border-radius: 0 6px 6px 0;
+}
+.segmented button.active {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  font-weight: 600;
+  position: relative;
+}
+.strategy-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.7rem;
+}
+.strategy-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+  min-width: 0;
+}
+.strategy-card.active {
+  border: 2px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+.strategy-name {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.strategy-pick {
+  margin: 0.2rem 0 0.5rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.strategy-kpis {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.15rem 0.8rem;
+  margin: 0;
+  font-size: 0.85rem;
+}
+.strategy-kpis dt {
+  color: var(--muted);
+}
+.strategy-kpis dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 600;
+}
+.chip.kind {
+  background: var(--bg);
+}
+.chip.kind-cancel,
+.chip.kind-consolidate {
+  background: var(--bad-bg);
+  color: var(--bad);
+  border-color: transparent;
+}
+.agent-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+.agent-form select,
+.agent-form textarea {
+  font: inherit;
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--ink);
+}
+.agent-panel {
+  border-left: 4px solid var(--care) !important;
+}
+.agent-pick {
+  margin: 0 0 0.4rem;
+}
+.agent-lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.4rem 1.2rem;
+}
+.agent-lists h3 {
+  margin: 0.4rem 0 0.2rem;
+  font-size: 0.9rem;
+}
+.agent-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0.4rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.agent-step {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.6rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.agent-step.warn {
+  background: var(--warn-bg);
+  border-color: var(--warn);
+}
+.agent-step-n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.agent-step.warn .agent-step-n {
+  background: var(--warn);
+  color: #fff;
+}
+.agent-step p {
+  margin: 0;
+}
+.agent-step-note {
+  margin-top: 0.15rem !important;
+}
+.agent-step-summary {
+  font-family: var(--mono);
+  overflow-wrap: anywhere;
+}
+.agent-runs ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}

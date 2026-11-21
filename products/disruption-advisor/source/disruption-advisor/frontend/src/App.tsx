@@ -1,5 +1,15 @@
 import { type FormEvent, useCallback, useEffect, useState } from "react";
-import { api, errorText, type Meta, type Scenario, type ScenarioSummary, type Session, setToken } from "./api";
+import { AgentRunsList, AgentRunView, agentStartError } from "./AgentRunView";
+import {
+  type AgentRunRequest,
+  api,
+  errorText,
+  type Meta,
+  type Scenario,
+  type ScenarioSummary,
+  type Session,
+  setToken,
+} from "./api";
 import { CancelView } from "./CancelView";
 import { DelayView } from "./DelayView";
 import { Launcher } from "./Launcher";
@@ -10,7 +20,17 @@ import { utc } from "./format";
 const STORAGE_KEY = "disruption-advisor-session";
 const OPEN_KEY = "disruption-advisor-open-scenario";
 const VIEW_KEY = "disruption-advisor-view";
-type View = "scenario" | "watchlist";
+const AGENT_KEY = "disruption-advisor-agent-run";
+type View = "scenario" | "watchlist" | "agent";
+const VIEWS: View[] = ["scenario", "watchlist", "agent"];
+
+function recall(key: string): string | null {
+  try {
+    return sessionStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
 
 function remember(key: string, value: string | null) {
   try {
@@ -127,13 +147,15 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
   const [history, setHistory] = useState<ScenarioSummary[]>([]);
   const [load, setLoad] = useState<Load>({ kind: "idle" });
   const [view, setView] = useState<View>(() => {
-    try {
-      return sessionStorage.getItem(VIEW_KEY) === "watchlist" ? "watchlist" : "scenario";
-    } catch {
-      return "scenario";
-    }
+    const saved = recall(VIEW_KEY) as View | null;
+    return saved && VIEWS.includes(saved) ? saved : "scenario";
   });
   useEffect(() => remember(VIEW_KEY, view), [view]);
+  // Phase 3: the agent run on screen survives a reload, like the open scenario.
+  const [agentRunId, setAgentRunId] = useState<string | null>(() => recall(AGENT_KEY));
+  const [agentStart, setAgentStart] = useState<Load>({ kind: "idle" });
+  const [agentStatus, setAgentStatus] = useState<string | null>(null);
+  useEffect(() => remember(AGENT_KEY, agentRunId), [agentRunId]);
 
   const refreshHistory = useCallback(() => {
     api.scenarios().then(setHistory).catch(() => setHistory([]));
@@ -178,6 +200,20 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
     }
   }
 
+  async function askAgent(request: AgentRunRequest) {
+    setView("agent");
+    setAgentStart({ kind: "busy", label: "Starting the agent…" });
+    try {
+      const started = await api.startAgent({ ...request, note: request.note ?? "" });
+      setAgentRunId(started.id);
+      setAgentStart({ kind: "idle" });
+    } catch (e: unknown) {
+      setAgentStart({ kind: "error", message: agentStartError(e) });
+    }
+  }
+
+  const busy = load.kind === "busy" || agentStart.kind === "busy";
+
   return (
     <>
       <header className="site-header">
@@ -218,7 +254,7 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
             {meta && (
               <Launcher
                 meta={meta}
-                busy={load.kind === "busy"}
+                busy={busy}
                 active={scenario && scenario.kind === "DELAY" && scenario.delay_minutes
                   ? { flightId: scenario.flight_id, flightNumber: scenario.result.flight.flight_number, delay: scenario.delay_minutes }
                   : null}
@@ -232,6 +268,7 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
                     api.createScenario({ kind: "CANCEL", flight_id: flightId, weights: meta.default_weights }),
                   )
                 }
+                onAgent={askAgent}
               />
             )}
             <section className="history" aria-labelledby="history-title">
@@ -266,16 +303,47 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
               onClick={() => setView("watchlist")}>
               Delay watchlist (7 days)
             </button>
+            <button type="button" className={`tab ${view === "agent" ? "active" : ""}`} aria-pressed={view === "agent"}
+              onClick={() => setView("agent")}>
+              Agent
+            </button>
           </nav>
           {view === "watchlist" && meta && (
             <WatchlistView
-              busy={load.kind === "busy"}
+              busy={busy}
               onAnalyse={(flightId, delay) =>
                 run(`Analysing a ${delay}-minute delay…`, () =>
                   api.createScenario({ kind: "DELAY", flight_id: flightId, delay_minutes: delay, weights: meta.default_weights }),
                 )
               }
+              onAgent={(flightId, delay) => askAgent({ flight_id: flightId, delay_minutes: delay })}
             />
+          )}
+          {view === "agent" && (
+            <>
+              {agentStart.kind === "busy" && <p className="status">{agentStart.label}</p>}
+              {agentStart.kind === "error" && (
+                <p className="error" role="alert">
+                  {agentStart.message}
+                </p>
+              )}
+              {agentRunId ? (
+                <AgentRunView runId={agentRunId} onRetry={askAgent} onStatus={setAgentStatus}
+                  onOpenScenario={(id) => run("Opening the agent's scenario…", () => api.scenario(id))} />
+              ) : (
+                agentStart.kind === "idle" && (
+                  <section className="empty">
+                    <h1>Ask the agent</h1>
+                    <p>
+                      Choose <strong>Ask the agent</strong> in the launcher on the left, or on a flight in the delay
+                      watchlist. The agent investigates the flight with the recovery engine, shows each step and recommends
+                      one option. You review it and approve or override it.
+                    </p>
+                  </section>
+                )
+              )}
+              <AgentRunsList refreshKey={`${agentRunId}:${agentStatus}`} onOpen={(id) => { setAgentStart({ kind: "idle" }); setAgentRunId(id); }} />
+            </>
           )}
           {view === "scenario" && load.kind === "busy" && <p className="status">{load.label}</p>}
           {view === "scenario" && load.kind === "error" && (
