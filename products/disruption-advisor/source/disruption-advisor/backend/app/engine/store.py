@@ -77,6 +77,23 @@ class OpsStore:
         self.last_week: dict[str, Any] = json.loads(week.read_text()) if week.exists() else {}
         report = ops_dir / "ingest_report.json"
         self.report: dict[str, Any] = json.loads(report.read_text()) if report.exists() else {}
+        # Build PAX_COLUMNS dynamically: columns added in later ingest versions use NULL AS <col> fallback.
+        _pax_cols = {r["column_name"] for r in self.query("DESCRIBE pax_segments")}
+        _cust_cols = {r["column_name"] for r in self.query("DESCRIBE customers")}
+        _pax_optional = ("family_account_synthetic", "family_head_synthetic", "family_tier_synthetic")
+        _cust_optional = ("loyalty_priority", "loyalty_id_synthetic", "available_points_synthetic")
+        _family_sel = ", ".join(f"p.{c}" if c in _pax_cols else f"NULL AS {c}" for c in _pax_optional)
+        _loyalty_sel = ", ".join(f"c.{c}" if c in _cust_cols else f"NULL AS {c}" for c in _cust_optional)
+        self.PAX_COLUMNS = (
+            "p.flight_id, p.pnr, p.customer_key, p.pax_type, p.origin, p.destination, "
+            "p.dep_utc, p.booking_code, p.revenue_type, p.fare_family_synthetic, p.fare, p.ancillaries, "
+            "p.baggage_kg, p.has_meal, p.has_seat, p.pnr_size, p.adults, p.children, p.infants, p.ssr_code, "
+            "p.ssr_source, p.sales_channel, p.passenger_id, "
+            "p.passport_number_synthetic, p.national_id_synthetic, p.identity_rule, "
+            f"{_family_sel}, "
+            f"c.is_loyalty_member, c.loyalty_tier_synthetic, {_loyalty_sel}, "
+            "c.travel_frequency_band, c.flown_segments_12m, c.ambiguous_common_name"
+        )
 
     def query(self, sql: str, params: list[Any] | None = None) -> list[dict[str, Any]]:
         cur = self._con.cursor()
@@ -144,17 +161,6 @@ class OpsStore:
         return [self._leg(r) for r in rows]
 
     # --- passengers ----------------------------------------------------------------------------------------
-    PAX_COLUMNS = (
-        "p.flight_id, p.pnr, p.customer_key, p.pax_type, p.origin, p.destination, "
-        "p.dep_utc, p.booking_code, p.revenue_type, p.fare_family_synthetic, p.fare, p.ancillaries, "
-        "p.baggage_kg, p.has_meal, p.has_seat, p.pnr_size, p.adults, p.children, p.infants, p.ssr_code, "
-        "p.ssr_source, p.sales_channel, p.passenger_id, "
-        "p.passport_number_synthetic, p.national_id_synthetic, p.identity_rule, "
-        "p.family_account_synthetic, p.family_head_synthetic, p.family_tier_synthetic, "
-        "c.is_loyalty_member, c.loyalty_tier_synthetic, c.loyalty_priority, c.loyalty_id_synthetic, "
-        "c.available_points_synthetic, c.travel_frequency_band, "
-        "c.flown_segments_12m, c.ambiguous_common_name"
-    )
 
     def passengers_on(self, flight_ids: list[str]) -> list[dict[str, Any]]:
         if not flight_ids:
