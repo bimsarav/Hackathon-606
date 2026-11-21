@@ -397,6 +397,9 @@ label {
 .nav-section + .nav-section {
   border-top: 1px solid rgba(255,255,255,.06);
 }
+.nav-section--no-label {
+  padding-top: 0.25rem;
+}
 .nav-section-label {
   font-size: 0.65rem;
   text-transform: uppercase;

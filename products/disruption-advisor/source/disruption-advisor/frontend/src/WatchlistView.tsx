@@ -43,7 +43,6 @@ export function WatchlistView({ onAnalyse, onAgent, busy }: Props) {
   return (
     <article className="result">
       <header className="result-head">
-        <p className="eyebrow">Phase 2 · Predict</p>
         <h1>Delay watchlist: next 7 days</h1>
         <p className="muted">
           Chance of a late departure for every flight, from the 2026 history and what is known a week ahead (schedule,

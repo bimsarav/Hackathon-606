@@ -161,7 +161,10 @@ const VIEW_SECTION: Partial<Record<View, string>> = {
   model: "Reference", testdata: "Reference",
 };
 
-function Breadcrumb({ view, scenario, onView }: { view: View; scenario: Scenario | null; onView: (v: View) => void }) {
+function Breadcrumb({ view, scenario, onView, fromRecent, onRecent }: {
+  view: View; scenario: Scenario | null; onView: (v: View) => void;
+  fromRecent?: boolean; onRecent?: () => void;
+}) {
   const section = VIEW_SECTION[view];
   const viewLabel = VIEW_LABEL[view];
   const flightLabel = scenario
@@ -172,7 +175,11 @@ function Breadcrumb({ view, scenario, onView }: { view: View; scenario: Scenario
   return (
     <nav className="breadcrumb" aria-label="Breadcrumb">
       <span className="bc-item bc-home" onClick={() => onView(view)}>aeroRecovery</span>
-      {section && <><span className="bc-sep">›</span><span className="bc-item bc-section">{section}</span></>}
+      {fromRecent && onRecent ? (
+        <><span className="bc-sep">›</span><span className="bc-item bc-home" onClick={onRecent}>Recent Searches</span></>
+      ) : (
+        section && <><span className="bc-sep">›</span><span className="bc-item bc-section">{section}</span></>
+      )}
       <span className="bc-sep">›</span>
       <span className="bc-item bc-view">{viewLabel}</span>
       {flightLabel && <><span className="bc-sep">›</span><span className="bc-item bc-flight">{flightLabel}</span></>}
@@ -197,7 +204,13 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
   const [load, setLoad] = useState<Load>({ kind: "idle" });
   const [delaySubmitted, setDelaySubmitted] = useState(false);
   const [cancelSubmitted, setCancelSubmitted] = useState(false);
+  const [fromRecent, setFromRecent] = useState(false);
   const isEvaluator = session.role === "EVALUATOR";
+
+  function navigate(v: View) {
+    setView(v);
+    setFromRecent(false);
+  }
   const [view, setView] = useState<View>(() => {
     const saved = recall(VIEW_KEY) as View | null;
     return saved && VIEWS.includes(saved) && (isEvaluator || !EVALUATOR_VIEWS.includes(saved)) ? saved : "delay";
@@ -237,8 +250,9 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
 
   useEffect(() => remember(OPEN_KEY, scenario?.id ?? null), [scenario?.id]);
 
-  async function run(targetView: "delay" | "cancel", label: string, action: () => Promise<Scenario>) {
+  async function run(targetView: "delay" | "cancel", label: string, action: () => Promise<Scenario>, fromRecentSearches = false) {
     setView(targetView);
+    setFromRecent(fromRecentSearches);
     setLoad({ kind: "busy", label });
     try {
       const s = await action();
@@ -297,32 +311,31 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
           <nav>
             <div className="nav-section">
               <p className="nav-section-label">Analyze</p>
-              <NavItem label="Flight Delay" icon="↑" active={view === "delay"} onClick={() => setView("delay")} />
-              <NavItem label="Cancellation" icon="✕" active={view === "cancel"} onClick={() => setView("cancel")} />
-              <NavItem label="Predict the Flight Delay" icon="◎" active={view === "agent"} onClick={() => setView("agent")} />
+              <NavItem label="Flight Delay" icon="↑" active={view === "delay"} onClick={() => navigate("delay")} />
+              <NavItem label="Cancellation" icon="✕" active={view === "cancel"} onClick={() => navigate("cancel")} />
+              <NavItem label="Predict the Flight Delay" icon="◎" active={view === "agent"} onClick={() => navigate("agent")} />
             </div>
             <div className="nav-section">
               <p className="nav-section-label">Monitor</p>
-              <NavItem label="Delay Watchlist" icon="◉" active={view === "watchlist"} onClick={() => setView("watchlist")} />
+              <NavItem label="Delay Watchlist" icon="◉" active={view === "watchlist"} onClick={() => navigate("watchlist")} />
             </div>
             {isEvaluator && (
               <div className="nav-section">
                 <p className="nav-section-label">Reference</p>
-                <NavItem label="Model Card" icon="☰" active={view === "model"} onClick={() => setView("model")} />
-                <NavItem label="Test data" icon="⇪" active={view === "testdata"} onClick={() => setView("testdata")} />
+                <NavItem label="Model Card" icon="☰" active={view === "model"} onClick={() => navigate("model")} />
+                <NavItem label="Test data" icon="⇪" active={view === "testdata"} onClick={() => navigate("testdata")} />
+              </div>
+            )}
+            {history.length > 0 && (
+              <div className="nav-section nav-section--no-label">
+                <NavItem label="Recent Searches" icon="◷" active={view === "recent"} onClick={() => navigate("recent")} />
               </div>
             )}
           </nav>
-
-          {history.length > 0 && (
-            <div className="nav-section">
-              <NavItem label="Recent Searches" icon="🕐" active={view === "recent"} onClick={() => setView("recent")} />
-            </div>
-          )}
         </aside>
 
         <main id="main" aria-live="polite" aria-busy={load.kind === "busy"}>
-          <Breadcrumb view={view} scenario={scenario} onView={setView} />
+          <Breadcrumb view={view} scenario={scenario} onView={navigate} fromRecent={fromRecent} onRecent={() => navigate("recent")} />
 
           {/* ── Flight Delay ─────────────────────────────── */}
           {view === "delay" && (
@@ -490,7 +503,8 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
                       onClick={() => run(
                         h.kind === "DELAY" ? "delay" : "cancel",
                         "Opening scenario…",
-                        () => api.scenario(h.id)
+                        () => api.scenario(h.id),
+                        true
                       )}
                     >
                       <span className={`recent-badge ${h.kind === "DELAY" ? "recent-badge-delay" : "recent-badge-cancel"}`}>
