@@ -243,3 +243,7 @@ The new Playwright tests have not been run locally (no Playwright or Docker on t
 - The server had been redeployed at 11:32Z with live delay models that were not in git; the tree was saved, merged (3-way, CSS conflict only) and deployed.
 - Smoke 11/11; roles unchanged; `/risk/flights/{id}/predict` answers the planning forecast and, with an inbound delay, the live forecast; **Playwright 11/11 (1.6 min)**.
 - Uploaded test flights: planning forecast only; live inputs answer 409 (backend test added). Frontend 44/44 locally after the page redesign (not deployed yet).
+
+## Production check, Flight Delay page redesign (21 Nov 2026, 14:54Z, heshawa d56398b)
+- Smoke 11/11; the served bundle contains the new layout; **Playwright 11/11 (1.6 min)**; frontend unit tests 45/45 (glance tiles, folding, passenger boxes, crew section, compact search).
+- Crew FDP data: the roster covers 1 Oct to 20 Nov 2026, so roster-checked flights in the operating window are on 20 Nov only (217 flights); later flights use an estimated duty where possible; the synthetic demo flights (G99xx) have none and now say "no crew data for this flight". G9502 (20 Nov 18:35) with a 30 to 420 minute delay shows a roster breach.
