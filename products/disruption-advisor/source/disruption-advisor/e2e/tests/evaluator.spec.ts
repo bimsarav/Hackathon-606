@@ -45,18 +45,24 @@ test("the evaluator reads the model evidence, uploads two flights, analyses one 
 
   await nav.getByRole("button", { name: "Model Card" }).click();
   await expect(page.getByRole("heading", { name: "Model overview" })).toBeVisible();
-  await page.getByRole("button", { name: /Calibration: does a 20% chance mean 20%/ }).click();
-  await expect(page.getByRole("table", { name: "Calibration" })).toBeVisible();
-  await page.getByRole("button", { name: /Alert cut-offs: true and false alarms/ }).click();
-  await expect(page.getByRole("table", { name: /Operating points/ }).first()).toBeVisible();
-  await page.getByRole("button", { name: /Month-by-month results/ }).click();
-  await expect(page.getByRole("table", { name: "Month by month" })).toBeVisible();
-  await page.getByRole("button", { name: /Model comparison and tuning \(delay model\)/ }).click();
-  await expect(page.getByRole("cell", { name: "0.703" }).first()).toBeVisible();
-  await page.getByRole("button", { name: /Reward preference model/ }).click();
+  // One box per model or rule; each opens a detail page with charts and tables.
+  await page.getByRole("button", { name: /Delay risk \(departure\): open details/ }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Delay risk (departure)" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "Ranking quality (AUC) by delay threshold" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "Calibration: delay of 60+ minutes" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "Models compared on validation (Brier skill score)" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Performance by threshold" })).toBeVisible();
+  await page.getByRole("button", { name: "← All models" }).click();
+  await page.getByRole("button", { name: /Arrival delay & missed connections: open details/ }).click();
+  await expect(page.getByRole("img", { name: /Missed connections: predicted vs what happened/ })).toBeVisible();
+  await page.getByRole("button", { name: "← All models" }).click();
+  await page.getByRole("button", { name: /Reward preference: open details/ }).click();
   await expect(page.getByText(/Trained on SIMULATED redemption history/)).toBeVisible();
-  await page.getByRole("button", { name: /Cascade check \(knock-on formula\)/ }).click();
+  await expect(page.getByRole("img", { name: "Ranking quality (AUC) by reward type" })).toBeVisible();
+  await page.getByRole("button", { name: "← All models" }).click();
+  await page.getByRole("button", { name: /Cascade \(knock-on\) formula: open details/ }).click();
   await expect(page.getByRole("table", { name: "Cascade check summary" })).toBeVisible();
+  await page.getByRole("button", { name: "← All models" }).click();
 
   await nav.getByRole("button", { name: "Test data" }).click();
   await expect(page.getByRole("heading", { name: "Test data" })).toBeVisible();
