@@ -16,3 +16,5 @@ T-504 (2026-11-21, machine /media/dev/dev21): check.sh fixed (DOCKER_HOST for Te
 T-506: SSH key = input/cloud-environment/hackathon22_172.31.76.23 (copy to 600 before use); server tree == local after sync; teammate deployed c9ab1d2 + unpushed fixes at 00:26Z (now merged locally, NOT committed)
 T-510 (2026-11-21): evaluation extended (confusion matrices, cut-off sweep, lift, monthly walk-forward) in model card + app panel + docs/testing/model-card.md; prod redeployed 01:46Z (rollback pre-202611210144 + dump), smoke 11/11, e2e 4/4. NOT committed.
 T-511 (2026-11-21): Air Arabia UI theme (UI only) deployed web-only, rollback web:pre-202611210211; smoke 11/11, e2e 4/4. NOT committed.
+T-512 (2026-11-21): LightGBM Optuna-tuned model deployed prod (AUC-60=0.7687, 14 features incl. month+route_freq). ml-experiments/T-511 folder. delay_risk.py updated.
+T-513 (2026-11-21): Rebased local stack — api image rebuilt (lightgbm now in venv), ops-data volume populated, ML scored (03:22Z). Fixed Playwright strict-mode violation: WatchlistView aria-label "Flights at risk" → "Watchlist flights" (getByLabel("Risk") was ambiguous). e2e 4/4 local. NOT committed.

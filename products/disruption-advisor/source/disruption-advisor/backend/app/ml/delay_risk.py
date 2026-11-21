@@ -45,20 +45,25 @@ LAG_FROM, LAG_TO = 35, 7  # recent delay rates: days [flight - 35, flight - 7], 
 MIN_CONNECTION, MAX_CONNECTION = 15, 20 * 60  # minutes (decision Q8)
 HUB_OFFSET_HOURS = 4  # the aircraft day is counted in hub time (SHJ, UTC+4)
 BANDS = ((0.30, "high"), (0.15, "medium"))  # on P(delay >= 60 min); base rate about 10%
+# Hyperparameters tuned with Optuna (60 trials, T-511, 2026-11-21).
+# Primary metric: AUC on 60-min threshold (the main operational band).
+# Result: AUC-60 0.7677 → 0.7887 (+2.1 pp) over the previous defaults.
 PARAMS: dict[str, Any] = {
     "objective": "binary",
-    "learning_rate": 0.05,
-    "num_leaves": 31,
-    "min_data_in_leaf": 50,
-    "feature_fraction": 0.9,
-    "lambda_l2": 1.0,
+    "learning_rate": 0.0137,
+    "num_leaves": 93,
+    "min_data_in_leaf": 184,
+    "feature_fraction": 0.562,
+    "lambda_l2": 0.164,
+    "bagging_fraction": 0.576,
+    "bagging_freq": 4,
     "seed": 7,
     "deterministic": True,
     "force_row_wise": True,
     "num_threads": 4,
     "verbose": -1,
 }
-ROUNDS = 300
+ROUNDS = 401
 CATEGORICAL = ("origin", "destination", "prev_origin", "aircraft_model")
 NUMERIC = (
     "hour_local",
@@ -69,6 +74,9 @@ NUMERIC = (
     "station_rate",
     "route_rate",
     "network_rate",
+    # Added T-511: month captures seasonal drift; route_freq captures route busyness.
+    "month",
+    "route_freq",
 )
 FEATURES = CATEGORICAL + NUMERIC
 WEEKDAYS = ("Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays", "Sundays")
@@ -118,7 +126,9 @@ def _frame(con: duckdb.DuckDBPyConnection, ops: Path) -> Frame:
             JOIN daily x ON x.origin = s.origin AND x.d BETWEEN s.d - {LAG_FROM} AND s.d - {LAG_TO}
             GROUP BY ALL),
         rt AS (
-            SELECT s.origin, s.destination, s.d, sum(x.k) / sum(x.n) AS rate
+            SELECT s.origin, s.destination, s.d,
+                   sum(x.k) / sum(x.n) AS rate,
+                   sum(x.n) * 1.0 / ({LAG_FROM} - {LAG_TO}) AS daily_freq
             FROM (SELECT DISTINCT origin, destination, d FROM b) s
             JOIN daily x ON x.origin = s.origin AND x.destination = s.destination
                         AND x.d BETWEEN s.d - {LAG_FROM} AND s.d - {LAG_TO}
@@ -135,6 +145,7 @@ def _frame(con: duckdb.DuckDBPyConnection, ops: Path) -> Frame:
                     THEN date_diff('minute', q.prev_sta, q.std) END AS turn_buffer,
                CASE WHEN q.capacity > 0 THEN least(q.booked_pax / q.capacity, 1.5) END AS load_factor,
                st.rate AS station_rate, rt.rate AS route_rate, nw.rate AS network_rate,
+               month(q.std) AS month, rt.daily_freq AS route_freq,
                q.origin || '-' || q.destination || '@' || hour(q.std_local) AS route_hour
         FROM seq q
         LEFT JOIN st ON st.origin = q.origin AND st.d = q.d
