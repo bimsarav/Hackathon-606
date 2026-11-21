@@ -82,6 +82,7 @@ export function FlightEditor() {
   const kept = pax.filter((p) => !p.remove).length;
   // Seats sold follows the passenger list (infants sit on a lap and take no seat); it can still be typed by hand.
   const seats = (p: EditablePassenger) => (p.pax_type === "IN" ? 0 : 1);
+  const seatedKept = pax.filter((p) => !p.remove && p.pax_type !== "IN").length;
   function bumpSold(by: number) {
     if (by) setFlight((f) => ({ ...f, booked_seats: Math.max(0, f.booked_seats + by) }));
   }
@@ -146,6 +147,13 @@ export function FlightEditor() {
             <div className="filter-field"><label htmlFor="ed-sold">Seats sold</label>
               <input id="ed-sold" type="number" min={0} max={600} value={flight.booked_seats} onChange={(e) => setFlight({ ...flight, booked_seats: Number(e.target.value) })} /></div>
           </div>
+          {flight.booked_seats !== seatedKept && (
+            <p className="small note" role="note">
+              Seats sold ({flight.booked_seats}) does not match the {seatedKept} passengers with a seat in the list.{" "}
+              <button type="button" className="link" onClick={() => setFlight((f) => ({ ...f, booked_seats: seatedKept }))}>
+                Set seats sold to {seatedKept}</button>, then save.
+            </p>
+          )}
           <p className="small muted">{kept} passengers kept of {pax.length} listed{pax.some((p) => !p.customer_key) ? " (incl. added)" : ""}.
             Seats sold goes down by one for each passenger you remove and up for each you add (infants take no seat).</p>
           <div className="table-wrap flight-editor-table">

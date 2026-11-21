@@ -37,6 +37,9 @@ describe("edit an existing flight", () => {
     const table = await screen.findByRole("table", { name: "Passengers of the flight" });
     expect(within(table).getAllByRole("row")).toHaveLength(3);
 
+    expect(screen.getByText(/Seats sold \(168\) does not match the 2 passengers/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Set seats sold to 2" }));
+    expect(screen.getByLabelText("Seats sold")).toHaveValue(2);
     await userEvent.clear(screen.getByLabelText("Seats sold"));
     await userEvent.type(screen.getByLabelText("Seats sold"), "174");
     await userEvent.selectOptions(within(table).getAllByLabelText("Loyalty tier")[0] as HTMLElement, "Platinum");
