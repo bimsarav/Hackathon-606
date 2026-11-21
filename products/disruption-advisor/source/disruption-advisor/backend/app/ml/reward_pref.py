@@ -38,14 +38,20 @@ SEED = 7
 MAX_PASSENGERS = 150_000
 OFFERS_PER_PASSENGER = 2
 HOLDOUT_SHARE = 0.2
-ROUNDS = 250
-PARAMS: dict[str, Any] = {
+ROUNDS = 200
+PARAMS: dict[
+    str, Any
+] = {  # tuned with Optuna on grouped validation folds (T-515, docs/testing/reward-model-selection.md)
     "objective": "binary",
-    "learning_rate": 0.05,
-    "num_leaves": 31,
-    "min_data_in_leaf": 100,
-    "feature_fraction": 0.9,
-    "lambda_l2": 5.0,
+    "learning_rate": 0.0347,
+    "num_leaves": 37,
+    "min_data_in_leaf": 192,
+    "feature_fraction": 0.9365,
+    "bagging_fraction": 0.8902,
+    "bagging_freq": 1,
+    "lambda_l2": 0.7849,
+    "cat_smooth": 8.0119,
+    "min_data_per_group": 101,
     "seed": SEED,
     "deterministic": True,
     "force_row_wise": True,

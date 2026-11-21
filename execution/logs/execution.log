@@ -156,3 +156,4 @@
 2026-11-21T03:29Z | T-514 | STARTED | redeploy merged tree (tuned model, last-week panel, rewards + synthetic preference model, teammate phase 3) to prod; rollback tag pre-202611210329 | output/T-514-deploy.log
 2026-11-21T03:46Z | T-514 | BLOCKED | deployed + verified at 03:35Z, then overwritten at 03:37Z by another deploy (live image has an unpushed delay-model tuning, no rewards/last-week); no further server changes by me; waiting for user | output/T-514-*.log
 2026-11-21T04:18Z | T-515 | STARTED | hyperparameter tuning + model comparison for the reward preference model (synthetic data) | output/T-515-selection.log
+2026-11-21T04:39Z | T-515 | DONE | reward preference model tuned + compared (Optuna 40 lgb / 25 xgb, grouped CV, oracle bound); tuned LightGBM adopted, gain negligible | docs/testing/reward-model-selection.md

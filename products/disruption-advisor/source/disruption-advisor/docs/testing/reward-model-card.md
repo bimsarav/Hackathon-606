@@ -24,7 +24,7 @@ Estimate P(accept) for a given passenger, reward type, amount and disruption sev
 `fare_family`, `sales_channel`, `loyalty_tier`, `frequency`, `reward_type`, `has_meal`, `has_seat`, `ancillaries`, `fare`, `baggage_kg`, `pnr_size`, `children`, `infants`, `flown_12m`, `is_member`, `amount_aed`, `severity`.
 
 ## Model
-LightGBM binary classifier, 4.7.0, 250 rounds, 31 leaves, fixed seed, deterministic.
+LightGBM binary classifier, tuned settings (T-515: 200 rounds, 37 leaves, at least 192 rows per leaf, learning rate 0.0347), fixed seed, deterministic. How they were chosen and what else was compared: [reward-model-selection.md](reward-model-selection.md).
 
 ## Results on held-out passengers (synthetic outcomes)
 | Model | AUC | Brier |
