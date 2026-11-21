@@ -1,0 +1,6 @@
+rollback tag web: pre-202611210211
+ Image disruption-advisor-web:latest Built 
+ Container disruption-advisor-web-1 Healthy 
+api: Up 25 minutes (healthy)
+db: Up 6 hours (healthy)
+web: Up 5 seconds (healthy)

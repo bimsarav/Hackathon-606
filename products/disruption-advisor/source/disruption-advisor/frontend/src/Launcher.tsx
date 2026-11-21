@@ -1,5 +1,6 @@
 import { type FormEvent, useEffect, useState } from "react";
 import { api, type CancelPreset, type DelayPreset, errorText, type FlightRow, type Meta } from "./api";
+import { CarrierTail } from "./CarrierTail";
 import { utc } from "./format";
 
 interface Props {
@@ -93,6 +94,7 @@ export function Launcher({ busy, active, onDelay, onCancel }: Props) {
             <li key={p.flight_id}>
               <button type="button" className="preset" disabled={busy} onClick={() => start(p.flight_id)}>
                 <span className="preset-title">
+                  <CarrierTail flightNumber={p.flight_number} />
                   {p.flight_number} {p.origin}→{p.destination}
                   {p.is_demo && <span className="chip chip-synthetic">Demo (synthetic)</span>}
                 </span>
@@ -110,10 +112,11 @@ export function Launcher({ busy, active, onDelay, onCancel }: Props) {
             <li key={p.flight_id}>
               <button type="button" className="preset" disabled={busy} onClick={() => start(p.flight_id)}>
                 <span className="preset-title">
+                  <CarrierTail flightNumber={p.flight_number} />
                   {p.flight_number} {p.origin}→{p.destination}
                 </span>
                 <span className="small muted">
-                  {utc(p.std)} · {p.booked_seats} booked · {p.free_seats} free seats on alternatives
+                  {utc(p.std)} · {p.tail} · {p.booked_seats} booked · {p.free_seats} free seats on alternatives
                 </span>
               </button>
             </li>
@@ -138,6 +141,7 @@ export function Launcher({ busy, active, onDelay, onCancel }: Props) {
             <li key={f.flight_id}>
               <button type="button" className="preset" disabled={busy} onClick={() => start(f.flight_id)}>
                 <span className="preset-title">
+                  <CarrierTail flightNumber={f.flight_number} />
                   {f.flight_number} {f.origin}→{f.destination}
                 </span>
                 <span className="small muted">

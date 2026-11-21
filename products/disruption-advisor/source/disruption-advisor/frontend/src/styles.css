@@ -1,14 +1,20 @@
-/* Operations-console look: calm neutral surfaces, one teal accent, semantic colours only for state. */
+/* Air Arabia look: white and neutral-grey surfaces, brand red for actions, semantic colours only for state.
+   --brand is the logo red (#FF0141, decorative only: 3.9:1 on white is too light for text); --accent is a deeper
+   red for buttons, links and focus (5.4:1 on white); the greys come from the tail outline (#808589). */
 :root {
-  --bg: #f4f6f8;
+  --bg: #f6f6f7;
   --panel: #ffffff;
-  --ink: #16202a;
-  --muted: #5a6776;
-  --line: #d8dee5;
-  --accent: #0b6e8a;
+  --ink: #1f2124;
+  --muted: #5f6368;
+  --line: #e0e2e5;
+  --brand: #ff0141;
+  --accent: #d6002f;
   --accent-ink: #ffffff;
-  --head: #13202c;
-  --head-ink: #e6edf3;
+  --head: #ffffff;
+  --head-ink: #1f2124;
+  --head-line: #e0e2e5;
+  --tag: #3c4043;
+  --tag-ink: #ffffff;
   --ok: #1d7a4d;
   --ok-bg: #e3f3ea;
   --warn: #8a5a00;
@@ -24,15 +30,19 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0f151b;
-    --panel: #161e26;
-    --ink: #e4e9ee;
-    --muted: #9aa7b4;
-    --line: #2a3541;
-    --accent: #4fb3d0;
-    --accent-ink: #06222b;
-    --head: #0a1015;
-    --head-ink: #e4e9ee;
+    --bg: #121214;
+    --panel: #1c1c1f;
+    --ink: #ececee;
+    --muted: #a3a7ad;
+    --line: #2f3034;
+    --brand: #ff0141;
+    --accent: #ff4d6d;
+    --accent-ink: #1a0007;
+    --head: #1c1c1f;
+    --head-ink: #ececee;
+    --head-line: #2f3034;
+    --tag: #d4d6da;
+    --tag-ink: #1c1c1f;
     --ok: #5fcf95;
     --ok-bg: #12301f;
     --warn: #e9b44c;
@@ -231,23 +241,47 @@ label {
   align-items: center;
   background: var(--head);
   color: var(--head-ink);
-  padding: 0.7rem max(16px, env(safe-area-inset-left, 0px));
+  border-bottom: 1px solid var(--head-line);
+  box-shadow: inset 0 -3px 0 var(--brand);
+  padding: 0.6rem max(16px, env(safe-area-inset-left, 0px)) 0.75rem;
 }
 .site-header .chip {
-  border-color: #3a4855;
+  border-color: var(--line);
   color: var(--head-ink);
 }
 .site-header .chip-ok {
-  color: #9be0bd;
-  background: #173a2a;
+  color: var(--ok);
+  background: var(--ok-bg);
 }
 .site-header .chip-warn {
-  color: #f3cd7c;
-  background: #3a2c0c;
+  color: var(--warn);
+  background: var(--warn-bg);
 }
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+}
+.brand-logo {
+  height: 18px;
+  width: auto;
+  display: block;
+}
+.brand-tail {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+.brand-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--line);
+}
+.brand-name {
+  font-size: 1rem;
+  color: var(--head-ink);
 }
 .header-meta {
   display: flex;
@@ -261,7 +295,7 @@ label {
   align-items: center;
 }
 .header-user .link {
-  color: #8fd3e6;
+  color: var(--accent);
 }
 
 /* Layout */
@@ -332,6 +366,15 @@ aside > section,
 }
 .preset-title {
   font-weight: 600;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+.carrier-tail {
+  width: 20px;
+  height: 15px;
+  flex: none;
 }
 .search {
   display: flex;
@@ -566,9 +609,22 @@ tr.detail td {
 .login-card {
   background: var(--panel);
   border: 1px solid var(--line);
+  border-top: 4px solid var(--brand);
   border-radius: 12px;
   padding: 2rem;
   width: min(420px, 100%);
+}
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 1.2rem;
+}
+.login-brand .brand-logo {
+  height: 22px;
+}
+.login-brand .brand-tail {
+  height: 30px;
 }
 .login-card form {
   display: flex;
@@ -668,7 +724,7 @@ tr.clickable.selected {
 .rb-block { display: grid; gap: 4px; margin-top: 8px; }
 .rb-title { display: flex; align-items: center; gap: 8px; font-weight: 600; }
 .rb-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; padding: 1px 8px; border-radius: 3px; }
-.rb-tag.before { background: var(--head); color: var(--head-ink); }
+.rb-tag.before { background: var(--tag); color: var(--tag-ink); }
 .rb-tag.after { background: var(--bad); color: #fff; }
 .rb-board { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
 .rb-grid { position: relative; }

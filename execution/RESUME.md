@@ -15,3 +15,4 @@ T-409 (2026-11-21): pushed heshawa 74369fd (key removed from commit, settings.en
 T-504 (2026-11-21, machine /media/dev/dev21): check.sh fixed (DOCKER_HOST for Testcontainers, cgroup v1); local INPUT_DIR (git-ignored settings.env/.env) -> input/data/disruption-uc5 (extracts/ folder gone); esm-hub local stack is crash-looping (not touched)
 T-506: SSH key = input/cloud-environment/hackathon22_172.31.76.23 (copy to 600 before use); server tree == local after sync; teammate deployed c9ab1d2 + unpushed fixes at 00:26Z (now merged locally, NOT committed)
 T-510 (2026-11-21): evaluation extended (confusion matrices, cut-off sweep, lift, monthly walk-forward) in model card + app panel + docs/testing/model-card.md; prod redeployed 01:46Z (rollback pre-202611210144 + dump), smoke 11/11, e2e 4/4. NOT committed.
+T-511 (2026-11-21): Air Arabia UI theme (UI only) deployed web-only, rollback web:pre-202611210211; smoke 11/11, e2e 4/4. NOT committed.

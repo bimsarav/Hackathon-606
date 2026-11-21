@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Meta, Scenario } from "./api";
 import { App } from "./App";
 import { CancelView } from "./CancelView";
+import { CarrierTail } from "./CarrierTail";
 import { DelayView } from "./DelayView";
 import { WatchlistView } from "./WatchlistView";
 import { aed, minutes, utc } from "./format";
@@ -44,6 +45,16 @@ function stubFetch(handler: (url: string) => unknown) {
 
 beforeEach(() => sessionStorage.clear());
 afterEach(() => vi.unstubAllGlobals());
+
+describe("carrier tail", () => {
+  it("shows the airline tail for known carriers and nothing for bus legs", () => {
+    const { container, rerender } = render(<CarrierTail flightNumber="G9519" />);
+    expect(container.querySelector("img")?.getAttribute("src")).toBe("/brand/tails/G9.svg");
+    expect(container.querySelector("img")?.getAttribute("alt")).toBe("");
+    rerender(<CarrierTail flightNumber="02123" />);
+    expect(container.querySelector("img")).toBeNull();
+  });
+});
 
 describe("format", () => {
   it("formats UTC times, minutes and money", () => {

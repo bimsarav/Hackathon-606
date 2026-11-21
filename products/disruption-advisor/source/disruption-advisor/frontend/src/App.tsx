@@ -90,6 +90,10 @@ function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
   return (
     <main id="main" className="login">
       <div className="login-card">
+        <div className="login-brand">
+          <img className="brand-tail" src="/brand/air-arabia-tail.svg" alt="" />
+          <img className="brand-logo" src="/brand/air-arabia-logo.svg" alt="Air Arabia" />
+        </div>
         <p className="eyebrow">Operations Control · Passenger Control Unit</p>
         <h1>Disruption Advisor</h1>
         <p className="muted">Assess a disruption, compare recovery options and protect passengers before the impact spreads.</p>
@@ -176,7 +180,12 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
   return (
     <>
       <header className="site-header">
-        <span className="brand">Disruption Advisor</span>
+        <span className="brand">
+          <img className="brand-tail" src="/brand/air-arabia-tail.svg" alt="" />
+          <img className="brand-logo" src="/brand/air-arabia-logo.svg" alt="Air Arabia" />
+          <span className="brand-divider" aria-hidden="true" />
+          <span className="brand-name">Disruption Advisor</span>
+        </span>
         {meta && (
           <span className="header-meta">
             <span className="chip">Ops clock {utc(meta.now_utc)}</span>

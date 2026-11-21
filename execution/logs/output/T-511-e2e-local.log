@@ -1,0 +1,79 @@
+
+Running 4 tests using 1 worker
+
+  ✓  1 [chromium] › tests/advisor.spec.ts:14:1 › wrong password is rejected and the API needs a token (277ms)
+  ✓  2 [chromium] › tests/advisor.spec.ts:23:1 › scenario A: a delay is assessed, options compared, recommendation approved (20.8s)
+  ✓  3 [chromium] › tests/advisor.spec.ts:54:1 › scenario B: a cancellation ranks passengers by tier and re-runs with new weights (5.4s)
+  ✘  4 [chromium] › tests/advisor.spec.ts:74:1 › phase 2: delay watchlist ranks flights, shows reasons and opens a delay scenario (390ms)
+  ✘  5 [chromium] › tests/advisor.spec.ts:74:1 › phase 2: delay watchlist ranks flights, shows reasons and opens a delay scenario (retry #1) (443ms)
+
+
+  1) [chromium] › tests/advisor.spec.ts:74:1 › phase 2: delay watchlist ranks flights, shows reasons and opens a delay scenario 
+
+    Error: locator.selectOption: Error: strict mode violation: getByLabel('Risk') resolved to 2 elements:
+        1) <select>…</select> aka getByLabel('Risk High onlyMedium and')
+        2) <table aria-label="Flights at risk">…</table> aka getByRole('table', { name: 'Flights at risk' })
+
+    Call log:
+      - waiting for getByLabel('Risk')
+
+
+      76 |   await page.getByRole("button", { name: /Delay watchlist/ }).click();
+      77 |   await expect(page.getByRole("heading", { name: /Delay watchlist/ })).toBeVisible();
+    > 78 |   await page.getByLabel("Risk").selectOption("all");
+         |                                 ^
+      79 |   const table = page.getByRole("table", { name: "Flights at risk" });
+      80 |   await expect(table).toBeVisible();
+      81 |   await table.locator("tbody tr.clickable").first().locator("button.link").click();
+        at /e2e/tests/advisor.spec.ts:78:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/advisor-phase-2-delay-watc-02588--and-opens-a-delay-scenario-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/advisor-phase-2-delay-watc-02588--and-opens-a-delay-scenario-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/advisor-phase-2-delay-watc-02588--and-opens-a-delay-scenario-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/advisor-phase-2-delay-watc-02588--and-opens-a-delay-scenario-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: locator.selectOption: Error: strict mode violation: getByLabel('Risk') resolved to 2 elements:
+        1) <select>…</select> aka getByLabel('Risk High onlyMedium and')
+        2) <table aria-label="Flights at risk">…</table> aka getByRole('table', { name: 'Flights at risk' })
+
+    Call log:
+      - waiting for getByLabel('Risk')
+
+
+      76 |   await page.getByRole("button", { name: /Delay watchlist/ }).click();
+      77 |   await expect(page.getByRole("heading", { name: /Delay watchlist/ })).toBeVisible();
+    > 78 |   await page.getByLabel("Risk").selectOption("all");
+         |                                 ^
+      79 |   const table = page.getByRole("table", { name: "Flights at risk" });
+      80 |   await expect(table).toBeVisible();
+      81 |   await table.locator("tbody tr.clickable").first().locator("button.link").click();
+        at /e2e/tests/advisor.spec.ts:78:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/advisor-phase-2-delay-watc-02588--and-opens-a-delay-scenario-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/advisor-phase-2-delay-watc-02588--and-opens-a-delay-scenario-chromium-retry1/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/advisor-phase-2-delay-watc-02588--and-opens-a-delay-scenario-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/advisor-phase-2-delay-watc-02588--and-opens-a-delay-scenario-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/advisor.spec.ts:74:1 › phase 2: delay watchlist ranks flights, shows reasons and opens a delay scenario 
+  3 passed (28.2s)
