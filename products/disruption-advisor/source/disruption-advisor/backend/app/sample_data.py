@@ -544,11 +544,16 @@ def check(flights_csv: str, passengers_csv: str, existing_ids: set[str], known_r
 
 # --- storage ---------------------------------------------------------------------------------------------------
 def version(directory: Path) -> int | None:
-    """Changes whenever test data is added, replaced or removed (the store reloads on a change)."""
+    """Changes whenever test data or a flight edit is added, replaced or removed (the store reloads on a change)."""
     try:
-        return (directory / MANIFEST).stat().st_mtime_ns
+        uploaded = (directory / MANIFEST).stat().st_mtime_ns
     except OSError:
-        return None
+        uploaded = 0
+    try:
+        edited = (directory / "flight_edits.json").stat().st_mtime_ns
+    except OSError:
+        edited = 0
+    return (uploaded + edited) or None
 
 
 def status(directory: Path) -> dict[str, Any]:

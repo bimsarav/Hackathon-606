@@ -1794,3 +1794,14 @@ tr.clickable.selected {
 .login-glass .login-secret input { background: transparent; }
 .login-glass .login-submit { margin-top: 0.9rem; }
 @media (prefers-reduced-motion: reduce) { .ops-plane { display: none; } }
+
+/* Evaluator: edit an existing flight */
+.flight-editor { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.flight-editor-search { display: flex; flex-direction: column; gap: 0.25rem; max-width: 16rem; margin-bottom: 0.5rem; }
+.flight-editor-form { margin-top: 0.75rem; }
+.flight-editor-form h4 { margin: 0.5rem 0; display: flex; gap: 0.5rem; align-items: center; }
+.flight-editor-table { max-height: 440px; overflow: auto; }
+.flight-editor-table input, .flight-editor-table select { width: 100%; min-width: 4.5rem; padding: 0.2rem 0.3rem; font-size: 0.85rem; }
+.flight-editor-table td.num input { width: 6rem; text-align: right; }
+.flight-editor-table tr.removed td { opacity: 0.45; text-decoration: line-through; }
+.edited-chip { display: inline-flex; gap: 0.35rem; align-items: center; margin-right: 0.75rem; }

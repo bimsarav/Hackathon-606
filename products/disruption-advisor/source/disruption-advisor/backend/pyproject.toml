@@ -50,6 +50,7 @@ known-third-party = ["alembic"]
 # SQL text there interpolates only constant table/column names and configured file paths (never request data);
 # every user-supplied value is passed as a bound parameter.
 "app/cascade_check.py" = ["S608"]
+"app/flight_edits.py" = ["S608"]  # column names come from fixed lists, values are bound parameters
 "app/engine/store.py" = ["S608"]
 "app/ingest/*.py" = ["S608"]
 "app/ml/*.py" = ["S608"]
