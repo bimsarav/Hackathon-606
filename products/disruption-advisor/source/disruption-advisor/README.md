@@ -4,9 +4,10 @@ Disruption Advisor helps an airline's Operations Control Centre (OCC) and Passen
 - **Scenario A, delay:** for a delayed flight it shows every later flight on the same aircraft rotation and every passenger connection that breaks over the next 7 days. It compares recovery options (absorb the delay, or swap in a same-type aircraft) on delay, missed connections and cost, and recommends one.
 - **Scenario B, cancellation:** for a cancelled flight it ranks the affected passengers. Strict tiers come first (mandated care, then urgency); configurable weights order passengers inside a tier (loyalty, travel frequency, fare, ancillaries, journey, family/group). It then assigns passengers to alternative flights within the seats actually available, keeping bookings together.
 - **Explanations:** every recommendation is explained in plain English, written by Claude when an API key is configured, otherwise by templates, and passenger messages are drafted.
+- **Delay watchlist (phase 2):** for the next 7 days it estimates each flight's chance of a late departure, gives the main reasons in plain words, and ranks flights by expected missed connections. Opening a flight shows its connecting passengers at risk and starts Scenario A with a suggested delay. Method and test results: [docs/testing/model-card.md](docs/testing/model-card.md).
 - **Human approval:** the tool **only recommends**. A person approves or rejects every action, and each decision is audited.
 
-Stack: Python 3.14 · FastAPI · DuckDB over Parquet · Google OR-Tools (CP-SAT) · Anthropic Claude API · SQLAlchemy 2 · Alembic · PostgreSQL 18 · React 19 + TypeScript + Vite · nginx · Docker Compose · Playwright.
+Stack: Python 3.14 · FastAPI · DuckDB over Parquet · Google OR-Tools (CP-SAT) · LightGBM · Anthropic Claude API · SQLAlchemy 2 · Alembic · PostgreSQL 18 · React 19 + TypeScript + Vite · nginx · Docker Compose · Playwright.
 Details: [docs/architecture/SYSTEM_ARCHITECTURE.md](docs/architecture/SYSTEM_ARCHITECTURE.md) (diagrams) · [docs/delivery/MVP_AND_INCREMENTAL_PLAN.md](docs/delivery/MVP_AND_INCREMENTAL_PLAN.md) · [docs/deployment/DEPLOYMENT_GUIDE.md](docs/deployment/DEPLOYMENT_GUIDE.md).
 
 ## Prerequisites
@@ -34,7 +35,7 @@ Then open `http://localhost:${WEB_PORT}`. The API docs are at `/api/docs`.
 Start-up runs in this order:
 1. `db`
 2. `migrate` (Alembic)
-3. `ingest`: converts the extracts to typed Parquet. It takes about 4 minutes the first time, and skips the work when the inputs are unchanged.
+3. `ingest`: converts the extracts to typed Parquet, builds the operating picture and trains the delay-risk model. It takes about 4 minutes the first time, and skips the work when the inputs are unchanged.
 4. `api`
 5. `web`
 
@@ -48,11 +49,12 @@ Every long-running service restarts by itself, including after a server reboot.
   - customer profiles.
 
   Capacity comes from the inventory allocation (curtail/oversell) where available, otherwise from the aircraft layout inferred from the data.
+- **Stage 3 (`app/ml/delay_risk.py`, phase 2):** trains the delay-risk model on the 2026 history (LightGBM, features known 7 days ahead) and scores the window. Writes `flight_risk.parquet`, `connection_risk.parquet` and `model_card.json` to `<data>/ops`. It reruns with stage 2, so every new data drop retrains the model. Details: [docs/testing/model-card.md](docs/testing/model-card.md).
 - **Synthetic fields:** the extracts have no loyalty tier, fare family or special-service codes, so these are synthetic, deterministic and labelled in the UI. The data quality report is in `<data>/ops/ingest_report.json`.
 
 ## Tests
 ```bash
-scripts/check.sh                 # backend lint, format, strict types, 39 tests (Testcontainers PostgreSQL); frontend type check, tests, build
+scripts/check.sh                 # backend lint, format, strict types, 47 tests (Testcontainers PostgreSQL); frontend type check, 9 tests, build
 scripts/e2e.sh                   # Playwright end-to-end tests against the running stack (E2E_BASE_URL to target a server)
 scripts/smoke.sh [base-url]      # post-deployment smoke test against a running stack (read-mostly)
 scripts/check.sh lock            # after editing dependencies: refresh uv.lock / package-lock.json
@@ -66,6 +68,9 @@ Logs are written to `logs/`.
 | `/api/v1/auth/login` | Sign in (rate limited: 10 per minute per address) |
 | `/api/v1/meta`, `/api/v1/presets`, `/api/v1/flights` | Context, suggested scenarios, flight search |
 | `/api/v1/scenarios` (+ `/{id}`, `/reprioritise`, `/decisions`, `/messages`) | Run and store analyses, what-if, approvals, message drafts |
+| `/api/v1/risk/watchlist` | Flights in the next 1–7 days by risk band, ranked by expected missed connections or by delay risk (read-only) |
+| `/api/v1/risk/flights/{flight_id}` | One flight's delay risk and reasons, with its connecting passengers ranked by missed-connection risk |
+| `/api/v1/risk/model` | Model card: training data, features, test metrics against the baseline |
 | `/api/openapi.json`, `/api/docs` | OpenAPI schema and Swagger UI |
 | `/healthz`; API `/health/live`, `/health/ready` | Health (readiness = database + operating data loaded) |
 

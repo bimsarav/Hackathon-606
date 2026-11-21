@@ -70,3 +70,16 @@ test("scenario B: a cancellation ranks passengers by tier and re-runs with new w
   await page.getByRole("button", { name: "Approve rebooking plan" }).click();
   await expect(page.locator(".audit").last()).toContainText("APPROVE");
 });
+
+test("phase 2: delay watchlist ranks flights, shows reasons and opens a delay scenario", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("button", { name: /Delay watchlist/ }).click();
+  await expect(page.getByRole("heading", { name: /Delay watchlist/ })).toBeVisible();
+  await page.getByLabel("Risk").selectOption("all");
+  const table = page.getByRole("table", { name: "Flights at risk" });
+  await expect(table).toBeVisible();
+  await table.locator("tbody tr.clickable").first().locator("button.link").click();
+  await expect(page.getByRole("heading", { name: "Why this flight" })).toBeVisible();
+  await page.getByRole("button", { name: /^Analyse a/ }).click();
+  await expect(page.getByRole("heading", { name: "Recovery options compared" })).toBeVisible();
+});

@@ -59,7 +59,7 @@ def footer(canvas, doc) -> None:  # noqa: ANN001
     canvas.saveState()
     canvas.setFont("Helvetica", 7.5)
     canvas.setFillColor(MUTED)
-    canvas.drawString(18 * mm, 10 * mm, "Disruption Advisor (UC5) - Methods, theories and justifications - MVP, 20 Nov 2026")
+    canvas.drawString(18 * mm, 10 * mm, "Disruption Advisor (UC5) - Methods, theories and justifications - phases 1-2, 21 Nov 2026")
     canvas.drawRightString(192 * mm, 10 * mm, f"Page {doc.page}")
     canvas.restoreState()
 
@@ -67,12 +67,12 @@ def footer(canvas, doc) -> None:  # noqa: ANN001
 story: list = []
 story += [
     p("Disruption Advisor", TITLE),
-    p("Methods, theories and justifications (MVP, phase 1)", ParagraphStyle("st", parent=H2, textColor=MUTED, fontSize=13)),
-    p("Use case UC5: Flight &amp; Passenger Disruption Management. Version 1.0, 20 November 2026. "
+    p("Methods, theories and justifications (MVP and phase 2)", ParagraphStyle("st", parent=H2, textColor=MUTED, fontSize=13)),
+    p("Use case UC5: Flight &amp; Passenger Disruption Management. Version 1.1, 21 November 2026 (adds Section 9, phase 2). "
       "Audience: OCC and PCU business owners, solution reviewers and judges.", S),
     Spacer(1, 6),
     p("<b>Labels used.</b> [STD] standard or regulation, [PRACTICE] common airline practice, [ACADEMIC] research, "
-      "[ASSUMPTION] our assumption to validate with the airline. Reference numbers like [R4] point to Section 10.", S),
+      "[ASSUMPTION] our assumption to validate with the airline. Reference numbers like [R4] point to Section 12.", S),
 ]
 
 story += [p("1. Summary", H1)]
@@ -83,7 +83,8 @@ story += bullets([
     "integer-programming solver for seat allocation, an additive scoring model for passenger priority, and a language model "
     "only to <i>word</i> results. No black-box machine-learning model takes part in any MVP decision.",
     "<b>Explainable AI (XAI)</b> is built in by design: every number on screen can be traced to a formula and its inputs "
-    "(Section 8). Post-hoc XAI such as SHAP is planned for the phase-2 prediction model, where it is needed.",
+    "(Section 8). Post-hoc XAI (TreeSHAP) is used only for the phase-2 delay-risk model, which ranks flights and never "
+    "decides (Section 9).",
     "Gaps in the supplied data were filled with <b>labelled, deterministic synthetic data</b> (Section 3), as instructed by the "
     "user, so that every synthetic value can be replaced by real data without changing the logic.",
 ])
@@ -276,10 +277,54 @@ story += [table([
     ["Grounded natural-language explanation", "'Why this recommendation' box", "Claude rewrites the engine's numbers into prose; it "
      "receives only those facts, so it cannot invent a different decision."],
 ], [50, 38, 84])]
-story += [p("Phase 2 adds a LightGBM delay-risk model; there post-hoc XAI is needed and SHAP (TreeExplainer) will show the "
-            "drivers of each prediction.", S)]
+story += [p("Phase 2 adds a LightGBM delay-risk model; there post-hoc XAI is needed, and TreeSHAP shows the drivers of each "
+            "prediction (Section 9).", S)]
 
-story += [p("9. Generative AI and human oversight", H1)]
+story += [PageBreak(), p("9. Phase 2: delay-risk prediction", H1)]
+story += [p(
+    "<b>Purpose.</b> Phase 2 looks ahead: for every flight in the next 7 days it estimates the chance of a late departure, says "
+    "why, and estimates which connecting passengers may miss their onward flight. Predictions only rank flights and pre-fill "
+    "Scenario A with a planning delay; a person runs the scenario and approves any action. Full details: "
+    "<i>docs/testing/model-card.md</i>.")]
+story += [p("9.1 Delay-risk model", H2), p(
+    "<b>Theory.</b> A delay curve S(t) = P(departure delay &gt;= t) is estimated with one gradient-boosted tree classifier "
+    "(LightGBM) per threshold t = 5, 15, 30, 60, 120, 180 min, then made non-increasing in t. Gradient boosting captures "
+    "interactions such as station x hour x season that a logistic regression misses [ACADEMIC, R17]. Training data: G9 flights "
+    "from 1 Jan 2026 with actual times (punctuality extract). Only features known 7 days ahead are used: stations, the previous "
+    "station of the aircraft, aircraft type, local hour and weekday, leg of the aircraft's day, scheduled turn buffer, booked "
+    "load factor, and the 15-minute delay rate of the station, route and network over days 35 to 7 before the flight.")]
+story += [p("weight = 0.5 ^ (age in days / 60)          (recent months count more)<br/>"
+            "S(t) = min( p<sub>s</sub> for all thresholds s &lt;= t )    (monotone curve)<br/>"
+            "planning delay = t with S(t) = 20%             (linear between thresholds)<br/>"
+            "band: high if S(60) &gt;= 30%, medium if 15-30%, else low", F)]
+story += [p(
+    "<b>Validation.</b> Time-ordered, never random: trained on 1 Jan - 21 Oct 2026 (57,104 flights), tested on the next four "
+    "weeks (5,956 flights). Test AUC 0.798 for 15+ min and 0.757 for 60+ min, against 0.741 and 0.676 for the historical rate "
+    "of the same route and departure hour. An isotonic calibration step fitted on a later month was tried and dropped: delay "
+    "levels shift from month to month (16% of flights 15+ min late in June, 45% in October), and it made calibration worse on "
+    "the test weeks. Recency weighting follows the drift instead. The production model is retrained on all history at every "
+    "ingest.")]
+story += [p("9.2 Reasons with TreeSHAP", H2), p(
+    "<b>Theory.</b> SHAP values split a prediction into additive feature contributions with the properties of Shapley values "
+    "[ACADEMIC, R18]; for tree ensembles they are computed exactly and fast (TreeSHAP), built into LightGBM. For each flight the "
+    "three features that raise the 60-minute risk most are turned into plain phrases, e.g. 'this route was late 78% of the time "
+    "recently'. <b>Justification.</b> A ranked list without reasons cannot be checked or trusted by a controller, and GDPR Art. 22 "
+    "favours explanations for automated scoring [STD, R16]. The phrases show what the model weighed, not proven causes.")]
+story += [p("9.3 Missed-connection risk", H2), p(
+    "A second set of classifiers gives the arrival-delay curve A(t). For a connecting passenger with slack = connection time - "
+    "MCT, the inbound arrival delay and the onward departure delay are taken as independent, each represented by one value per "
+    "band of its curve:")]
+story += [p("P(miss) = &Sigma;<sub>i,j</sub> a<sub>i</sub> d<sub>j</sub> [ v<sub>i</sub> - v<sub>j</sub> &gt; slack ]<br/>"
+            "a<sub>i</sub>, d<sub>j</sub> = probability mass of band i of the arrival curve, band j of the onward departure curve<br/>"
+            "v = 0, 10, 22, 45, 90, 150, 210 min (representative delay per band)<br/>"
+            "expected missed connections of a flight = &Sigma; P(miss) over its connecting passengers", F)]
+story += [p(
+    "<b>Check.</b> On the test weeks, for SHJ connections with no slack, the model predicted a 0.70 miss rate against 0.69 "
+    "observed. <b>Limits.</b> Seven-day view only (no same-day actuals); inbound and onward delays share causes such as hub "
+    "weather, so independence is an approximation; delays of 2 h or more are rare and over-estimated (use them to rank); aircraft "
+    "type and capacity are inferred for many flights [ASSUMPTION].", S)]
+
+story += [p("10. Generative AI and human oversight", H1)]
 story += bullets([
     "<b>Grounded generation:</b> the model (claude-opus-5-5, low effort) gets a fixed system instruction ('use only the facts given') "
     "and a JSON of engine facts. It never chooses an option or a passenger.",
@@ -291,7 +336,7 @@ story += bullets([
     "operator's designated staff [STD, R14]. The tool recommends; approve/reject decisions are recorded with user, role and time.",
 ])
 
-story += [p("10. Limitations and what must be validated", H1)]
+story += [p("11. Limitations and what must be validated", H1)]
 story += bullets([
     "Costs, the 40-minute turn time, the 45-minute default MCT and the SSR rates are assumptions (configurable) [ASSUMPTION].",
     "Crew duty limits are not checked (no crew data): crew control must confirm every swap.",
@@ -302,7 +347,7 @@ story += bullets([
     "EU261 is estimated (no extraordinary-circumstances or rerouting reductions); other regimes use generic care rules.",
 ])
 
-story += [p("11. References", H1)]
+story += [p("12. References", H1)]
 refs = [
     "R1 Davies et al., Decision Support for Schedule Recovery at Lufthansa Group Airlines, INFORMS J. Applied Analytics 56(1), 2026.",
     "R2 Kohl, Larsen, Larsen, Ross, Tiourine, Airline disruption management - perspectives, experiences and outlook, J. Air "
@@ -324,7 +369,10 @@ refs = [
     "R14 FAA AC 120-101 CHG 1, Part 121 Air Carrier Operational Control (2016).",
     "R15 14 CFR Part 250 (oversales; boarding priority rules), §250.3.",
     "R16 CJEU C-634/21 SCHUFA Holding (Scoring), 7 Dec 2023; GDPR Art. 22.",
-    "Tools: Google OR-Tools CP-SAT 9.15; DuckDB 2.0; Apache Parquet; Anthropic Claude API (claude-opus-5-5).",
+    "R17 Ke et al., LightGBM: A Highly Efficient Gradient Boosting Decision Tree, NeurIPS 2017.",
+    "R18 Lundberg et al., From local explanations to global understanding with explainable AI for trees, Nature Machine "
+    "Intelligence 2:56-67, 2020.",
+    "Tools: Google OR-Tools CP-SAT 9.15; DuckDB 2.0; Apache Parquet; LightGBM 4.7; Anthropic Claude API (claude-opus-5-5).",
 ]
 story += [p(r, S) for r in refs]
 story += [Spacer(1, 6), p("The full source list with URLs and access dates is kept in the team's airline knowledge base "

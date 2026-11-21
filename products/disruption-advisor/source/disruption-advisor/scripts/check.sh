@@ -27,7 +27,10 @@ run() { # run <step> <py|node> <command...>
   if [ "$kind" = py ]; then
     args+=(--group-add "$SOCK_GID" --network host -v /var/run/docker.sock:/var/run/docker.sock
            -v "$ROOT/backend":/app -w /app -e UV_CACHE_DIR=/cache/uv -e UV_PROJECT_ENVIRONMENT=/cache/venv
-           -e TESTCONTAINERS_HOST_OVERRIDE=localhost "$PY_IMAGE")
+           -e TESTCONTAINERS_HOST_OVERRIDE=localhost
+           # explicit DOCKER_HOST: otherwise Testcontainers copies this container's "host" network onto PostgreSQL
+           # where it can detect its own container id (cgroup v1 hosts) and the port binding is rejected
+           -e DOCKER_HOST=unix:///var/run/docker.sock "$PY_IMAGE")
   else
     args+=(-v "$ROOT/frontend":/web -w /web -e npm_config_cache=/cache/npm -e CI=true -e NO_COLOR=1 "$NODE_IMAGE")
   fi

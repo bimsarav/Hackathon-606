@@ -1,4 +1,4 @@
-# RESUME (updated 2026-11-21) — UC5 disruption-advisor PHASE 1 (MVP) DEPLOYED & VERIFIED; Phase 2 NOT started (user)
+# RESUME (updated 2026-11-21) — disruption-advisor PHASE 2 DONE + REDEPLOYED 00:57Z (T-507: smoke 11/11, e2e 4/4; rollback tag + dump pre-202611210055). NOT committed (user). WAITING: commit decision, phase 3 / phase 6 approval
 Product: esm-hub (R = products/esm-hub/source/esm-hub) · Status: COMPLETED by user instruction, NOT deployed
 Verified locally: clean build 253 tests; frontend lint + 18 tests; compose stack healthy; API smoke (output/T-005.2-smoke.log); Playwright 6/6 (output/T-005.2-e2e-run3.log)
 Cloud: OCI VM discovered + read-only dry run passed (R/docs/deployment/CLOUD_ENVIRONMENT.md, execution/DEPLOYMENT_STATUS.md); nothing deployed
@@ -12,3 +12,5 @@ DONE 1-6: reboot test PASSED, Phase 1 DEPLOYED (verified), arch docs + ADRs 0005
 T-407 (2026-11-21): teammate data/format changes from origin/heshawa (b283970, 891de45, 71ad3a3, a7df83f, 6a1125e) merged into the working tree, NOT committed; gate 36+5, e2e 3/3 local+prod, prod smoke 11/11 (output/T-407-*.log). Rollback images: disruption-advisor-{api,web}:rollback on the server.
 T-408 (2026-11-21): name-free bookings format (D-024) DONE, prod verified (checksum = supplied files, smoke 11/11, e2e 3/3). Server input now has parquet/raw/bookings (supplied). Rollback images :rollback = pre-T-408. NOT committed. WARNING: settings.env (secrets) is staged by force-add; user told to unstage.
 T-409 (2026-11-21): pushed heshawa 74369fd (key removed from commit, settings.env git-ignored, merged origin). WAITING for user: airline data with names already on GitHub (72348be, 6a1125e); SSH key rotation; Phase 2 approval.
+T-504 (2026-11-21, machine /media/dev/dev21): check.sh fixed (DOCKER_HOST for Testcontainers, cgroup v1); local INPUT_DIR (git-ignored settings.env/.env) -> input/data/disruption-uc5 (extracts/ folder gone); esm-hub local stack is crash-looping (not touched)
+T-506: SSH key = input/cloud-environment/hackathon22_172.31.76.23 (copy to 600 before use); server tree == local after sync; teammate deployed c9ab1d2 + unpushed fixes at 00:26Z (now merged locally, NOT committed)

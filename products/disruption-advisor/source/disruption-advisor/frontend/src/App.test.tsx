@@ -5,6 +5,7 @@ import type { Meta, Scenario } from "./api";
 import { App } from "./App";
 import { CancelView } from "./CancelView";
 import { DelayView } from "./DelayView";
+import { WatchlistView } from "./WatchlistView";
 import { aed, minutes, utc } from "./format";
 
 const weights = { loyalty: 20, frequency: 15, fare_value: 20, ancillaries: 10, journey: 20, booking: 15 };
@@ -126,5 +127,44 @@ describe("result views", () => {
     expect(screen.getByText("Lina Haddad")).toBeInTheDocument();
     expect(screen.getByText("G9203")).toBeInTheDocument();
     expect(screen.getAllByText("Care").length).toBeGreaterThan(0);
+  });
+});
+
+describe("WatchlistView", () => {
+  const risk = {
+    flight_id: flight.flight_id, flight_number: "G9519", origin: "MCT", destination: "SHJ", std: "2026-11-21T02:00:00",
+    sta: "2026-11-21T03:00:00", tail: "A6-AOH", aircraft_model: "A320-174", p_15: 0.42, p_30: 0.31, p_60: 0.22,
+    p_120: 0.08, planning_delay_minutes: 45, risk_band: "high" as const,
+    reasons: [{ feature: "tail_delay", text: "The aircraft was late on its earlier flights", contribution: 0.4 }],
+    connecting_pax: 30, expected_misconnects: 6.4,
+  };
+
+  it("lists flights at risk, opens one with reasons and connections, and starts a scenario", async () => {
+    stubFetch((url) => {
+      if (url.includes("/risk/watchlist"))
+        return { from_utc: "2026-11-20T00:00:00", days: 7, band: "medium",
+          totals: { flights: 1, high: 1, medium: 0, expected_misconnects: 6.4 }, flights: [risk] };
+      if (url.includes("/risk/flights/"))
+        return { flight: risk, connections: [{ pnr: "ABC123", passenger_id: "P1", outbound_flight_id: "G9201_202611211200",
+          outbound_flight_number: "G9201", hub: "SHJ", final_destination: "CAI", connection_minutes: 95, mct_minutes: 60,
+          default_mct: false, slack_minutes: 35, misconnect_risk: 0.37 }] };
+      throw new Error("no model card");
+    });
+    const onAnalyse = vi.fn();
+    render(<WatchlistView onAnalyse={onAnalyse} busy={false} />);
+    expect(await screen.findByText("22%")).toBeInTheDocument();
+    expect(screen.getByText("High")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "G9519" }));
+    expect(await screen.findByText("The aircraft was late on its earlier flights", { selector: "li" })).toBeInTheDocument();
+    expect(await screen.findByText("37%")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /Analyse a 45 min delay/ }));
+    expect(onAnalyse).toHaveBeenCalledWith(flight.flight_id, 45);
+  });
+
+  it("shows the API error when the risk data is not available", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () =>
+      new Response(JSON.stringify({ title: "Unavailable", status: 503, detail: "Delay-risk data is not available yet" }), { status: 503 })));
+    render(<WatchlistView onAnalyse={() => {}} busy={false} />);
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
   });
 });

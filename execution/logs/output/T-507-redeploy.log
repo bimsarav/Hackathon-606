@@ -1,0 +1,30 @@
+rollback tag: pre-202611210055
+-rw-r--r--. 1 opc opc 535648 Nov 21 00:55 /home/opc/backups/disruption-advisor/pre-202611210055.dump
+== build 00:55:50
+
+#38 [migrate] resolving provenance for metadata file
+#38 DONE 0.0s
+ Image disruption-advisor-api:latest Built 
+ Image disruption-advisor-web:latest Built 
+== up 00:56:40
+ Container disruption-advisor-migrate-1 Starting 
+ Container disruption-advisor-migrate-1 Started 
+ Container disruption-advisor-migrate-1 Waiting 
+ Container disruption-advisor-migrate-1 Exited 
+ Container disruption-advisor-ingest-1 Starting 
+ Container disruption-advisor-ingest-1 Started 
+ Container disruption-advisor-ingest-1 Waiting 
+ Container disruption-advisor-ingest-1 Exited 
+ Container disruption-advisor-api-1 Starting 
+ Container disruption-advisor-api-1 Started 
+ Container disruption-advisor-api-1 Waiting 
+ Container disruption-advisor-api-1 Healthy 
+== state 00:57:04
+api: Up 5 seconds (healthy)
+db: Up 5 hours (healthy)
+ingest: Exited (0) 5 seconds ago
+migrate: Exited (0) 7 seconds ago
+web: Up 28 minutes (healthy)
+ingest-1  | 2026-11-21 00:56:58,673 INFO stage 1 skipped: extracts unchanged
+ingest-1  | 2026-11-21 00:56:58,674 INFO stage 2 skipped: operating picture is current
+exit=0

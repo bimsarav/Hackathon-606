@@ -8,7 +8,7 @@ Stage 2 (raw -> ops, seconds) runs when the inputs, the
 options or the build code changed.
 OPERATING_CARRIERS (default G9) limits the picture to those carriers.
 DEMO_SCENARIO=true appends the labelled synthetic demo scenario (app/ingest/demo.py).
-Stage 3 (phase 2) trains the delay-risk model and scores the window (app/ml/delay_risk.py, about a minute).
+Stage 3 (phase 2) trains the delay-risk model and scores the window (app/ml/delay_risk.py, ~30 s on the server).
 """
 
 import argparse

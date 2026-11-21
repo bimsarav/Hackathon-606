@@ -276,38 +276,37 @@ flowchart LR
 - **Limits (MVP):** G9 flights only (no partner or other carriers), no crew legality (no crew data), no equipment change, no bus legs, simulated "now" = 2026-11-20 (Q2).
 
 ## 10. Phase 2: Predict (approved by the user on 21 Nov 2026)
-Phase 2 adds a forward view (which flights are likely to be late in the next 7 days, and which passengers are likely to misconnect) and production basics (HTTPS, nightly backups). The engine and the human approval loop of phase 1 are unchanged: predictions only rank and pre-fill, a person still runs and approves the scenario.
+Phase 2 adds a forward view (which flights are likely to be late in the next 7 days, and which passengers are likely to misconnect) (HTTPS and nightly backups, first planned here, were moved to phase 6 by the user on 2026-11-21; see §10.3). The engine and the human approval loop of phase 1 are unchanged: predictions only rank and pre-fill, a person still runs and approves the scenario.
 
 ### 10.1 Delay-risk pipeline
 ```mermaid
 flowchart LR
   H[(history_flights<br/>63k G9 flights<br/>1 Jan – 18 Nov 2026)] --> F[features known<br/>7 days ahead]
   W[(flights in the window<br/>19 – 30 Nov, tail plan,<br/>bookings)] --> F
-  F --> T[train: LightGBM<br/>one model per threshold<br/>15 · 30 · 60 · 120 · 180 min]
-  T --> C[calibrate: isotonic<br/>on a later month]
-  C --> E[evaluate on the last weeks<br/>vs a route × hour baseline<br/>AUC, Brier, reliability]
-  C --> S[score the window flights]
+  F --> T[train: LightGBM<br/>one model per threshold<br/>5 · 15 · 30 · 60 · 120 · 180 min<br/>recency-weighted]
+  T --> E[evaluate on the last weeks<br/>vs a route × hour baseline<br/>AUC, Brier, reliability]
+  T --> S[score the window flights]
   S --> R[("flight_risk.parquet<br/>P(delay ≥ t) per threshold,<br/>planning delay P80,<br/>top reasons from SHAP")]
   E --> MC[(model_card.json<br/>metrics, data range, features)]
   R --> API[api: watchlist,<br/>risk on flights,<br/>misconnect risk per passenger]
 ```
-- **Runs in the ingest** (stage 3, after the operating picture), so a new data drop retrains and rescores without a separate service. Deterministic (fixed seeds, single thread), so the same data gives the same model.
+- **Runs in the ingest** (stage 3, after the operating picture), so a new data drop retrains and rescores without a separate service. Deterministic (fixed seed, LightGBM `deterministic` mode with 4 threads), so the same data gives the same model.
 - **Features known 7 days ahead only** (no actual times of the day itself): departure station, arrival station, departure hour (local) and weekday, aircraft type, position of the flight in the aircraft's day, scheduled turn buffer before it, booked load factor, and the recent delay rate of the station and of the route (28 days, ending 7 days before the flight, so it is known in time).
-- **Time-ordered validation**, never random: train on the oldest months, calibrate on the next month, test on the most recent weeks. The model card states the numbers and is shown in the UI.
+- **Time-ordered validation**, never random: train on the older history, test on the most recent 28 days. Isotonic calibration was tested and dropped (worse under month-to-month drift). The model card states the numbers and is shown in the UI.
 - **Reasons:** LightGBM's built-in TreeSHAP contributions, mapped to plain phrases ("evening departures from SHJ run late", "tight 40-minute turn").
 
 ### 10.2 From delay risk to passengers
 ```mermaid
 flowchart TB
-  P["P(departure delay ≥ t)<br/>t = 15, 30, 60, 120, 180"] --> Sv["delay curve S(t)<br/>monotone, interpolated"]
+  P["P(departure delay ≥ t)<br/>t = 5, 15, 30, 60, 120, 180"] --> Sv["delay curve S(t)<br/>monotone, interpolated"]
   Sv --> P80[planning delay = delay<br/>exceeded with 20% chance]
-  Sv --> M["misconnect risk per connecting passenger<br/>= S(connection time − MCT)"]
+  Sv --> M["misconnect risk per connecting passenger<br/>= P(inbound arrival delay − onward<br/>departure delay > connection − MCT)"]
   P80 --> A[Scenario A pre-filled<br/>from the watchlist]
   M --> WL[watchlist: expected misconnects<br/>per flight = Σ risk]
 ```
-- Arrival delay is taken as the departure delay (block-time recovery ignored; conservative), and the onward flight is assumed on time. Both are stated as assumptions in the UI.
+- The inbound arrival delay has its own curve (a second set of LightGBM models trained on actual arrival delays), and the onward flight's departure-delay curve is included, so a late onward flight saves some connections. The two delays are taken as independent. Back-tested on past connections: 0.70 predicted vs 0.69 observed (model card).
 
-### 10.3 Deployment additions
+### 10.3 Deployment additions (moved to phase 6, user 2026-11-21; not built yet)
 ```mermaid
 flowchart LR
   user([OCC / PCU]) -->|https://92-5-154-198.sslip.io| caddy

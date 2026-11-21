@@ -40,6 +40,7 @@ input/inbox/*
 !input/inbox/README.md
 # Disruption-management (UC5) datasets: treated as real passenger data (user 2026-11-20), ~1 GB. Never commit.
 input/data/disruption-uc5/Past & Future Booking Data.zip
+input/data/disruption-uc5/Past & Future Booking Data/*
 input/data/disruption-uc5/parquet/raw/bookings/*
 # Secrets supplied by the user (e.g. AI_API_KEY, user 2026-11-20). Never commit, print or log.
 input/secrets/

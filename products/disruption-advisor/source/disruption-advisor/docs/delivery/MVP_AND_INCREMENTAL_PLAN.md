@@ -6,9 +6,10 @@ Delivery cadence (user instruction 2026-11-20): design first, MVP first, host th
 |---|---|---|
 | 0 Design | Architecture and diagrams ([SYSTEM_ARCHITECTURE.md](../architecture/SYSTEM_ARCHITECTURE.md)) | Done 2026-11-20 |
 | 1 MVP | Scenarios A and B end to end, hosted | Done 2026-11-20: deployed and verified, incl. reboot test |
-| 2 Predict | Delay-risk prediction and a 7-day watchlist; HTTPS | Needs approval |
+| 2 Predict | Delay-risk prediction, 7-day watchlist, misconnect risk per passenger | Approved 2026-11-21; deployed (reboot check skipped by user) |
 | 3 Agent and what-if | Agentic orchestration; cancellation and consolidation as recovery options; strategy comparison | Needs approval |
 | 4 Extend | Equipment change, bus legs, crew, real data feeds, production hardening | Needs approval |
+| 6 Secure and protect | HTTPS (Caddy, sslip.io) and nightly PostgreSQL backup with a restore test (moved from phase 2 by the user, 2026-11-21) | Needs approval |
 
 ## Phase 1 — MVP (approved)
 **Goal:** the briefing's ask: *"Pick one or two realistic disruption scenarios. Show how the AI agent identifies impact, evaluates the available recovery, and recommends an action"*, with explanations.
@@ -58,13 +59,12 @@ Delivery cadence (user instruction 2026-11-20): design first, MVP first, host th
 - The reboot test passes.
 - The URL and logins are sent to the user.
 
-## Phase 2 — Predict (needs approval)
-- LightGBM delay-risk model trained on the Jan–Nov 2026 punctuality data (route, time, day, station, inbound delay, rotation position).
-- Calibrated probability of a delay of 15 min or more and of 60 min or more per upcoming flight, with SHAP reasons.
+## Phase 2 — Predict (approved by the user 2026-11-21)
+- LightGBM delay-risk model trained on the Jan–Nov 2026 punctuality data, using only what is known 7 days ahead (stations, departure hour and weekday, aircraft type, position in the aircraft's day, turn buffer, load factor, recent station/route/network delay rates). Details: `docs/testing/model-card.md`.
+- Probability of a departure delay of 5, 15, 30, 60, 120 and 180 min or more per upcoming flight, with plain-language reasons from TreeSHAP.
 - A 7-day "at risk" watchlist that feeds Scenario A automatically.
 - Per-passenger misconnect risk.
-- HTTPS through Caddy and Let's Encrypt on a free sslip.io hostname, with `:8888` kept.
-- Nightly PostgreSQL backup with a restore test.
+- (HTTPS and nightly backups moved to phase 6 by the user, 2026-11-21.)
 
 ## Phase 3 — Agent and what-if (needs approval)
 - A Claude tool-using agent that coordinates the impact, recovery, priority and rebooking modules and explains its chain of reasoning. It stays recommend-only.
@@ -79,12 +79,17 @@ Delivery cadence (user instruction 2026-11-20): design first, MVP first, host th
 - Replace synthetic data with real loyalty, SSR, fare-family and aircraft files as they arrive.
 - CI/CD deployment, monitoring and alerting, and the full §14 operations baseline.
 
+## Phase 6 — Secure and protect (needs approval; moved from phase 2 by the user, 2026-11-21)
+No phase 5 is defined yet.
+- HTTPS through Caddy and Let's Encrypt on a free sslip.io hostname, with `:8888` kept (design: ADR 0009).
+- Nightly PostgreSQL backup with a restore test (design: ADR 0009).
+
 ## Deployment procedure (every phase)
 1. Plan the phase and get user approval.
 2. Build and run `scripts/check.sh`.
 3. Run Playwright locally.
 4. Run the Trivy scans.
-5. Tag the images, deploy with `scripts/deploy.sh` (back up the database first from Phase 2 on), and run migrations.
+5. Tag the images, deploy (copy the tree to the server and run `docker compose up -d --build`, see `docs/deployment/DEPLOYMENT_GUIDE.md`; take a manual `pg_dump` of the database first; automated nightly backups come in phase 6), and run migrations.
 6. Verify (engineering standards §13.9): health checks, Playwright against the server URL, and the logs.
 7. Rollback = redeploy the previous image tag. The rollback steps are in the runbook.
 8. Report the URL and results, update the phase status table above, and wait for approval of the next phase.

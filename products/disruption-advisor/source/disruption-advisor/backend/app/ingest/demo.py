@@ -178,4 +178,19 @@ def add_demo_scenario(ops: Path) -> dict[str, int]:
         "demo_flights": _append(ops / "flights.parquet", flights),
         "demo_pax_segments": _append(ops / "pax_segments.parquet", segments),
         "demo_customers": _append(ops / "customers.parquet", customers),
+        # Synthetic hub rule for the demo connection, so the story (connecting passengers miss G9951) holds with
+        # the measured 51-min SHJ turn: the delayed aircraft can take over G9951, but not 60 min after landing.
+        "demo_mct": _append(
+            ops / "mct.parquet",
+            [
+                {
+                    "ond_code": "KHI/SHJ/HBE",
+                    "origin": "KHI",
+                    "hub": "SHJ",
+                    "destination": "HBE",
+                    "min_minutes": 60,
+                    "max_minutes": 1200,
+                }
+            ],
+        ),
     }

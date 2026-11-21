@@ -1,6 +1,8 @@
-# Test Report (MVP)
+# Test Report
 
-All results come from real runs on 2026-11-20. Commands are in the README. Logs are in `logs/` and are not committed.
+All results come from real runs: phase 1 (MVP) on 2026-11-20, phase 2 (Predict) on 2026-11-21 ([below](#phase-2-predict-2026-11-21)). Commands are in the README. Logs are in `logs/` and are not committed.
+
+# Phase 1 (MVP)
 
 ## Local quality gate: `scripts/check.sh`
 | Step | Result |
@@ -52,3 +54,44 @@ The API tests cover:
 | Repository: `uv.lock`, `package-lock.json`, Dockerfiles (dependencies, secrets, misconfiguration) | 0 findings |
 | Image `disruption-advisor-web` | 0 findings |
 | Image `disruption-advisor-api` | 0 vulnerabilities. The secret-rule matches (`gcp-service-account`) are **false positives** in the Anthropic SDK's own docstrings (the text `"type": "service_account"` in `anthropic/resources/beta/agents/*.py`); no credential is present |
+
+# Phase 2 (Predict), 2026-11-21
+
+## Local quality gate: `scripts/check.sh`
+| Step | Result |
+|---|---|
+| Backend lint, format, mypy strict | PASS |
+| Backend tests (pytest + Testcontainers PostgreSQL 18) | **47 passed** |
+| Frontend type check, unit tests (Vitest), production build | PASS: **9 tests** |
+
+New tests in this phase:
+- `backend/tests/test_delay_risk.py`:
+  - the delay curve interpolates between thresholds;
+  - AUC and Brier match textbook values;
+  - the planning delay is exceeded with a 20% chance;
+  - the miss probability grows as the slack shrinks, and a late onward flight saves some connections;
+  - the model learns a pattern planted in the test network and writes `flight_risk`, `connection_risk` and the model card;
+  - training is deterministic (same data, same output);
+  - the watchlist and flight-risk API (sign-in required).
+- `frontend/src/App.test.tsx`: the watchlist lists flights at risk, opens one with reasons and connections and starts a scenario; it shows the API error when the risk data is not available.
+- `frontend/src/RotationBoard.test.tsx` (teammate addition): legs sit on the scheduled aircraft before and on the operating aircraft after; both boards render with a summary of the change.
+
+## Model evaluation (time-ordered)
+Evaluation model trained on 2026-01-01 .. 2026-10-21 (57,104 flights), tested on 2026-10-21 .. 2026-11-18 (5,956 flights), production run on the server:
+
+| Delay of at least | Model AUC | Route × hour baseline AUC |
+|---|---|---|
+| 15 min | 0.798 | 0.741 |
+| 60 min | 0.757 | 0.676 |
+
+Missed-connection backtest (SHJ connections in the test weeks, no-slack band): 0.70 predicted vs 0.69 observed. Method, calibration decision and limitations: [model-card.md](model-card.md).
+
+## Server checks (`http://<server>:8888`)
+| Check | Result |
+|---|---|
+| Smoke test `scripts/smoke.sh` | **11/11** |
+| Playwright `scripts/e2e.sh` (Chromium) | **4 passed**: wrong password and token check; scenario A; scenario B; phase 2 watchlist (ranks flights, shows reasons, opens a delay scenario) |
+| Risk API | Watchlist 1,491 flights in 7 days: 18 high, 140 medium risk; model card served |
+| Reboot test | **Not done yet** (pending user approval) |
+
+The local Playwright run was not done: the development machine's bookings Parquet still uses the old `dep_year` layout. The runtime code is identical to the server, so the end-to-end tests ran against the server. No Trivy scan is recorded for the phase 2 images.

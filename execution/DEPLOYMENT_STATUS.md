@@ -1,14 +1,15 @@
 # Deployment Status — disruption-advisor (MASTER_PROMPT §13.12, §14; phase gates per D-018)
-Overall: **PHASE 1 (MVP) DEPLOYED (verified incl. reboot test)** · Updated: 2026-11-20T19:58Z · Phase 2 IN PROGRESS (approved by user 2026-11-21) · URL: http://92.5.154.198:8888
+Overall: **PHASE 1 (MVP) DEPLOYED (verified incl. reboot test)** · Updated: 2026-11-20T19:58Z · Phase 2 IN PROGRESS (approved by user 2026-11-21); phase 2 live in prod (teammate deploy 00:26Z, synced + verified 2026-11-21: smoke 11/11, e2e 4/4, risk API; output/T-506-*.log); reboot check skipped by user decision · URL: http://92.5.154.198:8888
 Target: OCI VM 92.5.154.198 (same host as the esm-hub discovery below), port 8888, code ~/apps/disruption-advisor, extracts ~/disruption-advisor-input (700 + ACL for container uid 999), secrets ~/apps/disruption-advisor/settings.env (600; .env is a link to it). Demo logins: workspace input/secrets/disruption-advisor-demo-logins.txt (git-ignored).
 
 | Phase | Status | Approval |
 |---|---|---|
 | 0 Design | DONE (artifact https://claude.ai/artifact/PTzSvCcSHABHNz7HYhxG2s) | user 2026-11-20 |
 | 1 MVP | DEPLOYED (verified) | user 2026-11-20 ("define MVP … host it") |
-| 2 Predict + HTTPS | IN PROGRESS (started 2026-11-20T23:25Z) | user 2026-11-21 ("start phase 2 now") |
+| 2 Predict | DEPLOYED (verified; redeployed 2026-11-21T00:57Z, rollback tag pre-202611210055; reboot check skipped by user) (started 2026-11-20T23:25Z) | user 2026-11-21 ("start phase 2 now") |
 | 3 Agent + what-if | NOT STARTED | needs approval |
 | 4 Extend | NOT STARTED | needs approval |
+| 6 Secure and protect (HTTPS + nightly backup, moved from phase 2 by user 2026-11-21) | NOT STARTED | needs approval |
 
 | Area | Status | Evidence |
 |---|---|---|

@@ -1,6 +1,6 @@
 # ADR-0009: HTTPS with Caddy on an sslip.io hostname; nightly PostgreSQL dumps with a restore test
 
-- **Status:** Accepted (2026-11-21, phase 2 approved by the user)
+- **Status:** Accepted, deferred: moved from phase 2 to phase 6 by the user on 2026-11-21; not built yet
 - **Context:** The MVP runs over plain HTTP on :8888, and PostgreSQL (scenarios, decisions, audit) has no backup. No domain name or off-site storage was supplied. Ports 80 and 443 are open on the server and in the cloud firewall.
 - **Decision:**
   - **TLS:** a Caddy 2 container terminates TLS for `92-5-154-198.sslip.io` (the hostname is configurable: `PUBLIC_HOSTNAME`). Caddy obtains and renews certificates automatically (Let's Encrypt, ZeroSSL as fallback), redirects HTTP to HTTPS and adds HSTS. It is enabled through a Compose profile, so a laptop run needs no certificate. `:8888` stays for existing links.

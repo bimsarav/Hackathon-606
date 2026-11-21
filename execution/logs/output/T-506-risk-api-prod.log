@@ -1,0 +1,8 @@
+watchlist totals {'flights': 1491, 'high': 18, 'medium': 140, 'expected_misconnects': 4452.3}
+  G9406 2026-11-21T23:25:00 medium 0.16 101.9 this route was late 78% of the time recently
+  G9801 2026-11-26T01:50:00 low 0.14 72.74 this route was late 76% of the time recently
+  G9148 2026-11-26T13:55:00 low 0.13 63.71 aircraft type A321 (inferred)
+flight G9406 connections 3 [('G9298', 10, 0.67), ('G9298', 10, 0.67), ('G9298', 10, 0.67)]
+model LightGBM binary classifier per threshold, recency-weighted (half-life 60 days), ADR 0008 train 2026-01-01 .. 2026-10-21 (57104 flights) test 2026-10-21 .. 2026-11-18 (5956 flights)
+ t 15 auc 0.798 baseline 0.741
+ t 60 auc 0.757 baseline 0.676

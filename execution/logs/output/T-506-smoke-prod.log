@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Post-deployment smoke test against a RUNNING stack (local or server). Read-mostly: it signs in, reads reference
+# data and runs one cancellation analysis (stored as a normal scenario). It never builds, stops or deletes anything.
+#   scripts/smoke.sh                         → http://localhost:${WEB_PORT} (from settings.env)
+#   scripts/smoke.sh http://92.5.154.198:8888
+# Credentials: the first DEMO_USERS entry in settings.env, or SMOKE_USER / SMOKE_PASSWORD.
+PASS 200 GET /healthz
+PASS 200 GET /
+PASS 200 GET /some/client/route
+PASS 200 GET /api/openapi.json
+PASS 401 GET /api/v1/meta
+PASS 401 POST /api/v1/auth/login
+PASS security headers on /
+PASS sign in as occ
+PASS 200 GET /api/v1/meta
+PASS presets include a cancellation candidate (G9800_202611231745)
+PASS 201 POST /api/v1/scenarios
