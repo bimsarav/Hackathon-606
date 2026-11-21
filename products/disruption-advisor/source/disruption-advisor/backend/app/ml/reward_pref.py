@@ -265,7 +265,11 @@ def train(history: dict[str, np.ndarray]) -> tuple[lgb.Booster, dict[str, Any]]:
                 "auc": round(float(auc(yt[sel], p[sel])), 4),
             }
     # baselines: the average acceptance of the reward type, and the proxy rules of the first version
-    rate = {k: float(y[train_rows][history["reward_type"][train_rows].astype(int) == k].mean()) for k in range(5)}
+    overall = float(y[train_rows].mean())
+    rate = {}
+    for k in range(5):
+        picked = y[train_rows][history["reward_type"][train_rows].astype(int) == k]
+        rate[k] = float(picked.mean()) if len(picked) else overall  # a reward type absent from a tiny history
     type_avg = np.asarray([rate[k] for k in kinds])
     proxy = _proxy_scores(history, test)
     metrics = {

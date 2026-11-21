@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import duckdb
+from fastapi.testclient import TestClient
 
 from app import cascade_check as cc
 
@@ -103,3 +104,14 @@ def test_pairs_older_than_a_month_are_left_out(tmp_path: Path) -> None:
     cc.run(ops)
     card = json.loads((ops / "cascade_check.json").read_text())
     assert [r["flight"] for r in card["rows"]] == ["G9004"]
+
+
+def test_cascade_api_serves_the_check_and_needs_a_sign_in(client: TestClient, auth: dict[str, str]) -> None:
+    card = client.get("/api/v1/risk/cascade", headers=auth).json()
+    assert card["kpis"]["pairs"] == len(card["rows"]) == card["rows_total"]
+    assert sum(b["count"] for b in card["histogram"]) == card["kpis"]["pairs"]
+    assert [b["label"] for b in card["histogram"]] == ["< -15", "-15 to 0", "0 to 15", "15 to 30", "30 to 60", "> 60"]
+    assert all(r["formula_ko"] > 0 for r in card["rows"])  # a cascade pair is one the formula predicts a knock-on for
+    assert all(r["delta"] == r["actual_ko"] - r["formula_ko"] for r in card["rows"])
+    assert "40 min" in card["formula"]
+    assert client.get("/api/v1/risk/cascade").status_code == 401

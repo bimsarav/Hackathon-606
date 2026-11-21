@@ -12,6 +12,7 @@ from pydantic import SecretStr
 from sqlalchemy import text
 from testcontainers.community.postgres import PostgresContainer
 
+from app import cascade_check
 from app.config import Settings
 from app.main import create_app
 from app.ml import delay_risk
@@ -32,7 +33,9 @@ def alembic_config() -> Iterator[Config]:
 @pytest.fixture(scope="session")
 def data_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
     path = tmp_path_factory.mktemp("data")
-    delay_risk.run(write_ops(path), default_mct=50)  # phase 2 outputs, as ingest stage 3 writes them
+    ops = write_ops(path)
+    delay_risk.run(ops, default_mct=50)  # phase 2 outputs, as ingest stage 3 writes them
+    cascade_check.run(ops)  # the last-month cascade check, as ingest stage 3b writes it
     return path
 
 

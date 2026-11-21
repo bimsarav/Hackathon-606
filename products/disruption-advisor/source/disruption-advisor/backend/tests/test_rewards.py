@@ -1,10 +1,14 @@
 """Phase 5 reward recommendation (ADR 0012): severity, proxy preferences, eligibility and the budget fit."""
 
+import json
+from pathlib import Path
 from typing import Any
 
 import pytest
+from fastapi.testclient import TestClient
 
 from app.engine import rewards as rw
+from tests.ops_fixture import F1
 
 
 def person(
@@ -236,3 +240,102 @@ def test_a_reward_never_repeats_what_the_care_plan_already_gives() -> None:
     plan = rw.recommend([plain, fed, housed], 10_000)
     meals = [r for r in plan["rows"] if r["reward"] and r["reward"]["type"] == rw.MEAL]
     assert all(r["pnr"] == plain.pnr for r in meals)
+
+
+# ------------------------------------------------------------------------------ the reward API (needs Docker)
+def _scenario(client: TestClient, auth: dict[str, str], kind: str = "DELAY") -> dict[str, Any]:
+    body: dict[str, Any] = {"kind": kind, "flight_id": F1}
+    if kind == "DELAY":
+        body["delay_minutes"] = 150
+    created = client.post("/api/v1/scenarios", headers=auth, json=body)
+    assert created.status_code == 201
+    return dict(created.json())
+
+
+def test_reward_plan_api_stays_within_the_budget_and_covers_the_flight(
+    client: TestClient, auth: dict[str, str]
+) -> None:
+    scenario = _scenario(client, auth)
+    plan = client.post(f"/api/v1/scenarios/{scenario['id']}/rewards", headers=auth, json={"budget_aed": 3000}).json()
+    assert plan["budget_aed"] == 3000
+    spent = sum(r["reward"]["cost_aed"] for r in plan["rows"] if r["reward"])
+    assert spent == plan["planned_spend_aed"] <= 3000
+    assert plan["passengers"] == len(plan["rows"]) > 0  # every passenger of the flight is considered
+    assert plan["rewarded"] == sum(1 for r in plan["rows"] if r["reward"])
+    assert plan["preference_model"]["kind"] in {"proxy rules", "trained model"}
+    assert plan["disruption"]["label"] in {"minor", "moderate", "major", "severe"}
+    assert plan["assumptions"]
+    bigger = client.post(
+        f"/api/v1/scenarios/{scenario['id']}/rewards", headers=auth, json={"budget_aed": 1_000_000}
+    ).json()
+    assert bigger["planned_spend_aed"] >= plan["planned_spend_aed"]
+    assert bigger["planned_spend_aed"] == bigger["ideal_spend_aed"]  # a generous budget buys the whole plan
+    again = client.post(f"/api/v1/scenarios/{scenario['id']}/rewards", headers=auth, json={"budget_aed": 3000}).json()
+    assert again["rows"] == plan["rows"]  # deterministic
+
+
+def test_reward_plan_api_never_repeats_what_the_care_plan_gives(client: TestClient, auth: dict[str, str]) -> None:
+    for kind in ("DELAY", "CANCEL"):
+        scenario = _scenario(client, auth, kind)
+        care = {(p["pnr"], p["customer_key"]): p["care"] for p in scenario["result"]["passengers"]}
+        plan = client.post(
+            f"/api/v1/scenarios/{scenario['id']}/rewards", headers=auth, json={"budget_aed": 1_000_000}
+        ).json()
+        for row in plan["rows"]:
+            given = care.get((row["pnr"], row["customer_key"]))
+            kind_given = row["reward"]["type"] if row["reward"] else None
+            if given and given["meals"] > 0:
+                assert kind_given != rw.MEAL
+            if given and given["hotel"]:
+                assert kind_given != rw.LOUNGE
+
+
+def test_reward_plan_api_validates_and_needs_a_sign_in(client: TestClient, auth: dict[str, str]) -> None:
+    scenario = _scenario(client, auth)
+    url = f"/api/v1/scenarios/{scenario['id']}/rewards"
+    assert client.post(url, headers=auth, json={"budget_aed": -1}).status_code == 422
+    assert client.post(url, headers=auth, json={"budget_aed": 10_000_000}).status_code == 422
+    assert client.post(url, headers=auth, json={}).status_code == 422
+    assert client.post(url, headers=auth, json={"budget_aed": 100, "extra": 1}).status_code == 422
+    assert client.post(url, json={"budget_aed": 100}).status_code == 401
+    unknown = "00000000-0000-0000-0000-000000000000"
+    assert (
+        client.post(f"/api/v1/scenarios/{unknown}/rewards", headers=auth, json={"budget_aed": 100}).status_code == 404
+    )
+    zero = client.post(url, headers=auth, json={"budget_aed": 0}).json()
+    assert zero["rewarded"] == 0
+    assert zero["planned_spend_aed"] == 0
+
+
+def test_reward_plan_approval_goes_to_the_audit_log(client: TestClient, auth: dict[str, str]) -> None:
+    scenario = _scenario(client, auth)
+    decision = client.post(
+        f"/api/v1/scenarios/{scenario['id']}/decisions",
+        headers=auth,
+        json={"target": "rewards:3000", "action": "APPROVE", "comment": "within the goodwill budget"},
+    )
+    assert decision.status_code == 201
+    logged = client.get(f"/api/v1/scenarios/{scenario['id']}/decisions", headers=auth).json()
+    assert [(d["target"], d["action"]) for d in logged] == [("rewards:3000", "APPROVE")]
+    assert logged[0]["decided_by"] == "pcu (PCU)"
+
+
+# ------------------------------------------------------------------------------ ingest stage 4 on the small fixture
+def test_stage_four_writes_a_labelled_model_and_the_history(tmp_path: Path) -> None:
+    from app.ml import reward_pref as rp
+    from tests.ops_fixture import write_ops
+
+    ops = write_ops(tmp_path)
+    assert len(rp.load_passengers(ops)) > 0
+    out = rp.run(ops)
+    assert out["offers"] > 0
+    card = json.loads((ops / "reward_model_card.json").read_text())
+    assert card["synthetic_training_data"] is True
+    assert "SIMULATED" in card["warning"]
+    assert (ops / "reward_history_synthetic.parquet").exists()
+    model = rp.RewardModel.load(ops)
+    assert model is not None
+    probs = model.accept(rp.load_passengers(ops)[:3], [(rw.MEAL, 50.0, 60.0)] * 3)
+    assert len(probs) == 3
+    assert all(0.0 < float(p) < 1.0 for p in probs)
+    assert rp.RewardModel.load(tmp_path / "nowhere") is None  # no model file: the plan falls back to the proxy rules
