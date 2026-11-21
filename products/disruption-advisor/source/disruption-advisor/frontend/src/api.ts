@@ -521,6 +521,21 @@ export interface RollingFold {
   [threshold: string]: ModelMetrics | string | number;
 }
 
+export interface ReliabilityBin {
+  from: number;
+  to: number;
+  flights: number;
+  predicted: number;
+  observed: number;
+}
+
+export interface ArrivalMetrics {
+  observed_rate: number;
+  auc: number;
+  brier: number;
+  climatology_brier: number;
+}
+
 export interface ModelCard {
   model: string;
   trained_at: string;
@@ -536,6 +551,8 @@ export interface ModelCard {
     connection_backtest: { slack: string; pairs: number; predicted: number; observed: number }[];
     classification?: Record<string, Classification>;
     rolling_monthly?: RollingFold[];
+    reliability_60?: ReliabilityBin[];
+    arrival_model_metrics?: Record<string, ArrivalMetrics>;
   };
   production?: {
     train: string;
@@ -544,6 +561,35 @@ export interface ModelCard {
   };
   connections?: { pairs: number; default_mct_minutes: number };
   assumptions: string[];
+}
+
+/** One block of a bundled model write-up (backend app/model_docs.py). */
+export type DocBlock =
+  | { type: "title" | "heading" | "paragraph" | "quote"; text: string }
+  | { type: "bullets"; items: string[] }
+  | { type: "table"; header: string[]; rows: string[][] };
+export interface ModelDocs {
+  delay_selection: DocBlock[];
+  reward_selection: DocBlock[];
+}
+export interface RewardModelCard {
+  synthetic_training_data: boolean;
+  warning: string;
+  assumed_behaviour: string[];
+  trained_at: string;
+  versions?: Record<string, string>;
+  features: string[];
+  categories: Record<string, string[]>;
+  history: { offers: number; passengers: number; train_offers: number; test_offers: number };
+  metrics_on_held_out_passengers: {
+    auc: number;
+    brier: number;
+    baseline_type_average: { auc: number; brier: number };
+    baseline_proxy_rules: { auc: number };
+    observed_acceptance_rate: number;
+    by_reward_type: Record<string, { offers: number; acceptance_rate: number; auc: number }>;
+    reliability?: ReliabilityBin[];
+  };
 }
 
 export interface TestDataField {
@@ -648,6 +694,8 @@ export const api = {
     post<RewardPlan>(`/api/v1/scenarios/${id}/rewards`, { budget_aed: budgetAed }),
   cascade: () => request<CascadeCheck>("/api/v1/risk/cascade"),
   modelCard: () => request<ModelCard>("/api/v1/risk/model"),
+  modelDocs: () => request<ModelDocs>("/api/v1/risk/model-docs"),
+  rewardModel: () => request<RewardModelCard>("/api/v1/risk/reward-model"),
   testDataSpec: () => request<TestDataSpec>("/api/v1/test-data/spec"),
   testData: () => request<TestDataStatus>("/api/v1/test-data"),
   uploadTestData: (flightsCsv: string, passengersCsv: string, commit: boolean) =>

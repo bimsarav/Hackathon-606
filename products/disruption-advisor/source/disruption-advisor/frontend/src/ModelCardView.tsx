@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type ModelCard, type ModelMetrics, errorText } from "./api";
 import { num } from "./format";
+import { ModelAnalysis } from "./ModelAnalysis";
 
 // ── tiny helpers ────────────────────────────────────────────────────────────
 
@@ -276,6 +277,8 @@ export function ModelCardView() {
           ))}
         </ul>
       </Expandable>
+
+      <ModelAnalysis card={card} />
 
     </article>
   );

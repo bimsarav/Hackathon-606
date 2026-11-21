@@ -85,6 +85,7 @@ Logs are written to `logs/`.
 | `/api/v1/risk/model` | Model card: training data, features, test metrics against the baseline |
 | `/api/v1/risk/cascade` | The last month's cascade check: the knock-on formula against real departures, with all pairs (read-only) |
 | `/api/v1/scenarios/{id}/rewards` | Goodwill reward plan for the passengers of the scenario's flight within a budget (phase 5, [design](docs/architecture/REWARDS_DESIGN.md)); computed on request, approved through `/decisions` |
+| `/api/v1/risk/model-docs`, `/api/v1/risk/reward-model` | Evaluator only: the model comparison and tuning write-ups and the reward model card shown in the Model Card view |
 | `/api/v1/test-data` (+ `/spec`) | Evaluator test data: file description, check, add and remove a few flights with their passengers ([ADR 0013](docs/architecture/adr/0013-test-data-upload.md)) |
 | `/api/v1/scenarios/{id}/strategy` | Switch a delay scenario's strategy (lowest cost, protect passengers, least delay); the recommendation follows (phase 3) |
 | `/api/v1/agent/runs` (+ `/{id}`) | Start an agent run on a flight and follow its steps; the result is saved as a scenario for approval (phase 3, [agent card](docs/testing/agent-card.md)) |

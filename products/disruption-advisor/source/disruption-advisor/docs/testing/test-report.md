@@ -212,3 +212,11 @@ The new Playwright tests have not been run locally (no Playwright or Docker on t
   launcher redesign (92c807c) removed; the spec was last changed in b029ef0. The test data page has no browser test. The spec needs rewriting for the new sidebar UI.
 - Frontend unit tests after pulling the teammates' newest UI commits (e0851e3, 2a06d3f): 4 of 33 fail (cancel passenger table, watchlist panel switch, two strategy tests); they test the old tabs
   and buttons those commits removed. Not part of the deployed build and not changed by this release (33/33 before the pull).
+
+## Model Card view: all model evidence (21 Nov 2026, local, not yet deployed)
+- New sections under the delay model overview, all collapsible: calibration (reliability of P(60+)), alert cut-offs (true and false alarms, top-10% lift, cut-off sweep),
+  month-by-month results, arrival-delay model, model comparison and tuning (delay), reward preference model (synthetic-data warning, scores on held-out passengers by reward type,
+  assumed behaviour, comparison and tuning), cascade check summary, and how uploaded test flights are scored. Evaluator role only (the endpoints answer 403 to OCC and PCU).
+- `backend/tests/test_model_docs.py` (4): the bundled write-ups in `app/data/model_docs` equal `docs/testing/*selection.md`, markdown to blocks, the real tables parse, evaluator-only access.
+  `frontend/src/ModelAnalysis.test.tsx` (2). Checked against the real local data: model-docs 14 and 15 blocks, reward card AUC 0.702, model card carries all fields. Not looked at in a browser.
+- Keep the copies in sync: edit `docs/testing/model-selection.md` or `reward-model-selection.md`, then copy to `backend/app/data/model_docs/` (`delay-model-selection.md`, `reward-model-selection.md`); the test fails if they differ.

@@ -10,7 +10,7 @@ from fastapi import FastAPI
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app import advisor, agent_api, health, risk, sample_data
+from app import advisor, agent_api, health, model_docs, risk, sample_data
 from app.config import Settings, get_settings
 from app.engine.explain import Explainer
 from app.engine.store import OpsStore
@@ -76,4 +76,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(risk.router)
     app.include_router(agent_api.router)
     app.include_router(sample_data.router)
+    app.include_router(model_docs.router)
     return app
