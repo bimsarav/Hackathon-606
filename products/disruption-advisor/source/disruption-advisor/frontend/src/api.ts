@@ -329,36 +329,6 @@ export interface ConnectionRisk {
   misconnect_risk: number;
 }
 
-export interface LastWeekRow {
-  flight_id: string;
-  flight_number: string | null;
-  origin: string;
-  destination: string;
-  std: string;
-  p_15: number;
-  p_60: number;
-  band: "high" | "medium" | "low";
-  actual_delay_minutes: number;
-  outcome: "hit" | "false_alarm" | "missed";
-}
-
-export interface LastWeek {
-  from: string;
-  to: string;
-  trained_on: string;
-  flights: number;
-  late_15_rate: number;
-  late_60_rate: number;
-  auc_15: number | null;
-  auc_60: number | null;
-  brier_60: number;
-  flag_60: ConfusionPoint;
-  flag_15: ConfusionPoint;
-  high_band: { flights: number; late_60: number };
-  rows: LastWeekRow[];
-  rows_total: number;
-}
-
 export interface CascadeRow {
   date: string;
   tail: string;
@@ -586,7 +556,6 @@ export const api = {
   rewards: (id: string, budgetAed: number) =>
     post<RewardPlan>(`/api/v1/scenarios/${id}/rewards`, { budget_aed: budgetAed }),
   cascade: () => request<CascadeCheck>("/api/v1/risk/cascade"),
-  lastWeek: () => request<LastWeek>("/api/v1/risk/last-week"),
   modelCard: () => request<ModelCard>("/api/v1/risk/model"),
   message: (id: string, customerKey: string) =>
     post<{ text: string; source: string }>(`/api/v1/scenarios/${id}/messages`, { customer_key: customerKey }),

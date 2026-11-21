@@ -748,25 +748,6 @@ tr.clickable.selected {
   display: flex; justify-content: space-between; align-items: flex-end; padding: 1px 3px; font: 600 10px var(--mono); color: var(--muted); z-index: 1; }
 .rb-gnd.short { border-color: var(--bad); color: var(--bad); }
 
-.last-week {
-  margin-top: 1rem;
-}
-.last-week h2 {
-  font-size: 1rem;
-  margin: 0 0 0.5rem;
-}
-.last-week-kpis,
-.last-week-list {
-  list-style: none;
-  padding: 0;
-  margin: 0.5rem 0;
-  display: grid;
-  gap: 0.35rem;
-}
-.last-week-kpis strong {
-  font-size: 1.05rem;
-}
-
 .reward-form {
   display: flex;
   gap: 0.5rem;

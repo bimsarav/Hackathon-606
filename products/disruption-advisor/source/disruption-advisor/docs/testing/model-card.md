@@ -49,9 +49,6 @@ Only information known 7 days ahead. No actual times of the day itself are used.
 
 > The results below are from the production run before tuning (T-510). The tuned model's numbers are in [model-selection.md](model-selection.md) and replace these at the next redeploy.
 
-## Last-week check
-The watchlist tab shows the last 7 days of flights predicted by a model trained only on the flights before that week, against what really happened (`last_week.json`, `GET /api/v1/risk/last-week`).
-
 ## Results (production run on the server, verified 2026-11-21)
 Train 2026-01-01 .. 2026-10-21 (57,104 flights); test 2026-10-21 .. 2026-11-18 (5,956 flights).
 

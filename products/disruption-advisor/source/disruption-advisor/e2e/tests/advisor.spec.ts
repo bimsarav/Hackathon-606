@@ -119,14 +119,12 @@ test("phase 3: the agent investigates a flight and its recommendation opens for 
   await expect(page.getByRole("heading", { name: /Agent recommendation/ })).toBeVisible();
 });
 
-test("phase 2: the 7-day tab shows last week's predictions against what happened, instead of the scenario launcher", async ({
+test("phase 2: the 7-day tab shows last month's cascade check instead of the scenario launcher", async ({
   page,
 }) => {
   await signIn(page);
   await expect(page.getByRole("heading", { name: "New scenario" })).toBeVisible();
   await page.getByRole("button", { name: /Delay watchlist/ }).click();
-  await expect(page.getByRole("heading", { name: "Last week: predicted vs actual" })).toBeVisible();
-  await expect(page.getByText(/of flights called right/)).toBeVisible();
   await expect(page.getByRole("heading", { name: "Last month: cascade formula vs actual" })).toBeVisible();
   await expect(page.getByText("Within ±15 min").first()).toBeVisible();
   await page.getByRole("button", { name: "Expand the full view" }).click();

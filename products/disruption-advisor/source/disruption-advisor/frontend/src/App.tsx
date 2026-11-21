@@ -14,7 +14,6 @@ import { CancelView } from "./CancelView";
 import { DelayView } from "./DelayView";
 import { Launcher } from "./Launcher";
 import { CascadePanel } from "./CascadePanel";
-import { LastWeekPanel } from "./LastWeekPanel";
 import { WatchlistView } from "./WatchlistView";
 import { utc } from "./format";
 
@@ -249,7 +248,6 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
               {metaError}
             </p>
           )}
-          {view === "watchlist" && <LastWeekPanel />}
           {view === "watchlist" && <CascadePanel />}
           {/* Hidden, not unmounted, on the 7-day view: the slider and suggestions keep their state. */}
           <div hidden={view === "watchlist"}>

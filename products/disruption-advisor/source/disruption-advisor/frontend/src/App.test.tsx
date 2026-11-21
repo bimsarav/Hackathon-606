@@ -7,7 +7,6 @@ import { CancelView } from "./CancelView";
 import { CarrierTail } from "./CarrierTail";
 import { DelayView } from "./DelayView";
 import { CascadePanel } from "./CascadePanel";
-import { LastWeekPanel } from "./LastWeekPanel";
 import { PassengerTabs } from "./PassengerTabs";
 import { RewardPanel } from "./RewardPanel";
 import { WatchlistView } from "./WatchlistView";
@@ -174,21 +173,6 @@ describe("WatchlistView", () => {
     expect(await screen.findByText("37%")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: /Analyse a 45 min delay/ }));
     expect(onAnalyse).toHaveBeenCalledWith(flight.flight_id, 45);
-  });
-
-  it("shows last week's predictions against what really happened", async () => {
-    const point = { cutoff: 0.15, true_positive: 8, false_positive: 12, false_negative: 2, true_negative: 178,
-      precision: 0.4, recall: 0.8, f1: 0.53, accuracy: 0.93, specificity: 0.94, flagged_share: 0.1 };
-    stubFetch(() => ({ from: "2026-11-11", to: "2026-11-18", trained_on: "flights before 2026-11-11 (60000)", flights: 200,
-      late_15_rate: 0.3, late_60_rate: 0.05, auc_15: 0.79, auc_60: 0.75, brier_60: 0.05, flag_60: point,
-      flag_15: { ...point, accuracy: 0.71 }, high_band: { flights: 5, late_60: 4 }, rows_total: 2,
-      rows: [{ flight_id: "G9519_202611150200", flight_number: "G9519", origin: "MCT", destination: "SHJ",
-        std: "2026-11-15T02:00:00", p_15: 0.5, p_60: 0.33, band: "high", actual_delay_minutes: 140, outcome: "hit" }] }));
-    render(<LastWeekPanel />);
-    expect(await screen.findByText("93%")).toBeInTheDocument();
-    expect(screen.getByText("80%")).toBeInTheDocument();
-    expect(screen.getByText("G9519 MCT→SHJ")).toBeInTheDocument();
-    expect(screen.getByText(/actual 140 min/)).toBeInTheDocument();
   });
 
   it("recommends rewards within a budget and shows what the plan costs", async () => {
