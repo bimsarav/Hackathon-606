@@ -91,6 +91,22 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
             : worst.key !== best.key ? `saves ${aed(worst.cost_aed - best.cost_aed)} vs worst option` : "only feasible option"} />
       </section>
 
+      {/* The decision comes first: approve or reject the option on screen (recorded with who and when). */}
+      <section className="decision-top" aria-label="Decision">
+        <p className="small decision-top-label">
+          <strong>{override ? "Selected (override):" : "Recommended:"}</strong> {shown.label}
+          <span className="muted"> · change it in Recovery options below</span>
+        </p>
+        {override && (
+          <p className="note">
+            You selected an option that is not the recommendation. Approving it is recorded as an override and needs a
+            reason in the comment.
+          </p>
+        )}
+        <DecisionBar scenario={scenario} target={`option:${shown.key}`}
+          label={override ? "selected option (override)" : "recommended option"} requireComment={override} />
+      </section>
+
       <nav className="glance" aria-label="On this page">
         {result.strategies && result.strategy && (
           <Tile label="Strategy" value={STRATEGY_LABEL[result.strategy]} sub={`picks ${best.label}`} onClick={() => reveal("strategies")} />
@@ -175,14 +191,6 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
             {selectError}
           </p>
         )}
-        {override && (
-          <p className="note">
-            You selected an option that is not the recommendation. Approving it is recorded as an override and needs a
-            reason in the comment.
-          </p>
-        )}
-        <DecisionBar scenario={scenario} target={`option:${shown.key}`}
-          label={override ? "selected option (override)" : "recommended option"} requireComment={override} />
       </section>
       </Fold>
 
