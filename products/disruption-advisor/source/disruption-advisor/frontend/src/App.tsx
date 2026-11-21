@@ -13,6 +13,7 @@ import {
 import { CancelView } from "./CancelView";
 import { DelayView } from "./DelayView";
 import { Launcher } from "./Launcher";
+import { ModelCardView } from "./ModelCardView";
 import { WatchlistView } from "./WatchlistView";
 import { utc } from "./format";
 
@@ -20,8 +21,8 @@ const STORAGE_KEY = "disruption-advisor-session";
 const OPEN_KEY = "disruption-advisor-open-scenario";
 const VIEW_KEY = "disruption-advisor-view";
 const AGENT_KEY = "disruption-advisor-agent-run";
-type View = "scenario" | "watchlist" | "agent";
-const VIEWS: View[] = ["scenario", "watchlist", "agent"];
+type View = "scenario" | "watchlist" | "agent" | "model";
+const VIEWS: View[] = ["scenario", "watchlist", "agent", "model"];
 
 function recall(key: string): string | null {
   try {
@@ -302,6 +303,10 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
               onClick={() => setView("agent")}>
               Agent
             </button>
+            <button type="button" className={`tab ${view === "model" ? "active" : ""}`} aria-pressed={view === "model"}
+              onClick={() => setView("model")}>
+              Model
+            </button>
           </nav>
           {view === "watchlist" && meta && (
             <WatchlistView
@@ -363,6 +368,7 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
           {view === "scenario" && scenario && meta && scenario.result.type === "CANCEL" && (
             <CancelView scenario={scenario} result={scenario.result} meta={meta} onUpdate={setScenario} />
           )}
+          {view === "model" && <ModelCardView />}
         </main>
       </div>
     </>
