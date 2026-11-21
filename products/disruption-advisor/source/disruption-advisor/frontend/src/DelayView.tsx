@@ -76,7 +76,7 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
       <Explanation text={result.explanation.text} source={result.explanation.source} />
 
       <section aria-labelledby="options-title">
-        <h2 id="options-title">Recovery options compared</h2>
+        <h2 id="options-title">Recovery options</h2>
         <p className="small muted">Click an option to see its flights, passengers and cost. {result.strategies
           ? "The recommendation is the pick of the active strategy."
           : "The recommendation is the cheapest."}</p>

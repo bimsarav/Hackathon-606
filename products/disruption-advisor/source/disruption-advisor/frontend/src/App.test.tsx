@@ -114,7 +114,7 @@ describe("roles", () => {
   }
 
   const navNames = () =>
-    within(screen.getByRole("navigation")).getAllByRole("button").map((b) => b.textContent?.replace(/^[^A-Za-z]+/, "").trim());
+    within(screen.getByRole("complementary", { name: "Navigation" })).getAllByRole("button").map((b) => b.textContent?.replace(/^[^A-Za-z]+/, "").trim());
 
   it("shows the evaluator every view, including Model and Test data", async () => {
     await signIn("EVALUATOR");

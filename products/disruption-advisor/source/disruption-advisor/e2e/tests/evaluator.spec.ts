@@ -26,7 +26,7 @@ async function signInAs(page: Page, name: string, secret: string) {
 
 test("the OCC role does not see the Model Card and Test data views, and the API refuses them", async ({ page, request }) => {
   await signInAs(page, user, password);
-  const nav = page.getByRole("navigation");
+  const nav = page.getByRole("complementary", { name: "Navigation" });
   await expect(nav.getByRole("button", { name: "Delay Watchlist" })).toBeVisible();
   await expect(nav.getByRole("button", { name: "Model Card" })).toHaveCount(0);
   await expect(nav.getByRole("button", { name: "Test data" })).toHaveCount(0);
@@ -41,7 +41,7 @@ test("the evaluator reads the model evidence, uploads two flights, analyses one 
   test.skip(!evalUser, "set E2E_EVAL_USER and E2E_EVAL_PASSWORD (an EVALUATOR account)");
   test.setTimeout(180_000);
   await signInAs(page, evalUser, evalPassword);
-  const nav = page.getByRole("navigation");
+  const nav = page.getByRole("complementary", { name: "Navigation" });
 
   await nav.getByRole("button", { name: "Model Card" }).click();
   await expect(page.getByRole("heading", { name: "Model overview" })).toBeVisible();
@@ -73,7 +73,7 @@ test("the evaluator reads the model evidence, uploads two flights, analyses one 
     await page.locator("#ff-flight").fill("G9981");
     await page.getByRole("button", { name: "Search", exact: true }).click();
     await page.locator(".preset-list .preset").first().click();
-    await expect(page.getByRole("heading", { name: "Recovery options compared" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Recovery options", exact: true })).toBeVisible();
     await expect(page.locator("h1")).toContainText("G9981");
   } finally {
     // Always leave the system as found: wait for the page to say what is loaded, then remove it.
@@ -88,7 +88,7 @@ test("the evaluator reads the model evidence, uploads two flights, analyses one 
 test("a bad flights sheet is rejected with the row and column, and nothing is added", async ({ page }) => {
   test.skip(!evalUser, "set E2E_EVAL_USER and E2E_EVAL_PASSWORD (an EVALUATOR account)");
   await signInAs(page, evalUser, evalPassword);
-  await page.getByRole("navigation").getByRole("button", { name: "Test data" }).click();
+  await page.getByRole("complementary", { name: "Navigation" }).getByRole("button", { name: "Test data" }).click();
   const bad = FLIGHTS.replace("KHI,SHJ", "KHIX,SHJ");
   await page.getByLabel("Upload flights sheet").setInputFiles({ name: "flights.csv", mimeType: "text/csv", buffer: Buffer.from(bad) });
   await page.getByLabel("Upload passengers sheet").setInputFiles({ name: "passengers.csv", mimeType: "text/csv", buffer: Buffer.from(PASSENGERS) });

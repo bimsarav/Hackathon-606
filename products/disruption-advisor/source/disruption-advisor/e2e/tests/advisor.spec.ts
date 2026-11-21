@@ -24,7 +24,7 @@ test("scenario A: a delay is assessed, options compared, recommendation approved
   await signIn(page);
   await page.getByRole("button", { name: "Flight Delay", exact: true }).click();
   await page.locator(".preset-list .preset").first().click();
-  await expect(page.getByRole("heading", { name: "Recovery options compared" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Recovery options", exact: true })).toBeVisible();
   const recommended = page.locator("tr.recommended");
   await expect(recommended).toHaveCount(1);
   await expect(page.getByRole("heading", { name: /Why this recommendation/ })).toBeVisible();
@@ -82,7 +82,7 @@ test("phase 2: delay watchlist ranks flights, shows reasons and opens a delay sc
   await table.locator("tbody tr.clickable").first().locator("button.link").click();
   await expect(page.getByRole("heading", { name: "Why this flight" })).toBeVisible();
   await page.getByRole("button", { name: /^Analyse a/ }).click();
-  await expect(page.getByRole("heading", { name: "Recovery options compared" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Recovery options", exact: true })).toBeVisible();
 });
 
 test("phase 3: strategies switch the recommendation", async ({ page }) => {
@@ -113,7 +113,7 @@ test("phase 3: the agent investigates a flight and its recommendation opens for 
   await expect(page.getByRole("heading", { name: /^Recommendation/ })).toBeVisible();
   await expect(page.locator(".agent-panel .reasons li").first()).toBeVisible();
   await page.getByRole("button", { name: "Open scenario to review and approve" }).click();
-  await expect(page.getByRole("heading", { name: "Recovery options compared" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Recovery options", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: /Agent recommendation/ })).toBeVisible();
 });
 

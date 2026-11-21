@@ -138,7 +138,7 @@ export function RotationBoard({ option, disruptedId, meta }: { option: RecoveryO
   return (
     <section aria-labelledby="rotation-title" className="rb">
       <div className="rb-head">
-        <h2 id="rotation-title">How the aircraft change: {option.label}</h2>
+        <h2 id="rotation-title">Flight Board: {option.label}</h2>
         <label className="small">
           Show{" "}
           <select value={spanIdx} onChange={(e) => setSpanIdx(Number(e.target.value))} aria-label="Time span">
