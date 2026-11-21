@@ -150,7 +150,7 @@ describe("strategy comparison", () => {
     const res = base.result as DelayResult;
     const scenario = delayScenario({ options: res.options.map((o) => (o.key === res.recommended_key ? { ...o, crew } : o)) });
     render(<DelayView scenario={scenario} result={scenario.result as DelayResult} meta={meta} onUpdate={() => {}} />);
-    await userEvent.click(screen.getByRole("button", { name: "Crew duty (FDP)", exact: true }));
+    await userEvent.click(screen.getByRole("button", { name: /^Crew duty \(FDP\)$/ }));
     const table = screen.getByRole("table", { name: "Crew duty by flight" });
     expect(within(table).getByText("G9520")).toBeInTheDocument();
     expect(within(table).getByText("20 min")).toBeInTheDocument();
