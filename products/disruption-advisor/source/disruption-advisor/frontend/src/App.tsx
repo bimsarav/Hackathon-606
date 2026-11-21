@@ -1,4 +1,4 @@
-import { type FormEvent, useCallback, useEffect, useState } from "react";
+import { type FormEvent, Fragment, useCallback, useEffect, useState } from "react";
 import { AgentRunsList, AgentRunView, agentStartError } from "./AgentRunView";
 import {
   type AgentRunRequest,
@@ -64,6 +64,8 @@ export function App() {
 
   function signIn(s: Session) {
     setToken(s.token);
+    // A fresh sign-in starts on the home page (Flight Delay) with no earlier search open.
+    for (const key of [VIEW_KEY, OPEN_KEY, AGENT_KEY]) remember(key, null);
     try {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(s));
     } catch {
@@ -247,9 +249,18 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
   const [fromRecent, setFromRecent] = useState(false);
   const isEvaluator = session.role === "EVALUATOR";
 
+  // Moving to a page from the menu starts it clean: no earlier search, flight or agent run carried over.
+  const [visit, setVisit] = useState(0);
   function navigate(v: View) {
     setView(v);
     setFromRecent(false);
+    setScenario(null);
+    setDelaySubmitted(false);
+    setCancelSubmitted(false);
+    setLoad({ kind: "idle" });
+    setAgentRunId(null);
+    setAgentStart({ kind: "idle" });
+    setVisit((n) => n + 1);
   }
   const [view, setView] = useState<View>(() => {
     const saved = recall(VIEW_KEY) as View | null;
@@ -376,6 +387,7 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
 
         <main id="main" aria-live="polite" aria-busy={load.kind === "busy"}>
           <Breadcrumb view={view} scenario={scenario} onView={navigate} fromRecent={fromRecent} onRecent={() => navigate("recent")} />
+          <Fragment key={visit}>
 
           {/* ── Flight Delay ─────────────────────────────── */}
           {view === "delay" && (
@@ -561,7 +573,7 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
               </ul>
             </section>
           )}
-
+          </Fragment>
         </main>
       </div>
     </>

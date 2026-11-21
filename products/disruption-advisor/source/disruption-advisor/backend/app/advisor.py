@@ -17,7 +17,7 @@ from app.db import SessionDep
 from app.engine import rewards
 from app.engine import strategy as strategies
 from app.engine.priority import DEFAULT_WEIGHTS, LABELS
-from app.engine.scenarios import Context, ScenarioError, analyse_cancellation, analyse_delay, presets
+from app.engine.scenarios import Context, ScenarioError, analyse_cancellation, analyse_delay, explain_now, presets
 from app.models import Decision, Scenario
 from app.schemas import (
     ChooseStrategy,
@@ -173,6 +173,20 @@ def _get(session: SessionDep, scenario_id: uuid.UUID) -> Scenario:
 @router.get("/scenarios/{scenario_id}")
 def get_scenario(scenario_id: uuid.UUID, session: SessionDep, _: CurrentUser) -> ScenarioRead:
     return _read(_get(session, scenario_id))
+
+
+@router.post("/scenarios/{scenario_id}/explanation")
+def explain_scenario(scenario_id: uuid.UUID, request: Request, session: SessionDep, _: CurrentUser) -> dict[str, Any]:
+    """The AI wording of the "Why?" text, fetched after the analysis is on screen (the analysis returns the
+    template first so it does not wait for the AI). Saved on the scenario, so it is asked for once."""
+    scenario = _get(session, scenario_id)
+    current = dict(scenario.result.get("explanation") or {})
+    if not current.get("pending"):
+        return current
+    done = jsonable_encoder(explain_now(_context(request), scenario.kind, current))
+    scenario.result = {**scenario.result, "explanation": done}
+    session.commit()
+    return dict(done)
 
 
 @router.post("/scenarios/{scenario_id}/reprioritise")

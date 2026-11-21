@@ -21,7 +21,7 @@ from app.engine import priority, rebooking
 from app.engine import strategy as strategies
 from app.engine.care import CareRules, care_for
 from app.engine.cost import CostModel, care_cost, eu261_compensation_eur, great_circle_km
-from app.engine.explain import Explainer, template_message
+from app.engine.explain import Explainer, template_cancellation, template_message, template_recommendation
 from app.engine.network import (
     RotationPlan,
     TurnTimes,
@@ -421,6 +421,23 @@ def _merge_payloads(parts: list[tuple[str, dict[str, Any]]]) -> dict[str, Any]:
     return {"passengers": rows, "tier_counts": tiers, "rebooking": reb}
 
 
+def _later(ctx: Context, kind: str, facts: dict[str, Any]) -> dict[str, Any]:
+    """The template text now, so the analysis returns in about 2 s instead of waiting about 6 s for the AI.
+    With AI enabled, ``pending`` asks the page to fetch the AI wording next (POST /scenarios/{id}/explanation),
+    using the kept facts (counts, stations, times and reasons only: no names, PNRs or customer keys)."""
+    text = template_recommendation(facts) if kind == "DELAY" else template_cancellation(facts)
+    return {"text": text, "source": "template", "pending": ctx.explainer.enabled, "facts": facts}
+
+
+def explain_now(ctx: Context, kind: str, explanation: dict[str, Any]) -> dict[str, Any]:
+    """The AI wording for a kept explanation (falls back to the template when the AI is off or fails)."""
+    facts = explanation.get("facts") or {}
+    if not facts:
+        return {**explanation, "pending": False}
+    said = ctx.explainer.recommendation(facts) if kind == "DELAY" else ctx.explainer.cancellation(facts)
+    return {"text": said.text, "source": said.source, "pending": False, "facts": facts}
+
+
 def analyse_delay(
     ctx: Context,
     flight_id: str,
@@ -515,7 +532,6 @@ def analyse_delay(
         "passengers_without_seat": (pax_plan.get("rebooking") or {}).get("unprotected", 0),
         "hotel_rooms_needed": (pax_plan.get("rebooking") or {}).get("hotel_rooms", 0),
     }
-    narrative = ctx.explainer.recommendation(facts)
     return {
         "type": "DELAY",
         "flight": _leg_json(leg),
@@ -525,7 +541,7 @@ def analyse_delay(
         "strategies": [{"key": k, "label": v[0], "pick": picks[k]} for k, v in strategies.STRATEGIES.items()],
         "recommended_key": best["key"],
         "selected_key": chosen["key"],
-        "explanation": {"text": narrative.text, "source": narrative.source},
+        "explanation": _later(ctx, "DELAY", facts),
         "misconnections": [vars(c) for c in missed],
         **pax_plan,
         "assumptions": _assumptions(ctx),
@@ -711,11 +727,10 @@ def analyse_cancellation(ctx: Context, flight_id: str, weights: dict[str, float]
         "then passengers with onward connections; staff travel last",
         "estimated_cost_aed": sum(cost.values()),
     }
-    narrative = ctx.explainer.cancellation(facts)
     return {
         "type": "CANCEL",
         "flight": _leg_json(leg),
-        "explanation": {"text": narrative.text, "source": narrative.source},
+        "explanation": _later(ctx, "CANCEL", facts),
         "cost_aed": cost,
         "cost_total_aed": sum(cost.values()),
         "eu261_per_passenger_eur": rebooked["eu"],
