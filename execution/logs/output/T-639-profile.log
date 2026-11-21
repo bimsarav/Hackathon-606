@@ -1,0 +1,43 @@
+{"path": "/data/ops", "test_data": true, "event": "ops_data_loaded", "level": "info", "logger": "app.main", "timestamp": "2026-11-21T18:45:47.299819Z"}
+{"event": "HTTP Request: POST https://api.anthropic.com/v1/messages \"HTTP/1.1 200 OK\"", "level": "info", "logger": "httpx2", "timestamp": "2026-11-21T18:45:54.984819Z"}
+{"event": "HTTP Request: POST https://api.anthropic.com/v1/messages \"HTTP/1.1 200 OK\"", "level": "info", "logger": "httpx2", "timestamp": "2026-11-21T18:46:03.306520Z"}
+total 8.27
+         286362 function calls (286278 primitive calls) in 8.256 seconds
+   Ordered by: cumulative time
+   List reduced from 771 to 35 due to restriction <35>
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.002    0.002    8.270    8.270 /app/app/engine/scenarios.py:424(analyse_delay)
+        1    0.000    0.000    6.112    6.112 /app/app/engine/explain.py:77(recommendation)
+        1    0.000    0.000    6.112    6.112 /app/app/engine/explain.py:45(_ask)
+        1    0.000    0.000    6.112    6.112 /app/.venv/lib/python3.14/site-packages/anthropic/_utils/_utils.py:260(wrapper)
+        1    0.000    0.000    6.112    6.112 /app/.venv/lib/python3.14/site-packages/anthropic/resources/beta/messages/messages.py:1463(create)
+        1    0.000    0.000    6.112    6.112 /app/.venv/lib/python3.14/site-packages/anthropic/_base_client.py:1673(post)
+        1    0.000    0.000    6.111    6.111 /app/.venv/lib/python3.14/site-packages/anthropic/_base_client.py:1216(request)
+        1    0.000    0.000    6.111    6.111 /app/.venv/lib/python3.14/site-packages/anthropic/_base_client.py:1252(_request)
+        1    0.000    0.000    6.110    6.110 /app/.venv/lib/python3.14/site-packages/anthropic/_base_client.py:1414(_attempt_request)
+        1    0.000    0.000    6.109    6.109 /app/.venv/lib/python3.14/site-packages/httpx2/_client.py:943(send)
+        1    0.000    0.000    6.108    6.108 /app/.venv/lib/python3.14/site-packages/httpx2/_client.py:990(_send_handling_auth)
+        1    0.000    0.000    6.108    6.108 /app/.venv/lib/python3.14/site-packages/httpx2/_client.py:1024(_send_handling_redirects)
+        1    0.000    0.000    6.108    6.108 /app/.venv/lib/python3.14/site-packages/httpx2/_client.py:1059(_send_single_request)
+        1    0.000    0.000    6.107    6.107 /app/.venv/lib/python3.14/site-packages/httpx2/_transports/default.py:222(handle_request)
+        1    0.000    0.000    6.107    6.107 /app/.venv/lib/python3.14/site-packages/httpcore2/_sync/connection_pool.py:192(handle_request)
+        1    0.000    0.000    6.107    6.107 /app/.venv/lib/python3.14/site-packages/httpcore2/_sync/connection.py:69(handle_request)
+        1    0.000    0.000    6.107    6.107 /app/.venv/lib/python3.14/site-packages/httpcore2/_sync/http11.py:63(handle_request)
+        5    0.000    0.000    6.106    1.221 /app/.venv/lib/python3.14/site-packages/httpcore2/_sync/http11.py:194(_receive_event)
+        1    0.000    0.000    6.106    6.106 /app/.venv/lib/python3.14/site-packages/httpcore2/_sync/http11.py:160(_receive_response_headers)
+        4    0.000    0.000    6.106    1.526 /app/.venv/lib/python3.14/site-packages/httpcore2/_backends/sync.py:124(read)
+        4    0.000    0.000    6.106    1.526 /usr/local/lib/python3.14/ssl.py:1289(recv)
+        4    0.000    0.000    6.106    1.526 /usr/local/lib/python3.14/ssl.py:1140(read)
+        4    6.106    1.526    6.106    1.526 {method 'read' of '_ssl._SSLSocket' objects}
+      904    1.823    0.002    1.827    0.002 /app/app/engine/store.py:176(query)
+       22    0.010    0.000    1.480    0.067 /app/app/engine/scenarios.py:130(_option_kpis)
+       24    0.039    0.002    1.029    0.043 /app/app/engine/passengers.py:40(connections_at_risk)
+        5    0.005    0.001    0.602    0.120 /app/app/engine/scenarios.py:359(_option_passengers)
+       29    0.000    0.000    0.564    0.019 /app/app/engine/store.py:274(passengers_on)
+       22    0.005    0.000    0.440    0.020 /app/app/engine/scenarios.py:212(_misconnect_goodwill)
+        5    0.004    0.001    0.417    0.083 /app/app/engine/scenarios.py:535(_reaccommodate_misconnects)
+      584    0.002    0.000    0.336    0.001 /app/app/engine/store.py:294(mct_minutes)
+       24    0.000    0.000    0.318    0.013 /app/app/engine/store.py:283(onward_segments)
+        3    0.000    0.000    0.191    0.064 /app/app/engine/scenarios.py:476(<genexpr>)
+        2    0.001    0.000    0.191    0.095 /app/app/engine/scenarios.py:308(_with_holds)
+        2    0.001    0.000    0.181    0.090 /app/app/engine/scenarios.py:592(_rebook_cancelled)

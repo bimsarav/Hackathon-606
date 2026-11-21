@@ -1,0 +1,24 @@
+== test flight G9406_202611212325
+   baseline: seats 170, listed 170, search booked 170, delay misconnects 154, rewards 170, 7-day connections 19
+PASS round 1 saved  [HTTP 200]
+PASS seats sold reduced by 3 and increased by 1  [170 -> 168]
+PASS passenger list: 3 removed, 1 added  [170 -> 168]
+PASS flight search shows the new booked count  [170 -> 168]
+PASS rewards list: removed passengers gone, added one in  [170 -> 168]
+FAIL delay analysis passengers follow the edit  [misconnects 154 -> 152]
+PASS delay analysis booked count follows the edit  [170 -> 168]
+PASS cancellation: passengers to rebook follow the edit  [170 -> 168]
+FAIL 7-day prediction: connecting passengers list drops removed passengers  [19 -> 19]
+FAIL 7-day prediction: connecting-passenger count follows the edit  [167 -> 167]
+PASS round 2: earlier removals still removed
+PASS round 2: added passenger still there, once
+PASS round 2: seats and search agree  [167 / 167]
+PASS round 2: rewards exclude all 4 removed  [167]
+PASS round 3 saved (one hour later, capacity = seats sold)  [HTTP 200 ]
+PASS search shows the new departure time  [2026-11-21T23:25:00 -> 2026-11-21T00:25:00]
+PASS delay analysis result changes with the new schedule  [misconnects 154 -> 0, best cost 118300 -> 127850]
+FAIL 7-day delay prediction changes with the edits  [P(>=15m) None -> None]
+FAIL watchlist row follows the edit (connecting passengers, expected misconnects)  [167 -> 167]
+PASS reset restores seats, passengers and search  [170 / 170]
+PASS reset restores the delay analysis
+== 16/21 passed
