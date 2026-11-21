@@ -10,8 +10,9 @@ Disruption Advisor helps the Operations Control Centre (OCC) and the Passenger C
 
 It only recommends. A person approves or rejects each action, and every decision is audited.
 
-- **Status:** Phase 1 (MVP) deployed and verified on 20 Nov 2026, including a server reboot test. Phase 2 (Predict) deployed and verified on 21 Nov 2026; its reboot check was skipped by user decision. Phase 3 (Agent and what-if) deployed and verified on 21 Nov 2026 (smoke and Playwright on the server); no reboot test was run for it. The demo runs over plain HTTP with no automated database backup; HTTPS and backups are phase 6, which needs approval.
-- **Demo URL:** http://92.5.154.198:8888 (demo sign-in for the OCC and PCU roles is shared separately)
+- **Status:** Phase 1 (MVP) deployed and verified on 20 Nov 2026, including a server reboot test. Phase 2 (Predict) deployed and verified on 21 Nov 2026; its reboot check was skipped by decision. Phase 3 (Agent and what-if) deployed and verified on 21 Nov 2026 (smoke and Playwright on the server); no reboot test was run for it. The demo runs over plain HTTP with no automated database backup; HTTPS and backups are phase 6, which needs approval.
+- **Demo:** UI http://92.5.154.198:8080; API http://92.5.154.198:8888/api/... (OpenAPI docs at /api/docs). Both are plain HTTP; demo sign-ins are shared separately.
+- **Roles:** as of now the distinct roles are **OCC** and **Evaluator** (the Evaluator also sees the Model Card and Test data views). The **PCU** role has the same access as OCC; only the audit trail records the role name.
 - **Repository:** `<repository-url>`
 
 ## Business problem and goals
@@ -38,7 +39,7 @@ Today OCC, crew control and the PCU each work with different information. The go
 | Synthetic passenger ID, passport and national ID per person over all bookings Oct 2025 - Mar 2027 (6.29M persons, same IDs in the app and the shared export). Since 21 Nov 2026 the bookings are stored without names (name-free format by departure month) and passengers are shown by their synthetic passenger ID | Done |
 | Name-free bookings format (21 Nov 2026): the ingest accepts the bookings as name-free Parquet by departure month, or converts the zip to that format; `python -m app.ingest.share` copies them (about 950 MB) for a shared drive, never Git | Done |
 | Plain-English explanations and passenger message drafts (Claude AI, with template fallback) | Done |
-| Approve or reject with an audit trail; demo roles OCC and PCU | Done |
+| Approve or reject with an audit trail; demo roles (OCC and Evaluator are distinct; PCU has the same access as OCC) | Done |
 | Approve a non-recommended option (override with a required reason, audited) | Done (21 Nov 2026) |
 | Before/after aircraft rotation board in the delay view | Done (21 Nov 2026) |
 | Delay prediction: 7-day delay watchlist with reasons and per-passenger missed-connection risk | Done (phase 2, 21 Nov 2026; see below) |
@@ -127,15 +128,15 @@ Agent details: `docs/testing/agent-card.md`; design: `docs/architecture/SYSTEM_A
 
 **7-day tab.** The tab now shows last month's cascade check in the sidebar (the scenario launcher is hidden there): the formula *next departure = max(scheduled departure, previous arrival + 40 min)* against real departures, as six boxes (1,656 pairs, mean delta +10 min, 75% within 15 minutes, 93% within 30 minutes, 412 under- and 1 over-estimates for 19 Oct to 18 Nov). "Expand the full view" opens the scatter, the delta histogram and the table of all pairs.
 
-**Models tuned.** The delay model and the reward model were both tuned with Optuna and compared with other models on time-ordered or grouped validation; the tuning of the reward model gained almost nothing. A teammate's extra delay feature `month` raises ranking slightly but lowers the validation score, so it is flagged for a decision.
+**Models tuned.** The delay model and the reward model were both tuned with Optuna and compared with other models on time-ordered or grouped validation; the tuning of the reward model gained almost nothing. An added delay feature, `month`, raises ranking slightly but lowers the validation score, so it is flagged for a decision.
 
 **Limits.** The reward preferences come from simulated data and the reward values and weights are assumptions to confirm with the airline. Details: `docs/architecture/REWARDS_DESIGN.md`, `docs/testing/reward-model-card.md`, `docs/testing/reward-model-selection.md`.
 
 ## Architecture
 ```
- Browser (OCC / PCU)
-        |  HTTP :8888 (HTTPS in phase 6)
-        v
+ Browser (OCC / PCU / Evaluator)     API clients
+        |  UI: HTTP :8080                  |  API: HTTP :8888 (direct)
+        v                                  v
  +------------------+      +---------------------------------------------+
  | web: nginx       |----->| api: FastAPI                                |
  | React app, CSP,  | /api | impact, recovery, priority, rebooking,       |
@@ -157,7 +158,7 @@ Agent details: `docs/testing/agent-card.md`; design: `docs/architecture/SYSTEM_A
                                           +--------------------+
 ```
 - **Data stores:** PostgreSQL holds what users create (scenarios, decisions and, since phase 3, agent runs with their steps). Parquet files queried with DuckDB hold the airline extracts and, since phase 2, the delay-risk scores and model card.
-- **Services (Docker Compose):** `db`, `migrate` (one-shot), `ingest` (one-shot), `api`, `web`.
+- **Services (Docker Compose):** `db`, `migrate` (one-shot), `ingest` (one-shot), `extracts-db` (one-shot), `api` (published on port 8888), `web` (published on port 8080; its own `/api` calls go to `api` inside Compose). Ports and their risks: ADR 0015 in the repository.
 
 ## Technology stack
 | Layer | Technology |
@@ -193,7 +194,7 @@ The full methods document with references is `docs/delivery/Disruption_Advisor_M
 | Environment | Where | Notes |
 |---|---|---|
 | Local | Docker Compose on a workstation | `docker compose up -d --build` |
-| Demo | OCI VM, port 8888 (HTTP) | Secrets only in the server `settings.env` (mode 600); automatic restart verified by a reboot test on 20 Nov 2026 (phase 1). Phase 2 deployed 21 Nov 2026 (reboot check skipped by user decision). Phase 3 deployed 21 Nov 2026 02:31 UTC with rollback image tags and a database dump taken first; no reboot test run. No automated backup yet (phase 6) |
+| Demo | OCI VM: UI port 8080, API port 8888 (HTTP) | Secrets only in the server `settings.env` (mode 600); automatic restart verified by a reboot test on 20 Nov 2026 (phase 1). Phase 2 deployed 21 Nov 2026 (reboot check skipped by decision). Phase 3 deployed 21 Nov 2026 02:31 UTC with rollback image tags and a database dump taken first; no reboot test run. No automated backup yet (phase 6) |
 
 **Agent settings (phase 3)**, in `settings.env`:
 
@@ -211,10 +212,12 @@ scripts/init-settings.sh        # creates settings.env (visible) + the .env link
 docker compose up -d --build    # first ingest takes 4-15 minutes
 scripts/check.sh                # lint, types, 69 backend tests, 19 frontend tests, build
 scripts/e2e.sh                  # Playwright end-to-end tests against the running stack
-scripts/smoke.sh <base-url>     # post-deployment smoke test
+scripts/smoke.sh <ui-url> <api-url>   # post-deployment smoke test (UI port, then API port)
 ```
 
 ## API summary
+The API is published directly on port 8888 (`http://92.5.154.198:8888/api/...`); the UI on port 8080 calls the same endpoints through its own `/api`.
+
 | Endpoint | Purpose |
 |---|---|
 | POST /api/v1/auth/login | Sign in (rate limited) |
@@ -235,7 +238,7 @@ scripts/smoke.sh <base-url>     # post-deployment smoke test
 | /api/docs | OpenAPI documentation |
 
 ## Security
-- **Sign-in:** demo authentication with two roles, signed expiring tokens and a rate limit on sign-in. Production will use the airline's identity provider (OIDC).
+- **Sign-in:** demo authentication; distinct roles OCC and Evaluator (PCU has the same access as OCC); signed expiring tokens; a rate limit on sign-in on the UI port 8080 (not on the API port 8888). Production will use the airline's identity provider (OIDC).
 - **Secrets:** only in the server `settings.env`; never in the repository. The airline data is git-ignored and mounted read-only.
 - **AI data sharing:** no names, booking references, passenger IDs, document numbers or contact details are sent to the AI service. This includes the phase 3 agent, whose tools return flight facts and counts only.
 - **Hardening:** security headers (CSP, nosniff, frame deny), non-root containers, input validation, consistent error responses.
@@ -249,7 +252,7 @@ scripts/smoke.sh <base-url>     # post-deployment smoke test
 | Playwright end-to-end on the demo server | 6 passed (phase 3, incl. "strategies switch the recommendation" and "the agent investigates a flight and its recommendation opens for approval"); phase 2: 4; phase 1: 3 |
 | Smoke test on the demo server | 11 of 11 passed (phases 1, 2 and 3) |
 | Agent run on the demo server | Flight G9901 (22 Nov): AI source, 7 steps in 25 s, recommended the swap with A6-AOH under "protect passengers" |
-| Server reboot test | Phase 1 passed: back in about 50 s, all services healthy without manual action, data intact. Phase 2: skipped by user decision. Phase 3: not run |
+| Server reboot test | Phase 1 passed: back in about 50 s, all services healthy without manual action, data intact. Phase 2: skipped by decision. Phase 3: not run |
 | Delay-risk model, test weeks | AUC 0.798 (15+ min) and 0.757 (60+ min) vs 0.741 and 0.676 for the route × hour baseline |
 | Real-data example | G9519 delayed 150 min: swap with A6-ARI costs AED 70,875 vs AED 222,600 to absorb the delay |
 | Delay scenario time with the phase 3 options (real data) | 0.6 to 7 s per scenario |
@@ -269,7 +272,7 @@ scripts/smoke.sh <base-url>     # post-deployment smoke test
 - **Approval:** approving an option other than the recommended one is an override and needs a reason.
 - **Cancellations:** lost fare revenue is not counted in the cost of a cancel or consolidate option.
 - **Agent:** its wording and step order vary between runs; the options and numbers do not. A run interrupted by a server restart shows as failed and must be started again.
-- **Connection:** HTTP only, and no automated database backup; both are phase 6 (needs approval).
+- **Connection:** HTTP only on both ports, and no automated database backup; HTTPS and backups are phase 6 (needs approval). The API on port 8888 is published directly: no sign-in rate limit there, and the address it logs can be set by the client (ADR 0015).
 - **Predictions:** see the phase 2 limitations above.
 - **Open questions:** listed in the project's clarification register.
 
@@ -277,10 +280,10 @@ scripts/smoke.sh <base-url>     # post-deployment smoke test
 | Phase | Content | Status |
 |---|---|---|
 | 1 MVP | Scenarios A and B, explanations, approvals, hosting | Done |
-| 2 Predict | Delay-risk prediction with explanations (LightGBM, SHAP), 7-day watchlist, per-passenger missed-connection risk | Deployed 21 Nov 2026 and verified (smoke, Playwright); reboot check skipped by user decision |
+| 2 Predict | Delay-risk prediction with explanations (LightGBM, SHAP), 7-day watchlist, per-passenger missed-connection risk | Deployed 21 Nov 2026 and verified (smoke, Playwright); reboot check skipped by decision |
 | 3 Agent and what-if | AI agent coordinating the steps; cancel or consolidate as recovery options; strategy comparison | Deployed 21 Nov 2026 and verified (smoke 11/11, Playwright 6/6, agent run on the server); reboot test not run |
 | 4 Extend | Partner and other carriers, unaccompanied minors, equipment change, bus legs, crew legality, real data feeds, CI/CD and monitoring | Not started (needs approval) |
-| 6 Secure and protect | HTTPS (Caddy, sslip.io hostname, :8888 kept) and nightly PostgreSQL backups with a restore test; moved out of phase 2 by the user on 21 Nov 2026. No phase 5 is defined | Not started (needs approval) |
+| 6 Secure and protect | HTTPS (Caddy, sslip.io hostname) and nightly PostgreSQL backups with a restore test; moved out of phase 2 on 21 Nov 2026. No phase 5 is defined | Not started (needs approval) |
 
 ## Contacts and ownership
 | Role | Name |
