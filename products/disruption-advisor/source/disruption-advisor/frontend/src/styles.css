@@ -1807,3 +1807,6 @@ tr.clickable.selected {
 .edited-chip { display: inline-flex; gap: 0.35rem; align-items: center; margin-right: 0.75rem; }
 .testdata-modes { margin: 0.75rem 0 1.25rem; }
 .testdata .flight-editor { margin-top: 0; padding-top: 0; border-top: 0; }
+.flight-editor-search { max-width: 26rem; }
+.flight-editor-searchrow { display: flex; gap: 0.5rem; }
+.flight-editor-searchrow input { flex: 1; }
