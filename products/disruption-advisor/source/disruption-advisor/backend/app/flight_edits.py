@@ -6,13 +6,16 @@ are stored as one small JSON file next to the test data (``flight_edits.json`` i
 the operating store on top of the real data each time it loads; the Parquet files and the trained models are never
 changed. Every scenario, rebooking, crew check and reward plan computed afterwards uses the edited data. Resetting a
 flight deletes its entry. A changed loyalty tier or travel frequency belongs to the customer, so it shows on every
-flight of that customer. The 7-day delay risk of an edited flight keeps its precomputed value.
+flight of that customer. After each save or reset the edited flights are re-scored with the saved delay model
+(``rescore``): their 7-day delay risk, connecting passengers and expected missed connections follow the edits
+(``edit_flight_risk.parquet`` / ``edit_connection_risk.parquet``, loaded over the precomputed rows by ``apply_risk``).
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 import re
 from datetime import UTC, datetime, timedelta
@@ -27,7 +30,10 @@ from pydantic import BaseModel, Field, field_validator
 from app.auth import EvaluatorUser
 from app.ingest.build import LOYALTY_PRIORITY
 
+log = logging.getLogger(__name__)
 EDITS_FILE = "flight_edits.json"
+RISK_FILE = "edit_flight_risk.parquet"
+CONNECTIONS_FILE = "edit_connection_risk.parquet"
 EDIT_SOURCE = "evaluator-edit"
 TIERS = ("none", "Basic", "Silver", "Gold", "Platinum")
 FREQUENCIES = ("occasional", "regular", "frequent", "unknown")
@@ -192,6 +198,83 @@ def merge_passengers(
     return out
 
 
+# --- the 7-day delay risk of edited flights -----------------------------------------------------------------------
+def apply_risk(con: duckdb.DuckDBPyConnection, directory: Path | None) -> int:
+    """Put the re-scored risk of edited flights over the precomputed rows. Returns the flights replaced."""
+    if directory is None or not (directory / RISK_FILE).exists() or not load(directory):
+        return 0
+    risk, conn = directory / RISK_FILE, directory / CONNECTIONS_FILE
+    ids = [r[0] for r in con.execute(f"SELECT flight_id FROM read_parquet('{risk}')").fetchall()]
+    ids = [i for i in ids if i in load(directory)]  # a reset flight goes back to its precomputed risk
+    if not ids:
+        return 0
+    con.execute("DELETE FROM flight_risk WHERE list_contains(?, flight_id)", [ids])
+    con.execute(
+        f"CREATE TEMP TABLE edit_risk AS SELECT * FROM read_parquet('{risk}') WHERE list_contains(?, flight_id)", [ids]
+    )
+    _insert_table(con, "flight_risk", "edit_risk")
+    con.execute("DELETE FROM connection_risk WHERE list_contains(?, inbound_flight_id)", [ids])
+    if conn.exists():
+        con.execute(
+            f"CREATE TEMP TABLE edit_conn AS SELECT * FROM read_parquet('{conn}') "
+            "WHERE list_contains(?, inbound_flight_id)",
+            [ids],
+        )
+        _insert_table(con, "connection_risk", "edit_conn")
+    # Passengers removed from an edited flight no longer connect onto it either.
+    con.execute(
+        """DELETE FROM connection_risk c WHERE list_contains(?, c.outbound_flight_id) AND NOT EXISTS (
+               SELECT 1 FROM pax_segments p WHERE p.flight_id = c.outbound_flight_id AND p.pnr = c.pnr
+               AND p.customer_key = c.customer_key)""",
+        [ids],
+    )
+    return len(ids)
+
+
+def _insert_table(con: duckdb.DuckDBPyConnection, table: str, source: str) -> None:
+    have = _columns(con, table)
+    cols = [c for c in _columns(con, source) if c in have]
+    listing = ", ".join(f'"{c}"' for c in cols)
+    con.execute(f"INSERT INTO {table} BY NAME SELECT {listing} FROM {source}")
+
+
+def rescore(store: Any, directory: Path, default_mct: int | None = None) -> int:
+    """Re-score every edited flight from the edited data the store holds now; writes the risk files (or removes
+    them when nothing is edited). Returns the flights scored."""
+    edited = [f for f in load(directory) if store.query("SELECT 1 AS x FROM flights WHERE flight_id = ?", [f])]
+    if not edited or not getattr(store, "has_risk", False):
+        for name in (RISK_FILE, CONNECTIONS_FILE):
+            (directory / name).unlink(missing_ok=True)
+        return 0
+    from app.ml import delay_risk  # heavy (LightGBM): only when scoring
+
+    flights = store.arrow(
+        "SELECT flight_id, flight_number, tail, origin, destination, std, sta, aircraft_model, capacity, booked_pax "
+        "FROM flights"
+    )
+    pax = store.arrow(
+        """SELECT pnr, customer_key, passenger_id, flight_id, origin, destination, pax_type FROM pax_segments
+           WHERE pnr IN (SELECT pnr FROM pax_segments WHERE list_contains(?, flight_id))""",
+        [edited],
+    )
+    real = store.arrow(
+        "SELECT flight_id, p_5, p_15, p_30, p_60, p_120, p_180, a_5, a_15, a_30, a_60, a_120, a_180 FROM flight_risk"
+    )
+    scored = delay_risk.score_edited_flights(store.ops_dir, flights, pax, real, edited, default_mct)
+    if scored is None:
+        return 0
+    risk, connections = scored
+    import pyarrow.parquet as pq
+
+    tmp = directory / f".{CONNECTIONS_FILE}.tmp"
+    pq.write_table(connections, tmp)
+    os.replace(tmp, directory / CONNECTIONS_FILE)
+    tmp = directory / f".{RISK_FILE}.tmp"
+    pq.write_table(risk, tmp)
+    os.replace(tmp, directory / RISK_FILE)  # written last: its time stamp makes every worker reload
+    return int(risk.num_rows)
+
+
 # --- API -------------------------------------------------------------------------------------------------------
 class FlightFields(BaseModel):
     std: str
@@ -301,7 +384,8 @@ def save_flight(
         "saved_at": datetime.now(UTC).isoformat(timespec="seconds"),
     }
     write(directory, edits)
-    return {"saved": True, "flight_id": flight_id}
+    scored = _rescore_now(request)
+    return {"saved": True, "flight_id": flight_id, "rescored": scored}
 
 
 @router.delete("/flights/{flight_id}")
@@ -312,4 +396,19 @@ def reset_flight(
     edits = load(directory)
     removed = edits.pop(flight_id, None) is not None
     write(directory, edits)
+    _rescore_now(request)
     return {"reset": removed, "flight_id": flight_id}
+
+
+def _rescore_now(request: Request) -> int:
+    """Reload the store with the new edits, then re-score the edited flights (the risk files trigger one more
+    reload in every worker). A scoring failure keeps the edit and the precomputed risk."""
+    directory = request.app.state.settings.test_data_dir
+    store = request.app.state.get_store()
+    if store is None:
+        return 0
+    try:
+        return rescore(store, directory)
+    except Exception:  # the saved edit stands; the risk just stays precomputed
+        log.exception("rescoring edited flights failed")
+        return 0

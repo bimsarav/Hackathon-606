@@ -549,10 +549,10 @@ def version(directory: Path) -> int | None:
         uploaded = (directory / MANIFEST).stat().st_mtime_ns
     except OSError:
         uploaded = 0
-    try:
-        edited = (directory / "flight_edits.json").stat().st_mtime_ns
-    except OSError:
-        edited = 0
+    edited = 0
+    for name in ("flight_edits.json", "edit_flight_risk.parquet"):  # the edits, then their re-scored risk
+        path = directory / name
+        edited += path.stat().st_mtime_ns if path.exists() else 0
     return (uploaded + edited) or None
 
 
