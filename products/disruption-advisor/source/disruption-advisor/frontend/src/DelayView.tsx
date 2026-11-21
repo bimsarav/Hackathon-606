@@ -97,7 +97,7 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
         )}
         <Tile label="Why?" value={result.explanation.source.startsWith("ai:") ? "AI-worded" : "Template"} sub={firstSentence(result.explanation.text)} onClick={() => reveal("why")} />
         <Tile label="Recovery options" value={num(result.options.length)} sub={`recommended: ${best.label}`} onClick={() => reveal("options")} />
-        <Tile label="Crew duty (FDP)" value={crewLabel(shown)} sub={shown.crew ? `${num(shown.crew.flights_checked)} flights checked` : "no roster data"}
+        <Tile label="Crew duty (FDP)" value={crewLabel(shown)} sub={crewSub(shown)}
           tone={shown.crew?.status === "over" ? "bad" : shown.crew?.status === "tight" ? "warn" : undefined} onClick={() => reveal("crew")} />
         <Tile label="Flight Board" value={`${num(new Set(shown.legs.map((l) => l.operated_by)).size)} aircraft`} sub={`${num(shown.legs.length)} flights in the rotation`} onClick={() => reveal("board")} />
         <Tile label="Flights affected" value={num(shown.legs_delayed)} sub={`delayed of ${num(shown.legs.length)}`} onClick={() => reveal("legs")} />
@@ -189,7 +189,7 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
       <CrewFdpAlerts options={result.options} selectedKey={shown.key} />
 
       <Fold id="crew" title={`Crew duty (FDP): ${shown.label}`}
-        summary={shown.crew ? `${crewLabel(shown)} · ${num(shown.crew.flights_checked)} flights checked${shown.crew.worst ? ` · tightest ${num(shown.crew.worst.minutes_left)} min left` : ""}` : "no roster data"}
+        summary={`${crewLabel(shown)} · ${crewSub(shown)}${shown.crew?.worst ? ` · tightest ${num(shown.crew.worst.minutes_left)} min left` : ""}`}
         open={openSecs.has("crew")} onToggle={() => toggle("crew")}>
         <CrewSection option={shown} />
       </Fold>
@@ -465,8 +465,17 @@ function firstSentence(text: string): string {
 }
 
 function crewLabel(o: RecoveryOption): string {
-  if (!o.crew) return "—";
-  return { ok: "within limits", tight: "tight", over: "breach", unknown: "unknown" }[o.crew.status];
+  if (!o.crew || o.crew.status === "unknown" || o.crew.flights_checked === 0) return "no data";
+  return { ok: "within limits", tight: "tight", over: "breach", unknown: "no data" }[o.crew.status];
+}
+
+/** Where the crew figures come from: the roster, an estimate, or nothing (e.g. a synthetic demo flight). */
+function crewSub(o: RecoveryOption): string {
+  const c = o.crew;
+  if (!c || c.status === "unknown" || c.flights_checked === 0) return "no crew data for this flight";
+  if (c.estimated >= c.flights_checked) return `${num(c.flights_checked)} flight(s), estimated duty`;
+  if (c.estimated > 0) return `${num(c.flights_checked)} flights · ${num(c.estimated)} estimated`;
+  return `${num(c.flights_checked)} flights from the roster`;
 }
 
 /** One "at a glance" tile: what a section shows, in a number; a click opens that section. */
@@ -540,7 +549,10 @@ function CrewSection({ option }: { option: RecoveryOption }) {
     <section aria-labelledby="crew-title">
       <h2 id="crew-title">Crew duty (FDP): {option.label}</h2>
       {!crew || crew.flights.length === 0 ? (
-        <p className="muted">No crew roster data for the flights of this option, so their duty time cannot be checked.</p>
+        <p className="muted">
+          No crew data for the flights of this option (no rostered crew and no duty estimate, for example a synthetic demo
+          flight), so their duty time cannot be checked. The roster covers 1 Oct to 20 Nov 2026; later flights use an estimate where possible.
+        </p>
       ) : (
         <>
           <p className="small muted">

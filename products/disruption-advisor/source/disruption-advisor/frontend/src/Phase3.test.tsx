@@ -135,7 +135,8 @@ describe("strategy comparison", () => {
     expect(screen.queryByText(/Click a card to apply that strategy/)).not.toBeInTheDocument();
     await userEvent.click(within(glance).getByRole("button", { name: /^Crew duty/ }));
     expect(screen.getByRole("heading", { name: /^Crew duty \(FDP\): / })).toBeInTheDocument();
-    expect(screen.getByText(/No crew roster data for the flights of this option/)).toBeInTheDocument();
+    expect(screen.getByText(/No crew data for the flights of this option/)).toBeInTheDocument();
+    expect(within(glance).getByRole("button", { name: /^Crew duty/ })).toHaveTextContent("no crew data for this flight");
   });
 
   it("lists each flight's crew headroom for the selected option", async () => {
@@ -155,6 +156,7 @@ describe("strategy comparison", () => {
     expect(within(table).getByText("20 min")).toBeInTheDocument();
     expect(within(table).getByText("Captain")).toBeInTheDocument();
     expect(within(table).getByText("tight")).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "On this page" })).toHaveTextContent("2 flights from the roster");
   });
 
   it("labels passengers by why they need a new flight", async () => {
