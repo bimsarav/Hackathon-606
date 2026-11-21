@@ -1,0 +1,18 @@
+flowchart TB
+  subgraph api [api: modular monolith]
+    auth[auth<br/>demo roles OCC / PCU]
+    scen[scenarios<br/>create disruption: delay or cancellation]
+    net[network<br/>rotation graph, turn times,<br/>delay propagation, 7-day cascade]
+    pax[passengers<br/>journeys, connections, MCT 15 min–20 h,<br/>misconnect detection]
+    rec[recovery<br/>options: delay · same-type swap<br/>cost and impact scoring]
+    pri[priority<br/>tiers + weighted score + reasons]
+    reb[rebooking<br/>CP-SAT seat assignment<br/>groups kept together]
+    exp[explain<br/>Claude or template narrative,<br/>message drafts]
+    dec[decisions<br/>approve / reject, audit trail]
+  end
+  scen --> net --> pax
+  net --> rec
+  pax --> rec
+  rec --> exp
+  pax --> pri --> reb --> exp
+  exp --> dec

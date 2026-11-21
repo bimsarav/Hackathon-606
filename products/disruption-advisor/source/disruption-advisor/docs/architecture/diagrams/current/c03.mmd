@@ -1,0 +1,29 @@
+flowchart LR
+  subgraph api [api: modular monolith]
+    direction LR
+    auth[auth<br/>roles OCC / PCU / EVALUATOR<br/>signed tokens]
+    sc[scenarios<br/>delay or cancellation]
+    net[network<br/>rotation graph, measured turns,<br/>7-day cascade]
+    pax[passengers<br/>journeys, connections, MCT,<br/>misconnect detection]
+    rec[recovery options<br/>absorb · swap · hold connection ·<br/>cancel / consolidate round trip]
+    crew[crew FDP check<br/>headroom per flight:<br/>ok · tight · breach]
+    cost[cost + strategy<br/>lowest cost · protect passengers ·<br/>least delay]
+    pri[priority<br/>tiers + weighted score + reasons]
+    reb[rebooking<br/>CP-SAT, groups kept together,<br/>sold SHJ connections]
+    care[care<br/>meals, hotel, transport, refund]
+    rew[rewards<br/>severity × value × acceptance,<br/>within budget]
+    exp[explain<br/>Claude or template,<br/>message drafts]
+    risk[risk<br/>7-day watchlist, SHAP reasons,<br/>misconnect risk, cascade check]
+    agent[agent<br/>Claude tool use on read-only<br/>engine tools, planner fallback]
+    td[test data + model card<br/>evaluator only]
+    dec[decisions<br/>approve / override / reject, audit]
+  end
+  sc --> net --> rec --> crew --> cost
+  net --> pax --> pri --> reb --> care
+  cost --> exp
+  reb --> exp
+  care --> rew
+  exp --> dec
+  risk --> sc
+  agent --> sc
+  td --> risk

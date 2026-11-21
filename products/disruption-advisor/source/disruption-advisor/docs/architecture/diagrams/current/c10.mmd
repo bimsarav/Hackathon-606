@@ -1,0 +1,23 @@
+sequenceDiagram
+  autonumber
+  actor U as OCC / PCU
+  participant W as web
+  participant A as api: agent runner
+  participant C as Claude API (tool use)
+  participant E as engine tools (read-only)
+  participant P as PostgreSQL
+  U->>W: Ask the agent (flight, optional delay, strategy, note)
+  W->>A: POST /agent/runs
+  A->>P: agent_runs row (RUNNING)
+  loop up to 12 tool calls, 120 s
+    A->>C: messages + tool definitions
+    C-->>A: progress note + tool_use
+    A->>E: status · rotation · assess_delay · compare · impact
+    E-->>A: counts and flight facts only, incl. crew FDP check
+    A->>P: append step to the trace
+  end
+  C-->>A: submit_recommendation(option, reasons, risks, checks)
+  A->>A: option must exist in the engine result
+  A->>P: run DONE (or planner fallback)
+  W->>A: poll run
+  U->>W: open scenario → approve / override (audited)

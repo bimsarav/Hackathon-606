@@ -1,0 +1,42 @@
+[
+ {
+  "n": "1",
+  "title": "System context",
+  "note": "Who uses it and what it talks to. The AI service only receives minimised fields."
+ },
+ {
+  "n": "2",
+  "title": "Containers (Docker Compose)",
+  "note": "What runs on the server. DuckDB holds the big airline extracts; PostgreSQL holds what people create."
+ },
+ {
+  "n": "3",
+  "title": "Components inside the API",
+  "note": "Modules inside the API and how a disruption flows through them."
+ },
+ {
+  "n": "4",
+  "title": "Data flow and model",
+  "note": "How raw extracts become the operating picture, and the data model."
+ },
+ {
+  "n": "5",
+  "title": "Scenario A: inbound delay at the hub (delay vs aircraft swap)",
+  "note": "Scenario A: an inbound flight at Sharjah is delayed; compare absorbing the delay with an aircraft swap."
+ },
+ {
+  "n": "6",
+  "title": "Scenario B: cancellation with too few seats (priority + rebooking)",
+  "note": "Scenario B: a flight is cancelled and seats are short; rank passengers and rebook within inventory."
+ },
+ {
+  "n": "7",
+  "title": "Priority decision logic",
+  "note": "Legal and care tiers come first. The weighted score only orders passengers inside a tier."
+ },
+ {
+  "n": "8",
+  "title": "Deployment",
+  "note": "MVP hosting on the provided OCI server, port 8888."
+ }
+]

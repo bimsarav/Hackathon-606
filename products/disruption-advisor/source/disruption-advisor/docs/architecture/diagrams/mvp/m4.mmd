@@ -1,0 +1,15 @@
+flowchart LR
+  B[Booking CSVs ×18<br/>27.9M rows] --> C1[clean: Latin-1 → UTF-8,<br/>reject malformed lines]
+  C1 --> C2[active segments<br/>CNF/CNF/ACT, window 19–30 Nov]
+  R[Rotation .xls] --> L[flight legs + tails]
+  I[Inventory CSV] --> S[seat capacity per flight<br/>adult_capacity ± curtail/oversell]
+  M[Connection times] --> J
+  T[Airport time zones] --> L
+  SYN[Synthetic enrichment<br/>profiles · fare families · SSR · registry] --> C2
+  C2 --> J[journeys + connections]
+  L --> J
+  S --> AV[availability = capacity − booked<br/>mismatch flagged, never fatal]
+  C2 --> AV
+  J --> OPS[(ops.duckdb)]
+  L --> OPS
+  AV --> OPS

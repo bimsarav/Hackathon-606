@@ -1,0 +1,20 @@
+sequenceDiagram
+  actor OCC as OCC controller
+  participant UI as Web UI
+  participant API as api
+  participant NET as network
+  participant PAX as passengers
+  participant REC as recovery
+  participant EXP as explain (Claude / template)
+  OCC->>UI: G9xxx into SHJ delayed 150 min
+  UI->>API: POST /scenarios {flight, delay}
+  API->>NET: propagate along tail rotation (turn times, slack)
+  NET-->>API: downstream legs + new ETDs (7-day horizon)
+  API->>PAX: re-check every connection (MCT, 15 min–20 h)
+  PAX-->>API: misconnecting passengers, by journey
+  API->>REC: options = absorb delay | swap with each same-type tail free at SHJ
+  REC-->>API: per option: delay min, pax affected, misconnects, cost
+  API->>EXP: best option + trade-offs
+  EXP-->>API: explanation ("why this, why not the others")
+  API-->>UI: impact view, ranked options, recommendation
+  OCC->>UI: approve or reject (audited)

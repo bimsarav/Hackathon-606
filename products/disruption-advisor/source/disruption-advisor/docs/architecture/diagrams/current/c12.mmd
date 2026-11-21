@@ -1,0 +1,12 @@
+flowchart LR
+  roster[(Crew roster<br/>names and IDs removed)] --> head[Headroom per flight<br/>max FDP − planned FDP<br/>of the tightest crew member]
+  histc[(Flight-number history)] -->|no roster| est[10th percentile estimate<br/>labelled estimated]
+  head --> chk
+  est --> chk
+  opt[Each recovery option<br/>delayed flights + extra minutes] --> chk{Delay vs headroom}
+  chk -->|≥ 30 min left| ok[ok]
+  chk -->|< 30 min left| tight[tight]
+  chk -->|past max FDP| breach[breach]
+  breach --> alert[Crew FDPs alert in the scenario<br/>for crew control to review]
+  breach --> ag[Agent reports it as a risk]
+  roster --> mcard[Model Card: FDP analysis<br/>35,021 duties, median 275 min,<br/>+60 min → 4.3% over]

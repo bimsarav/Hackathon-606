@@ -1,0 +1,8 @@
+flowchart LR
+  occ([OCC controller]) -->|assess delay, compare and approve recovery| DA
+  pcu([PCU agent]) -->|prioritise and rebook passengers, approve messages| DA
+  DA[Disruption Advisor]
+  files[(Airline extracts<br/>bookings, schedule, rotation,<br/>inventory, MCT, punctuality)] -->|batch ingest| DA
+  tz[(Public airport<br/>time-zone dataset)] -->|ingest| DA
+  DA -->|explain + draft English messages<br/>minimised fields, no contact details| llm[Anthropic Claude API]
+  DA -.->|later phases: events, real SSR/loyalty,<br/>crew, PSS write-back| ext[Airline systems]

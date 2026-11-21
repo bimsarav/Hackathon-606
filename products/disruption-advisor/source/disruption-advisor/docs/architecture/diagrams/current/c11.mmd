@@ -1,0 +1,11 @@
+flowchart LR
+  scen[Delay or cancellation<br/>scenario] --> sev[Disruption severity 0–100<br/>delay, cancellation, missed connection,<br/>wait, vulnerable passenger, upcoming trips]
+  scen --> val[Passenger value 0–100<br/>rank of recovery-priority score]
+  sev --> tgt[Target amount<br/>up to AED 600]
+  val --> tgt
+  tgt --> allowed[Allowed rewards<br/>meal · voucher · lounge · miles · ticket<br/>rules: wait, care plan, membership]
+  pref[(Acceptance model<br/>LightGBM on simulated history<br/>AUC 0.70 vs rules 0.665)] --> pick
+  allowed --> pick[Pick per passenger<br/>severity × value × acceptance × √cost]
+  budget([Goodwill budget, AED]) --> fit
+  pick --> fit[Fit to budget<br/>scale down cheapest-to-lose]
+  fit --> plan[Reward plan + reasons<br/>approve via audit; nothing sent]

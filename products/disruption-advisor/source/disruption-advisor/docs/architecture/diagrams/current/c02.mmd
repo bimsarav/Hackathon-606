@@ -1,0 +1,23 @@
+flowchart LR
+  browser([Browser]) -->|HTTP :8888<br/>HTTPS in phase 6| web
+  subgraph host [Server: Docker Compose, restart unless-stopped, log rotation]
+    web[web<br/>nginx: React SPA + /api proxy<br/>CSP, security headers, login rate limit]
+    api[api<br/>FastAPI + uvicorn, 2 workers<br/>recovery engine, risk, agent, rewards, crew]
+    migrate[migrate<br/>one-shot: alembic upgrade head]
+    ingest[ingest<br/>one-shot: extracts → typed Parquet,<br/>trains delay + reward models]
+    xdb[extracts-db<br/>one-shot: Parquet → PostgreSQL<br/>extracts schema]
+    db[(PostgreSQL 18<br/>scenarios, decisions, audit,<br/>agent runs, extracts schema)]
+    ops[(ops-data volume<br/>Parquet read by DuckDB,<br/>saved models, risk tables)]
+    test[(test-data volume<br/>evaluator uploads)]
+    input[/input extracts<br/>read-only mount/]
+  end
+  web -->|/api/| api
+  api -->|SQLAlchemy| db
+  api -->|DuckDB, read-only| ops
+  api -->|read / write| test
+  input --> ingest
+  ingest --> ops
+  ops --> xdb
+  xdb --> db
+  migrate --> db
+  api -->|HTTPS| claude[Claude API]

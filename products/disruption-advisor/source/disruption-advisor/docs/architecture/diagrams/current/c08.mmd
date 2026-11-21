@@ -1,0 +1,19 @@
+flowchart LR
+  user([OCC / PCU / Evaluator]) -->|http://92.5.154.198:8888| fw
+  subgraph oci [OCI VM eu-frankfurt-1: 8 vCPU, 62 GiB, Oracle Linux 10]
+    fw[firewalld]
+    fw --> web
+    subgraph compose [docker compose, restart unless-stopped, docker enabled at boot]
+      web[web :8888 → 8080] --> api
+      api --> db[(db-data volume)]
+      api --> ops[(ops-data volume)]
+      api --> tdv[(test-data volume)]
+      ingest --> ops
+      xdb[extracts-db] --> db
+    end
+    data[/~/disruption-advisor-input<br/>airline extracts, read-only/]
+    data --> ingest
+    secrets[/settings.env, mode 600<br/>DB password, AI key, demo users/]
+    rb[/rollback image tags +<br/>pg_dump before each deploy/]
+  end
+  api -->|HTTPS| claude[Claude API]

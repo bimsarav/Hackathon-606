@@ -1,0 +1,22 @@
+sequenceDiagram
+  actor OCC as OCC controller
+  participant UI as Web UI
+  participant API as api
+  participant NET as network
+  participant REC as recovery + crew
+  participant PAX as passengers
+  participant EXP as explain (Claude / template)
+  OCC->>UI: pick flight (search, suggestion or watchlist), set delay
+  UI->>API: POST /scenarios (flight, DELAY, minutes)
+  API->>NET: propagate along the rotation, 7 days
+  NET-->>API: affected flights + new times
+  API->>PAX: re-check connections vs MCT
+  PAX-->>API: misconnects, slack, miss risk, rebooking
+  API->>REC: absorb · swaps · hold · cancel / consolidate
+  REC-->>API: KPIs, cost, crew FDP status per option
+  API->>API: rank under 3 strategies, pick recommendation
+  API->>EXP: engine facts only (no names, PNRs)
+  EXP-->>API: explanation
+  API-->>UI: options, strategies, crew alerts, rotation board, passengers
+  OCC->>UI: switch strategy / select option (what-if)
+  OCC->>UI: approve, or override with a reason (audited)

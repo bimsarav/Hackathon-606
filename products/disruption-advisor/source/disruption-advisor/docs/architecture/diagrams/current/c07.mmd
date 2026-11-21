@@ -1,0 +1,12 @@
+flowchart TB
+  A[Affected passenger] --> F{Feasible alternative?<br/>seats, MCT, same PNR group,<br/>sold SHJ connections}
+  F -- no --> NX[Next day + hotel + meals<br/>or refund option]
+  F -- yes --> T1{Tier 1: mandated care<br/>special assistance codes,<br/>infant in PNR}
+  T1 -- yes --> P1[Care tier]
+  T1 -- no --> T2{Tier 2: urgency<br/>onward connection,<br/>last flight of day}
+  T2 -- yes --> P2[Urgent tier]
+  T2 -- no --> P3[Standard tier]
+  P1 & P2 & P3 --> W[Weighted score inside the tier<br/>loyalty tier · frequency incl. non-members ·<br/>fare + booking class · ancillaries ·<br/>journey complexity · family / group]
+  W --> NR{Non-revenue?}
+  NR -- yes --> L[After all revenue passengers]
+  NR -- no --> O[Ordered list + points per attribute + reason]

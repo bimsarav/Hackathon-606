@@ -1,0 +1,18 @@
+flowchart LR
+  browser([Browser]) -->|HTTP :8888 MVP<br/>HTTPS later| web
+  subgraph host [Server: Docker Compose, restart unless-stopped]
+    web[web<br/>nginx: React SPA + /api proxy<br/>CSP, security headers]
+    api[api<br/>FastAPI + uvicorn<br/>impact, recovery, priority,<br/>rebooking, explanations]
+    ingest[ingest<br/>one-shot: extracts → ops.duckdb<br/>runs when data changes]
+    migrate[migrate<br/>one-shot: alembic upgrade head]
+    db[(PostgreSQL 18<br/>scenarios, recommendations,<br/>decisions, weight profiles, audit)]
+    ops[(ops.duckdb volume<br/>read-only analytics store)]
+    input[/input files<br/>read-only mount/]
+  end
+  web -->|/api/| api
+  api -->|SQLAlchemy| db
+  api -->|DuckDB read-only| ops
+  ingest --> ops
+  input --> ingest
+  migrate --> db
+  api -->|HTTPS| claude[Claude API]

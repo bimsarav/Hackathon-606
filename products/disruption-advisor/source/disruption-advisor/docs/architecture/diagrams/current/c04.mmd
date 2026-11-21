@@ -1,0 +1,37 @@
+flowchart LR
+  subgraph raw [Airline extracts]
+    bk[Bookings Oct 2025 – Mar 2027<br/>27.9M rows]
+    sch[Schedule + rotation]
+    inv[Inventory + fares list]
+    mct[Connection times]
+    pun[Punctuality 2026<br/>actual times, delay codes]
+    crw[Crew roster<br/>names removed]
+  end
+  tz[Airport time zones]
+  conv[convert<br/>clean, typed Parquet,<br/>name-free bookings by month]
+  build[build<br/>operating window, rotations,<br/>connections, sold SHJ connections,<br/>capacity, booking class levels]
+  ids[Synthetic passenger IDs<br/>loyalty accounts, labelled]
+  hist[history_flights<br/>actual chains, delays]
+  crewt[crew_flights<br/>FDP headroom + estimates]
+  m3[stage 3: delay-risk models<br/>LightGBM per threshold + SHAP]
+  m3b[stage 3b: cascade check<br/>formula vs actual]
+  m4[stage 4: reward preference<br/>model on simulated history]
+  store[(ops-data: Parquet + models<br/>read by DuckDB in the api)]
+  tdat[(test-data<br/>evaluator flights, scored)]
+  bk --> conv
+  sch --> conv
+  inv --> conv
+  mct --> conv
+  pun --> conv
+  crw --> conv
+  tz --> build
+  conv --> build
+  ids --> build
+  conv --> hist
+  conv --> crewt
+  build --> store
+  hist --> m3 --> store
+  hist --> m3b --> store
+  m4 --> store
+  crewt --> store
+  tdat -.->|appended at load| store

@@ -1,0 +1,13 @@
+flowchart LR
+  login([Sign in]) --> role{Role}
+  role -->|OCC / PCU| base[Flight Delay · Cancellation ·<br/>Predict · Watchlist · Recent Searches]
+  role -->|EVALUATOR| all[All views + Model Card + Test data]
+  all --> tpl[Download templates<br/>flights.csv · passengers.csv]
+  tpl --> chkf[Check files<br/>validate, nothing stored]
+  chkf --> add[Add to system<br/>≤ 50 flights, 3,000 passenger rows]
+  add --> tdv[(test-data volume<br/>labelled judge-test-data)]
+  tdv --> scorep[Saved delay model scores<br/>the new flights, no retraining]
+  scorep --> use[Search, delay, cancellation,<br/>rebooking, care, rewards, watchlist]
+  use --> rm[Remove test data<br/>real data restored]
+  all --> mc[Model Card<br/>performance, calibration, cut-offs,<br/>tuning, reward model, cascade, crew FDP]
+  srv{{api enforces roles:<br/>403 for OCC / PCU}} -.-> all

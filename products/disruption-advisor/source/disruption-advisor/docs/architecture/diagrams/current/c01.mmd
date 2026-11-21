@@ -1,0 +1,9 @@
+flowchart LR
+  occ([OCC controller]) -->|assess delay, compare strategies,<br/>approve or override recovery| DA
+  pcu([PCU agent]) -->|prioritise and rebook passengers,<br/>care, rewards, messages| DA
+  ev([Evaluator]) -->|own test flights,<br/>model evidence| DA
+  DA[aeroRecovery<br/>Disruption Advisor]
+  files[(Airline extracts<br/>bookings, schedule, rotation, inventory,<br/>MCT, punctuality, fares, crew roster)] -->|batch ingest| DA
+  tz[(Public airport<br/>time-zone dataset)] -->|ingest| DA
+  DA -->|explanations, message drafts, agent tool use<br/>minimised fields, no names or contacts| llm[Anthropic Claude API]
+  DA -.->|later phases: events, partner carriers,<br/>live feeds, PSS write-back| ext[Airline systems]

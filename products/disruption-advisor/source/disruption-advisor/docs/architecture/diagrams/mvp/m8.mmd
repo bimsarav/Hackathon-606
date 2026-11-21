@@ -1,0 +1,16 @@
+flowchart LR
+  user([OCC / PCU users]) -->|http://92.5.154.198:8888 MVP| fw
+  subgraph oci [OCI VM eu-frankfurt-1: 8 vCPU, 62 GiB, Oracle Linux 10]
+    fw[firewalld: 22, 80, 443, 8080, 8888, 5432 open]
+    fw --> web
+    subgraph compose [docker compose, restart unless-stopped, docker enabled at boot]
+      web --> api
+      api --> db[(postgres volume)]
+      api --> ops[(ops.duckdb volume)]
+      ingest --> ops
+    end
+    data[/~/disruption-advisor/input<br/>airline extracts, read-only/]
+    data --> ingest
+    secrets[/.env on server only<br/>DB password, AI key, user passwords/]
+  end
+  api -->|HTTPS| claude[Claude API]

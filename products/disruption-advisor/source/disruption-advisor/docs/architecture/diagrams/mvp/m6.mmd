@@ -1,0 +1,17 @@
+sequenceDiagram
+  actor PCU as PCU agent
+  participant UI as Web UI
+  participant API as api
+  participant PRI as priority
+  participant REB as rebooking (CP-SAT)
+  participant EXP as explain
+  PCU->>UI: G9yyy cancelled
+  UI->>API: POST /scenarios {flight, CANCEL}
+  API->>PRI: affected passengers + attributes
+  PRI-->>API: tier + score + contribution per attribute
+  API->>REB: alternatives (same O&D or legal SHJ connection, ≤24 h), seats, priority
+  REB-->>API: assignment (groups together), unprotected passengers → next day + hotel
+  API->>EXP: reasons per passenger + message drafts
+  API-->>UI: priority list, rebooking plan, messages
+  PCU->>UI: change weights → re-run (what-if)
+  PCU->>UI: approve plan / messages (audited)

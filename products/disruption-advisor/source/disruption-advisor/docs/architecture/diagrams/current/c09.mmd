@@ -1,0 +1,11 @@
+flowchart LR
+  hist[(2026 flight history<br/>~57,000 G9 flights)] --> feat[Features known 7 days ahead<br/>route, hour, airport, aircraft plan,<br/>bookings, recent late rates]
+  feat --> train[LightGBM, one model per threshold<br/>+5 · +15 · +30 · +60 · +120 · +180 min<br/>recency-weighted, time-ordered validation]
+  train --> card[Model card<br/>AUC 0.801 at +15, 0.770 at +60<br/>vs 0.741 / 0.676 baseline]
+  train --> score["Score next 7 days<br/>P(delay ≥ t), planning delay"]
+  score --> shap[SHAP reasons<br/>in plain words]
+  score --> mc[Missed-connection risk<br/>inbound vs onward vs slack after MCT]
+  shap --> wl[7-day watchlist<br/>high / medium risk,<br/>expected missed connections]
+  mc --> wl
+  wl -->|Analyse N min delay| scen[Pre-filled delay scenario]
+  wl -->|Ask the agent| agent[Agent run]
