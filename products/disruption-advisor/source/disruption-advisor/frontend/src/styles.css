@@ -332,19 +332,6 @@ label {
   letter-spacing: 0.01em;
 }
 /* Vertical divider + Menu label */
-.header-menu-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-left: 1.25rem;
-  padding-left: 1.25rem;
-  border-left: 1px solid rgba(255,255,255,.25);
-  color: rgba(255,255,255,.9);
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: default;
-  user-select: none;
-}
 /* Right: avatar + username + sign out */
 .header-user {
   margin-left: auto;

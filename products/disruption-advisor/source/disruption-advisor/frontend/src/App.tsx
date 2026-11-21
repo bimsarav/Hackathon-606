@@ -236,9 +236,6 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
           </span>
           <span className="brand-name">aeroRecovery</span>
         </span>
-        <span className="header-menu-btn">
-          <span aria-hidden="true">☰</span> Menu
-        </span>
         <span className="header-user">
           <span className="user-avatar" aria-hidden="true">
             {session.username.charAt(0).toUpperCase()}
