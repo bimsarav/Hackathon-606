@@ -1,7 +1,7 @@
 import type { CancelResult, Meta, Scenario } from "./api";
 import { Kpi } from "./DelayView";
 import { aed, num, utc } from "./format";
-import { RewardPanel } from "./RewardPanel";
+import { PassengerTabs } from "./PassengerTabs";
 import { Assumptions, DecisionBar, Explanation, PassengerTable, WeightsPanel } from "./Shared";
 
 interface Props {
@@ -89,13 +89,13 @@ export function CancelView({ scenario, result, meta, onUpdate }: Props) {
 
       <WeightsPanel meta={meta} scenario={scenario} onUpdate={onUpdate} />
 
-      <section aria-labelledby="ranked-title">
-        <h2 id="ranked-title">Passengers in priority order</h2>
-        <PassengerTable scenario={scenario} rows={result.passengers} meta={meta} />
-        <DecisionBar scenario={scenario} target="rebooking" label="rebooking plan" />
-      </section>
-
-      <RewardPanel scenario={scenario} />
+      <PassengerTabs scenario={scenario} passengersLabel={`Passengers to rebook (${num(result.passengers.length)})`}>
+        <section aria-labelledby="ranked-title">
+          <h2 id="ranked-title">Passengers in priority order</h2>
+          <PassengerTable scenario={scenario} rows={result.passengers} meta={meta} />
+          <DecisionBar scenario={scenario} target="rebooking" label="rebooking plan" />
+        </section>
+      </PassengerTabs>
       <Assumptions items={result.assumptions} />
     </article>
   );

@@ -3,7 +3,7 @@ import { api, type DelayResult, errorText, type Meta, type RecoveryOption, type 
 import { aed, hhmm, minutes, num, utc } from "./format";
 import { AgentRecommendationPanel } from "./AgentRunView";
 import { RotationBoard } from "./RotationBoard";
-import { RewardPanel } from "./RewardPanel";
+import { PassengerTabs } from "./PassengerTabs";
 import { OptionKindInfo, StrategyPanel } from "./StrategyPanel";
 import { Assumptions, DecisionBar, Explanation, PassengerTable, WeightsPanel } from "./Shared";
 
@@ -183,26 +183,29 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
         )}
       </section>
 
-      <section aria-labelledby="pax-title">
-        <h2 id="pax-title">
-          {cancelledPax
-            ? `Passengers to rebook: missed connections and cancelled flights (${num(result.passengers.length)})`
-            : `Passengers still missing a connection (${num(result.misconnections.length)})`}
-        </h2>
-        {result.rebooking && (
-          <p className="muted">
-            {num(result.rebooking.protected)} rebooked on later flights within 24 h ·{" "}
-            <strong>{num(result.rebooking.unprotected)}</strong> without a seat (next day + hotel, or refund)
-            {result.rebooking.hotel_rooms ? ` · ${num(result.rebooking.hotel_rooms)} hotel rooms` : ""}
-            {result.rebooking.care_cost_aed ? ` · care ${aed(result.rebooking.care_cost_aed)}` : ""}.
-          </p>
-        )}
-        {result.passengers.length > 0 && <WeightsPanel meta={meta} scenario={scenario} onUpdate={onUpdate} />}
-        <PassengerTable scenario={scenario} rows={result.passengers} meta={meta} />
-        {result.passengers.length > 0 && <DecisionBar scenario={scenario} target="rebooking" label="rebooking plan" />}
-      </section>
-
-      <RewardPanel scenario={scenario} />
+      <PassengerTabs
+        scenario={scenario}
+        passengersLabel={cancelledPax ? `Passengers to rebook (${num(result.passengers.length)})` : `Connection passengers (${num(result.misconnections.length)})`}
+      >
+        <section aria-labelledby="pax-title">
+          <h2 id="pax-title">
+            {cancelledPax
+              ? `Passengers to rebook: missed connections and cancelled flights (${num(result.passengers.length)})`
+              : `Passengers still missing a connection (${num(result.misconnections.length)})`}
+          </h2>
+          {result.rebooking && (
+            <p className="muted">
+              {num(result.rebooking.protected)} rebooked on later flights within 24 h ·{" "}
+              <strong>{num(result.rebooking.unprotected)}</strong> without a seat (next day + hotel, or refund)
+              {result.rebooking.hotel_rooms ? ` · ${num(result.rebooking.hotel_rooms)} hotel rooms` : ""}
+              {result.rebooking.care_cost_aed ? ` · care ${aed(result.rebooking.care_cost_aed)}` : ""}.
+            </p>
+          )}
+          {result.passengers.length > 0 && <WeightsPanel meta={meta} scenario={scenario} onUpdate={onUpdate} />}
+          <PassengerTable scenario={scenario} rows={result.passengers} meta={meta} />
+          {result.passengers.length > 0 && <DecisionBar scenario={scenario} target="rebooking" label="rebooking plan" />}
+        </section>
+      </PassengerTabs>
 
       <Assumptions items={result.assumptions} />
     </article>

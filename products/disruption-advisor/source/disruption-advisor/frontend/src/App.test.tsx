@@ -7,6 +7,7 @@ import { CancelView } from "./CancelView";
 import { CarrierTail } from "./CarrierTail";
 import { DelayView } from "./DelayView";
 import { LastWeekPanel } from "./LastWeekPanel";
+import { PassengerTabs } from "./PassengerTabs";
 import { RewardPanel } from "./RewardPanel";
 import { WatchlistView } from "./WatchlistView";
 import { aed, minutes, utc } from "./format";
@@ -201,6 +202,24 @@ describe("WatchlistView", () => {
     expect(await screen.findByText("AED 200 shopping voucher")).toBeInTheDocument();
     expect(screen.getByText(/covers 42% of the full plan/)).toBeInTheDocument();
     expect(screen.getByText("books online or in the app")).toBeInTheDocument();
+  });
+
+  it("switches one panel between the connection passengers and the rewards", async () => {
+    stubFetch(() => []);
+    const scenario = { id: "s1", flight_id: "G9519_202611210200", kind: "DELAY", delay_minutes: 120, weights: {}, result: {}, created_by: "x", created_at: "" } as unknown as Scenario;
+    render(
+      <PassengerTabs scenario={scenario} passengersLabel="Connection passengers (3)">
+        <p>the connection passenger table</p>
+      </PassengerTabs>,
+    );
+    expect(screen.getByRole("tab", { name: "Connection passengers (3)" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByText("the connection passenger table")).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Passenger rewards (goodwill)", hidden: true })).not.toBeVisible();
+    await userEvent.click(screen.getByRole("tab", { name: "Passenger rewards / compensation" }));
+    expect(screen.getByRole("heading", { name: "Passenger rewards (goodwill)" })).toBeVisible();
+    expect(screen.getByText("the connection passenger table")).not.toBeVisible();
+    await userEvent.click(screen.getByRole("tab", { name: "Connection passengers (3)" }));
+    expect(screen.getByText("the connection passenger table")).toBeVisible();
   });
 
   it("shows the API error when the risk data is not available", async () => {

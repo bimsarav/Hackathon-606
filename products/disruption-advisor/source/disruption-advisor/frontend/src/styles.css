@@ -948,3 +948,10 @@ tr.clickable.selected {
   flex-direction: column;
   gap: 0.35rem;
 }
+
+.passenger-panel {
+  margin-top: 1rem;
+}
+.passenger-panel > .tabs {
+  margin-bottom: 0.75rem;
+}
