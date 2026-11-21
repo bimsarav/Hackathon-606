@@ -195,6 +195,8 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const [history, setHistory] = useState<ScenarioSummary[]>([]);
   const [load, setLoad] = useState<Load>({ kind: "idle" });
+  const [delaySubmitted, setDelaySubmitted] = useState(false);
+  const [cancelSubmitted, setCancelSubmitted] = useState(false);
   const isEvaluator = session.role === "EVALUATOR";
   const [view, setView] = useState<View>(() => {
     const saved = recall(VIEW_KEY) as View | null;
@@ -241,6 +243,8 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
     try {
       const s = await action();
       setScenario(s);
+      if (targetView === "delay") setDelaySubmitted(true);
+      if (targetView === "cancel") setCancelSubmitted(true);
       setLoad({ kind: "idle" });
       refreshHistory();
     } catch (e: unknown) {
@@ -346,14 +350,14 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
                   onAgent={askAgent}
                 />
               )}
-              {!scenario && load.kind !== "busy" && (
+              {!delaySubmitted && load.kind !== "busy" && (
                 <section className="empty">
                   <h1>Flight Delay Analysis</h1>
                   <p>Select a suggested flight above, or search by flight number, airport or aircraft tail. The engine maps the knock-on effect along the full rotation and compares every recovery option by cost.</p>
                   <p className="muted">Every recommendation needs a person to approve it before anything changes in airline systems.</p>
                 </section>
               )}
-              {scenario && meta && scenario.result.type === "DELAY" && (
+              {delaySubmitted && scenario && meta && scenario.result.type === "DELAY" && (
                 <DelayView scenario={scenario} result={scenario.result} meta={meta} onUpdate={setScenario} />
               )}
             </>
@@ -385,14 +389,14 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
                   onAgent={askAgent}
                 />
               )}
-              {!scenario && load.kind !== "busy" && (
+              {!cancelSubmitted && load.kind !== "busy" && (
                 <section className="empty">
                   <h1>Cancellation Analysis</h1>
                   <p>Select a flight to cancel. The engine ranks all affected passengers by tier and urgency, then rebooks them against available seats on alternative flights.</p>
                   <p className="muted">Every recommendation needs a person to approve it before anything changes in airline systems.</p>
                 </section>
               )}
-              {scenario && meta && scenario.result.type === "CANCEL" && (
+              {cancelSubmitted && scenario && meta && scenario.result.type === "CANCEL" && (
                 <CancelView scenario={scenario} result={scenario.result} meta={meta} onUpdate={setScenario} />
               )}
             </>
@@ -490,7 +494,7 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
                       )}
                     >
                       <span className={`recent-badge ${h.kind === "DELAY" ? "recent-badge-delay" : "recent-badge-cancel"}`}>
-                        {h.kind === "DELAY" ? `+${h.delay_minutes}m` : "Canc"}
+                        {h.kind === "DELAY" ? "Flight Delay" : "Cancellation"}
                       </span>
                       <span className="recent-flight">{h.flight_id.split("_")[0]}</span>
                       <span className="recent-kind muted small">{h.kind === "DELAY" ? "Delay scenario" : "Cancellation"}</span>
