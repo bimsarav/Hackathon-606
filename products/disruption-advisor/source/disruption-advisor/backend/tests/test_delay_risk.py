@@ -132,7 +132,9 @@ def test_last_week_replays_unseen_flights_and_matches_the_actuals(ops: Path) -> 
     assert all((r["band"] == "low") == (r["outcome"] == "missed") for r in week["rows"])
 
 
-def test_watchlist_and_flight_risk_api(client: TestClient, auth: dict[str, str]) -> None:
+def test_watchlist_and_flight_risk_api(
+    client: TestClient, auth: dict[str, str], evaluator_auth: dict[str, str]
+) -> None:
     body = client.get("/api/v1/risk/watchlist?band=all&sort=delay", headers=auth).json()
     assert body["flights"]
     p60 = [f["p_60"] for f in body["flights"]]
@@ -144,7 +146,7 @@ def test_watchlist_and_flight_risk_api(client: TestClient, auth: dict[str, str])
     assert detail["connections"]
     assert "pnr" in detail["connections"][0]
     assert "name" not in detail["connections"][0]
-    assert client.get("/api/v1/risk/model", headers=auth).json()["thresholds_minutes"] == list(dr.THRESHOLDS)
+    assert client.get("/api/v1/risk/model", headers=evaluator_auth).json()["thresholds_minutes"] == list(dr.THRESHOLDS)
     assert client.get("/api/v1/risk/flights/G9999_202611210000", headers=auth).status_code == 404
     assert client.get("/api/v1/risk/flights/bad id", headers=auth).status_code == 422
     assert client.get("/api/v1/risk/watchlist").status_code == 401

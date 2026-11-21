@@ -164,3 +164,4 @@
 2026-11-21T04:34Z | T-612 | DONE | commit "loyalty improvements" rebased onto origin/heshawa b9319c2; removed b9319c2 duplicate api.ts types (RewardPlan, LastWeek with wrong /risk/lastweek route, PassengerRow loyalty fields) already present from the server code; gate 90+23 (output/T-612-check.log); pushed. input CSV + LibreOffice lock not committed | -
 2026-11-21T05:24Z | T-516 | STARTED | production deploy of heshawa 3d3d08f (user request); checking live state first | output/T-516-*.log
 2026-11-21T05:34Z | T-516 | DONE | production deployed and verified: smoke 11/11, e2e 8/8, new endpoints; rollback tag pre-202611210525; found + preserved server-only nginx.conf fix | output/T-516-*.log
+2026-11-21T12:50Z | T-617 | DONE | test data upload (evaluator adds flights via UI): backend, UI, tests, ADR 0013; local only, not committed or deployed | docs/architecture/adr/0013-test-data-upload.md

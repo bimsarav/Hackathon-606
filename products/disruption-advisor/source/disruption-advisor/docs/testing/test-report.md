@@ -180,3 +180,24 @@ The e2e folder's `tsconfig.json` needs `@types/node` in the e2e `devDependencies
 
 ### Not run
 The new Playwright tests have not been run locally (no Playwright or Docker on this machine) and not on the server since the fix. The 26 PostgreSQL-backed tests ran only in the SQLite scratch copy.
+
+
+## Test data upload (21 Nov 2026, local only, not deployed)
+- `backend/tests/test_sample_data.py` (5 tests): the template passes its own check; errors name file, row and column
+  (bad airport code, time, capacity, fare family, passenger type, missing column, unknown flight); clash with a real
+  flight, overbooking and a duplicate passenger are rejected; stored flights work in a delay scenario (3 misses,
+  full flight, next-day flight with 8 free seats) and are gone after removal; API: check-only stores nothing, add,
+  search, scenario, rewards, replace, remove, 401 without sign-in.
+- `frontend/src/TestData.test.tsx` (4 tests): columns shown, check then add, problems table, remove. Frontend total 28.
+- Run on the real local stack (real data plus demo): template added, G9981 found as `judge-test-data`, delay (2
+  missed connections), cancellation, rewards, remove. API tests ran on a SQLite scratch copy (no Docker locally);
+  the Postgres-only tests and Playwright were not run. No Playwright test was added for this page.
+- Not tested: a very large upload, two API workers reloading at the same time (design relies on file version only).
+- Roles (21 Nov 2026): `evaluator` sees all five views; `OCC` and `PCU` see Scenario, Watchlist and Agent only (frontend tests, 31 in
+  total, also when a hidden view was remembered). Backend: `/test-data*` and `/risk/model` return 403 for OCC and PCU, 200 for the
+  evaluator; the rest stays open (`test_only_the_evaluator_role_reaches_...`). Checked on the local stack with real logins.
+- Saved delay model (21 Nov 2026): `test_saved_model_scores_uploaded_flights_into_the_risk_tables` (models saved by the ingest and reloaded, monotone
+  curve, 3 flights and 3 connections scored, rows visible in the store) and `test_a_model_built_for_other_features_is_not_used` (mismatch: not used,
+  flights still added, reason shown). Local real-data stack: stage 3 retrained once (AUC-60 0.7697, same as before), uploading the template
+  scored 2 flights and 2 connections, the watchlist totals rose by those 2 flights (1,491 to 1,493), the flight page showed band, reasons and 2
+  connections; removal restored the totals. The watchlist rows are capped at 60, so low-risk test flights show only in the totals and the flight page.

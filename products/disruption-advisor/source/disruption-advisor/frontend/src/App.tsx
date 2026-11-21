@@ -15,6 +15,7 @@ import { DelayView } from "./DelayView";
 import { Launcher } from "./Launcher";
 import { CascadePanel } from "./CascadePanel";
 import { ModelCardView } from "./ModelCardView";
+import { TestDataPanel } from "./TestDataPanel";
 import { WatchlistView } from "./WatchlistView";
 import { utc } from "./format";
 
@@ -22,8 +23,10 @@ const STORAGE_KEY = "disruption-advisor-session";
 const OPEN_KEY = "disruption-advisor-open-scenario";
 const VIEW_KEY = "disruption-advisor-view";
 const AGENT_KEY = "disruption-advisor-agent-run";
-type View = "scenario" | "watchlist" | "agent" | "model";
-const VIEWS: View[] = ["scenario", "watchlist", "agent", "model"];
+type View = "scenario" | "watchlist" | "agent" | "model" | "testdata";
+const VIEWS: View[] = ["scenario", "watchlist", "agent", "model", "testdata"];
+/** Views only the evaluator role sees (the server refuses the others as well). */
+const EVALUATOR_VIEWS: View[] = ["model", "testdata"];
 
 function recall(key: string): string | null {
   try {
@@ -147,9 +150,10 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const [history, setHistory] = useState<ScenarioSummary[]>([]);
   const [load, setLoad] = useState<Load>({ kind: "idle" });
+  const isEvaluator = session.role === "EVALUATOR";
   const [view, setView] = useState<View>(() => {
     const saved = recall(VIEW_KEY) as View | null;
-    return saved && VIEWS.includes(saved) ? saved : "scenario";
+    return saved && VIEWS.includes(saved) && (isEvaluator || !EVALUATOR_VIEWS.includes(saved)) ? saved : "scenario";
   });
   useEffect(() => remember(VIEW_KEY, view), [view]);
   // Phase 3: the agent run on screen survives a reload, like the open scenario.
@@ -308,10 +312,18 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
               onClick={() => setView("agent")}>
               Agent
             </button>
-            <button type="button" className={`tab ${view === "model" ? "active" : ""}`} aria-pressed={view === "model"}
-              onClick={() => setView("model")}>
-              Model
-            </button>
+            {isEvaluator && (
+              <>
+                <button type="button" className={`tab ${view === "model" ? "active" : ""}`} aria-pressed={view === "model"}
+                  onClick={() => setView("model")}>
+                  Model
+                </button>
+                <button type="button" className={`tab ${view === "testdata" ? "active" : ""}`} aria-pressed={view === "testdata"}
+                  onClick={() => setView("testdata")}>
+                  Test data
+                </button>
+              </>
+            )}
           </nav>
           {view === "watchlist" && meta && (
             <WatchlistView
@@ -373,7 +385,8 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
           {view === "scenario" && scenario && meta && scenario.result.type === "CANCEL" && (
             <CancelView scenario={scenario} result={scenario.result} meta={meta} onUpdate={setScenario} />
           )}
-          {view === "model" && <ModelCardView />}
+          {isEvaluator && view === "model" && <ModelCardView />}
+          {isEvaluator && view === "testdata" && <TestDataPanel />}
         </main>
       </div>
     </>

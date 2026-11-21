@@ -1,4 +1,4 @@
-"""Demo authentication (ADR 0004): two roles, OCC and PCU (decision Q19).
+"""Demo authentication (ADR 0004): roles OCC, PCU (decision Q19) and EVALUATOR (sees everything; see evaluator_only).
 
 Users come from the DEMO_USERS secret ("user:password:role,..."), set only in the server .env. Tokens are
 HMAC-SHA256-signed, expiring bearer tokens (stdlib only). This is a demo control, not an identity provider:
@@ -18,7 +18,8 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.config import Settings
 
-ROLES = frozenset({"OCC", "PCU"})
+ROLES = frozenset({"OCC", "PCU", "EVALUATOR"})
+EVALUATOR = "EVALUATOR"  # sees every view; the other roles do not see the Model and Test data views
 _bearer = HTTPBearer(auto_error=False)
 
 
@@ -88,3 +89,13 @@ def current_user(
 
 
 CurrentUser = Annotated[User, Depends(current_user)]
+
+
+def evaluator_only(user: CurrentUser) -> User:
+    """The Model and Test data views (and their endpoints) are for the evaluator role."""
+    if user.role != EVALUATOR:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "This view is for the evaluator role")
+    return user
+
+
+EvaluatorUser = Annotated[User, Depends(evaluator_only)]

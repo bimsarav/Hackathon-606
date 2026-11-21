@@ -94,9 +94,26 @@ class Frame:
     x: np.ndarray  # float matrix in FEATURES order (categories as integer codes)
     raw: dict[str, np.ndarray]  # readable feature values for the reasons
     route_hour: np.ndarray  # baseline key
+    levels: dict[str, list[str]]  # category -> its values in code order (saved with the model)
 
 
-def _frame(con: duckdb.DuckDBPyConnection, ops: Path) -> Frame:
+def _frame(
+    con: duckdb.DuckDBPyConnection,
+    ops: Path,
+    extra: pa.Table | None = None,
+    levels: dict[str, list[str]] | None = None,
+) -> Frame:
+    """Features of every flight. ``extra``: more flights to score (uploaded test flights, part 'extra'), using the
+    same history. ``levels``: category codes of a saved model (unseen values get -1, which LightGBM treats as missing);
+    without it the codes are the ranks of the values in this data, which is what training uses."""
+    extra_sql = ""
+    if extra is not None:
+        con.register("extra_in", extra)
+        extra_sql = """
+        UNION ALL
+        SELECT flight_id, tail, origin, destination, std, sta, aircraft_model, capacity, booked_pax,
+               NULL::DOUBLE, NULL::DOUBLE, 'extra'
+        FROM extra_in"""
     con.execute(f"""
         CREATE OR REPLACE TEMP TABLE allf AS
         SELECT flight_id, tail, origin, destination, std, sta, aircraft_model, capacity, booked_pax,
@@ -106,7 +123,7 @@ def _frame(con: duckdb.DuckDBPyConnection, ops: Path) -> Frame:
         UNION ALL
         SELECT flight_id, tail, origin, destination, std, sta, aircraft_model, capacity, booked_pax,
                NULL::DOUBLE, NULL::DOUBLE, 'window'
-        FROM '{ops}/flights.parquet'""")
+        FROM '{ops}/flights.parquet'{extra_sql}""")
     con.execute(f"""
         CREATE OR REPLACE TEMP TABLE feat AS
         WITH b AS (
@@ -156,9 +173,16 @@ def _frame(con: duckdb.DuckDBPyConnection, ops: Path) -> Frame:
         ORDER BY q.std, q.flight_id""")
     codes = ", ".join(f"dense_rank() OVER (ORDER BY {c}) - 1 AS {c}_code" for c in CATEGORICAL)
     data = con.execute(f"SELECT *, {codes} FROM feat ORDER BY std, flight_id").fetchnumpy()
-    columns = [np.asarray(data[f"{c}_code"], dtype=float) for c in CATEGORICAL] + [
-        np.asarray(_floats(data[c]), dtype=float) for c in NUMERIC
-    ]
+    if levels is None:
+        levels = {
+            c: [str(r[0]) for r in con.execute(f"SELECT DISTINCT {c} FROM feat ORDER BY {c}").fetchall()]
+            for c in CATEGORICAL
+        }
+        cat_columns = [np.asarray(data[f"{c}_code"], dtype=float) for c in CATEGORICAL]
+    else:
+        index = {c: {v: i for i, v in enumerate(levels[c])} for c in CATEGORICAL}
+        cat_columns = [np.array([index[c].get(str(v), -1) for v in data[c]], dtype=float) for c in CATEGORICAL]
+    columns = cat_columns + [np.asarray(_floats(data[c]), dtype=float) for c in NUMERIC]
     return Frame(
         flight_id=np.asarray(data["flight_id"]),
         part=np.asarray(data["part"]),
@@ -168,6 +192,7 @@ def _frame(con: duckdb.DuckDBPyConnection, ops: Path) -> Frame:
         x=np.column_stack(columns),
         raw={c: np.asarray(data[c]) for c in FEATURES},
         route_hour=np.asarray(data["route_hour"]),
+        levels=levels,
     )
 
 
@@ -198,6 +223,13 @@ class DelayCurve:
             y = (label >= t).astype(int)
             data = lgb.Dataset(frame.x[known], y[known], weight=weight, categorical_feature=cat, free_raw_data=False)
             self.boosters[t] = lgb.train(PARAMS, data, num_boost_round=ROUNDS)
+
+    @classmethod
+    def loaded(cls, boosters: dict[int, lgb.Booster]) -> DelayCurve:
+        """A curve rebuilt from saved boosters (no training)."""
+        curve = cls.__new__(cls)
+        curve.boosters = boosters
+        return curve
 
     def predict(self, x: np.ndarray) -> np.ndarray:
         """Rows x thresholds, non-increasing along the thresholds."""
@@ -461,14 +493,24 @@ def _baseline(frame: Frame, train: np.ndarray, rows: np.ndarray, threshold: int)
     )
 
 
-def _connections(con: duckdb.DuckDBPyConnection, ops: Path, risk: pa.Table, default_mct: int) -> pa.Table:
-    """Connecting passengers of every window flight with the misconnect risk S(connection time - MCT)."""
+def _connections(
+    con: duckdb.DuckDBPyConnection,
+    ops: Path,
+    risk: pa.Table,
+    default_mct: int,
+    pax_src: str | None = None,
+    flight_src: str | None = None,
+) -> pa.Table:
+    """Connecting passengers of every window flight with the misconnect risk S(connection time - MCT).
+    ``pax_src`` / ``flight_src``: SQL sources instead of the ops files (to include uploaded test flights)."""
+    pax_src = pax_src or f"'{ops}/pax_segments.parquet'"
+    flight_src = flight_src or f"'{ops}/flights.parquet'"
     con.register("risk_in", risk)
     rows = con.execute(f"""
         WITH seg AS (
             SELECT p.pnr, p.customer_key, p.passenger_id, p.flight_id, p.origin, p.destination, f.std, f.sta,
                    f.flight_number
-            FROM '{ops}/pax_segments.parquet' p JOIN '{ops}/flights.parquet' f USING (flight_id)
+            FROM {pax_src} p JOIN {flight_src} f USING (flight_id)
             WHERE p.pax_type <> 'IN'),
         pairs AS (
             SELECT i.pnr, i.customer_key, i.passenger_id, i.flight_id AS inbound_flight_id,
@@ -661,6 +703,7 @@ def run(ops: Path, default_mct: int = 50) -> dict[str, Any]:
     connection_check = _connection_backtest(
         con, ops, frame, test_rows, arrival_eval.predict(frame.x[test_rows]), p_test, default_mct
     )
+    save_models(ops, production, arrival, frame.levels, default_mct, str(end.astype("datetime64[D]")))
     win = np.flatnonzero(frame.part == "window")
     p_win = production.predict(frame.x[win])
     a_win = arrival.predict(frame.x[win])
@@ -734,6 +777,122 @@ def run(ops: Path, default_mct: int = 50) -> dict[str, Any]:
     return {"scored": len(win), "connections": connections.num_rows, "auc_60": metrics["60"]["auc"]}
 
 
+# --- the trained knowledge: saved at ingest, loaded to score flights that were not in the ingest run ---------------
+MODEL_DIR = "delay_model"
+
+
+def save_models(
+    ops: Path,
+    departure: DelayCurve,
+    arrival: DelayCurve,
+    levels: dict[str, list[str]],
+    default_mct: int,
+    history_end: str,
+) -> None:
+    """Write the production boosters (departure and arrival delay, per threshold) and what is needed to reuse them."""
+    folder = ops / MODEL_DIR
+    folder.mkdir(parents=True, exist_ok=True)
+    for kind, curve in (("dep", departure), ("arr", arrival)):
+        for t in THRESHOLDS:
+            curve.boosters[t].save_model(str(folder / f"{kind}_{t}.txt"))
+    meta = {
+        "lightgbm": lgb.__version__,
+        "features": list(FEATURES),
+        "thresholds": list(THRESHOLDS),
+        "levels": levels,
+        "default_mct": default_mct,
+        "history_end": history_end,
+        "trained_at": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    }
+    (folder / "meta.json").write_text(json.dumps(meta))
+
+
+def load_models(ops: Path) -> tuple[DelayCurve, DelayCurve, dict[str, Any]] | None:
+    """The saved departure and arrival curves and their meta, or None when missing or built for other code
+    (a different feature list, thresholds or LightGBM version): then nothing is scored rather than scored wrongly."""
+    folder = ops / MODEL_DIR
+    try:
+        meta = json.loads((folder / "meta.json").read_text())
+        if (
+            meta["features"] != list(FEATURES)
+            or meta["thresholds"] != list(THRESHOLDS)
+            or meta["lightgbm"] != lgb.__version__
+        ):
+            return None
+        curves = [
+            DelayCurve.loaded({t: lgb.Booster(model_file=str(folder / f"{kind}_{t}.txt")) for t in THRESHOLDS})
+            for kind in ("dep", "arr")
+        ]
+    except Exception:
+        return None
+    return curves[0], curves[1], dict(meta)
+
+
+def score_test_flights(ops: Path, test_dir: Path, default_mct: int | None = None) -> dict[str, Any]:
+    """Score the uploaded test flights with the saved model and write test_dir/flight_risk.parquet and
+    connection_risk.parquet (same columns as the ops files). History, real flights and model are only read."""
+    flights_file = test_dir / "flights.parquet"
+    loaded = load_models(ops)
+    if loaded is None:
+        return {"scored": 0, "connections": 0, "reason": "no saved model: run the ingest once"}
+    departure, arrival, meta = loaded
+    mct = int(meta["default_mct"]) if default_mct is None else default_mct
+    con = duckdb.connect()
+    extra = con.execute(
+        f"""SELECT flight_id, tail, origin, destination, std, sta, aircraft_model, capacity, booked_pax
+            FROM '{flights_file}'"""
+    ).to_arrow_table()
+    frame = _frame(con, ops, extra=extra, levels=meta["levels"])
+    rows = np.flatnonzero(frame.part == "extra")
+    if len(rows) == 0:
+        return {"scored": 0, "connections": 0, "reason": "no flights"}
+    p_rows, a_rows = departure.predict(frame.x[rows]), arrival.predict(frame.x[rows])
+    contrib = departure.contributions(frame.x[rows])
+    j60 = THRESHOLDS.index(REASON_THRESHOLD)
+    risk = pa.table(
+        {
+            "flight_id": [str(frame.flight_id[i]) for i in rows],
+            **{f"p_{t}": [round(float(v), 4) for v in p_rows[:, j]] for j, t in enumerate(THRESHOLDS)},
+            **{f"a_{t}": [round(float(v), 4) for v in a_rows[:, j]] for j, t in enumerate(THRESHOLDS)},
+            "planning_delay_minutes": [planning_delay(r) for r in p_rows],
+            "risk_band": [_band(float(r[j60])) for r in p_rows],
+            "reasons": [json.dumps(reasons(frame, int(i), contrib[k])) for k, i in enumerate(rows)],
+        }
+    )
+    # Real flights' risk is needed too: a test passenger may connect onto a real flight.
+    real = con.execute(
+        f"SELECT flight_id, {', '.join(f'p_{t}, a_{t}' for t in THRESHOLDS)} FROM '{ops}/flight_risk.parquet'"
+    )
+    both = pa.concat_tables(
+        [real.to_arrow_table(), risk.select(["flight_id", *[f"{k}_{t}" for t in THRESHOLDS for k in "pa"]])]
+    )
+    pax_src = (
+        f"(SELECT pnr, customer_key, passenger_id, flight_id, origin, destination, pax_type "
+        f"FROM '{ops}/pax_segments.parquet' "
+        f"UNION ALL BY NAME SELECT pnr, customer_key, passenger_id, flight_id, origin, destination, pax_type "
+        f"FROM '{test_dir}/pax_segments.parquet')"
+    )
+    flight_src = (
+        f"(SELECT flight_id, std, sta, flight_number FROM '{ops}/flights.parquet' "
+        f"UNION ALL BY NAME SELECT flight_id, std, sta, flight_number FROM '{flights_file}')"
+    )
+    connections = _connections(con, ops, both, mct, pax_src=pax_src, flight_src=flight_src)
+    ids = {str(frame.flight_id[i]) for i in rows}
+    mask = [v in ids for v in connections.column("inbound_flight_id").to_pylist()]
+    connections = connections.filter(pa.array(mask, type=pa.bool_()))
+    con.register("risk_t", risk)
+    con.register("conn_t", connections)
+    risk = con.sql("""
+        SELECT r.*, coalesce(c.n, 0)::INTEGER AS connecting_pax,
+               round(coalesce(c.expected, 0), 2) AS expected_misconnects
+        FROM risk_t r LEFT JOIN (SELECT inbound_flight_id, count(*) AS n, sum(misconnect_risk) AS expected
+                                 FROM conn_t GROUP BY 1) c ON c.inbound_flight_id = r.flight_id
+        ORDER BY r.flight_id""").to_arrow_table()
+    pq.write_table(risk, test_dir / "flight_risk.parquet")
+    pq.write_table(connections, test_dir / "connection_risk.parquet")
+    return {"scored": risk.num_rows, "connections": connections.num_rows, "reason": None}
+
+
 def default_mct_from_env(value: str | None) -> int:
     try:
         return int(value) if value else 50
@@ -741,4 +900,13 @@ def default_mct_from_env(value: str | None) -> int:
         return 50
 
 
-__all__ = ["THRESHOLDS", "DelayCurve", "planning_delay", "run", "survival"]
+__all__ = [
+    "THRESHOLDS",
+    "DelayCurve",
+    "load_models",
+    "planning_delay",
+    "run",
+    "save_models",
+    "score_test_flights",
+    "survival",
+]

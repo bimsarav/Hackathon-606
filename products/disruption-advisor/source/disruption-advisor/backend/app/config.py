@@ -21,6 +21,8 @@ class Settings(BaseSettings):
 
     # Operating data (Parquet built by `python -m app.ingest`); the API only reads <data_dir>/ops.
     data_dir: Path = Path("/data")
+    # Test data uploaded in the UI (app/sample_data.py): a few flights added on top of the real data. Writable.
+    test_data_dir: Path = Path("/testdata")
     # Demo "now" (decision Q2): the extracts are a snapshot, so the clock is simulated.
     now_utc: datetime = datetime(2026, 11, 20, 0, 0)
     horizon_days: int = 7

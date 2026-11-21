@@ -11,7 +11,7 @@ from typing import Annotated, Any, Literal
 from fastapi import APIRouter, HTTPException, Path, Query, Request, status
 from fastapi.encoders import jsonable_encoder
 
-from app.auth import CurrentUser
+from app.auth import CurrentUser, EvaluatorUser
 from app.engine.store import OpsStore
 
 router = APIRouter(prefix="/api/v1/risk", tags=["risk"])
@@ -41,7 +41,7 @@ def _row(r: dict[str, Any]) -> dict[str, Any]:
 
 
 @router.get("/model")
-def model_card(request: Request, _: CurrentUser) -> dict[str, Any]:
+def model_card(request: Request, _: EvaluatorUser) -> dict[str, Any]:
     """How the delay-risk model was trained and how well it did on the most recent weeks it did not see."""
     return _store(request).model_card
 

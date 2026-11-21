@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Meta, Scenario } from "./api";
@@ -95,6 +95,37 @@ describe("App", () => {
     expect(await screen.findByText("Start with a disruption")).toBeInTheDocument();
     expect(await screen.findByText(/142 connecting/)).toBeInTheDocument();
     expect(screen.getByText("AI off: template explanations")).toBeInTheDocument();
+  });
+});
+
+describe("roles", () => {
+  async function signIn(role: "OCC" | "PCU" | "EVALUATOR") {
+    stubFetch((url) => {
+      if (url.includes("/auth/login")) return { token: "t", username: "u", role, expires_at: "2099-01-01T00:00:00Z" };
+      if (url.includes("/meta")) return { ...meta, user: { username: "u", role } };
+      if (url.includes("/presets")) return { delay: [], cancel: [] };
+      if (url.includes("/scenarios")) return [];
+      return {};
+    });
+    render(<App />);
+    await userEvent.type(screen.getByLabelText("User name"), "u");
+    await userEvent.type(screen.getByLabelText("Password"), "pw");
+    await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    await screen.findByText("Start with a disruption");
+  }
+
+  it("shows the evaluator every view, including Model and Test data", async () => {
+    await signIn("EVALUATOR");
+    const names = within(screen.getByRole("navigation", { name: "Views" })).getAllByRole("button").map((b) => b.textContent);
+    expect(names).toEqual(["Scenario", "Delay watchlist (7 days)", "Agent", "Model", "Test data"]);
+  });
+
+  it.each(["OCC", "PCU"] as const)("hides Model and Test data from %s, even when one was remembered", async (role) => {
+    sessionStorage.setItem("disruption-advisor-view", "testdata");
+    await signIn(role);
+    const names = within(screen.getByRole("navigation", { name: "Views" })).getAllByRole("button").map((b) => b.textContent);
+    expect(names).toEqual(["Scenario", "Delay watchlist (7 days)", "Agent"]);
+    expect(screen.queryByRole("heading", { name: "Test data" })).not.toBeInTheDocument();
   });
 });
 

@@ -10,7 +10,7 @@ from fastapi import FastAPI
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app import advisor, agent_api, health, risk
+from app import advisor, agent_api, health, risk, sample_data
 from app.config import Settings, get_settings
 from app.engine.explain import Explainer
 from app.engine.store import OpsStore
@@ -31,12 +31,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def get_store() -> OpsStore | None:
         """Load the operating data on first use; None until the ingest has produced it."""
         with lock:
-            if "store" not in loaded:
-                ops = settings.data_dir / "ops"
+            ops = settings.data_dir / "ops"
+            stamp = sample_data.version(settings.test_data_dir)
+            current = loaded.get("store")
+            # Reload when test data was added, replaced or removed (by any worker): a cheap file check per call.
+            if current is None or current.test_version != stamp:
                 if not (ops / "flights.parquet").exists():
                     return None
-                loaded["store"] = OpsStore(ops)
-                log.info("ops_data_loaded", path=str(ops))
+                loaded["store"] = OpsStore(ops, settings.test_data_dir)
+                log.info("ops_data_loaded", path=str(ops), test_data=stamp is not None)
             return loaded["store"]
 
     @asynccontextmanager
@@ -72,4 +75,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(advisor.router)
     app.include_router(risk.router)
     app.include_router(agent_api.router)
+    app.include_router(sample_data.router)
     return app

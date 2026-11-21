@@ -101,6 +101,7 @@ services:
     environment: *api-env
     volumes:
       - ops-data:/data:ro
+      - test-data:/testdata
     depends_on:
       db: { condition: service_healthy }
       migrate: { condition: service_completed_successfully }
@@ -123,3 +124,4 @@ services:
 volumes:
   db-data:
   ops-data:
+  test-data:  # judge test data uploaded in the UI (separate from the real data)

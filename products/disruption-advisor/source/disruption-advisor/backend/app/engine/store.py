@@ -15,6 +15,7 @@ from typing import Any
 
 import duckdb
 
+from app import sample_data
 from app.ml.reward_pref import RewardModel
 
 TABLES = ("flights", "pax_segments", "customers", "aircraft", "mct", "airports", "booking_classes")
@@ -55,18 +56,21 @@ LEG_COLUMNS = (
 class OpsStore:
     """Loads the ops Parquet tables into memory; each call uses its own cursor (thread-safe)."""
 
-    def __init__(self, ops_dir: Path) -> None:
+    def __init__(self, ops_dir: Path, test_dir: Path | None = None) -> None:
         self.ops_dir = ops_dir
+        self.test_dir = test_dir
         self._con = duckdb.connect(":memory:")
         self._lock = threading.Lock()
         for table in TABLES:
             self._con.execute(f"CREATE TABLE {table} AS SELECT * FROM read_parquet('{ops_dir / table}.parquet')")
+        self.test_version = self._add_test_data(test_dir)
         self._con.execute("CREATE INDEX idx_pax_flight ON pax_segments (flight_id)")
         self._con.execute("CREATE INDEX idx_pax_pnr ON pax_segments (pnr)")
         self.has_risk = all((ops_dir / f"{t}.parquet").exists() for t in RISK_TABLES)
         if self.has_risk:
             for table in RISK_TABLES:
                 self._con.execute(f"CREATE TABLE {table} AS SELECT * FROM read_parquet('{ops_dir / table}.parquet')")
+            self._add_test_data(test_dir, sample_data.RISK_TABLES)
             self._con.execute("CREATE INDEX idx_conn_in ON connection_risk (inbound_flight_id)")
         card = ops_dir / "model_card.json"
         self.model_card: dict[str, Any] = json.loads(card.read_text()) if card.exists() else {}
@@ -77,6 +81,30 @@ class OpsStore:
         self.last_week: dict[str, Any] = json.loads(week.read_text()) if week.exists() else {}
         report = ops_dir / "ingest_report.json"
         self.report: dict[str, Any] = json.loads(report.read_text()) if report.exists() else {}
+
+    def _add_test_data(self, test_dir: Path | None, tables: tuple[str, ...] = sample_data.TABLES) -> int | None:
+        """Append the uploaded test flights (app/sample_data.py) to the in-memory tables; the Parquet is untouched."""
+        stamp = sample_data.version(test_dir) if test_dir else None
+        if test_dir is None or stamp is None:
+            return None
+        for table in tables:
+            path = test_dir / f"{table}.parquet"
+            if path.exists():
+                # Only the columns the real table has; columns it lacks are left out, ones the sheet lacks stay NULL.
+                have = {
+                    r[0]
+                    for r in self._con.execute(
+                        f"SELECT column_name FROM information_schema.columns WHERE table_name = '{table}'"
+                    ).fetchall()
+                }
+                cols = [
+                    r[0]
+                    for r in self._con.execute(f"DESCRIBE SELECT * FROM read_parquet('{path}')").fetchall()
+                    if r[0] in have
+                ]
+                listing = ", ".join(f'"{c}"' for c in cols)
+                self._con.execute(f"INSERT INTO {table} BY NAME SELECT {listing} FROM read_parquet('{path}')")
+        return stamp
 
     def query(self, sql: str, params: list[Any] | None = None) -> list[dict[str, Any]]:
         cur = self._con.cursor()

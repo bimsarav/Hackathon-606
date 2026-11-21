@@ -1137,3 +1137,10 @@ tr.clickable.selected {
 
 /* Loyalty: family-account chip next to the tier (airline loyalty sample) */
 .loyalty-family { margin-left: 4px; }
+
+.testdata h2 { margin-top: 0; }
+.testdata-files { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); margin: 0.75rem 0; }
+.testdata-file { border: 1px solid var(--line, #d0d5dd); border-radius: 6px; padding: 0.75rem; overflow-x: auto; }
+.testdata-file h3 { margin: 0 0 0.25rem; }
+.testdata-actions { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin: 0.5rem 0; }
+.testdata-status, .testdata-report { margin: 0.75rem 0; overflow-x: auto; }

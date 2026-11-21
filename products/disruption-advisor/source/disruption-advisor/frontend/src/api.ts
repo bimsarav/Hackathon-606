@@ -17,7 +17,7 @@ export class ApiError extends Error {
   }
 }
 
-export type Role = "OCC" | "PCU";
+export type Role = "OCC" | "PCU" | "EVALUATOR";
 export interface Session {
   token: string;
   username: string;
@@ -520,6 +520,53 @@ export interface ModelCard {
   assumptions: string[];
 }
 
+export interface TestDataField {
+  name: string;
+  required: boolean;
+  example: string;
+  help: string;
+}
+export interface TestDataFile {
+  key: "flights" | "passengers";
+  title: string;
+  file_name: string;
+  purpose: string;
+  fields: TestDataField[];
+  template: string;
+}
+export interface TestDataSpec {
+  files: TestDataFile[];
+  format: string;
+  limits: { flights: number; passenger_rows: number };
+  notes: string[];
+}
+export interface TestDataStatus {
+  loaded: boolean;
+  uploaded_by?: string;
+  uploaded_at?: string;
+  counts?: { flights: number; passenger_segments: number; passengers: number };
+  /** Delay risk of the test flights, scored with the saved model (reason is set when nothing was scored). */
+  risk?: { scored: number; connections: number; reason: string | null };
+  flights?: {
+    flight_id: string; flight_number: string; route: string; std: string; sta: string; tail: string;
+    capacity: number; booked_seats: number; passengers: number;
+  }[];
+}
+export interface TestDataIssue {
+  file: string;
+  row: number | null;
+  column: string | null;
+  message: string;
+}
+export interface TestDataReport {
+  ok: boolean;
+  committed: boolean;
+  errors: TestDataIssue[];
+  warnings: string[];
+  summary: { flights: number; passenger_segments: number; passengers: number };
+  status?: TestDataStatus;
+}
+
 let token: string | null = null;
 export const setToken = (value: string | null): void => {
   token = value;
@@ -575,6 +622,11 @@ export const api = {
     post<RewardPlan>(`/api/v1/scenarios/${id}/rewards`, { budget_aed: budgetAed }),
   cascade: () => request<CascadeCheck>("/api/v1/risk/cascade"),
   modelCard: () => request<ModelCard>("/api/v1/risk/model"),
+  testDataSpec: () => request<TestDataSpec>("/api/v1/test-data/spec"),
+  testData: () => request<TestDataStatus>("/api/v1/test-data"),
+  uploadTestData: (flightsCsv: string, passengersCsv: string, commit: boolean) =>
+    post<TestDataReport>("/api/v1/test-data", { flights_csv: flightsCsv, passengers_csv: passengersCsv, commit }),
+  removeTestData: () => request<TestDataStatus>("/api/v1/test-data", { method: "DELETE" }),
   message: (id: string, customerKey: string) =>
     post<{ text: string; source: string }>(`/api/v1/scenarios/${id}/messages`, { customer_key: customerKey }),
 };

@@ -40,15 +40,16 @@ def data_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
 
 
 @pytest.fixture
-def client(alembic_config: Config, data_dir: Path) -> Iterator[TestClient]:
+def client(alembic_config: Config, data_dir: Path, tmp_path: Path) -> Iterator[TestClient]:
     url = alembic_config.get_main_option("sqlalchemy.url")
     assert url
     settings = Settings(
         database_url=url,
         log_json=False,
         data_dir=data_dir,
+        test_data_dir=tmp_path / "testdata",
         now_utc=t(0),
-        demo_users=SecretStr("occ:occ-pass:OCC,pcu:pcu-pass:PCU"),
+        demo_users=SecretStr("occ:occ-pass:OCC,pcu:pcu-pass:PCU,judge:judge-pass:EVALUATOR"),
         token_secret=SecretStr("test-secret-0123456789"),
     )
     app = create_app(settings)
@@ -61,4 +62,10 @@ def client(alembic_config: Config, data_dir: Path) -> Iterator[TestClient]:
 @pytest.fixture
 def auth(client: TestClient) -> dict[str, str]:
     token = client.post("/api/v1/auth/login", json={"username": "pcu", "password": "pcu-pass"}).json()["token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+def evaluator_auth(client: TestClient) -> dict[str, str]:
+    token = client.post("/api/v1/auth/login", json={"username": "judge", "password": "judge-pass"}).json()["token"]
     return {"Authorization": f"Bearer {token}"}
