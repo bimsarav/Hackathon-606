@@ -90,6 +90,7 @@ test("phase 3: strategies switch the recommendation", async ({ page }) => {
   await page.getByRole("button", { name: "Flight Delay", exact: true }).click();
   await page.locator(".preset-list .preset").first().click();
   await expect(page.getByRole("heading", { name: "Strategies compared" })).toBeVisible();
+  await page.getByRole("button", { name: /Strategies compared/ }).click(); // sections fold until opened
   await expect(page.locator(".strategy-card.active")).toHaveAttribute("data-strategy", "lowest_cost");
 
   await page.locator('.strategy-card[data-strategy="protect_passengers"]').click();
