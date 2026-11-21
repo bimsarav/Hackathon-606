@@ -1,0 +1,13 @@
+GET: model 200 | watchlist 200 | cascade 200 | agent runs 200 | scenarios 200
+cascade: 2026-10-19 to 2026-11-18 | pairs 1656 | mean delta 10.0 | within15 0.7506 | within30 0.9336
+rewards: major | passengers 215 | rewarded 76 | spend 8000.0 | trained model | severity: connection 75.9 vs none 65.0 | {'Loyalty miles': 45, 'Gift voucher': 31}
+  approve reward plan 201 | negative budget 422 | unauthenticated 401
+rewards: moderate | passengers 215 | rewarded 88 | spend 7970.0 | trained model | severity: connection 44.1 vs none 33.2 | {'Loyalty miles': 10, 'Gift voucher': 40, 'Lounge pass': 1, 'Meal voucher': 37}
+  approve reward plan 201 | negative budget 422 | unauthenticated 401
+web bundle:
+  Last month: cascade        1
+  Passenger rewards          1
+  Connection passengers      1
+  Gift voucher               0
+  Last week: predicted       0
+nginx dynamic DNS in the running web container: 3

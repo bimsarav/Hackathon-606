@@ -1,0 +1,13 @@
+
+Running 8 tests using 1 worker
+
+  ✓  1 [chromium] › tests/advisor.spec.ts:14:1 › wrong password is rejected and the API needs a token (316ms)
+  ✓  2 [chromium] › tests/advisor.spec.ts:23:1 › scenario A: a delay is assessed, options compared, recommendation approved (19.3s)
+  ✓  3 [chromium] › tests/advisor.spec.ts:54:1 › scenario B: a cancellation ranks passengers by tier and re-runs with new weights (5.1s)
+  ✓  4 [chromium] › tests/advisor.spec.ts:74:1 › phase 2: delay watchlist ranks flights, shows reasons and opens a delay scenario (6.5s)
+  ✓  5 [chromium] › tests/advisor.spec.ts:87:1 › phase 3: strategies switch the recommendation (15.5s)
+  ✓  6 [chromium] › tests/advisor.spec.ts:106:1 › phase 3: the agent investigates a flight and its recommendation opens for approval (25.1s)
+  ✓  7 [chromium] › tests/advisor.spec.ts:122:1 › phase 2: the 7-day tab shows last month's cascade check instead of the scenario launcher (695ms)
+  ✓  8 [chromium] › tests/advisor.spec.ts:141:1 › phase 5: a budget gives a reward plan from the preference model, and the plan can be approved (10.2s)
+
+  8 passed (1.4m)

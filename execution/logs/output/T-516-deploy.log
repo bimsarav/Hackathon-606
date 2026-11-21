@@ -1,0 +1,51 @@
+== backup 05:25:40 tag pre-202611210525
+-rw-r--r--. 1 opc opc 1258180882 Nov 21 05:28 /home/opc/backups/disruption-advisor/pre-202611210525.dump
+disruption-advisor-web:pre-202611210525
+disruption-advisor-api:pre-202611210525
+== ship 05:28:48 (from git HEAD 2d58d6e)
+extracted
+3
+== build 05:28:51
+  10 |     FROM nginx:1.30.7-alpine
+
+--------------------
+
+target web: failed to solve: process "/bin/sh -c npm run build" did not complete successfully: exit code: 1
+
+== built 05:29:06
+== removed the stale LastWeekPanel.tsx (deleted from the repo; the first web build failed on it) 05:29:34
+removed 'frontend/src/LastWeekPanel.tsx'
+== rebuild
+
+#38 [migrate] resolving provenance for metadata file
+#38 DONE 0.0s
+ Image disruption-advisor-api:latest Built 
+ Image disruption-advisor-web:latest Built 
+== built 05:30:52
+== up 05:30:59
+ Container disruption-advisor-migrate-1 Waiting 
+ Container disruption-advisor-migrate-1 Exited 
+ Container disruption-advisor-ingest-1 Starting 
+ Container disruption-advisor-ingest-1 Started 
+ Container disruption-advisor-ingest-1 Waiting 
+ Container disruption-advisor-ingest-1 Exited 
+ Container disruption-advisor-extracts-db-1 Starting 
+ Container disruption-advisor-api-1 Starting 
+ Container disruption-advisor-extracts-db-1 Started 
+ Container disruption-advisor-api-1 Started 
+ Container disruption-advisor-api-1 Waiting 
+ Container disruption-advisor-api-1 Healthy 
+ Container disruption-advisor-web-1 Starting 
+ Container disruption-advisor-web-1 Started 
+
+disruption-advisor-api-1 Up 5 seconds (healthy)
+disruption-advisor-db-1 Up 10 hours (healthy)
+disruption-advisor-web-1 Up Less than a second (health: starting)
+
+ingest-1  | 2026-11-21 05:31:19,118 INFO stage 1 skipped: extracts unchanged
+ingest-1  | 2026-11-21 05:31:19,118 INFO stage 2: building the operating picture
+ingest-1  | 2026-11-21 05:31:22,846 INFO stage 2 done: {"airports": 142, "aircraft": 81, "booking_classes": 388, "customers": 174723, "pax_segments": 299417, "flights": 2614, "history_flights": 63322, "mct": 39
+ingest-1  | 2026-11-21 05:31:46,252 INFO stage 3 done: {"scored": 2623, "connections": 88434, "auc_60": 0.7697}
+ingest-1  | 2026-11-21 05:31:46,326 INFO stage 3b done: {"pairs": 1656, "excluded": 3}
+ingest-1  | 2026-11-21 05:31:51,182 INFO stage 4 done: {"offers": 300000, "auc": 0.7018}
+== up done 05:31:57

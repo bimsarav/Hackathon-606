@@ -168,8 +168,15 @@ The e2e folder's `tsconfig.json` needs `@types/node` in the e2e `devDependencies
 - Delay model tuning and comparison (nine candidates): [model-selection.md](model-selection.md), including the check of the teammates' `month` and `route_freq` features.
 - Reward preference model (eight candidates, grouped folds, oracle bound): [reward-model-selection.md](reward-model-selection.md) and [reward-model-card.md](reward-model-card.md). The outcomes are simulated.
 
-### Server check before another deployment replaced the build (2026-11-21 03:35 UTC)
-Smoke test 11/11; the new endpoints answered correctly; Playwright ran 7 passed and 1 failed (the reward-approval assertion in the new test, fixed afterwards and not rerun on the server). Another deployment replaced the build minutes later, so these results do not describe the server's current state.
+### Production check (2026-11-21 05:35 UTC, heshawa `2d58d6e`)
+| Check | Result |
+|---|---|
+| Deployment | rollback tag `pre-202611210525` and a database dump first; all four ingest stages ran (stage 3 AUC-60 0.770, stage 3b 1,656 pairs, stage 4 AUC 0.702) |
+| Smoke test `scripts/smoke.sh` | **11/11** |
+| Playwright `scripts/e2e.sh` (Chromium) | **8 passed**, including the 7-day cascade panel with its full view and the reward plan with its approval |
+| New endpoints | cascade 200; reward plans via the trained model on a real cancellation and delay of G9148 (215 passengers): severity with a connection 75.9 against 65.0 without (cancellation); an approval is recorded (201); a negative budget returns 422; no sign-in returns 401 |
+| Reboot test | **Not run** for this release |
+| Found while deploying | the server held a `nginx.conf` fix that was not in git (committed first), and a stale source file broke the first web build (removed; see the deployment guide) |
 
 ### Not run
 The new Playwright tests have not been run locally (no Playwright or Docker on this machine) and not on the server since the fix. The 26 PostgreSQL-backed tests ran only in the SQLite scratch copy.

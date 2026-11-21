@@ -1,5 +1,5 @@
 # Deployment Status — disruption-advisor (MASTER_PROMPT §13.12, §14; phase gates per D-018)
-Overall: **PHASE 1 (MVP) DEPLOYED (verified incl. reboot test)** · Updated: 2026-11-20T19:58Z · Phase 2 IN PROGRESS (approved by user 2026-11-21); phase 2 live in prod (teammate deploy 00:26Z, synced + verified 2026-11-21: smoke 11/11, e2e 4/4, risk API; output/T-506-*.log); reboot check skipped by user decision · URL: http://92.5.154.198:8888
+Overall: **PHASES 1-3 AND 5 DEPLOYED – OPERATIONAL VERIFICATION PENDING** (no reboot test for phases 2, 3 and 5; nightly backups and HTTPS are phase 6) · Updated: 2026-11-21T05:35Z · production deploy of heshawa 2d58d6e verified: smoke 11/11, Playwright 8/8, new endpoints and reward plans checked (output/T-516-*.log); rollback tag pre-202611210525 + dump ~/backups/disruption-advisor/pre-202611210525.dump
 Target: OCI VM 92.5.154.198 (same host as the esm-hub discovery below), port 8888, code ~/apps/disruption-advisor, extracts ~/disruption-advisor-input (700 + ACL for container uid 999), secrets ~/apps/disruption-advisor/settings.env (600; .env is a link to it). Demo logins: workspace input/secrets/disruption-advisor-demo-logins.txt (git-ignored).
 
 | Phase | Status | Approval |
@@ -8,6 +8,7 @@ Target: OCI VM 92.5.154.198 (same host as the esm-hub discovery below), port 888
 | 1 MVP | DEPLOYED (verified) | user 2026-11-20 ("define MVP … host it") |
 | 2 Predict | DEPLOYED (verified; redeployed 2026-11-21T00:57Z, rollback tag pre-202611210055; reboot check skipped by user) (started 2026-11-20T23:25Z) | user 2026-11-21 ("start phase 2 now") |
 | 3 Agent + what-if | DEPLOYED (verified 2026-11-21T02:32Z: smoke 11/11, e2e 6/6, AI agent run on prod; rollback pre-202611210231; reboot test not run) | user 2026-11-21 ("start phase 3") |
+| 5 Passenger rewards + 7-day cascade check + tuned models | DEPLOYED (verified 2026-11-21T05:35Z: smoke 11/11, Playwright 8/8 incl. the cascade and reward tests, stages 3, 3b and 4 ran, reward plans via the trained model on a real delay and cancellation; rollback pre-202611210525; reboot test not run) | user 2026-11-21 ("deploy in production") |
 | 4 Extend | NOT STARTED | needs approval |
 | 6 Secure and protect (HTTPS + nightly backup, moved from phase 2 by user 2026-11-21) | NOT STARTED | needs approval |
 

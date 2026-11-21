@@ -54,6 +54,12 @@ This guide covers the target host, how the MVP and phase 2 (Predict) are deploye
 
   Take this manual dump before every deployment. Nightly automated backups with a restore test are planned for phase 6 (needs approval; design in ADR 0009).
 
+### Before an update: check what only the server has, and delete what the repository deleted (learned 2026-11-21)
+- **The server can hold changes that are not in git.** Before copying the tree, compare it with the repository (a checksum of every tracked file; for files that differ, check whether the server copy is just an older repository state). On 2026-11-21 this found a production fix to `frontend/nginx.conf` (re-resolving the API address through Docker DNS) that existed only on the server; it was committed first so the update could not overwrite it.
+- **Copying with `tar` adds and overwrites but never deletes.** A file removed from the repository stays on the server and can break the build (a removed panel left its old source file, and the web build failed on it). After copying, list the server's source files that are not tracked (`frontend/src`, `backend/app`, `backend/tests`, `e2e/tests`, `scripts`) and remove the stale ones.
+- **Ingest stages after an update:** stage 2 (operating picture), 3 (delay risk), 3b (cascade check) and 4 (reward preference model, simulated history) all rerun because their code is part of the ingest's change check; about 40 seconds in total on the server.
+- **Checks after the update:** `scripts/smoke.sh`, `E2E_BASE_URL=http://localhost:8888 scripts/e2e.sh` on the server (8 tests), and the new endpoints (`/api/v1/risk/cascade`, `/api/v1/scenarios/{id}/rewards`).
+
 ## Known limitations
 - **No HTTPS yet (phase 6).** Do not reuse the demo passwords anywhere else.
 - **No automated backup yet (phase 6).** Only the manual `pg_dump` above.
