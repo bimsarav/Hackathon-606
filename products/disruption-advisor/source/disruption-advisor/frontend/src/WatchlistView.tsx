@@ -19,11 +19,13 @@ const BAND_LABEL = { high: "High", medium: "Medium", low: "Low" } as const;
 interface Props {
   /** Opens Scenario A for the flight with the given delay (a person still reviews and approves). */
   onAnalyse: (flightId: string, delay: number) => void;
+  /** Phase 3: asks the agent to investigate the flight (delay: the planning delay, or null to let it decide). */
+  onAgent?: (flightId: string, delay: number | null) => void;
   busy: boolean;
 }
 
 /** Phase 2: flights likely to be late in the next 7 days, ranked by expected missed connections, with reasons. */
-export function WatchlistView({ onAnalyse, busy }: Props) {
+export function WatchlistView({ onAnalyse, onAgent, busy }: Props) {
   const [band, setBand] = useState<"all" | "medium" | "high">("medium");
   const [sort, setSort] = useState<"misconnects" | "delay">("misconnects");
   const [data, setData] = useState<Watchlist | null>(null);
@@ -137,7 +139,7 @@ export function WatchlistView({ onAnalyse, busy }: Props) {
                   {open === f.flight_id && (
                     <tr className="detail-row">
                       <td colSpan={9}>
-                        <FlightDetail flight={f} busy={busy} onAnalyse={onAnalyse} />
+                        <FlightDetail flight={f} busy={busy} onAnalyse={onAnalyse} onAgent={onAgent} />
                       </td>
                     </tr>
                   )}
@@ -152,7 +154,8 @@ export function WatchlistView({ onAnalyse, busy }: Props) {
   );
 }
 
-function FlightDetail({ flight, busy, onAnalyse }: { flight: RiskFlight; busy: boolean; onAnalyse: Props["onAnalyse"] }) {
+function FlightDetail({ flight, busy, onAnalyse, onAgent }:
+  { flight: RiskFlight; busy: boolean; onAnalyse: Props["onAnalyse"]; onAgent?: Props["onAgent"] }) {
   const [connections, setConnections] = useState<ConnectionRisk[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const delay = flight.planning_delay_minutes ?? 30;
@@ -181,10 +184,20 @@ function FlightDetail({ flight, busy, onAnalyse }: { flight: RiskFlight; busy: b
           Chance of a departure delay of at least 15 min {pct(flight.p_15)}, 30 min {pct(flight.p_30)}, 60 min{" "}
           {pct(flight.p_60)}, 2 h {pct(flight.p_120)}. Aircraft {flight.tail ?? "not assigned"}.
         </p>
-        <button type="button" className="primary" disabled={busy} onClick={() => onAnalyse(flight.flight_id, delay)}>
-          Analyse a {minutes(delay)} delay
-        </button>
-        <p className="small muted">Opens the delay scenario with this delay; you can change it there.</p>
+        <div className="row">
+          <button type="button" className="primary" disabled={busy} onClick={() => onAnalyse(flight.flight_id, delay)}>
+            Analyse a {minutes(delay)} delay
+          </button>
+          {onAgent && (
+            <button type="button" disabled={busy} onClick={() => onAgent(flight.flight_id, delay >= 15 ? delay : null)}>
+              Ask the agent
+            </button>
+          )}
+        </div>
+        <p className="small muted">
+          Opens the delay scenario with this delay; you can change it there.
+          {onAgent ? " The agent investigates the flight step by step and recommends an option for you to approve." : ""}
+        </p>
       </div>
       <div>
         <h3>Connecting passengers most at risk</h3>

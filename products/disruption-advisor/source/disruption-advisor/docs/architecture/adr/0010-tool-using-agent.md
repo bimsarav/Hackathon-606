@@ -1,0 +1,22 @@
+# ADR-0010: A recommend-only Claude agent on the Messages API, with a deterministic planner fallback
+
+- **Status:** Accepted (2026-11-21, phase 3 approved by the user)
+- **Context:**
+  - Phase 3 asks for an agent that coordinates the impact, recovery, priority and rebooking modules and explains its chain of reasoning.
+  - Phase 1 rules still hold: the engine decides the numbers, a person approves every action, and no personal data goes to the AI service (ADR 0007).
+  - The tools are in-process engine functions over private operating data (DuckDB/Parquet) on the OCI server.
+  - The product must work with no API key.
+- **Decision:**
+  - **Loop:** a manual tool-use loop on the Anthropic Messages API (Python SDK, the `anthropic` package already in use), run as a background task in the API process. Model: `claude-opus-5-5` (`AI_MODEL`), adaptive thinking with progress updates (`display: "updates"`), effort `medium` (`AGENT_EFFORT`), non-streaming requests with a per-request time-out taken from the run's remaining time, and server-side refusal fallback (`fallbacks: "default"`).
+  - **Tools:** read-only engine tools with strict JSON schemas (listed in SYSTEM_ARCHITECTURE §11.3). The final answer comes through a `submit_recommendation` tool. Its `option_key` must be one the engine produced; otherwise the tool returns an error to the model, which can correct itself within the limits (if it cannot, the planner answers).
+  - **Bounds:** 12 tool calls, 120 s, one run at a time per user. Each step (progress note, tool, inputs, one-line result) is stored in `agent_runs.trace`.
+  - **Privacy:** tool results are built from counts and flight facts. A unit test checks every request for names, PNRs and customer keys.
+  - **Fallback:** a deterministic planner calls the same tools in a fixed order, so the run always produces a recommendation. The UI shows which source produced it.
+- **Alternatives considered:**
+  - **Claude Managed Agents** (Anthropic hosts the loop and a sandbox): adds a beta dependency, session billing and session history held outside the server, with no gain here. Every tool would still have to call back into our API, because the data is local.
+  - **SDK Tool Runner (beta):** less code, but the manual loop gives exact control over the step limit, the time limit, the per-step trace and validation of the final answer.
+  - **Letting the model compute options or numbers:** rejected. It cannot be audited and could invent figures.
+- **Consequences:**
+  - An agent run takes about 20–60 s and is shown live. Estimated cost is about USD 0.05–0.30 per run (around 10 calls; the prompt cache covers the system prompt and tools).
+  - Agent output varies between runs; the numbers and the option list do not. Tests use a scripted fake client. E2E accepts either source (AI or planner).
+  - No new runtime dependency.

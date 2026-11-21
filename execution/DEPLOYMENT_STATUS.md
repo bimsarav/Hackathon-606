@@ -7,7 +7,7 @@ Target: OCI VM 92.5.154.198 (same host as the esm-hub discovery below), port 888
 | 0 Design | DONE (artifact https://claude.ai/artifact/PTzSvCcSHABHNz7HYhxG2s) | user 2026-11-20 |
 | 1 MVP | DEPLOYED (verified) | user 2026-11-20 ("define MVP … host it") |
 | 2 Predict | DEPLOYED (verified; redeployed 2026-11-21T00:57Z, rollback tag pre-202611210055; reboot check skipped by user) (started 2026-11-20T23:25Z) | user 2026-11-21 ("start phase 2 now") |
-| 3 Agent + what-if | NOT STARTED | needs approval |
+| 3 Agent + what-if | DEPLOYED (verified 2026-11-21T02:32Z: smoke 11/11, e2e 6/6, AI agent run on prod; rollback pre-202611210231; reboot test not run) | user 2026-11-21 ("start phase 3") |
 | 4 Extend | NOT STARTED | needs approval |
 | 6 Secure and protect (HTTPS + nightly backup, moved from phase 2 by user 2026-11-21) | NOT STARTED | needs approval |
 

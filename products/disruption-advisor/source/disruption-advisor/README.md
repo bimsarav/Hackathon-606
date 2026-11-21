@@ -1,8 +1,10 @@
 # Disruption Advisor
 
 Disruption Advisor helps an airline's Operations Control Centre (OCC) and Passenger Control Unit (PCU) handle a flight disruption before it cascades.
-- **Scenario A, delay:** for a delayed flight it shows every later flight on the same aircraft rotation and every passenger connection that breaks over the next 7 days. It compares recovery options (absorb the delay, or swap in a same-type aircraft) on delay, missed connections and cost, and recommends one.
+- **Scenario A, delay:** for a delayed flight it shows every later flight on the same aircraft rotation and every passenger connection that breaks over the next 7 days. It compares recovery options (absorb the delay, swap in a same-type aircraft, or, since phase 3, cancel or consolidate a later round trip of the delayed aircraft) on delay, missed connections, passengers and cost, and recommends one.
 - **Scenario B, cancellation:** for a cancelled flight it ranks the affected passengers. Strict tiers come first (mandated care, then urgency); configurable weights order passengers inside a tier (loyalty, travel frequency, fare, ancillaries, journey, family/group). It then assigns passengers to alternative flights within the seats actually available, keeping bookings together.
+- **Strategies (phase 3):** "Lowest cost" (default), "Protect passengers" and "Least delay" each pick their best option from the same list, shown side by side. Switching the strategy changes the recommendation, not the numbers. Design: [ADR 0011](docs/architecture/adr/0011-cancel-consolidate-and-strategies.md).
+- **Agent (phase 3):** on request, a Claude agent investigates a flight with read-only engine tools, shows each step live and recommends one engine option with reasons, risks and checks. The result opens as a normal scenario for approval. A rule-based planner answers when the AI is unavailable. No personal data is sent. Details: [docs/testing/agent-card.md](docs/testing/agent-card.md).
 - **Explanations:** every recommendation is explained in plain English, written by Claude when an API key is configured, otherwise by templates, and passenger messages are drafted.
 - **Delay watchlist (phase 2):** for the next 7 days it estimates each flight's chance of a late departure, gives the main reasons in plain words, and ranks flights by expected missed connections. Opening a flight shows its connecting passengers at risk and starts Scenario A with a suggested delay. Method and test results: [docs/testing/model-card.md](docs/testing/model-card.md).
 - **Human approval:** the tool **only recommends**. A person approves or rejects every action, and each decision is audited.
@@ -54,7 +56,7 @@ Every long-running service restarts by itself, including after a server reboot.
 
 ## Tests
 ```bash
-scripts/check.sh                 # backend lint, format, strict types, 47 tests (Testcontainers PostgreSQL); frontend type check, 9 tests, build
+scripts/check.sh                 # backend lint, format, strict types, 69 tests (Testcontainers PostgreSQL); frontend type check, 19 tests, build
 scripts/e2e.sh                   # Playwright end-to-end tests against the running stack (E2E_BASE_URL to target a server)
 scripts/smoke.sh [base-url]      # post-deployment smoke test against a running stack (read-mostly)
 scripts/check.sh lock            # after editing dependencies: refresh uv.lock / package-lock.json
@@ -67,16 +69,19 @@ Logs are written to `logs/`.
 | `/` | React app (sign in with a `DEMO_USERS` account) |
 | `/api/v1/auth/login` | Sign in (rate limited: 10 per minute per address) |
 | `/api/v1/meta`, `/api/v1/presets`, `/api/v1/flights` | Context, suggested scenarios, flight search |
-| `/api/v1/scenarios` (+ `/{id}`, `/reprioritise`, `/decisions`, `/messages`) | Run and store analyses, what-if, approvals, message drafts |
+| `/api/v1/scenarios` (+ `/{id}`, `/reprioritise`, `/select`, `/decisions`, `/messages`) | Run and store analyses, what-if, show another option, approvals and overrides, message drafts |
 | `/api/v1/risk/watchlist` | Flights in the next 1–7 days by risk band, ranked by expected missed connections or by delay risk (read-only) |
 | `/api/v1/risk/flights/{flight_id}` | One flight's delay risk and reasons, with its connecting passengers ranked by missed-connection risk |
 | `/api/v1/risk/model` | Model card: training data, features, test metrics against the baseline |
+| `/api/v1/scenarios/{id}/strategy` | Switch a delay scenario's strategy (lowest cost, protect passengers, least delay); the recommendation follows (phase 3) |
+| `/api/v1/agent/runs` (+ `/{id}`) | Start an agent run on a flight and follow its steps; the result is saved as a scenario for approval (phase 3, [agent card](docs/testing/agent-card.md)) |
 | `/api/openapi.json`, `/api/docs` | OpenAPI schema and Swagger UI |
 | `/healthz`; API `/health/live`, `/health/ready` | Health (readiness = database + operating data loaded) |
 
 ## Configuration
 Everything is set in **`settings.env`** (template: `settings.env.example`). Docker Compose reads it through the link `.env`, because Compose only looks for a file with that name.
 - **Data and access:** `INPUT_DIR`, `DEMO_USERS`, `TOKEN_SECRET`, `ANTHROPIC_API_KEY`, `AI_MODEL`.
+- **Agent (phase 3):** `AGENT_EFFORT` (default `medium`), `AGENT_MAX_TOOL_CALLS` (12), `AGENT_TIMEOUT_SECONDS` (120). Without `ANTHROPIC_API_KEY` the rule-based planner answers every agent run.
 - **Rule and cost defaults:** `MIN_TURN_MINUTES`, `DEFAULT_MCT_MINUTES`, `REBOOKING_WINDOW_HOURS`, `COST_DELAY_PER_MINUTE`, `COST_HOTEL_PER_NIGHT`, `COST_MEAL_VOUCHER`, `COST_REBOOKING_HANDLING`, `NOW_UTC` (demo clock).
 
 ## Push to your own git repository

@@ -1,8 +1,9 @@
 """Scenario analysis: the two MVP flows (UC5 briefing: "identify impact, evaluate recovery, recommend an action").
 
 A. ``analyse_delay``: a flight is delayed. Propagate along the aircraft rotation (7-day horizon), re-check every
-   connection, compare recovery options (absorb the delay | swap with a same-type aircraft at the hub), cost them,
-   recommend the cheapest, then prioritise and re-accommodate the passengers who still miss connections.
+   connection, compare recovery options (absorb the delay | swap with a same-type aircraft at the hub | cancel or
+   consolidate a later round trip, phase 3), cost them, re-accommodate the passengers each option leaves behind,
+   and recommend the pick of the chosen strategy (lowest cost by default; app/engine/strategy.py).
 B. ``analyse_cancellation``: a flight is cancelled. Rank its passengers (tiers + weights), assign them to
    alternatives within available seats (CP-SAT, PNRs together), and cost and explain the plan.
 
@@ -17,15 +18,27 @@ from typing import Any
 
 from app.config import Settings
 from app.engine import priority, rebooking
+from app.engine import strategy as strategies
 from app.engine.care import CareRules, care_for
 from app.engine.cost import CostModel, care_cost, eu261_compensation_eur, great_circle_km
 from app.engine.explain import Explainer, template_message
-from app.engine.network import RotationPlan, TurnTimes, absorb_delay, swap_rotations
+from app.engine.network import (
+    RotationPlan,
+    TurnTimes,
+    absorb_delay,
+    cancel_round_trip,
+    round_trip_pairs,
+    swap_rotations,
+)
 from app.engine.passengers import Connection, connections_at_risk
 from app.engine.store import Leg, OpsStore
 
 SWAP_SEARCH = timedelta(hours=3)
 MAX_SWAP_OPTIONS = 3
+CANCEL_WINDOW = timedelta(hours=24)  # round trips considered for cancellation (ADR 0011)
+MAX_CANCEL_OPTIONS = 3
+CONSOLIDATE_WITHIN_MINUTES = 360  # every cancelled passenger rebooked on the same route within 6 h
+NO_SEAT_DELAY_MINUTES = 24 * 60  # passenger delay counted for someone without a seat (assumption, shown in the UI)
 
 
 @dataclass(frozen=True)
@@ -108,7 +121,8 @@ def _eu261(ctx: Context, leg: Leg) -> int:
 # ---------------------------------------------------------------------------------------------------------------
 # A. Delay
 # ---------------------------------------------------------------------------------------------------------------
-def _option_kpis(ctx: Context, key: str, label: str, plan: RotationPlan, cancelled: set[str]) -> dict[str, Any]:
+def _option_kpis(ctx: Context, key: str, label: str, plan: RotationPlan, cancelled_legs: list[Leg]) -> dict[str, Any]:
+    cancelled = {x.flight_id for x in cancelled_legs}
     delayed = plan.delayed()
     connections = connections_at_risk(
         ctx.store,
@@ -118,7 +132,12 @@ def _option_kpis(ctx: Context, key: str, label: str, plan: RotationPlan, cancell
         ctx.settings.default_mct_minutes,
         ctx.max_connection,
     )
-    missed = [c for c in connections if c.missed]
+    # Passengers on a cancelled flight are rebooked as cancelled passengers, not counted again as missed connections.
+    missed = [
+        c
+        for c in connections
+        if c.missed and c.inbound_flight_id not in cancelled and c.outbound_flight_id not in cancelled
+    ]
     cm = ctx.cost
     delay_cost = plan.total_delay_minutes * cm.delay_per_minute
     care = sum(care_cost(cm, t.delay_minutes, overnight=False) * t.leg.booked_pax for t in delayed)
@@ -127,6 +146,7 @@ def _option_kpis(ctx: Context, key: str, label: str, plan: RotationPlan, cancell
     total = delay_cost + care + eu * cm.eur_to_aed + misconnect_cost
     return {
         "key": key,
+        "kind": key.split(":")[0],
         "label": label,
         "total_delay_minutes": plan.total_delay_minutes,
         "legs_delayed": len(delayed),
@@ -157,14 +177,100 @@ def _option_kpis(ctx: Context, key: str, label: str, plan: RotationPlan, cancell
             }
             for t in sorted(plan.timings.values(), key=lambda t: t.new_std)
         ],
+        "cancelled_flights": [
+            {
+                "flight_id": x.flight_id,
+                "flight_number": x.flight_number,
+                "origin": x.origin,
+                "destination": x.destination,
+                "std": x.std,
+                "booked_pax": x.booked_pax,
+            }
+            for x in cancelled_legs
+        ],
+        "cancelled_passengers": 0,  # set from the rebooking list (seated passengers) in _option_passengers
         "_missed": missed,
+        "_cancelled": cancelled_legs,
     }
 
 
+def _option_passengers(ctx: Context, o: dict[str, Any], weights: dict[str, float]) -> dict[str, Any]:
+    """Re-accommodate everyone the option leaves behind (missed connections and cancelled flights), add the
+    passenger KPIs and the cancellation cost to ``o``, and return the passenger payload for display."""
+    parts: list[tuple[str, dict[str, Any]]] = []
+    if o["_missed"]:
+        parts.append(("missed_connection", _reaccommodate_misconnects(ctx, o["_missed"], o, weights)))
+    cancel_cost = 0.0
+    excluded = [x.flight_id for x in o["_cancelled"]]
+    for leg in o["_cancelled"]:
+        rebooked = _rebook_cancelled(ctx, leg, weights, excluded)
+        parts.append(("cancelled", rebooked["payload"]))
+        cancel_cost += sum(rebooked["cost"].values())
+    payload = _merge_payloads(parts)
+    reb = payload["rebooking"] or {}
+    rows = payload["passengers"]
+    o["passengers_rebooked"] = reb.get("protected", 0)
+    o["passengers_without_seat"] = reb.get("unprotected", 0)
+    o["passenger_delay_minutes"] = (
+        sum(leg["delay_minutes"] * leg["booked_pax"] for leg in o["legs"])
+        + sum(r["arrival_delay_minutes"] or 0 for r in rows if r["assigned_flight_id"])
+        + NO_SEAT_DELAY_MINUTES * o["passengers_without_seat"]
+    )
+    if o["_cancelled"]:
+        o["cost_breakdown"]["cancellation"] = round(cancel_cost)
+        o["cost_aed"] = round(o["cost_aed"] + cancel_cost, 0)
+        a, b = o["_cancelled"]
+        cancelled_rows = [r for r in rows if r["group"] == "cancelled"]
+        o["cancelled_passengers"] = len(cancelled_rows)
+        consolidated = bool(cancelled_rows) and all(
+            r["assigned_flight_id"] and (r["arrival_delay_minutes"] or 0) <= CONSOLIDATE_WITHIN_MINUTES
+            for r in cancelled_rows
+        )
+        if consolidated:
+            o["kind"] = "consolidate"
+            o["label"] = (
+                f"Consolidate: cancel {a.flight_number}/{b.flight_number}, "
+                f"passengers move to other {a.origin}-{a.destination} flights"
+            )
+    return payload
+
+
+def _merge_payloads(parts: list[tuple[str, dict[str, Any]]]) -> dict[str, Any]:
+    """One passenger list for the option: each group keeps its own priority order and is labelled."""
+    if not parts:
+        return {"passengers": [], "rebooking": None}
+    rows, tiers = [], {"1": 0, "2": 0, "3": 0, "non_revenue": 0}
+    reb = {
+        "alternatives": [],
+        "protected": 0,
+        "unprotected": 0,
+        "groups_split": 0,
+        "care_cost_aed": 0,
+        "hotel_rooms": 0,
+    }
+    for group, part in parts:
+        rows += [{**r, "group": group} for r in part["passengers"]]
+        for k, v in part.get("tier_counts", {}).items():
+            tiers[k] = tiers.get(k, 0) + v
+        if part["rebooking"]:
+            reb["alternatives"] += part["rebooking"]["alternatives"]
+            for k in ("protected", "unprotected", "groups_split", "care_cost_aed", "hotel_rooms"):
+                reb[k] += part["rebooking"][k]
+    return {"passengers": rows, "tier_counts": tiers, "rebooking": reb}
+
+
 def analyse_delay(
-    ctx: Context, flight_id: str, delay_minutes: int, weights: dict[str, float], selected_key: str | None = None
+    ctx: Context,
+    flight_id: str,
+    delay_minutes: int,
+    weights: dict[str, float],
+    selected_key: str | None = None,
+    strategy: str = strategies.DEFAULT,
 ) -> dict[str, Any]:
-    """``selected_key``: the option a controller picked; passengers and costs then follow that option."""
+    """``selected_key``: the option a controller picked; passengers and costs then follow that option.
+    ``strategy``: which strategy's pick is the recommendation (app/engine/strategy.py)."""
+    if strategy not in strategies.STRATEGIES:
+        raise ScenarioError(f"Unknown strategy {strategy}")
     leg = ctx.store.leg(flight_id)
     if leg is None:
         raise ScenarioError(f"Flight {flight_id} is not in the operating window")
@@ -172,11 +278,8 @@ def analyse_delay(
     rest = [x for x in ctx.store.tail_legs(leg.tail, leg.std, horizon_end) if x.std > leg.std]
     delay = timedelta(minutes=delay_minutes)
 
-    options = [
-        _option_kpis(
-            ctx, "absorb", f"Absorb the delay on {leg.tail}", absorb_delay(leg, rest, delay, ctx.min_turn), set()
-        )
-    ]
+    absorbed = absorb_delay(leg, rest, delay, ctx.min_turn)
+    options = [_option_kpis(ctx, "absorb", f"Absorb the delay on {leg.tail}", absorbed, [])]
     if rest and rest[0].origin == leg.destination:
         takeover = rest[0].std
         candidates = ctx.store.tails_at_station(
@@ -188,33 +291,50 @@ def analyse_delay(
             plan = swap_rotations(leg, rest, delay, ctx.min_turn, tail, cand_legs)
             if plan is not None:
                 swaps.append(
-                    _option_kpis(ctx, f"swap:{tail}", f"Swap: {tail} takes over {rest[0].flight_number}", plan, set())
+                    _option_kpis(ctx, f"swap:{tail}", f"Swap: {tail} takes over {rest[0].flight_number}", plan, [])
                 )
-        options += sorted(swaps, key=_rank)[:MAX_SWAP_OPTIONS]
+        options += sorted(swaps, key=strategies.lowest_cost)[:MAX_SWAP_OPTIONS]
+    for i in round_trip_pairs(rest, absorbed, leg.std + CANCEL_WINDOW)[:MAX_CANCEL_OPTIONS]:
+        a, b = rest[i], rest[i + 1]
+        options.append(
+            _option_kpis(
+                ctx,
+                f"cancel:{a.flight_id}",
+                f"Cancel round trip {a.flight_number}/{b.flight_number} ({a.origin}-{a.destination}-{a.origin})",
+                cancel_round_trip(leg, rest, delay, ctx.min_turn, i),
+                [a, b],
+            )
+        )
 
-    options.sort(key=_rank)
-    best = options[0]
-    chosen = next((o for o in options if o["key"] == selected_key), best)
-    missed: list[Connection] = chosen["_missed"]
+    payloads = {o["key"]: _option_passengers(ctx, o, weights) for o in options}
+    missed_by_option: dict[str, list[Connection]] = {o["key"]: o.pop("_missed") for o in options}
     for o in options:
-        o.pop("_missed")
-
-    # Passengers who still miss a connection under the chosen option: rank and re-accommodate.
-    pax_plan = _reaccommodate_misconnects(ctx, missed, chosen, weights)
+        o.pop("_cancelled")
+    picks = strategies.picks(options)
+    for o in options:
+        o["picked_by"] = [name for name, key in picks.items() if key == o["key"]]
+    options = strategies.order(options, strategy)
+    best = next(o for o in options if o["key"] == picks[strategy])
+    chosen = next((o for o in options if o["key"] == selected_key), best)
+    missed = missed_by_option[chosen["key"]]
+    pax_plan = payloads[chosen["key"]]
     runner_up = next((o for o in options if o["key"] != chosen["key"]), None)
 
     def brief(o: dict[str, Any]) -> dict[str, Any]:
         return {
             "what": o["label"],
             "flights_delayed": o["legs_delayed"],
+            "flights_cancelled": len(o["cancelled_flights"]),
             "extra_delay_minutes": o["total_delay_minutes"],
             "passengers_missing_connections": o["misconnects"],
+            "passengers_without_seat": o["passengers_without_seat"],
             "estimated_cost_aed": round(o["cost_aed"]),
         }
 
     facts = {
         "late_flight": f"{leg.flight_number} from {leg.origin} to {leg.destination}",
         "delay_minutes": delay_minutes,
+        "strategy": strategies.label(strategy),
         "chosen_option": brief(chosen),
         "chosen_is_the_recommendation": chosen["key"] == best["key"],
         "recommended_option": brief(best),
@@ -230,6 +350,8 @@ def analyse_delay(
         "flight": _leg_json(leg),
         "delay_minutes": delay_minutes,
         "options": options,
+        "strategy": strategy,
+        "strategies": [{"key": k, "label": v[0], "pick": picks[k]} for k, v in strategies.STRATEGIES.items()],
         "recommended_key": best["key"],
         "selected_key": chosen["key"],
         "explanation": {"text": narrative.text, "source": narrative.source},
@@ -296,10 +418,9 @@ def _reaccommodate_misconnects(
 # ---------------------------------------------------------------------------------------------------------------
 # B. Cancellation
 # ---------------------------------------------------------------------------------------------------------------
-def analyse_cancellation(ctx: Context, flight_id: str, weights: dict[str, float]) -> dict[str, Any]:
-    leg = ctx.store.leg(flight_id)
-    if leg is None:
-        raise ScenarioError(f"Flight {flight_id} is not in the operating window")
+def _rebook_cancelled(ctx: Context, leg: Leg, weights: dict[str, float], exclude: list[str]) -> dict[str, Any]:
+    """Rank the passengers of a cancelled flight (tiers + weights) and rebook them on other flights of the same
+    route (CP-SAT, PNRs together, onward connections kept where possible); ``exclude`` lists cancelled flights."""
     passengers = ctx.store.passengers_on([leg.flight_id])
     connections = connections_at_risk(
         ctx.store,
@@ -335,7 +456,7 @@ def analyse_cancellation(ctx: Context, flight_id: str, weights: dict[str, float]
         leg.destination,
         after,
         leg.std + timedelta(hours=ctx.settings.rebooking_window_hours),
-        [leg.flight_id],
+        sorted({leg.flight_id, *exclude}),
     )
     result = rebooking.plan(ranked, alts, leg.sta, deadline)
     payload = _passenger_payload(
@@ -348,16 +469,23 @@ def analyse_cancellation(ctx: Context, flight_id: str, weights: dict[str, float]
         station=leg.origin,
         transfer=False,
     )
-
     cm, eu = ctx.cost, _eu261(ctx, leg)
-    free_seats = sum(int(str(a["available_seats"])) for a in result.alternatives)
-    seated = sum(1 for r in ranked)
-    unprotected = result.unprotected_passengers
+    seated = len(ranked)
     cost = {
         "eu261_compensation": round(eu * seated * cm.eur_to_aed),
         "passenger_care": round(payload["rebooking"]["care_cost_aed"]),
         "rebooking_handling": round(seated * cm.rebooking_handling),
     }
+    return {"ranked": ranked, "result": result, "payload": payload, "cost": cost, "eu": eu, "onward": onward}
+
+
+def analyse_cancellation(ctx: Context, flight_id: str, weights: dict[str, float]) -> dict[str, Any]:
+    leg = ctx.store.leg(flight_id)
+    if leg is None:
+        raise ScenarioError(f"Flight {flight_id} is not in the operating window")
+    rebooked = _rebook_cancelled(ctx, leg, weights, [])
+    result, payload, cost = rebooked["result"], rebooked["payload"], rebooked["cost"]
+    free_seats = sum(int(str(a["available_seats"])) for a in result.alternatives)
     nxt = next(
         (
             x
@@ -368,10 +496,10 @@ def analyse_cancellation(ctx: Context, flight_id: str, weights: dict[str, float]
     )
     facts = {
         "cancelled_flight": f"{leg.flight_number} from {leg.origin} to {leg.destination}",
-        "passengers_to_move": seated,
+        "passengers_to_move": len(rebooked["ranked"]),
         "free_seats_on_other_flights_within_24h": free_seats,
         "passengers_rebooked": result.protected_passengers,
-        "passengers_without_seat": unprotected,
+        "passengers_without_seat": result.unprotected_passengers,
         "who_goes_first": "passengers needing special assistance and families with babies; "
         "then passengers with onward connections; staff travel last",
         "estimated_cost_aed": sum(cost.values()),
@@ -383,8 +511,8 @@ def analyse_cancellation(ctx: Context, flight_id: str, weights: dict[str, float]
         "explanation": {"text": narrative.text, "source": narrative.source},
         "cost_aed": cost,
         "cost_total_aed": sum(cost.values()),
-        "eu261_per_passenger_eur": eu,
-        "onward_connections": len(onward),
+        "eu261_per_passenger_eur": rebooked["eu"],
+        "onward_connections": len(rebooked["onward"]),
         "solver_status": result.solver_status,
         "aircraft_follow_on": _leg_json(nxt) if nxt else None,
         **payload,
@@ -518,7 +646,10 @@ def _assumptions(ctx: Context) -> list[str]:
         "Loyalty tier, fare family and most special-service codes are synthetic (labelled in the passenger list).",
         f"Costs are assumed: delay AED {s.cost_delay_per_minute:g}/min, hotel AED {s.cost_hotel_per_night:g}, "
         f"meal AED {s.cost_meal_voucher:g}, handling AED {s.cost_rebooking_handling:g}; EU261 on EU/EEA/CH departures.",
-        "Crew legality is not checked (no crew data); crew control must confirm any swap.",
+        "Crew legality is not checked (no crew data); crew control must confirm any swap or cancellation.",
+        f"Cancelling a round trip: its passengers are rebooked on the same route within "
+        f"{s.rebooking_window_hours} h; revenue loss is not counted (no fare revenue per flight is supplied).",
+        f"Passenger delay minutes count {NO_SEAT_DELAY_MINUTES // 60} h for each passenger left without a seat.",
     ]
 
 
@@ -563,11 +694,3 @@ def presets(ctx: Context) -> dict[str, list[dict[str, Any]]]:
         [now, now],
     )
     return {"delay": delay, "cancel": cancel}
-
-
-def _rank(option: dict[str, Any]) -> tuple[float, int, int, int, str]:
-    """Cheapest first. Ties (common when two swaps protect the same flights) are broken by fewer missed
-    connections, fewer delay minutes, fewer flights moved to another aircraft (simpler for OCC), then the option
-    key, so the recommendation never depends on the order the database returns candidate aircraft."""
-    moved = sum(1 for leg in option["legs"] if leg["operated_by"] != leg["scheduled_tail"])
-    return (option["cost_aed"], option["misconnects"], option["total_delay_minutes"], moved, option["key"])

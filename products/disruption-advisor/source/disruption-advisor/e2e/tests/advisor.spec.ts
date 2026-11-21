@@ -83,3 +83,38 @@ test("phase 2: delay watchlist ranks flights, shows reasons and opens a delay sc
   await page.getByRole("button", { name: /^Analyse a/ }).click();
   await expect(page.getByRole("heading", { name: "Recovery options compared" })).toBeVisible();
 });
+
+test("phase 3: strategies switch the recommendation", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("tab", { name: "A · Delay" }).click();
+  await page.locator(".preset-list .preset").first().click();
+  await expect(page.getByRole("heading", { name: "Strategies compared" })).toBeVisible();
+  const switcher = page.getByRole("group", { name: "Strategy" });
+  await expect(switcher.getByRole("button", { name: "Lowest cost" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".strategy-card.active")).toHaveAttribute("data-strategy", "lowest_cost");
+
+  await switcher.getByRole("button", { name: "Protect passengers" }).click();
+  await expect(switcher.getByRole("button", { name: "Protect passengers" })).toHaveAttribute("aria-pressed", "true");
+  const active = page.locator(".strategy-card.active");
+  await expect(active).toHaveAttribute("data-strategy", "protect_passengers");
+  const pick = (await active.locator(".strategy-pick").innerText()).trim();
+  await expect(page.locator("tr.recommended")).toHaveCount(1);
+  await expect(page.locator("tr.recommended th")).toContainText(pick);
+  await expect(page.locator("tr.option-row.selected")).toHaveClass(/recommended/);
+});
+
+test("phase 3: the agent investigates a flight and its recommendation opens for approval", async ({ page }) => {
+  test.setTimeout(180_000);
+  await signIn(page);
+  await page.getByRole("tab", { name: "Ask the agent" }).click();
+  await page.getByLabel("Strategy", { exact: true }).selectOption("protect_passengers");
+  await page.locator(".preset-list .preset").first().click();
+  // Works whether the AI or the rule-based planner answers.
+  await expect(page.locator("[data-status]").first()).toHaveAttribute("data-status", "DONE", { timeout: 120_000 });
+  expect(await page.locator("ol.agent-steps > li").count()).toBeGreaterThanOrEqual(3);
+  await expect(page.getByRole("heading", { name: /^Recommendation/ })).toBeVisible();
+  await expect(page.locator(".agent-panel .reasons li").first()).toBeVisible();
+  await page.getByRole("button", { name: "Open scenario to review and approve" }).click();
+  await expect(page.getByRole("heading", { name: "Recovery options compared" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Agent recommendation/ })).toBeVisible();
+});

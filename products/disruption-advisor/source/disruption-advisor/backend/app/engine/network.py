@@ -135,5 +135,30 @@ def swap_rotations(
     return plan
 
 
+def round_trip_pairs(rest: list[Leg], absorbed: RotationPlan, until: datetime) -> list[int]:
+    """Indexes i where ``rest[i]`` X→Y and ``rest[i + 1]`` Y→X form a round trip that departs by ``until`` and is
+    still delayed when the delay is absorbed (cancelling a pair the delay never reaches would gain nothing)."""
+    out = []
+    for i in range(len(rest) - 1):
+        a, b = rest[i], rest[i + 1]
+        if a.std > until:
+            break
+        delayed = absorbed.timings.get(a.flight_id)
+        if b.origin == a.destination and b.destination == a.origin and delayed and delayed.delay_minutes > 0:
+            out.append(i)
+    return out
+
+
+def cancel_round_trip(disrupted: Leg, rest: list[Leg], delay: timedelta, min_turn: Turn, i: int) -> RotationPlan:
+    """Option 3 (phase 3, ADR 0011): cancel the round trip ``rest[i]``/``rest[i + 1]``. The aircraft skips it and
+    is back at the station where the pair started, so the rest of its rotation stays continuous and the delay stops
+    spreading without another aircraft. The cancelled legs are not in the plan; the caller lists them."""
+    plan = RotationPlan()
+    kept = [*rest[:i], *rest[i + 2 :]]
+    for t in propagate([disrupted, *kept], disrupted.std + delay, min_turn, disrupted.tail):
+        plan.timings[t.leg.flight_id] = t
+    return plan
+
+
 def first_departure_from(legs: list[Leg], station: str, not_before: datetime) -> Leg | None:
     return next((leg for leg in legs if leg.origin == station and leg.std >= not_before), None)

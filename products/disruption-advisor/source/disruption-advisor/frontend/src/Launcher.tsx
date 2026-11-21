@@ -1,5 +1,16 @@
 import { type FormEvent, useEffect, useState } from "react";
-import { api, type CancelPreset, type DelayPreset, errorText, type FlightRow, type Meta } from "./api";
+import {
+  type AgentRunRequest,
+  api,
+  type CancelPreset,
+  type DelayPreset,
+  errorText,
+  type FlightRow,
+  type Meta,
+  STRATEGY_KEYS,
+  STRATEGY_LABEL,
+  type StrategyKey,
+} from "./api";
 import { CarrierTail } from "./CarrierTail";
 import { utc } from "./format";
 
@@ -10,12 +21,15 @@ interface Props {
   active?: { flightId: string; flightNumber: string; delay: number } | null;
   onDelay: (flightId: string, delay: number) => void;
   onCancel: (flightId: string) => void;
+  /** Phase 3: hands the flight to the agent (it recommends; a person approves). */
+  onAgent?: (request: AgentRunRequest) => void;
 }
 
-type Tab = "DELAY" | "CANCEL";
+type Tab = "DELAY" | "CANCEL" | "AGENT";
+const AGENT_DELAYS = [30, 60, 90, 120, 150, 180, 240, 300, 360, 480];
 
 /** Scenario launcher: suggested flights from the data (UC5 example scenario) or any flight by search. */
-export function Launcher({ busy, active, onDelay, onCancel }: Props) {
+export function Launcher({ busy, active, onDelay, onCancel, onAgent }: Props) {
   const [tab, setTab] = useState<Tab>("DELAY");
   const [presets, setPresets] = useState<{ delay: DelayPreset[]; cancel: CancelPreset[] } | null>(null);
   const [presetError, setPresetError] = useState<string | null>(null);
@@ -23,6 +37,9 @@ export function Launcher({ busy, active, onDelay, onCancel }: Props) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<FlightRow[] | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [agentDelay, setAgentDelay] = useState<number | null>(null);
+  const [agentStrategy, setAgentStrategy] = useState<StrategyKey | null>(null);
+  const [agentNote, setAgentNote] = useState("");
 
   // Keep the slider in step with the scenario on screen (e.g. one reopened from history).
   useEffect(() => {
@@ -51,7 +68,11 @@ export function Launcher({ busy, active, onDelay, onCancel }: Props) {
     }
   }
 
-  const start = (flightId: string) => (tab === "DELAY" ? onDelay(flightId, delay) : onCancel(flightId));
+  function start(flightId: string) {
+    if (tab === "DELAY") onDelay(flightId, delay);
+    else if (tab === "CANCEL") onCancel(flightId);
+    else onAgent?.({ flight_id: flightId, delay_minutes: agentDelay, strategy: agentStrategy, note: agentNote.trim() });
+  }
 
   return (
     <section className="launcher" aria-labelledby="launcher-title">
@@ -65,6 +86,12 @@ export function Launcher({ busy, active, onDelay, onCancel }: Props) {
           onClick={() => setTab("CANCEL")}>
           B · Cancellation
         </button>
+        {onAgent && (
+          <button type="button" role="tab" aria-selected={tab === "AGENT"} className={tab === "AGENT" ? "tab active" : "tab"}
+            onClick={() => setTab("AGENT")}>
+            Ask the agent
+          </button>
+        )}
       </div>
 
       {tab === "DELAY" && (
@@ -85,10 +112,48 @@ export function Launcher({ busy, active, onDelay, onCancel }: Props) {
         </div>
       )}
 
+      {tab === "AGENT" && (
+        <div className="agent-form">
+          <p className="small muted">
+            The agent looks into the flight with the recovery engine, explains each step and recommends one option. You
+            review and approve it. Pick a flight below to start.
+          </p>
+          <div className="field">
+            <label htmlFor="agent-delay">Delay</label>
+            <select id="agent-delay" value={agentDelay ?? ""}
+              onChange={(e) => setAgentDelay(e.target.value ? Number(e.target.value) : null)}>
+              <option value="">Let the agent use the predicted delay</option>
+              {AGENT_DELAYS.map((d) => (
+                <option key={d} value={d}>
+                  {d} min
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="agent-strategy">Strategy</label>
+            <select id="agent-strategy" value={agentStrategy ?? ""}
+              onChange={(e) => setAgentStrategy(e.target.value ? (e.target.value as StrategyKey) : null)}>
+              <option value="">No preference</option>
+              {STRATEGY_KEYS.map((k) => (
+                <option key={k} value={k}>
+                  {STRATEGY_LABEL[k]}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="agent-note">Note for the agent (optional)</label>
+            <textarea id="agent-note" rows={2} maxLength={500} value={agentNote} placeholder="e.g. crew for A6-AOH times out at 18:00Z"
+              onChange={(e) => setAgentNote(e.target.value)} />
+          </div>
+        </div>
+      )}
+
       <h3>Suggested from the data</h3>
       {presetError && <p className="error">{presetError}</p>}
       {!presets && !presetError && <p className="muted">Finding suitable flights…</p>}
-      {presets && tab === "DELAY" && (
+      {presets && tab !== "CANCEL" && (
         <ul className="preset-list">
           {presets.delay.map((p) => (
             <li key={p.flight_id}>

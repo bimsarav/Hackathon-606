@@ -52,7 +52,7 @@ def test_delay_scenario_end_to_end_with_decision(client: TestClient, auth: dict[
     )
     assert created.status_code == 201
     scenario = created.json()
-    assert scenario["result"]["recommended_key"].startswith("swap:")
+    assert scenario["result"]["recommended_key"] != "absorb"
     assert len(scenario["result"]["misconnections"]) == 2
 
     decision = client.post(
@@ -82,6 +82,30 @@ def test_selecting_another_option_recomputes_and_is_kept_on_what_if(client: Test
     assert rerun.json()["result"]["selected_key"] == other  # what-if keeps the controller's choice
     unknown = client.post(f"/api/v1/scenarios/{scenario['id']}/select", headers=auth, json={"option_key": "swap:NOPE"})
     assert unknown.status_code == 404
+
+
+def test_strategy_is_stored_and_can_be_switched(client: TestClient, auth: dict[str, str]) -> None:
+    scenario = client.post(
+        "/api/v1/scenarios",
+        headers=auth,
+        json={"kind": "DELAY", "flight_id": F1, "delay_minutes": 150, "strategy": "protect_passengers"},
+    ).json()
+    result = scenario["result"]
+    picks = {s["key"]: s["pick"] for s in result["strategies"]}
+    assert result["strategy"] == "protect_passengers"
+    assert result["recommended_key"] == picks["protect_passengers"]
+    switched = client.post(
+        f"/api/v1/scenarios/{scenario['id']}/strategy", headers=auth, json={"strategy": "least_delay"}
+    )
+    assert switched.status_code == 200
+    assert switched.json()["result"]["recommended_key"] == picks["least_delay"]
+    assert switched.json()["result"]["strategy"] == "least_delay"
+    bad = client.post(f"/api/v1/scenarios/{scenario['id']}/strategy", headers=auth, json={"strategy": "fastest"})
+    assert bad.status_code == 422
+    cancel = client.post("/api/v1/scenarios", headers=auth, json={"kind": "CANCEL", "flight_id": X1}).json()
+    assert (
+        client.post(f"/api/v1/scenarios/{cancel['id']}/strategy", headers=auth, json={"strategy": "least_delay"})
+    ).status_code == 422
 
 
 def test_cancellation_has_no_options_to_select(client: TestClient, auth: dict[str, str]) -> None:

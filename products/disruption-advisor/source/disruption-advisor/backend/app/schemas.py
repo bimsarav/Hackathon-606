@@ -37,11 +37,19 @@ class Weights(Strict):
         return {a: float(getattr(self, a)) for a in ATTRIBUTES}
 
 
+StrategyKey = Literal["lowest_cost", "protect_passengers", "least_delay"]  # app/engine/strategy.py
+
+
 class ScenarioCreate(Strict):
     kind: Literal["DELAY", "CANCEL"]
     flight_id: str = Field(min_length=6, max_length=40, pattern=r"^[A-Z0-9]{2,8}_\d{12}$")
     delay_minutes: int | None = Field(default=None, ge=15, le=1440)
     weights: Weights = Field(default_factory=Weights)
+    strategy: StrategyKey = "lowest_cost"
+
+
+class ChooseStrategy(Strict):
+    strategy: StrategyKey
 
 
 class Reprioritise(Strict):
@@ -96,3 +104,28 @@ class MessageRequest(Strict):
 class MessageDraft(BaseModel):
     text: str
     source: str
+
+
+class AgentRunCreate(Strict):
+    flight_id: str = Field(min_length=6, max_length=40, pattern=r"^[A-Z0-9]{2,8}_\d{12}$")
+    delay_minutes: int | None = Field(default=None, ge=15, le=1440)
+    strategy: StrategyKey | None = None
+    note: str = Field(default="", max_length=500)
+
+
+class AgentRunRead(BaseModel):
+    id: uuid.UUID
+    flight_id: str
+    delay_minutes: int | None
+    strategy: str | None
+    note: str
+    status: str
+    source: str | None
+    fallback_reason: str | None
+    trace: list[dict[str, Any]]
+    recommendation: dict[str, Any] | None
+    error: str | None
+    scenario_id: uuid.UUID | None
+    created_by: str
+    created_at: datetime
+    finished_at: datetime | None

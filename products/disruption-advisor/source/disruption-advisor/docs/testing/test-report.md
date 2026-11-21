@@ -1,6 +1,6 @@
 # Test Report
 
-All results come from real runs: phase 1 (MVP) on 2026-11-20, phase 2 (Predict) on 2026-11-21 ([below](#phase-2-predict-2026-11-21)). Commands are in the README. Logs are in `logs/` and are not committed.
+All results come from real runs: phase 1 (MVP) on 2026-11-20, phase 2 (Predict) on 2026-11-21 ([below](#phase-2-predict-2026-11-21)), phase 3 (Agent and what-if) on 2026-11-21 ([below](#phase-3-agent-and-what-if-2026-11-21)). Commands are in the README. Logs are in `logs/` and are not committed.
 
 # Phase 1 (MVP)
 
@@ -92,6 +92,52 @@ Missed-connection backtest (SHJ connections in the test weeks, no-slack band): 0
 | Smoke test `scripts/smoke.sh` | **11/11** |
 | Playwright `scripts/e2e.sh` (Chromium) | **4 passed**: wrong password and token check; scenario A; scenario B; phase 2 watchlist (ranks flights, shows reasons, opens a delay scenario) |
 | Risk API | Watchlist 1,491 flights in 7 days: 18 high, 140 medium risk; model card served |
-| Reboot test | **Not done yet** (pending user approval) |
+| Reboot test | **Not done** (skipped by user decision) |
 
 The local Playwright run was not done: the development machine's bookings Parquet still uses the old `dep_year` layout. The runtime code is identical to the server, so the end-to-end tests ran against the server. No Trivy scan is recorded for the phase 2 images.
+
+# Phase 3 (Agent and what-if), 2026-11-21
+
+## Local quality gate: `scripts/check.sh`
+| Step | Result |
+|---|---|
+| Backend lint, format, mypy strict | PASS |
+| Backend tests (pytest + Testcontainers PostgreSQL 18) | **69 passed** |
+| Frontend type check, unit tests (Vitest), production build | PASS: **19 tests** |
+
+New tests in this phase:
+- `backend/tests/test_strategies.py` (10 tests, on the hand-made network with a round trip and its passengers):
+  - cancelling a round trip stops the delay spreading; no pair is offered when the delay never reaches it;
+  - a round trip is labelled "Consolidate" when every passenger fits on same-route flights;
+  - every option has passenger KPIs;
+  - each strategy picks its best option; switching the strategy changes the recommendation, not the numbers;
+  - selecting the cancel option lists its cancelled passengers; an unknown strategy is rejected;
+  - ties are broken by option key; at equal cost, keeping the schedule beats cancelling.
+- `backend/tests/test_agent.py` (10 tests, with a scripted fake Claude client):
+  - tool schemas are strict and use only supported keywords;
+  - the AI loop recommends an engine option with a trace, and sends the expected request settings;
+  - **privacy:** every request sent to the AI service is checked against all PNRs, customer keys, passenger IDs and (synthetic) passport numbers in the fixture; none appear;
+  - an option the engine did not produce is refused, and the model can correct it;
+  - without an API key the planner recommends the strategy's pick, using the predicted delay when none is given;
+  - a refusal and the step limit fall back to the planner and keep the AI's steps;
+  - tool inputs are validated;
+  - the runs API saves a scenario for approval, and validates its input.
+- `frontend/src/Phase3.test.tsx` (9 tests): the strategy panel shows three picks and switches on the server; the new pick is marked recommended; passengers are labelled by why they need a new flight; a scenario made by the agent shows its recommendation; the run view shows steps live, then the recommendation and the open-scenario button; it says when the planner answered; a failed run shows its error and retries with the same inputs; a run already in progress is explained; the watchlist passes the flight and its planning delay.
+- `e2e/tests/advisor.spec.ts`, two new Playwright tests:
+  - "phase 3: strategies switch the recommendation";
+  - "phase 3: the agent investigates a flight and its recommendation opens for approval" (accepts the AI or the planner as source).
+
+## Real-data checks before the deploy (server data, read-only container)
+- **Delay scenarios with the new options:** 0.6–7 s per scenario.
+- **Live agent probe, real API:** G9519 with no delay given; the agent used the 56-minute planning delay, made 7 tool calls in 37 s and recommended `swap:A6-ANO` under "protect passengers". Details: [agent-card.md](agent-card.md).
+
+## Server checks (`http://<server>:8888`)
+| Check | Result |
+|---|---|
+| Deployment | 2026-11-21 02:31 UTC, rollback tags and database dump taken first, Alembic 0002 applied |
+| Smoke test `scripts/smoke.sh` | **11/11** |
+| Playwright `scripts/e2e.sh` (Chromium) | **6 passed**: the four earlier tests plus the two phase 3 tests |
+| Agent run during the Playwright test | G9901_202611220500: source `ai:claude-opus-5-5`, 7 steps, 25 s, recommended `swap:A6-AOH` under "protect passengers" |
+| Reboot test | **Not run** for phase 3 |
+
+The e2e folder's `tsconfig.json` needs `@types/node` in the e2e `devDependencies` for a standalone `tsc` check; this predates phase 3 and does not affect the Playwright run. No Trivy scan is recorded for the phase 3 images.

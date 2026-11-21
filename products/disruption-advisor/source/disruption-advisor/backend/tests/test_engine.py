@@ -70,7 +70,7 @@ def test_delay_scenario_recommends_the_cheapest_option_and_finds_misconnects(ctx
     assert "absorb" in keys
     assert "swap:T2" in keys
     assert "swap:T4" in keys
-    assert result["recommended_key"].startswith("swap:")  # a swap beats carrying 570 delay minutes
+    assert result["recommended_key"] != "absorb"  # a swap or consolidation beats carrying 570 delay minutes
     costs = [o["cost_aed"] for o in result["options"]]
     assert costs == sorted(costs)
     # F1 arrives 12:30; H1 departs 11:30 → both connecting passengers miss it (MCT 55 from the hub table).

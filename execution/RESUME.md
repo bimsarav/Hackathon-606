@@ -1,4 +1,4 @@
-# RESUME (updated 2026-11-21) — disruption-advisor PHASE 2 DONE + REDEPLOYED 00:57Z (T-507: smoke 11/11, e2e 4/4; rollback tag + dump pre-202611210055). NOT committed (user). WAITING: commit decision, phase 3 / phase 6 approval
+# RESUME (updated 2026-11-21) — disruption-advisor PHASE 3 DONE (deployed + verified 02:32Z, docs done). Working tree = origin/heshawa a543204 + phase 3, NOT committed (user). WAITING: commit decision, phase 6 approval, reboot test decision
 Product: esm-hub (R = products/esm-hub/source/esm-hub) · Status: COMPLETED by user instruction, NOT deployed
 Verified locally: clean build 253 tests; frontend lint + 18 tests; compose stack healthy; API smoke (output/T-005.2-smoke.log); Playwright 6/6 (output/T-005.2-e2e-run3.log)
 Cloud: OCI VM discovered + read-only dry run passed (R/docs/deployment/CLOUD_ENVIRONMENT.md, execution/DEPLOYMENT_STATUS.md); nothing deployed

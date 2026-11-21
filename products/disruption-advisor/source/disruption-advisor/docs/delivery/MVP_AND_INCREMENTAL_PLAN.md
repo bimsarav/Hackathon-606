@@ -7,7 +7,7 @@ Delivery cadence (user instruction 2026-11-20): design first, MVP first, host th
 | 0 Design | Architecture and diagrams ([SYSTEM_ARCHITECTURE.md](../architecture/SYSTEM_ARCHITECTURE.md)) | Done 2026-11-20 |
 | 1 MVP | Scenarios A and B end to end, hosted | Done 2026-11-20: deployed and verified, incl. reboot test |
 | 2 Predict | Delay-risk prediction, 7-day watchlist, misconnect risk per passenger | Approved 2026-11-21; deployed (reboot check skipped by user) |
-| 3 Agent and what-if | Agentic orchestration; cancellation and consolidation as recovery options; strategy comparison | Needs approval |
+| 3 Agent and what-if | Claude agent (recommend-only) over the engine tools; cancel / consolidate as recovery options; strategy comparison | Approved 2026-11-21; deployed and verified 2026-11-21 (smoke 11/11, Playwright 6/6); reboot test not run |
 | 4 Extend | Equipment change, bus legs, crew, real data feeds, production hardening | Needs approval |
 | 6 Secure and protect | HTTPS (Caddy, sslip.io) and nightly PostgreSQL backup with a restore test (moved from phase 2 by the user, 2026-11-21) | Needs approval |
 
@@ -66,10 +66,38 @@ Delivery cadence (user instruction 2026-11-20): design first, MVP first, host th
 - Per-passenger misconnect risk.
 - (HTTPS and nightly backups moved to phase 6 by the user, 2026-11-21.)
 
-## Phase 3 — Agent and what-if (needs approval)
-- A Claude tool-using agent that coordinates the impact, recovery, priority and rebooking modules and explains its chain of reasoning. It stays recommend-only.
-- More recovery options: cancel or consolidate and protect passengers.
-- Side-by-side strategy comparison (for example "protect most passengers" vs "lowest cost" vs "least delay").
+## Phase 3 — Agent and what-if (approved by the user 2026-11-21)
+Design: SYSTEM_ARCHITECTURE §11, ADR 0010 (agent), ADR 0011 (cancel, consolidate, strategies).
+
+**In scope**
+1. **More recovery options for a delay:**
+   - Cancel a later round trip on the delayed aircraft (within 24 h, up to 3 pairs).
+   - The passengers are rebooked with the phase 1 priority rules and CP-SAT, with care and EU261 estimates.
+   - The option is labelled "Consolidate" when every passenger is rebooked on a same-route flight within 6 h.
+2. **Strategy comparison:**
+   - "Lowest cost" (the default, as today), "Protect passengers" and "Least delay" each pick their best option.
+   - Their picks are shown side by side with the same KPIs.
+   - Switching the strategy changes the recommendation. Approving another option is still an override with a reason.
+3. **Claude agent (recommend-only):**
+   - Read-only engine tools.
+   - Each step is shown live with a short note.
+   - The final recommendation must be an engine option and is saved as a normal scenario for approval.
+   - Bounded: 12 tool calls, 120 s.
+   - No personal data is sent.
+   - A deterministic planner runs when the AI is unavailable.
+4. **Tests:**
+   - pytest: the options, strategies, agent loop with a scripted fake client, privacy check on requests, planner fallback, API.
+   - Vitest: comparison panel, agent run page.
+   - Playwright: strategy switch, agent run (accepts AI or planner).
+5. **Deploy and verify:** prod deploy with rollback tags and a database dump; smoke; Playwright on prod; docs (Confluence, README, methods PDF, an agent card).
+
+**Out of scope:** equipment change, bus legs, crew legality, network-wide optimisation, the agent taking actions (phase 4 or later).
+
+**Done when:**
+- `scripts/check.sh` passes.
+- Playwright passes against the server URL.
+- An agent run on prod produces a recommendation with a visible trace.
+- The URL is reported to the user.
 
 ## Phase 4 — Extend (needs approval)
 - **Unaccompanied minors (future enhancement, removed from MVP scope 2026-11-21):** UMNR identification, mandatory priority (EU261 Art. 11), supervision during long waits, guardian notification, and handover rules.

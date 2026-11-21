@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { api, type DelayResult, errorText, type Meta, type RecoveryOption, type Scenario } from "./api";
 import { aed, hhmm, minutes, num, utc } from "./format";
+import { AgentRecommendationPanel } from "./AgentRunView";
 import { RotationBoard } from "./RotationBoard";
+import { OptionKindInfo, StrategyPanel } from "./StrategyPanel";
 import { Assumptions, DecisionBar, Explanation, PassengerTable, WeightsPanel } from "./Shared";
 
 interface Props {
@@ -40,6 +42,8 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
   const keyLegs = shown.legs.filter((l, i) => l.delay_minutes > 0 || i < 4);
   const legs = allLegs ? shown.legs : keyLegs;
   const f = result.flight;
+  const agentOption = result.agent ? result.options.find((o) => o.key === result.agent?.option_key) : undefined;
+  const cancelledPax = result.passengers.some((p) => p.group === "cancelled");
 
   return (
     <article className="result">
@@ -63,11 +67,17 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
             : worst.key !== best.key ? `saves ${aed(worst.cost_aed - best.cost_aed)} vs worst option` : "only feasible option"} />
       </section>
 
+      {result.agent && <AgentRecommendationPanel agent={result.agent} optionLabel={agentOption?.label ?? result.agent.option_key} />}
+
+      <StrategyPanel scenario={scenario} result={result} onUpdate={onUpdate} />
+
       <Explanation text={result.explanation.text} source={result.explanation.source} />
 
       <section aria-labelledby="options-title">
         <h2 id="options-title">Recovery options compared</h2>
-        <p className="small muted">Click an option to see its flights, passengers and cost. The recommendation is the cheapest.</p>
+        <p className="small muted">Click an option to see its flights, passengers and cost. {result.strategies
+          ? "The recommendation is the pick of the active strategy."
+          : "The recommendation is the cheapest."}</p>
         <div className="table-wrap">
           <table>
             <thead>
@@ -94,6 +104,7 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
                   <th scope="row">
                     {o.label}
                     {o.key === result.recommended_key && <span className="chip chip-ok">Recommended</span>}
+                    <OptionKindInfo option={o} />
                   </th>
                   <td className="num">{minutes(o.total_delay_minutes)}</td>
                   <td className="num">{o.legs_delayed}</td>
@@ -172,7 +183,11 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
       </section>
 
       <section aria-labelledby="pax-title">
-        <h2 id="pax-title">Passengers still missing a connection ({num(result.misconnections.length)})</h2>
+        <h2 id="pax-title">
+          {cancelledPax
+            ? `Passengers to rebook: missed connections and cancelled flights (${num(result.passengers.length)})`
+            : `Passengers still missing a connection (${num(result.misconnections.length)})`}
+        </h2>
         {result.rebooking && (
           <p className="muted">
             {num(result.rebooking.protected)} rebooked on later flights within 24 h ·{" "}

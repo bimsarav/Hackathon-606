@@ -192,6 +192,11 @@ export function PassengerTable({ scenario, rows, meta }: { scenario: Scenario; r
                 <td className="num">{p.rank}</td>
                 <td>
                   <strong>{p.name}</strong>
+                  {p.group && (
+                    <span className={`chip small ${p.group === "cancelled" ? "chip-bad" : "chip-warn"}`}>
+                      {p.group === "cancelled" ? "Flight cancelled" : "Missed connection"}
+                    </span>
+                  )}
                   <span className="small muted block">
                     {p.pnr} · {p.route}
                     {p.pnr_size > 1 ? ` · party of ${p.pnr_size}` : ""}
