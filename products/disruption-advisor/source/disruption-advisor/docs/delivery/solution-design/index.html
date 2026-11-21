@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>aeroRecovery Solution Design</title>
+<style>
+  @page { size: A4; margin: 14mm 14mm 16mm; }
+  :root { --ink: #1f2124; --muted: #5f6368; --line: #dfe3e8; --accent: #1255b4; --brand: #ff0141; --soft: #f4f6f9; }
+  * { box-sizing: border-box; }
+  body { font-family: "Inter", "Noto Sans", system-ui, sans-serif; color: var(--ink); font-size: 10.2pt; line-height: 1.45; margin: 0; }
+  h1 { font-size: 26pt; margin: 0 0 6pt; line-height: 1.1; }
+  h2 { font-size: 15pt; margin: 0 0 8pt; color: var(--accent); border-bottom: 2px solid var(--line); padding-bottom: 4pt; }
+  h3 { font-size: 11.5pt; margin: 12pt 0 4pt; }
+  p { margin: 0 0 6pt; }
+  ul { margin: 0 0 6pt; padding-left: 15pt; }
+  li { margin: 0 0 2.5pt; }
+  .page { page-break-after: always; }
+  .page:last-child { page-break-after: auto; }
+  .muted { color: var(--muted); }
+  .small { font-size: 8.8pt; }
+  figure { margin: 6pt 0 10pt; }
+  figure { break-inside: avoid; }
+  figure img { width: 100%; max-height: 100mm; object-fit: contain; object-position: left top; border: 1px solid var(--line); border-radius: 6px; display: block; background: #fff; }
+  figure.tall img { max-height: 125mm; }
+  figure.short img { max-height: 72mm; }
+  table, .kpis, .note { break-inside: avoid; }
+  figcaption { font-size: 8.6pt; color: var(--muted); margin-top: 3pt; }
+  .cover { display: flex; flex-direction: column; min-height: 265mm; }
+  .cover-band { background: linear-gradient(135deg, #0b2f6b, #1255b4 60%, #2a6fd6); color: #fff; border-radius: 10px; padding: 22pt 22pt 18pt; }
+  .cover-band h1 { color: #fff; }
+  .cover-band p { color: rgba(255,255,255,0.9); font-size: 11.5pt; }
+  .eyebrow { text-transform: uppercase; letter-spacing: 0.12em; font-size: 8.5pt; opacity: 0.85; margin-bottom: 8pt; }
+  .cover-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6pt 18pt; margin: 14pt 0; font-size: 9.6pt; }
+  .cover-meta b { display: block; color: var(--muted); font-size: 8pt; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7pt; margin: 8pt 0 10pt; }
+  .kpi { border: 1px solid var(--line); border-radius: 8px; padding: 7pt 8pt; background: var(--soft); }
+  .kpi .v { font-size: 15pt; font-weight: 700; color: var(--accent); display: block; }
+  .kpi .l { font-size: 8.2pt; color: var(--muted); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12pt; }
+  table { width: 100%; border-collapse: collapse; font-size: 8.9pt; margin: 4pt 0 8pt; }
+  th, td { border-bottom: 1px solid var(--line); padding: 4pt 5pt; text-align: left; vertical-align: top; }
+  th { background: var(--soft); font-weight: 600; }
+  td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tag { display: inline-block; font-size: 7.6pt; font-weight: 600; padding: 1pt 5pt; border-radius: 999px; background: #e2f3ec; color: #1a6e44; }
+  .tag.syn { background: #fdf0d0; color: #7a4f00; }
+  .note { border-left: 3px solid var(--accent); background: var(--soft); padding: 6pt 9pt; border-radius: 4px; margin: 6pt 0 8pt; }
+  .footer-line { margin-top: auto; font-size: 8.4pt; color: var(--muted); border-top: 1px solid var(--line); padding-top: 6pt; }
+</style>
+</head>
+<body>
+
+<!-- 1. Cover -->
+<section class="page cover">
+  <div class="cover-band">
+    <div class="eyebrow">ISA Hackathon 606 · UC5 Flight &amp; Passenger Disruption Management</div>
+    <h1>aeroRecovery</h1>
+    <p>Solution design: an AI disruption advisor for the Operations Control Centre (OCC) and the Passenger Control Unit (PCU). It turns a flight disruption into an explained, approved recovery plan before the impact spreads across the network.</p>
+  </div>
+  <div class="cover-meta">
+    <div><b>Live build</b>http://92.5.154.198:8888 (Oracle Cloud VM, Docker Compose)</div>
+    <div><b>Version</b>Release of 21 November 2026 (git branch heshawa)</div>
+    <div><b>Data</b>Air Arabia (G9) extracts: schedule, rotation, inventory, bookings, punctuality, connection times, crew roster</div>
+    <div><b>Principle</b>Recommend only. A person approves every decision; every approval is recorded with who and when.</div>
+  </div>
+  <figure class="tall"><img src="img/login.jpg" alt="aeroRecovery sign-in page over a live route map"><figcaption>Sign-in page of the live build: route map from the Sharjah hub, with the sign-in card.</figcaption></figure>
+  <div class="footer-line">Accounts are issued per role (OCC, PCU, Evaluator); credentials are provided separately and are not part of this document.</div>
+</section>
+
+<!-- 2. Problem and solution -->
+<section class="page">
+  <h2>1. The problem</h2>
+  <p>When a flight is delayed or cancelled, the impact does not stay with that flight. The same aircraft flies the next legs of its rotation, so the delay moves along the day; connecting passengers miss onward flights; crews run into their maximum duty time; and seats on the next flights are limited. OCC and PCU have to decide within minutes, usually by combining several systems and spreadsheets by hand.</p>
+  <ul>
+    <li><b>OCC</b> needs to see the knock-on effect on the rotation and compare recovery options (absorb, swap aircraft, cancel a round trip, hold a connection) by cost and passenger impact.</li>
+    <li><b>PCU</b> needs to know which passengers are affected, who must be protected first (special assistance, infants, connections), where they can be rebooked within real seats, and what care and goodwill they are owed.</li>
+    <li>Both need to act <b>before</b> the disruption: knowing a week ahead which flights are likely to be late.</li>
+  </ul>
+
+  <h2 style="margin-top:12pt">2. The proposed solution</h2>
+  <p>aeroRecovery is one web application for both teams. It reads the airline's own extracts, predicts delay risk, simulates the effect of a delay or cancellation, ranks recovery options and passengers with reasons, and produces a rebooking and reward plan that a person approves.</p>
+  <table>
+    <tr><th style="width:24%">Step</th><th>What the system does</th></tr>
+    <tr><td><b>1. Predict</b></td><td>Delay risk for every flight in the next 7 days (LightGBM, one model per delay threshold) with the main reasons; expected missed connections; a live forecast when the inbound aircraft's delay is known.</td></tr>
+    <tr><td><b>2. Assess</b></td><td>For a chosen flight and delay: the knock-on along the aircraft rotation, affected flights, missed connections, crew duty (FDP) headroom.</td></tr>
+    <tr><td><b>3. Compare</b></td><td>Recovery options side by side (absorb, aircraft swap, round-trip cancellation, hold a connection) by delay, passengers, EU261 and cost; three strategies (lowest cost, protect passengers, least delay).</td></tr>
+    <tr><td><b>4. Protect</b></td><td>Passengers ranked by strict tiers (care, urgency, others) and weights; seat-limited rebooking solved optimally (OR-Tools CP-SAT); care entitlements; goodwill rewards within a budget.</td></tr>
+    <tr><td><b>5. Decide</b></td><td>A person approves or overrides (an override needs a reason); an AI agent can investigate a flight and recommend, never decide.</td></tr>
+  </table>
+
+  <h3>Key outcomes in the submitted build</h3>
+  <div class="kpis">
+    <div class="kpi"><span class="v">0.768</span><span class="l">AUC for a 60+ min delay, a week ahead (baseline 0.677)</span></div>
+    <div class="kpi"><span class="v">0.901</span><span class="l">AUC with the inbound aircraft's delay known (live model)</span></div>
+    <div class="kpi"><span class="v">&lt; 1 s</span><span class="l">optimal seat-limited rebooking (147 passengers / 60 seats)</span></div>
+    <div class="kpi"><span class="v">11/11</span><span class="l">browser tests passing on the live server</span></div>
+  </div>
+  <p class="small muted">Figures are read from the live build (model card, 21 Nov 2026): time-ordered test on the last 28 days of history (5,956 flights) that the models never saw.</p>
+</section>
+
+<!-- 3. Architecture -->
+<section class="page">
+  <h2>3. Architecture</h2>
+  <figure class="short"><img src="img/c01.png" alt="System context"><figcaption>System context: OCC controller, PCU agent and evaluator use aeroRecovery; it ingests the airline extracts and calls the Claude API only to word explanations and run the agent (no names or contacts are sent).</figcaption></figure>
+  <figure class="short"><img src="img/c02.png" alt="Containers"><figcaption>Containers on the server: React web app, FastAPI API (engine, models, agent), PostgreSQL (scenarios, decisions, audit), ingest job writing Parquet read by DuckDB.</figcaption></figure>
+  <table>
+    <tr><th>Layer</th><th>Technology</th><th>Why</th></tr>
+    <tr><td>Web</td><td>React, TypeScript, Vite</td><td>One responsive app for both teams; role-based views.</td></tr>
+    <tr><td>API and engine</td><td>Python, FastAPI</td><td>Recovery engine, priority rules, rebooking, models and agent in one service.</td></tr>
+    <tr><td>Analytics store</td><td>Parquet + DuckDB</td><td>27.9 million booking rows queried in seconds without a database load.</td></tr>
+    <tr><td>Records</td><td>PostgreSQL</td><td>Scenarios, approvals and agent runs with an audit trail.</td></tr>
+    <tr><td>Optimisation</td><td>OR-Tools CP-SAT</td><td>Proven optimal seat assignment that keeps groups together.</td></tr>
+    <tr><td>Machine learning</td><td>LightGBM, Optuna</td><td>Delay, arrival and reward models; tuned on time-ordered validation.</td></tr>
+    <tr><td>Generative AI</td><td>Claude (claude-opus-5-5)</td><td>Plain-language explanations, passenger messages, a tool-using agent; never decides.</td></tr>
+    <tr><td>Deployment</td><td>Docker Compose on Oracle Cloud</td><td>Health checks, automatic restart, rollback image tags and database dumps.</td></tr>
+  </table>
+</section>
+
+<!-- 4. Data and models -->
+<section class="page">
+  <h2>4. Data and models</h2>
+  <figure class="short"><img src="img/c04.png" alt="Data pipeline"><figcaption>Ingest: the airline extracts become typed Parquet, then the operating picture (next 7 days), the delay models, the cascade check, the reward model and the crew duty analysis.</figcaption></figure>
+  <table>
+    <tr><th>Data in the build</th><td class="n">2,614</td><td>flights in the operating picture (19–30 Nov 2026)</td></tr>
+    <tr><th></th><td class="n">63,322</td><td>past flights with actual times (punctuality history, Jan–Nov 2026)</td></tr>
+    <tr><th></th><td class="n">299,417</td><td>passenger flight segments; 174,723 customers (no names kept)</td></tr>
+    <tr><th></th><td class="n">35,021</td><td>crew duties from the roster (1 Oct – 20 Nov 2026); no crew names or IDs kept</td></tr>
+  </table>
+  <h3>Models and rules</h3>
+  <table>
+    <tr><th>Component</th><th>Method</th><th>Result (held-out test)</th></tr>
+    <tr><td>Delay risk, 7 days ahead</td><td>LightGBM per threshold (5–180 min), recency-weighted, tuned with Optuna; reasons from SHAP</td><td>AUC 0.768 at 60+ min vs 0.677 for the route × hour baseline; top 10% of flights are 3.3× more often late</td></tr>
+    <tr><td>Live delay (on the day)</td><td>Same method plus the inbound aircraft's actual delay</td><td>AUC 0.901 at 60+ min; mean error 13 min (planning 20 min)</td></tr>
+    <tr><td>Arrival delay and missed connections</td><td>Arrival model combined with the onward departure model</td><td>Arrival AUC 0.762 at 60+ min; 88,434 connections scored</td></tr>
+    <tr><td>Reward preference <span class="tag syn">synthetic</span></td><td>LightGBM acceptance model on simulated redemption history</td><td>AUC 0.702 vs 0.617 baseline; recovers the assumed behaviour only, not real customer choices</td></tr>
+    <tr><td>Cascade (knock-on) rule</td><td>next departure = max(scheduled, previous arrival + 40 min)</td><td>1,656 aircraft pairs last month: 75% within ±15 min of the real departure</td></tr>
+    <tr><td>Crew duty (FDP)</td><td>Roster headroom vs the delay of each recovery option</td><td>Median headroom 275 min; flags breach or tight for each option (alert only)</td></tr>
+    <tr><td>Passenger priority</td><td>Strict tiers (care, urgency, others), weighted score inside a tier</td><td>Commercial value never moves a passenger across a tier</td></tr>
+    <tr><td>Rebooking</td><td>OR-Tools CP-SAT integer programme</td><td>Proven optimal plans in under a second; groups kept together</td></tr>
+  </table>
+  <p class="small muted">Validation is always time-ordered (train on the past, test on the last 28 days), never random, so no future information leaks into training.</p>
+</section>
+
+<!-- 5. What works: delay -->
+<section class="page">
+  <h2>5. What works in the submitted build</h2>
+  <h3>Flight Delay analysis</h3>
+  <figure class="tall"><img src="img/delay-top.jpg" alt="Flight Delay page"><figcaption>G9449 TRV→SHJ delayed 2 h 30 min (live data). Headline numbers, the decision bar (approve or reject, with a comment), and tiles that show every section at a glance; each tile opens its section.</figcaption></figure>
+  <ul>
+    <li><b>Search</b> by flight number with day chips; recent scenarios and suggested flights as chips; the delay slider re-runs the analysis on release.</li>
+    <li><b>Recovery options</b> compared by delay, flights and passengers delayed, missed connections, EU261 and cost; the active strategy picks the recommendation.</li>
+    <li><b>Explanation</b> ("Why?") worded by Claude from the engine's numbers, with a template fallback.</li>
+  </ul>
+</section>
+
+<!-- 6. Passengers and crew -->
+<section class="page">
+  <h3>Passengers, crew and rewards</h3>
+  <figure><img src="img/delay-passengers.jpg" alt="Passengers boxes and crew breaches"><figcaption>Crew duty breaches per option from the roster, and the three passenger boxes: connecting passengers at risk, passengers rebooked, rewards and compensation. Each opens its full detail.</figcaption></figure>
+  <figure><img src="img/delay-crew.jpg" alt="Crew duty section"><figcaption>Crew duty (FDP) for the selected option: headroom, minutes left after the delay and the tightest crew role for each flight.</figcaption></figure>
+  <ul>
+    <li><b>Connecting passengers at risk</b> with their missed-connection probability, connection time and slack.</li>
+    <li><b>Rebooking plan</b> with the priority score, care entitlements (meals, hotel, transport) and a draft passenger message.</li>
+    <li><b>Goodwill rewards</b> (meal, voucher, lounge, miles, ticket) chosen per passenger within a budget, never repeating care already given.</li>
+  </ul>
+</section>
+
+<!-- 7. Cancellation and watchlist -->
+<section class="page">
+  <h3>Cancellation</h3>
+  <figure><img src="img/cancel-top.jpg" alt="Cancellation page"><figcaption>A cancelled flight: free seats on alternatives, protected passengers, hotel rooms, the decision on the rebooking plan first, then tiles, priority weights (what-if) and the passenger boxes.</figcaption></figure>
+  <h3>Delay watchlist: next 7 days</h3>
+  <figure><img src="img/watchlist.jpg" alt="Delay watchlist"><figcaption>Every flight in the next 7 days ranked by expected missed connections or by delay risk, with the main reason; one click opens the flight's analysis or asks the agent.</figcaption></figure>
+</section>
+
+<!-- 8. Evaluator -->
+<section class="page">
+  <h2>6. Evaluation built into the product</h2>
+  <p>An <b>Evaluator</b> role sees two extra views (the server refuses them to OCC and PCU accounts):</p>
+  <div class="two">
+    <figure><img src="img/model-hub.jpg" alt="Model Card overview"><figcaption>Model Card: one box per model, rule and AI component with its headline figures.</figcaption></figure>
+    <figure><img src="img/model-delay.jpg" alt="Delay model detail"><figcaption>Delay model detail: AUC by threshold vs baseline, calibration, month by month, alert cut-offs and the models compared.</figcaption></figure>
+  </div>
+  <figure><img src="img/testdata.jpg" alt="Test data upload"><figcaption>Test data: evaluators download two CSV templates (flights, passengers), upload their own flights, see each problem by file, row and column, and analyse the flights. Uploaded flights are scored with the saved models, never trained on.</figcaption></figure>
+</section>
+
+<!-- 9. Quality, limits -->
+<section class="page">
+  <h2>7. Quality and verification</h2>
+  <table>
+    <tr><th>Check</th><th>Result</th></tr>
+    <tr><td>Browser tests (Playwright) on the live server</td><td><span class="tag">11/11 passed</span> sign-in, delay and approval, cancellation, watchlist, strategies, agent, cascade, rewards, roles, evaluator upload, bad-file rejection</td></tr>
+    <tr><td>Frontend unit tests</td><td>46 passed (1 skipped while advanced search is hidden)</td></tr>
+    <tr><td>Backend tests</td><td>pytest: engine, models, rebooking, rewards, test-data upload, roles (PostgreSQL test container)</td></tr>
+    <tr><td>Smoke test after each deploy</td><td>11/11 (health, pages, sign-in, scenario)</td></tr>
+    <tr><td>Deployment safety</td><td>Server compared with the repository before every deploy; rollback image tag and database dump each time</td></tr>
+    <tr><td>Security and privacy</td><td>Role-based access, signed tokens, no passenger names or crew IDs stored, no personal data sent to the AI service</td></tr>
+  </table>
+
+  <h2 style="margin-top:12pt">8. Limits, stated plainly</h2>
+  <ul>
+    <li><b>Snapshot data, simulated clock.</b> The build works on extracts with "now" set to 20 Nov 2026; there are no live feeds yet.</li>
+    <li><b>Synthetic fields.</b> Loyalty tiers, fare families and some special-service codes are partly synthetic; the reward model is trained on simulated history and must be retrained on the airline's real offer log.</li>
+    <li><b>Crew roster coverage.</b> The roster covers 1 Oct to 20 Nov 2026; later flights use an estimated duty where possible.</li>
+    <li><b>Prediction accuracy is moderate a week ahead.</b> Flagging flights at a 30% chance catches about a quarter of the late flights with about 31% precision: good for a watchlist, not for automatic action. The live model is much stronger once the inbound delay is known.</li>
+    <li><b>Recommend only.</b> No action is written back to airline systems; crew recovery is alerted, not planned.</li>
+  </ul>
+  <h2 style="margin-top:12pt">9. Next steps</h2>
+  <ul>
+    <li>Live feeds (flight status, ETAs, check-in) and write-back to the reservation system after approval.</li>
+    <li>Real reward-offer history and a fresh crew roster; partner carriers.</li>
+    <li>HTTPS, nightly backups and monitoring on the server (planned phase 6).</li>
+  </ul>
+</section>
+
+</body>
+</html>
