@@ -281,6 +281,20 @@ def decide(scenario_id: uuid.UUID, payload: DecisionCreate, session: SessionDep,
     return DecisionRead.model_validate(decision)
 
 
+def _readable_utc(value: object) -> str | None:
+    """'21 Nov 17:45 UTC' for a stored departure (ISO text or datetime); other text is kept as it is."""
+    if value is None or value == "":
+        return None
+    if isinstance(value, datetime):
+        moment = value
+    else:
+        try:
+            moment = datetime.fromisoformat(str(value))
+        except ValueError:
+            return str(value)
+    return f"{moment:%d %b %H:%M} UTC"
+
+
 @router.post("/scenarios/{scenario_id}/messages")
 def draft_message(
     scenario_id: uuid.UUID, payload: MessageRequest, request: Request, session: SessionDep, _: CurrentUser
@@ -298,7 +312,7 @@ def draft_message(
         "event": "cancelled" if scenario.kind == "CANCEL" else "missed connection",
         "late_inbound_flight": row.get("missed_inbound_flight"),
         "new_flight": row["assigned_flight"],
-        "new_departure": row["new_departure"],
+        "new_departure": _readable_utc(row["new_departure"]),
         "care_while_waiting": row["care"]["summary"],
         "waiting_hours": round(row["care"]["wait_minutes"] / 60) if row["care"]["wait_minutes"] is not None else None,
         "can_choose_refund_and_free_return_to_origin_or_date_change": row["care"]["refund_option"],

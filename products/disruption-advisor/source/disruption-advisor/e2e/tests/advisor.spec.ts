@@ -106,7 +106,7 @@ test("phase 3: strategies switch the recommendation", async ({ page }) => {
 test("phase 3: the agent investigates a flight and its recommendation opens for approval", async ({ page }) => {
   test.setTimeout(180_000);
   await signIn(page);
-  await page.getByRole("button", { name: "Predict the Flight Delay", exact: true }).click();
+  await page.getByRole("button", { name: "Predict the Flight Delay (AI agent)", exact: true }).click();
   await page.getByLabel("Strategy", { exact: true }).selectOption("protect_passengers");
   await page.locator(".preset-list .preset").first().click();
   // Works whether the AI or the rule-based planner answers.

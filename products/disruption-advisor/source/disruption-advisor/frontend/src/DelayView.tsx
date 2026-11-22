@@ -270,7 +270,7 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
             stats={result.rebooking ? [
               { label: "rebooked within 24 h", value: num(result.rebooking.protected) },
               { label: "without a seat", value: num(result.rebooking.unprotected) },
-              ...(result.rebooking.hotel_rooms ? [{ label: "hotel rooms (1 per passenger)", value: num(result.rebooking.hotel_rooms) }] : []),
+              ...(result.rebooking.hotel_rooms ? [{ label: "hotel rooms (no seat, or long or overnight wait)", value: num(result.rebooking.hotel_rooms) }] : []),
             ] : [{ label: "passengers", value: num(result.passengers.length) }]} />
           <PeopleBox kind="Goodwill & EU261" title="Rewards & compensation" active={people === "rewards"} onOpen={() => openPeople("rewards")}
             stats={[
@@ -292,7 +292,7 @@ export function DelayView({ scenario, result, meta, onUpdate }: Props) {
               <p className="muted">
                 {num(result.rebooking.protected)} rebooked on later flights within 24 h ·{" "}
                 <strong>{num(result.rebooking.unprotected)}</strong> without a seat (next day + hotel, or refund)
-                {result.rebooking.hotel_rooms ? ` · ${num(result.rebooking.hotel_rooms)} hotel rooms (one per passenger)` : ""}
+                {result.rebooking.hotel_rooms ? ` · ${num(result.rebooking.hotel_rooms)} hotel rooms (one per passenger without a seat or with a long or overnight wait)` : ""}
                 {result.rebooking.care_cost_aed ? ` · care ${aed(result.rebooking.care_cost_aed)}` : ""}.
               </p>
             )}

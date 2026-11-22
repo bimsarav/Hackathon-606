@@ -162,3 +162,12 @@ def test_explanation_endpoint_returns_the_saved_text(client: TestClient, auth: d
     got = client.post(f"/api/v1/scenarios/{made['id']}/explanation", headers=auth).json()
     assert got["text"] == made["result"]["explanation"]["text"]  # AI off in tests: the template stays
     assert got["pending"] is False
+
+
+def test_message_facts_give_the_new_departure_as_readable_utc() -> None:
+    """The draft facts carry '21 Nov 17:45 UTC', not a raw ISO timestamp, so the message is easy to read."""
+    from app.advisor import _readable_utc
+
+    assert _readable_utc("2026-11-21T17:45:00") == "21 Nov 17:45 UTC"
+    assert _readable_utc("21 Nov 17:45 UTC") == "21 Nov 17:45 UTC"
+    assert _readable_utc(None) is None

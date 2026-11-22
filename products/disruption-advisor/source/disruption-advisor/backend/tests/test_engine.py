@@ -210,3 +210,17 @@ def test_passenger_message_without_time_zone_falls_back_to_template() -> None:
     assert Writer("Dear customer, your new flight G9539 leaves at 08:30.").passenger_message(facts).source == "template"
     kept = Writer("Dear customer, your new flight G9539 leaves 21 Nov 08:30 UTC.").passenger_message(facts)
     assert kept.source == "ai:model"
+
+
+def test_split_bookings_count_each_booking_once() -> None:
+    """A booking counts as split only when its travellers end on different outcomes; counted once per booking."""
+    from app.engine.rebooking import Assignment
+    from app.engine.scenarios import split_bookings
+
+    def a(pnr: str, flight: str | None, split: bool = True) -> Assignment:
+        return Assignment(f"g-{pnr}", pnr, ["k"], 1, flight, None, None, None, None, split)
+
+    # P1 on two flights, P2 partly without a seat: split. P3 all without a seat, P4 all on one flight: together.
+    rows = [a("P1", "F1"), a("P1", "F2"), a("P2", "F1"), a("P2", None), a("P3", None), a("P3", None)]
+    rows += [a("P4", "F1"), a("P4", "F1"), a("P5", "F2", split=False)]
+    assert split_bookings(rows) == 2

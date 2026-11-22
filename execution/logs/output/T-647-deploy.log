@@ -1,0 +1,19 @@
+== T-647 deploy 202611212233 (base eb93f75 + uncommitted changes; diff sha b318c0985ace)
+tagged
+disruption-advisor-api:pre-202611212233
+disruption-advisor-web:pre-202611212233
+write /dev/stdout: no space left on device
+scp: dest open "/tmp/da-ship.tgz": Failure
+scp: failed to upload file /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/4128891c-5e4e-4a92-917a-7895eee51a43/scratchpad/ship2.tgz to /tmp/da-ship.tgz
+tar (child): /tmp/da-ship.tgz: Cannot open: No such file or directory
+tar (child): Error is not recoverable: exiting now
+tar: Child returned status 2
+tar: Error is not recoverable: exiting now
+Total:	6.243GB
+Total reclaimed space: 4.17GB
+/dev/mapper/ocivolume-root   78G   74G  4.7G  95% /
+TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+Images          79        4         31.17GB   25GB (80%)
+Containers      6         3         8.192kB   0B (0%)
+Local Volumes   3         3         12.24GB   0B (0%)
+Build Cache     85        0         27.03GB   3.289GB

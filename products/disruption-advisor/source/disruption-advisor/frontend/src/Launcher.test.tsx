@@ -2,7 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Meta } from "./api";
-import { Launcher } from "./Launcher";
+import { flightDay, latestPerScenario, Launcher } from "./Launcher";
 
 const weights = { loyalty: 20, frequency: 15, fare_value: 20, ancillaries: 10, journey: 20, booking: 15 };
 const meta = { user: { username: "occ", role: "OCC" }, default_weights: weights } as unknown as Meta;
@@ -48,7 +48,7 @@ describe("launcher flight lists", () => {
     const onOpenRecent = vi.fn();
     const recent = [{ id: "s9", kind: "DELAY" as const, flight_id: "G9502_202611201835", delay_minutes: 60, created_by: "occ", created_at: "2026-11-21T10:00:00" }];
     render(<Launcher meta={meta} busy={false} onDelay={() => {}} onCancel={() => {}} defaultTab="DELAY" hideTabNav recent={recent} onOpenRecent={onOpenRecent} />);
-    await userEvent.click(within(screen.getByRole("group", { name: "Recent scenarios" })).getByRole("button", { name: "G9502 · +60m" }));
+    await userEvent.click(within(screen.getByRole("group", { name: "Recent scenarios" })).getByRole("button", { name: "G9502 20 Nov · +60m" }));
     expect(onOpenRecent).toHaveBeenCalledWith("s9");
     await screen.findByText(/142 conn/);
     expect(screen.queryByRole("button", { name: /Show as list/ })).not.toBeInTheDocument(); // always chips
@@ -99,5 +99,13 @@ describe("launcher flight lists", () => {
     expect(await screen.findByRole("button", { name: "Change flight or search" })).toBeInTheDocument();
     expect(screen.getByLabelText(/Delay:/)).toBeInTheDocument(); // the slider stays in the folded line to re-run
     expect(screen.queryByRole("heading", { name: "Suggested flights" })).not.toBeInTheDocument();
+  });
+
+  it("shows one recent chip per flight, type and delay, with the flight's day", () => {
+    const older = { id: "a", kind: "DELAY" as const, flight_id: "G9901_202611210200", delay_minutes: 150, created_by: "occ", created_at: "2026-11-21T09:00:00" };
+    const newer = { ...older, id: "b", created_at: "2026-11-21T10:00:00" };
+    const other = { ...older, id: "c", delay_minutes: 60 };
+    expect(latestPerScenario([newer, older, other]).map((h) => h.id)).toEqual(["b", "c"]);
+    expect(flightDay("G9901_202611210200")).toBe("21 Nov");
   });
 });

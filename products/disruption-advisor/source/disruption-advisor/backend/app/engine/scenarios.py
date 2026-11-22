@@ -755,6 +755,7 @@ def _passenger_payload(
     transfer: bool = False,
 ) -> dict[str, Any]:
     where: dict[tuple[str, str], rebooking.Assignment] = {}
+    split_set = split_pnrs(assignments)
     for assignment in assignments:
         for key in assignment.customer_keys:
             where[(assignment.pnr, key)] = assignment
@@ -821,7 +822,7 @@ def _passenger_payload(
                 "new_departure": a.new_std if a else None,
                 "arrival_delay_minutes": a.arrival_delay_minutes if a else None,
                 "onward_ok": a.onward_ok if a else None,
-                "split": a.split if a else False,
+                "split": a is not None and a.pnr in split_set,
                 "assignment_reason": a.reason if a else "",
                 "missed_inbound_flight": late_inbound,
                 "care": {
@@ -857,11 +858,25 @@ def _passenger_payload(
             "alternatives": alternatives,
             "protected": sum(a.seats for a in assignments if a.flight_id),
             "unprotected": sum(a.seats for a in assignments if not a.flight_id),
-            "groups_split": sum(1 for a in assignments if a.split),
+            "groups_split": split_bookings(assignments),
             "care_cost_aed": round(care_total),
             "hotel_rooms": sum(1 for row in rows if row["care"]["hotel"]),
         },
     }
+
+
+def split_pnrs(assignments: list[rebooking.Assignment]) -> set[str]:
+    """Bookings (PNRs) whose travellers ended on different outcomes (different flights, or some with a seat and some
+    without). A large group that the solver had to consider one by one but that ended together is not split."""
+    outcomes: dict[str, set[str | None]] = {}
+    for a in assignments:
+        outcomes.setdefault(a.pnr, set()).add(a.flight_id)
+    return {pnr for pnr, flights in outcomes.items() if len(flights) > 1}
+
+
+def split_bookings(assignments: list[rebooking.Assignment]) -> int:
+    """Number of bookings whose travellers could not stay together (counted once per booking)."""
+    return len(split_pnrs(assignments))
 
 
 def _assumptions(ctx: Context) -> list[str]:

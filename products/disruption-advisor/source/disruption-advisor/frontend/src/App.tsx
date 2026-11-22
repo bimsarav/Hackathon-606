@@ -180,7 +180,7 @@ function Login({ onSignIn }: { onSignIn: (s: Session) => void }) {
       <section className="login-glass" aria-labelledby="login-title">
         <div className="login-glass-brand">{logo}<span>aeroRecovery</span></div>
         <h1 id="login-title">Sign in</h1>
-        <p className="login-glass-line">Disruption recovery for OCC and PCU</p>
+        <p className="login-glass-line">Disruption recovery for OCC, PCU and evaluators</p>
         {form}
       </section>
     </main>
@@ -192,7 +192,7 @@ type Load = { kind: "idle" } | { kind: "busy"; label: string } | { kind: "error"
 const VIEW_LABEL: Record<View, string> = {
   delay: "Flight Delay",
   cancel: "Cancellation",
-  agent: "Predict the Flight Delay",
+  agent: "Predict the Flight Delay (AI agent)",
   watchlist: "Delay Watchlist",
   model: "Model Card",
   testdata: "Test Data",
@@ -373,7 +373,7 @@ function Console({ session, onSignOut }: { session: Session; onSignOut: () => vo
               <p className="nav-section-label">Analyze</p>
               <NavItem label="Flight Delay" icon="↑" active={view === "delay"} onClick={() => navigate("delay")} />
               <NavItem label="Cancellation" icon="✕" active={view === "cancel"} onClick={() => navigate("cancel")} />
-              <NavItem label="Predict the Flight Delay" icon="◎" active={view === "agent"} onClick={() => navigate("agent")} />
+              <NavItem label="Predict the Flight Delay (AI agent)" icon="◎" active={view === "agent"} onClick={() => navigate("agent")} />
             </div>
             <div className="nav-section">
               <p className="nav-section-label">Monitor</p>

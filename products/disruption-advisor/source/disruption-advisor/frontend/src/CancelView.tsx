@@ -64,8 +64,8 @@ export function CancelView({ scenario, result, meta, onUpdate }: Props) {
       <section className="kpis" aria-label="Re-accommodation at a glance">
         <Kpi label="Free seats on alternatives" value={num(seats)}
           sub={`${direct.length} direct flights within 24 h${viaHub ? ` · ${viaHub} via SHJ` : ""}`} />
-        <Kpi label="Protected" value={num(reb?.protected ?? 0)} sub={`${reb?.groups_split ?? 0} booking(s) split`} />
-        <Kpi label="Hotel rooms" value={num(reb?.hotel_rooms ?? 0)} sub={`one per passenger · care ${aed(reb?.care_cost_aed ?? 0)}`} />
+        <Kpi label="Protected" value={num(reb?.protected ?? 0)} sub={`${reb?.groups_split ?? 0} booking(s) could not stay together`} />
+        <Kpi label="Hotel rooms" value={num(reb?.hotel_rooms ?? 0)} sub={`one per passenger without a seat or with a long or overnight wait · care ${aed(reb?.care_cost_aed ?? 0)}`} />
         <Kpi label="Without a seat" value={num(reb?.unprotected ?? 0)} sub="next day + hotel, or refund" />
         <Kpi label="Estimated cost" value={aed(result.cost_total_aed)}
           sub={result.eu261_per_passenger_eur ? `incl. EU261 €${result.eu261_per_passenger_eur}/pax` : "no EU261 exposure"} />
@@ -119,7 +119,7 @@ export function CancelView({ scenario, result, meta, onUpdate }: Props) {
             stats={[
               { label: "protected", value: num(reb?.protected ?? 0) },
               { label: "without a seat", value: num(reb?.unprotected ?? 0) },
-              { label: "bookings split", value: num(reb?.groups_split ?? 0) },
+              { label: "bookings not kept together", value: num(reb?.groups_split ?? 0) },
             ]} />
           <PeopleBox kind="Seats" title="Alternative flights" active={box === "alts"} onOpen={() => openBox("alts")}
             stats={[

@@ -14,6 +14,7 @@ import {
 } from "./api";
 import { DelaySlider, RowPredict } from "./PredictPanel";
 import { CarrierTail } from "./CarrierTail";
+import { flightLabel } from "./AgentRunView";
 import { utc } from "./format";
 
 interface Props {
@@ -38,6 +39,23 @@ interface Props {
 const SHOW_ADVANCED = false;
 const RECENT_CHIPS = 6;
 const SUGGESTION_CHIPS = 8;
+/** "21 Nov" from a flight id such as G9519_202611210200 (the flight's departure day, UTC). */
+export function flightDay(flightId: string): string {
+  const m = /_(\d{4})(\d{2})(\d{2})/.exec(flightId);
+  return m ? dayLabel(`${m[1]}-${m[2]}-${m[3]}T00:00:00`) : "";
+}
+
+/** One chip per flight, scenario type and delay: the newest run (the list arrives newest first). */
+export function latestPerScenario<T extends { flight_id: string; kind: string; delay_minutes: number | null }>(items: T[]): T[] {
+  const seen = new Set<string>();
+  return items.filter((h) => {
+    const key = `${h.flight_id}|${h.kind}|${h.delay_minutes ?? ""}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 const dayLabel = (iso: string) => new Date(iso.endsWith("Z") ? iso : `${iso}Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
 
 type Tab = "DELAY" | "CANCEL" | "AGENT";
@@ -223,7 +241,7 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
                 <select id="ff-type" value={tab} onChange={(e) => setTab(e.target.value as Tab)}>
                   <option value="DELAY">Delay</option>
                   <option value="CANCEL">Cancellation</option>
-                  {onAgent && <option value="AGENT">Predict the Flight Delay</option>}
+                  {onAgent && <option value="AGENT">Predict the Flight Delay (AI agent)</option>}
                 </select>
               </div>
             )}
@@ -307,10 +325,10 @@ export function Launcher({ meta, busy, active, onDelay, onCancel, onAgent, defau
           {recent && recent.length > 0 && onOpenRecent && (
             <div className="search-chips" role="group" aria-label="Recent scenarios">
               <span className="small muted">Recent</span>
-              {recent.slice(0, RECENT_CHIPS).map((h) => (
+              {latestPerScenario(recent).slice(0, RECENT_CHIPS).map((h) => (
                 <button key={h.id} type="button" className="chip-btn" disabled={busy} onClick={() => onOpenRecent(h.id)}
-                  title={`${h.flight_id.split("_")[0]} on ${dayLabel(h.created_at)}, by ${h.created_by}`}>
-                  {h.flight_id.split("_")[0]} · {h.kind === "DELAY" ? `+${h.delay_minutes}m` : "Canc"}
+                  title={`${flightLabel(h.flight_id)} · ${h.kind === "DELAY" ? `delay ${h.delay_minutes} min` : "cancellation"} · last run ${utc(h.created_at)} by ${h.created_by}`}>
+                  {h.flight_id.split("_")[0]} {flightDay(h.flight_id)} · {h.kind === "DELAY" ? `+${h.delay_minutes}m` : "Canc"}
                 </button>
               ))}
             </div>

@@ -1,0 +1,15 @@
+PASS 200 GET /healthz
+PASS 200 GET /
+PASS 200 GET /some/client/route
+PASS 200 GET /api/openapi.json
+PASS 401 GET /api/v1/meta
+PASS 401 POST /api/v1/auth/login
+PASS security headers on /
+PASS sign in as occ
+PASS 200 GET /api/v1/meta
+PASS presets include a cancellation candidate (G9298_202611200340)
+PASS 201 POST /api/v1/scenarios
+PASS API 200 GET /health/live
+PASS API 200 GET /api/openapi.json
+PASS API 401 GET /api/v1/meta
+PASS API 404 GET /

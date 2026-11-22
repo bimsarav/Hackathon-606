@@ -7,6 +7,7 @@ const TYPE_ICON: Record<string, string> = { MEAL: "Meal", VOUCHER: "Voucher", LO
 
 /** Phase 5: goodwill reward plan for the passengers of the flight, within a budget. Recommend-only. */
 export function RewardPanel({ scenario }: { scenario: Scenario }) {
+  const booked = scenario.result?.flight?.booked_pax;
   const [budget, setBudget] = useState("5000");
   const [plan, setPlan] = useState<RewardPlan | null>(null);
   const [busy, setBusy] = useState(false);
@@ -61,6 +62,11 @@ export function RewardPanel({ scenario }: { scenario: Scenario }) {
             </li>
             <li>
               <strong>{num(plan.rewarded)}</strong> of {num(plan.passengers)} passengers on the passenger list rewarded
+              {booked !== undefined && booked !== plan.passengers && (
+                <span className="small muted">
+                  {" "}(the flight's inventory count says {num(booked)} booked; the plan uses the passenger list, and the two airline sources can differ)
+                </span>
+              )}
             </li>
             <li>
               {plan.budget_covers_share >= 1

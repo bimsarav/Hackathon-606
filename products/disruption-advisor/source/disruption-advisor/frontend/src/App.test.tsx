@@ -119,14 +119,14 @@ describe("roles", () => {
   it("shows the evaluator every view, including Model and Test data", async () => {
     await signIn("EVALUATOR");
     expect(navNames()).toEqual([
-      "Flight Delay", "Cancellation", "Predict the Flight Delay", "Delay Watchlist", "Model Card", "Test data",
+      "Flight Delay", "Cancellation", "Predict the Flight Delay (AI agent)", "Delay Watchlist", "Model Card", "Test data",
     ]);
   });
 
   it.each(["OCC", "PCU"] as const)("hides Model and Test data from %s, even when one was remembered", async (role) => {
     sessionStorage.setItem("disruption-advisor-view", "testdata");
     await signIn(role);
-    expect(navNames()).toEqual(["Flight Delay", "Cancellation", "Predict the Flight Delay", "Delay Watchlist"]);
+    expect(navNames()).toEqual(["Flight Delay", "Cancellation", "Predict the Flight Delay (AI agent)", "Delay Watchlist"]);
     expect(screen.queryByRole("heading", { name: "Test data" })).not.toBeInTheDocument();
   });
 });

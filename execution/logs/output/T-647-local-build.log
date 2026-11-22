@@ -1,0 +1,10 @@
+#19 writing image sha256:93c4ac4d0f1bd5649a3ac7236a136774254f180f83356c698ae439a022b5af14 done
+#19 naming to docker.io/library/disruption-advisor-web:latest done
+#19 DONE 4.5s
+ Container disruption-advisor-web-1  Starting
+ Container disruption-advisor-api-1  Started
+ Container disruption-advisor-web-1  Started
+api=healthy
+api Up 15 seconds (healthy)
+db Up 3 hours (healthy)
+web Up 15 seconds (healthy)

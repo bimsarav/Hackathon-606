@@ -19,7 +19,7 @@ As of now there are **two distinct roles**:
 
 | Role | What it can do |
 |---|---|
-| **OCC** (operations user) | Flight Delay, Cancellation, Predict the Flight Delay (the AI agent), Delay Watchlist and Recent Searches; approve, override or reject recovery options, rebooking plans, care, rewards and passenger messages. |
+| **OCC** (operations user) | Flight Delay, Cancellation, Predict the Flight Delay (AI agent), Delay Watchlist and Recent Searches; approve, override or reject recovery options, rebooking plans, care, rewards and passenger messages. |
 | **Evaluator** | Everything the OCC role can do, plus the **Model Card** and **Test data** views. The API refuses those views to every other role (HTTP 403). |
 
 The **PCU** role exists as a login role (`DEMO_USERS`), but **as of now it has exactly the same views and permissions as OCC**; nothing differs except the role name that the audit trail records with each decision ("occ (OCC)", "pcu (PCU)"). A split between aircraft decisions (OCC) and passenger decisions (PCU) is not built. Where the role checks are: `backend/app/auth.py` (`evaluator_only`) and `frontend/src/App.tsx` (`EVALUATOR_VIEWS`).

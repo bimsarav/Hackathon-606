@@ -1,0 +1,13 @@
+== dump
+-rw-r--r--. 1 opc opc 1262868393 Nov 22 03:20 /home/opc/backups/disruption-advisor/pre-202611212233.dump
+== tar
+-rw-rw-r-- 1 heshawa heshawa 23746067 Nov 22 07:20 /tmp/claude-1000/-home-heshawa-AI-projects-personal-hack-isa-Hackathon-606/4128891c-5e4e-4a92-917a-7895eee51a43/scratchpad/t647.tgz
+== extract+build
+
+#38 [migrate] resolving provenance for metadata file
+#38 DONE 0.0s
+ Image disruption-advisor-web:latest Built 
+ Image disruption-advisor-api:latest Built 
+ Container disruption-advisor-api-1 Healthy 
+ Container disruption-advisor-web-1 Starting 
+ Container disruption-advisor-web-1 Started 

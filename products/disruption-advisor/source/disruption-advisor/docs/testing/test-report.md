@@ -168,7 +168,7 @@ The e2e folder's `tsconfig.json` needs `@types/node` in the e2e `devDependencies
 - Delay model tuning and comparison (nine candidates): [model-selection.md](model-selection.md), including the check of `month` and `route_freq` features.
 - Reward preference model (eight candidates, grouped folds, oracle bound): [reward-model-selection.md](reward-model-selection.md) and [reward-model-card.md](reward-model-card.md). The outcomes are simulated.
 
-### Production check (2026-11-21 05:35 UTC, heshawa `2d58d6e`)
+### Production check (2026-11-21 05:35 UTC, commit `2d58d6e`)
 | Check | Result |
 |---|---|
 | Deployment | rollback tag `pre-202611210525` and a database dump first; all four ingest stages ran (stage 3 AUC-60 0.770, stage 3b 1,656 pairs, stage 4 AUC 0.702) |
@@ -202,7 +202,7 @@ The new Playwright tests have not been run locally (no Playwright or Docker on t
   scored 2 flights and 2 connections, the watchlist totals rose by those 2 flights (1,491 to 1,493), the flight page showed band, reasons and 2
   connections; removal restored the totals. The watchlist rows are capped at 60, so low-risk test flights show only in the totals and the flight page.
 
-## Production check of the test-data release (21 Nov 2026, 09:10Z, heshawa 300d7e6)
+## Production check of the test-data release (21 Nov 2026, 09:10Z, commit 300d7e6)
 - Smoke 11/11. Ingest stages 3 (AUC-60 0.7697), 3b (1,656 pairs) and 4 (AUC 0.7018) ran; `ops/delay_model` saved; `/testdata` writable.
 - Roles by login: OCC and PCU get 403 on `/risk/model` and `/test-data`; the evaluator gets 200; all three reach the watchlist and `/meta`; an OCC upload gets 403.
 - Evaluator upload of the template (2 flights, 4 passenger rows): scored 2 flights and 2 connections; watchlist totals 1,491 to 1,493; flight page: medium band, 2 connections;
@@ -221,7 +221,7 @@ The new Playwright tests have not been run locally (no Playwright or Docker on t
   `frontend/src/ModelAnalysis.test.tsx` (2). Checked against the real local data: model-docs 14 and 15 blocks, reward card AUC 0.702, model card carries all fields. Not looked at in a browser.
 - Keep the copies in sync: edit `docs/testing/model-selection.md` or `reward-model-selection.md`, then copy to `backend/app/data/model_docs/` (`delay-model-selection.md`, `reward-model-selection.md`); the test fails if they differ.
 
-## Production check, Model Card release and Playwright rewrite (21 Nov 2026, 09:32Z, heshawa 2b9d87f)
+## Production check, Model Card release and Playwright rewrite (21 Nov 2026, 09:32Z, commit 2b9d87f)
 - Smoke 11/11. `/risk/model-docs` and `/risk/reward-model` answer 200 to the evaluator and 403 to OCC; `/risk/cascade` is open to both.
 - **Playwright on the server: 11/11 passed (1.6 min).** The spec was rewritten for the redesigned UI (sidebar buttons instead of tabs, passenger detail behind "Show passenger detail",
   strategy cards instead of buttons, "Details" instead of "Why & message", "Show rewards & compensation") and `e2e/tests/evaluator.spec.ts` was added (OCC cannot see or call the
@@ -232,22 +232,22 @@ The new Playwright tests have not been run locally (no Playwright or Docker on t
 - Regression found by the browser tests' neighbours, not by a test: my merge of the redesigned `App.tsx` dropped the cascade panel from the watchlist page (live 09:10Z to 09:32Z). Restored; `phase 2: the 7-day page shows last month's cascade check` now guards it.
 - Frontend unit tests: 35/35 (the 4 stale tests were rewritten for the banners and strategy cards). Backend suite not run against Postgres here (no Docker); the SQLite scratch run shows the same 9 environment-only failures as before.
 
-## Production check, UI polish release (21 Nov 2026, 10:49Z, heshawa 12454fb)
+## Production check, UI polish release (21 Nov 2026, 10:49Z, commit 12454fb)
 - Smoke 11/11; public address 200; OCC and PCU get 403 on `/risk/model`, `/risk/model-docs`, `/risk/reward-model` and `/test-data`, the evaluator 200.
 - **Playwright on the server: 11/11 passed (1.7 min, finished 10:51:27Z)**, against the renamed headings ('Recovery options', 'Why?'), the launcher that folds its lists away after a flight is chosen, and breadcrumb and Recent Searches navigation.
   The evaluator test left no test data behind.
 - Frontend unit tests 40/40 before the deploy (Launcher fold, role views, Model Card sections, test data page). Backend unit tests were not run against Postgres here (no Docker).
 - The server had been redeployed at 10:19Z (a63dc8d, crew duty check); it matched the repository exactly, so nothing was lost. Several people deploy to this one server: compare the server tree with the repository first (DEPLOYMENT_GUIDE).
 
-## Production check, live delay merge (21 Nov 2026, 14:35Z, heshawa 9e4d051)
+## Production check, live delay merge (21 Nov 2026, 14:35Z, commit 9e4d051)
 - The server had been redeployed at 11:32Z with live delay models that were not in git; the tree was saved, merged (3-way, CSS conflict only) and deployed.
 - Smoke 11/11; roles unchanged; `/risk/flights/{id}/predict` answers the planning forecast and, with an inbound delay, the live forecast; **Playwright 11/11 (1.6 min)**.
 - Uploaded test flights: planning forecast only; live inputs answer 409 (backend test added). Frontend 44/44 locally after the page redesign (not deployed yet).
 
-## Production check, Flight Delay page redesign (21 Nov 2026, 14:54Z, heshawa d56398b)
+## Production check, Flight Delay page redesign (21 Nov 2026, 14:54Z, commit d56398b)
 - Smoke 11/11; the served bundle contains the new layout; **Playwright 11/11 (1.6 min)**; frontend unit tests 45/45 (glance tiles, folding, passenger boxes, crew section, compact search).
 - Crew FDP data: the roster covers 1 Oct to 20 Nov 2026, so roster-checked flights in the operating window are on 20 Nov only (217 flights); later flights use an estimated duty where possible; the synthetic demo flights (G99xx) have none and now say "no crew data for this flight". G9502 (20 Nov 18:35) with a 30 to 420 minute delay shows a roster breach.
 
-## Production check, search redesign (21 Nov 2026, 15:17Z, heshawa 7c990a9)
+## Production check, search redesign (21 Nov 2026, 15:17Z, commit 7c990a9)
 - Smoke 11/11; served bundle checked; **Playwright 11/11 (1.7 min)**; frontend 46 passed, 1 skipped (advanced search is hidden for now; its test is skipped until it returns).
 - The build of b677204 failed on the server: a test used a Playwright-only option (`exact`) in Testing Library, which the type check in `npm run build` rejects. The site kept the previous build; fixed in 7c990a9. Always run `tsc --noEmit` after editing tests, not only `vitest`.

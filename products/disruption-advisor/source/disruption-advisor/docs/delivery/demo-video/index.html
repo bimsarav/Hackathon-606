@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>aeroRecovery – 10-minute demo video script</title>
+<style>
+  @page { size: A4; margin: 13mm 13mm 15mm; }
+  :root { --ink:#1b2430; --muted:#5b6675; --line:#d9dee5; --accent:#c8102e; --soft:#f5f7fa; --say:#eef4ff; --sayline:#3b6fd8; --tip:#fff6e5; --tipline:#d99a1b; }
+  * { box-sizing: border-box; }
+  body { font: 10.2pt/1.45 "Segoe UI", "Helvetica Neue", Arial, sans-serif; color: var(--ink); margin: 0; }
+  h1 { font-size: 21pt; margin: 0 0 2mm; }
+  h2 { font-size: 13.5pt; margin: 6mm 0 2mm; padding-bottom: 1mm; border-bottom: 2px solid var(--accent); }
+  h3 { font-size: 11pt; margin: 0; }
+  p { margin: 1.2mm 0; }
+  ul, ol { margin: 1mm 0 1mm 5mm; padding-left: 3mm; }
+  li { margin: 0.6mm 0; }
+  .sub { color: var(--muted); }
+  .cover { border-left: 5px solid var(--accent); padding: 2mm 0 2mm 5mm; margin-bottom: 4mm; }
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0; font-size: 9.4pt; }
+  th, td { border: 1px solid var(--line); padding: 1.4mm 2mm; text-align: left; vertical-align: top; }
+  th { background: var(--soft); }
+  .step { border: 1px solid var(--line); border-radius: 2mm; margin: 3.5mm 0; break-inside: avoid; page-break-inside: avoid; }
+  .step-head { display: flex; justify-content: space-between; align-items: baseline; background: var(--soft); padding: 1.8mm 3mm; border-bottom: 1px solid var(--line); border-radius: 2mm 2mm 0 0; }
+  .time { font-weight: 700; color: var(--accent); white-space: nowrap; margin-left: 3mm; }
+  .step-body { padding: 2mm 3mm; }
+  .label { font-weight: 700; font-size: 8.6pt; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-top: 1.6mm; }
+  .say { background: var(--say); border-left: 3px solid var(--sayline); padding: 1.6mm 3mm; margin: 1mm 0; font-style: italic; }
+  .tip { background: var(--tip); border-left: 3px solid var(--tipline); padding: 1.4mm 3mm; margin: 1.5mm 0; font-size: 9.2pt; }
+  .crit { font-size: 8.8pt; color: var(--muted); }
+  .num { white-space: nowrap; }
+  .pb { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>aeroRecovery – demo video script</h1>
+  <p class="sub">10-minute walkthrough of the Disruption Advisor (UC5 Disruption Management) · steps, what to show, what to say and what to explain</p>
+</div>
+
+<h2>How to use this script</h2>
+<ul>
+  <li>Total running time <b>10:00</b> (the submission limit). Each step has a time box, the clicks to make, a narration you can read or adapt (<i>blue boxes</i>) and the points to explain. Speak in your own words; the narration is a guide, not a teleprompter.</li>
+  <li>The story follows the UC5 example scenario (§6): <b>a flight arriving at the hub is delayed by 120 minutes, its aircraft has another flight soon after, and many passengers have onward connections</b>. Then a cancellation, prediction and the AI agent.</li>
+  <li>Figures below were read from a check run on 22 Nov 2026. Record on the live demo (<b>http://92.5.154.198:8080</b>) and say the figures you see on screen; they can differ slightly.</li>
+  <li>The time boxes follow the judging weights: problem fit 20, execution 25, technical depth 20, novelty 15, responsible design 10, clarity 10.</li>
+</ul>
+
+<h2>Before you record (checklist)</h2>
+<table>
+  <tr><th style="width:32%">Item</th><th>What to do</th></tr>
+  <tr><td>Browser</td><td>Chrome, one window, other tabs closed, notifications off, zoom 100–110 %, window about 1600×900. Hide bookmarks bar.</td></tr>
+  <tr><td>Sign-in</td><td>Sign in as <b>Evaluator</b> before you start (it sees every view, including Model Card and Test data). Do not show the password on screen.</td></tr>
+  <tr><td>Warm-up</td><td>Open G9519 +120 min and G9298 once before recording, so the analyses return at full speed during the take. Start one agent run on G9901 beforehand as a fallback in case the live run is slow.</td></tr>
+  <tr><td>AI wording</td><td>The "Why?" text and passenger messages are written by Claude when the AI key is set; if the AI is slow, the template text appears first and the AI wording replaces it a moment later. That is expected; you can mention it.</td></tr>
+  <tr><td>Approvals</td><td>Approving in the demo creates an audit record on the live system. That is fine for the demo; say that it is audited.</td></tr>
+  <tr><td>Recording</td><td>Record at 1080p; microphone close; one take per step is easier to edit than one 10-minute take. Leave 1 second of silence at the start and end of each step.</td></tr>
+</table>
+
+<h2>Timeline at a glance</h2>
+<table>
+  <tr><th style="width:13%">Time</th><th style="width:33%">Step</th><th>UC5 question / judging point it answers</th></tr>
+  <tr><td>0:00–0:40</td><td>1. Problem and promise</td><td>Problem significance; business value</td></tr>
+  <tr><td>0:40–1:40</td><td>2. Delay Watchlist (prediction)</td><td>Challenge 1 predictive; "7-day cascading impact"</td></tr>
+  <tr><td>1:40–4:10</td><td>3. Scenario A: G9519 +120 min</td><td>Challenges 2–4; "which flights and passengers are impacted", "which strategy best balances…"</td></tr>
+  <tr><td>4:10–6:10</td><td>4. Scenario B: G9298 cancelled</td><td>Prioritisation list; "how should passengers be prioritised when inventory is limited"; communication</td></tr>
+  <tr><td>6:10–7:30</td><td>5. AI agent</td><td>Agentic AI; "can AI explain its reasoning"; novelty</td></tr>
+  <tr><td>7:30–8:40</td><td>6. Trust: Model Card, test data, guardrails</td><td>Responsible design; execution (evaluator mode)</td></tr>
+  <tr><td>8:40–9:35</td><td>7. How it is built</td><td>Technical depth</td></tr>
+  <tr><td>9:35–10:00</td><td>8. Close</td><td>Business value; clarity</td></tr>
+</table>
+
+<div class="pb"></div>
+<h2>Step-by-step script</h2>
+
+<div class="step">
+  <div class="step-head"><h3>1. Problem and promise</h3><span class="time">0:00 – 0:40</span></div>
+  <div class="step-body">
+    <div class="label">Show</div>
+    <p>Title slide (or the sign-in page of aeroRecovery), then the Flight Delay home page after sign-in.</p>
+    <div class="label">Say</div>
+    <div class="say">"When one flight runs late at a hub, the problem does not stay with that flight. The same aircraft has its next flights, hundreds of passengers have connections, and alternative seats are limited. Today the OCC and the passenger teams work this out by hand, under time pressure. aeroRecovery is a disruption advisor for Air Arabia: it shows the full impact over seven days, compares recovery options, decides who to protect first, explains why — and a person approves every action."</div>
+    <div class="label">Explain</div>
+    <ul><li>Who it is for: OCC (aircraft and schedule) and the passenger control team.</li><li>It runs on Air Arabia's real extracts: schedule, rotations, inventory, minimum connection times, punctuality and 27.9 million booking rows.</li></ul>
+    <p class="crit">Judging: problem significance &amp; fit, clarity.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-head"><h3>2. Delay Watchlist – see trouble coming</h3><span class="time">0:40 – 1:40</span></div>
+  <div class="step-body">
+    <div class="label">Click</div>
+    <ol><li>Menu → <b>Delay Watchlist</b>.</li><li>Point at the top flight and its risk band and reasons (check run: G9406 BOM→SHJ, high risk, "departures from BOM are often late").</li><li>Open the <b>cascade check</b> panel.</li></ol>
+    <div class="label">Say</div>
+    <div class="say">"Before anything goes wrong, the watchlist looks seven days ahead. For every flight a model trained on this year's punctuality history estimates the chance of a late departure, gives the main reasons in plain words, and ranks flights by how many passenger connections are at stake — not just by delay. Here the top flight is high risk because departures from that airport are often late."</div>
+    <div class="say">"And we checked our knock-on formula against real history: for last month's consecutive flights of the same aircraft, most predicted knock-on delays landed within 30 minutes of what actually happened."</div>
+    <div class="label">Explain</div>
+    <ul><li>Prediction ranks by <b>expected missed connections</b>, which is what costs the airline.</li><li>The cascade panel is validation with actual data, not a claim. Read the percentage shown on screen (check run: about 93 % within 30 minutes over 1,656 pairs).</li><li>One click opens a flight and starts the delay analysis with a suggested delay.</li></ul>
+    <p class="crit">UC5 Challenge 1 (predictive) · §6 "7-day cascading impact".</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-head"><h3>3. Scenario A – G9519 Dhaka → Sharjah, 120 minutes late</h3><span class="time">1:40 – 4:10</span></div>
+  <div class="step-body">
+    <div class="label">Click</div>
+    <ol>
+      <li>Menu → <b>Flight Delay</b>; type <b>G9519</b>, pick the flight of <b>21 Nov 02:00</b>, set the delay to <b>120 min</b>, analyse.</li>
+      <li>Pause on the <b>at a glance</b> tiles; open <b>Flight Board</b> (before/after rotation).</li>
+      <li>Open <b>Recovery options</b>: show the six options and the recommended one.</li>
+      <li>Switch the <b>strategy</b> (Lowest cost → Protect passengers → Least delay) and back.</li>
+      <li>Open <b>Why?</b>. Open <b>Crew duty (FDP)</b>.</li>
+      <li>Open the passenger boxes: <b>connections at risk</b>, <b>rebooked</b>, <b>rewards and compensation</b>.</li>
+      <li>Click <b>Approve</b> on the top bar.</li>
+    </ol>
+    <div class="label">Say (impact)</div>
+    <div class="say">"This is the UC5 example. G9519 from Dhaka lands at Sharjah two hours late. Its aircraft is due out again on G9294 to Tbilisi soon after, and 142 passengers on board connect onwards. In seconds the advisor walks the aircraft's rotation and every connection over the next seven days."</div>
+    <div class="label">Say (options)</div>
+    <div class="say">"It builds the real recovery options from the schedule: absorb the delay on the same aircraft, swap in a spare aircraft of the same type, or cancel a later round trip. If we just absorb it, the delay ripples through five flights — 380 minutes in total and 86 missed connections. The recommendation is to swap: aircraft A6-ARI takes over G9294. The delay stays at one flight, missed connections drop to 29, and the cost falls from about 184 thousand to about 67 thousand dirhams."</div>
+    <div class="say">"Different days need different priorities, so the same options are ranked by three strategies — lowest cost, protect passengers, least delay. Switching changes the pick, never the numbers."</div>
+    <div class="label">Say (explanation, crew, passengers)</div>
+    <div class="say">"'Why?' explains the choice in plain English — written by AI, but every number comes from the engine. The crew check tests the new timings against flight duty limits. For the 29 passengers who still miss their connection, 27 are rebooked onto real free seats within 24 hours and 2 get the next-day option with hotel, meals and transport. Nothing happens until a controller approves, and every decision is audited."</div>
+    <div class="label">Explain</div>
+    <ul>
+      <li>Numbers to read from the screen (check run): booked 168; options 6; recommended swap A6-ARI: 120 min, 1 flight delayed, 29 of 154 connections missed, about AED 66,500; absorb: 380 min, 5 flights, 86 missed, about AED 184,500; 27 rebooked, 2 without a seat.</li>
+      <li>Cost model: delay, missed connections, care (hotel, meals) and EU261 where it applies.</li>
+      <li>Recommend-only: the approve/reject bar is the human control point.</li>
+    </ul>
+    <div class="tip">If the "Why?" text first shows the template wording, wait two seconds: the AI wording replaces it.</div>
+    <div class="tip">Crew duty: the crew roster covers 1 Oct – 20 Nov 2026. For a 21 Nov flight the section may show an estimate or "no crew data"; say so in one sentence, or show the crew check on a 20 Nov flight such as G9502 instead.</div>
+    <p class="crit">UC5 Challenges 2 (flight recovery), 3 (passenger recovery), 4 (decision support) · §6 "which flights and passengers are impacted", "which alternatives are available", "which strategy best balances efficiency, customer value, convenience and cost".</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-head"><h3>4. Scenario B – G9298 Sharjah → Tbilisi cancelled, few seats left</h3><span class="time">4:10 – 6:10</span></div>
+  <div class="step-body">
+    <div class="label">Click</div>
+    <ol>
+      <li>Menu → <b>Cancellation</b>; type <b>G9298</b>, pick <b>20 Nov 03:40</b>, analyse.</li>
+      <li>Point at the tiles: passengers to move, seats available, hotel rooms.</li>
+      <li>Open <b>Passengers to rebook</b>; show the tier column and one passenger's <b>reason</b> (score breakdown).</li>
+      <li>Open <b>priority weights</b>; move one slider (for example loyalty up) and re-run.</li>
+      <li>Draft a <b>passenger message</b> for one passenger.</li>
+      <li>Open <b>Rewards and compensation</b>; enter a budget (for example AED 5,000) → <b>Recommend rewards</b>.</li>
+    </ol>
+    <div class="label">Say (the hard case)</div>
+    <div class="say">"Now the hardest case: G9298 to Tbilisi is cancelled. 180 passengers are booked, but the alternatives only have 12 free seats. Somebody must decide who travels first — and that decision must be fair and explainable."</div>
+    <div class="label">Say (prioritisation)</div>
+    <div class="say">"Priority works in strict tiers first. Tier 1 is mandated care — passengers with infants, special assistance and similar needs — and they can never be pushed down by commercial value. Tier 2 is urgency, such as onward connections. Only inside a tier do the weights apply: loyalty, travel frequency, fare, ancillaries, the journey and family or group bookings. Every passenger gets a score with the reason spelled out. This one is Tier 1, travelling with an infant, Platinum member, score 64."</div>
+    <div class="say">"The weights are the airline's policy, not ours. If the airline values loyalty more today, we move the slider and the plan re-runs in seconds."</div>
+    <div class="label">Say (rebooking, care, communication)</div>
+    <div class="say">"An optimiser assigns passengers to the real free seats and keeps bookings together where it can. Everyone without a seat gets the next-day option with hotel and meals, or a refund. The AI drafts a clear message for each passenger, and the rewards model suggests goodwill gestures within a budget the airline sets."</div>
+    <div class="label">Explain</div>
+    <ul>
+      <li>Numbers to read (check run): 180 booked; 12 protected on the one alternative flight; 164 without a seat (next day + hotel, or refund); tiers 78 / 97 / 1; 3 bookings could not stay together.</li>
+      <li>UC5 rule respected: passenger rights and mandatory assistance come before commercial scores.</li>
+      <li>Messages contain no personal data sent to the AI: only flight facts go to the model.</li>
+    </ul>
+    <p class="crit">UC5 prioritisation list · §6 "how should passengers be prioritised when inventory is limited", "how should loyalty, frequency, fares, ancillaries and journey attributes influence recommendations", "how can AI support teams in making and communicating decisions".</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-head"><h3>5. The AI agent – Predict the Flight Delay</h3><span class="time">6:10 – 7:30</span></div>
+  <div class="step-body">
+    <div class="label">Click</div>
+    <ol><li>Menu → <b>Predict the Flight Delay (AI agent)</b>.</li><li>Start a run on the demo flight <b>G9901</b> (Karachi → Sharjah) and let it run; or open the run prepared before recording.</li><li>Scroll through its steps; open the recommendation (it opens as a normal scenario ready for approval).</li></ol>
+    <div class="label">Say</div>
+    <div class="say">"Finally, the agent. Instead of a controller clicking through each view, the AI agent investigates the flight itself: it predicts the delay, checks the rotation and the connections, compares the options and recommends one — showing each step live, with its reasons, risks and the checks to do before approval."</div>
+    <div class="say">"The agent can only use read-only tools of our engine, so it cannot invent numbers or change any data. Its recommendation lands on the same approval screen as before. If the AI service is unavailable, a rule-based planner gives the answer instead."</div>
+    <div class="label">Explain</div>
+    <ul><li>Agentic AI coordinating the steps, as UC5 suggests; human stays in control.</li><li>Guardrails: read-only tools, no personal data, engine-grounded numbers, fallback.</li></ul>
+    <p class="crit">UC5 innovation: agentic AI · §6 "can AI explain its prioritisation and recovery reasoning" · novelty.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-head"><h3>6. Trust – Model Card, test data and guardrails</h3><span class="time">7:30 – 8:40</span></div>
+  <div class="step-body">
+    <div class="label">Click</div>
+    <ol><li>Menu → <b>Model Card</b>: open the delay-risk card (test results, calibration).</li><li>Menu → <b>Test data</b>: show the spec and template (do not need to upload in the video).</li></ol>
+    <div class="label">Say</div>
+    <div class="say">"Judges and auditors should not have to take our word for it. The Model Card shows how the prediction model was tested on flights it never saw, how well its probabilities are calibrated, and how it compares with a simple baseline. Evaluators can also upload their own test flights from a template and see them scored and analysed like real ones."</div>
+    <div class="say">"Responsible by design: passenger names never leave the system — bookings are stored without names and only flight facts go to the AI. The AI writes words, the engine computes numbers. And nothing changes in the airline's operation without a person's approval, which is audited."</div>
+    <div class="label">Explain</div>
+    <ul><li>Roles: OCC sees the operational views; Evaluator also sees Model Card and Test data; the server refuses those views to other roles.</li><li>Transparency of the model is part of the deliverable.</li></ul>
+    <p class="crit">Responsible design · execution (evaluator mode) · clarity.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-head"><h3>7. How it is built</h3><span class="time">8:40 – 9:35</span></div>
+  <div class="step-body">
+    <div class="label">Show</div>
+    <p>The architecture slide (or the container diagram from the solution-design PDF).</p>
+    <div class="label">Say</div>
+    <div class="say">"Under the hood: the airline extracts are converted to typed Parquet and queried with DuckDB — 27.9 million booking rows, stored without names. Our own recovery engine builds the options; Google OR-Tools solves the seat assignment; LightGBM predicts delays; Claude writes explanations and drives the agent. A FastAPI service and a React interface run in Docker on the provided server, and they restart by themselves. Every release passes about 200 automated tests and end-to-end browser tests before and after deployment."</div>
+    <div class="label">Explain</div>
+    <ul><li>Quality over tool count: each technology has one clear job.</li><li>Not a thin AI wrapper: the engine, optimiser and models are ours; AI is used where it adds value — language and coordination.</li></ul>
+    <p class="crit">Technical depth · novelty · execution.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-head"><h3>8. Close</h3><span class="time">9:35 – 10:00</span></div>
+  <div class="step-body">
+    <div class="label">Show</div>
+    <p>Back to the G9519 result tiles, or the closing slide with the demo link.</p>
+    <div class="label">Say</div>
+    <div class="say">"So in minutes instead of hours, the team sees the whole seven-day impact, picks the recovery that fits today's priority, protects the passengers who need it most, and tells them clearly — with AI explaining every step and people making every decision. That is aeroRecovery. Thank you."</div>
+    <div class="label">Explain</div>
+    <ul><li>Business benefits: fewer missed connections, lower recovery cost, faster decisions, consistent and fair passenger treatment, clear communication.</li></ul>
+  </div>
+</div>
+
+<h2>UC5 example questions – where the video answers them</h2>
+<table>
+  <tr><th style="width:48%">UC5 §6 question</th><th>Step</th></tr>
+  <tr><td>Which flights and passengers are impacted, and what is the 7-day cascading impact?</td><td>2 (watchlist, cascade check), 3 (Flight Board, tiles)</td></tr>
+  <tr><td>Which passengers risk missing connections, and which alternatives are available?</td><td>3 (connections at risk, rebooked), 4 (alternative flight, seats)</td></tr>
+  <tr><td>How should passengers be prioritised when inventory is limited?</td><td>4 (tiers, scores, optimiser)</td></tr>
+  <tr><td>How should loyalty, frequency, fares, ancillaries and journey attributes influence recommendations?</td><td>4 (weights inside tiers, slider re-run, reason per passenger)</td></tr>
+  <tr><td>Can AI explain its prioritisation and recovery reasoning?</td><td>3 (Why?), 4 (reasons), 5 (agent steps)</td></tr>
+  <tr><td>Which strategy best balances operational efficiency, customer value, convenience and cost?</td><td>3 (six options, three strategies)</td></tr>
+  <tr><td>How can AI support airline teams in making and communicating decisions?</td><td>3 (approve bar), 4 (message drafts, rewards), 5 (agent)</td></tr>
+</table>
+
+<h2>If something goes wrong while recording</h2>
+<table>
+  <tr><th style="width:32%">Situation</th><th>What to do</th></tr>
+  <tr><td>An analysis takes long</td><td>Cut in editing; or open the same scenario from <b>Recent Searches</b> (it reloads instantly).</td></tr>
+  <tr><td>The agent run is slow</td><td>Open the run you prepared before recording from the agent page list.</td></tr>
+  <tr><td>Figures differ from this script</td><td>Say the figures on screen; the script figures are from a check run.</td></tr>
+  <tr><td>Signed out</td><td>Sign in again off-camera and continue from the same step.</td></tr>
+</table>
+
+</body>
+</html>
