@@ -243,3 +243,5 @@
 2026-11-22T03:36Z | T-648 | DONE | deck slide 1 URL -> :8080 (API :8888), edited in the pptx (pptx differs from build-deck.js, so not regenerated), PDF via LibreOffice, 14 slides; originals in scratchpad; NOT committed
 2026-11-22T03:42Z | T-649 | DONE | source ZIP products/disruption-advisor/aeroRecovery_Source_v1.0.0.zip (287 files, no deps/settings.env); clean-extract gate PASS 145 backend + 53 frontend (output/T-649-zip-check.log)
 2026-11-22T03:49Z | T-647 | DONE | prod regression QA-2026-11-22-05: QA PASSED WITH OBSERVATIONS 35/36 (97.2%), new QA-DA-007 Low/P4 open (day chip hover); known limitations QA-DA-005/006, J-DA-017
+2026-11-22T05:32Z | T-650 | STARTED | demo video edit: remove long silences, realign narration with screen (input demo-final-original.mp4)
+2026-11-22T05:32Z | T-650 | DONE | docs/delivery/demo-video/demo-final.mp4 11:09 (from 16:59), gaps >1.0s cut to 0.8s, 3 narration passages re-placed over matching screens (cancel tiles, rewards results, Test data), voice verified by re-transcription; plan + transcripts in output/T-650-video; original kept; NOT committed

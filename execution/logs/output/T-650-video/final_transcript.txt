@@ -1,0 +1,91 @@
+   1.78-   7.76  Hi everyone, let me introduce you error recovery first.
+   9.38-  15.22  When one flight translates at half, the problem does not stay with that flight.
+  15.88-  18.86  The same aircraft has its next flight.
+  19.30-  23.94  Hundreds of passengers have connections and alternative seats are limited.
+  23.94-  31.72  Today the OCC and the passenger teams work this out by hand under time pressure.
+  32.60-  35.84  Error recovery is a disruption advice for an RPR.
+  36.64-  43.86  It shows the full impact over 7 days, compares the recovery options, decides who to protect
+  43.86-  48.28  first, explain why and a person approves every action.
+  49.06-  50.54  Let me login now.
+  51.98-  55.70  First, let's check the delay watch list.
+  56.62-  64.32  Before anything goes wrong, watch list looks 7 days ahead and then for every flight model
+  64.32-  71.30  trained on this air, functionality history estimates the chance of late departure gives
+  71.30-  78.40  the main reasons in plain words and ranks the flights by how many passenger connections
+  78.40-  79.94  are at stake.
+  80.70-  91.72  Not just by delay, here the top flight is high risk because the departures from that
+  91.72-  98.08  airport are often late and we checked out Nocturne formula against real history.
+  98.76- 105.68  For last month's consecutive flights of the same aircraft, most predicted Nocturne
+ 105.68- 110.62  delays landed within 30 minutes of what actually happened.
+ 114.68- 118.16  Now let's check a flight delay and how it has been handled.
+ 119.28- 127.90  I will search for G9519 and pick the flight on 21st.
+ 127.90- 136.48  Now it's slicing the delays and this is the dashboard view for this flight.
+ 137.90- 142.62  It is showing recovery options that we have right now.
+ 143.60- 152.84  So now this flight is two hours delayed, two and a half hours delayed and this aircraft
+ 152.84- 156.94  is due out again on G9294.
+ 159.56- 167.58  Soon after and it has 154 passengers on board connecting words.
+ 168.28- 175.02  In seconds the advisor goes there after rotation and every connection over the next 7 days.
+ 176.28- 183.06  It builds the real recovery options from the schedule, absorbs the delay on the same aircraft,
+ 185.48- 190.34  a strap in a spare aircraft on the same type or cancel later round trip.
+ 191.04- 202.74  If we just absorb it, the delay ripples through 4 flights and it shows the delays of times
+ 202.74- 203.60  as well.
+ 205.04- 207.78  The recommendation is to swap.
+ 209.74- 219.82  Our recommended option is to swap with another flight and it is A6ARI.
+ 221.74- 224.44  It takes over G9294.
+ 224.44- 244.00  The delays is at one flight, next connection drops to 33 and the cost falls from about
+ 244.00- 252.26  333 to 79,400.
+ 252.26- 268.30  The difference is as of now this is the selected option and when we go to crew duty it shows
+ 268.30- 268.98  why.
+ 270.08- 277.16  Check within duty limits, one flight, use an estimated duty, now it must match and then
+ 277.16- 287.28  in the passenger boxes you can see who are at risk and reboot, rewards and compensation.
+ 292.24- 294.68  Now let us check a cancel flight.
+ 295.76- 304.84  I am going to search here G9298 on the 20th flight.
+ 304.84- 315.66  Now these are the passengers to move and then the seats available and hotel rooms without
+ 315.66- 320.14  seats so the estimated cost is this by the cancellation.
+ 322.00- 332.26  This is the rebooking plan and we have priority weight and we can draft a message for a passenger
+ 332.26- 341.00  and under rewards we can give the budget and then recommended award, so it is dividing
+ 341.00- 341.90  the values.
+ 342.80- 354.98  This is a very hard case, G9298 is cancelled, 180 passengers are booked, this flight is cancelled
+ 354.98- 374.00  and it has around 180 passengers but the alternatives only have limited seats, 12 seats.
+ 375.20- 381.46  Somebody must have to decide who travel first and that decision must be fair and explainable.
+ 382.46- 390.92  Priority works in strict first rate, one needs a mandated gear, passengers with influence,
+ 391.22- 401.22  special assistance and similar needs and they can never be pushed down by a commercial value,
+ 401.22- 414.72  tier 2 is an urgency such as onward connections, only inside a tier 2 it applies loyalty, travel
+ 414.72- 419.74  frequency, fare, anciliaries, the journey and family group bookings.
+ 420.58- 424.86  Every passenger gets a school with the reasons paid out.
+ 424.86- 429.96  This is tier 1, travelling with an infant.
+ 432.24- 440.76  When it comes to rebooking, the optimizer assigns passengers to real pre-seats and keep
+ 440.76- 442.76  bookings together where it can.
+ 444.14- 448.50  Everyone without seat gets next day option with hotel and meals or refund.
+ 448.50- 457.22  The air draft clear message for each passenger and rewards module such as food, meal, within
+ 457.22- 459.06  the budget airline sets.
+ 463.42- 472.40  Now predict the flight delay, the AI exit, I will start on demo on flight G9901.
+ 474.06- 477.92  Now it is working on the steps as you can see.
+ 481.36- 487.32  Now the agent instead of the controller clicking through each wheel, the AI agent investigates
+ 487.32- 493.12  the flight itself, it predicts the delay, checks the rotations and the connection.
+ 493.12- 502.58  Compare the options, recommends one showing each step life with its reason, risks and
+ 502.58- 504.14  checks before approval.
+ 504.64- 515.02  The agent can only use read-only tools in an engine so it cannot invent numbers or change
+ 515.02- 515.72  any data.
+ 516.10- 520.30  Its recommendation lands on the same approval screen as before.
+ 520.30- 527.10  If the AI service is unavailable, the rule-based planner gives the answer instead.
+ 528.08- 529.78  Now let us go to the module card.
+ 530.78- 535.12  Judges and auditors should not have to take a word for it.
+ 535.22- 542.26  The module card shows how the prediction module was tested on the flight, it never saw.
+ 542.26- 549.72  How well its probabilities are calibrated and how it compares with a simple baseline.
+ 550.28- 557.88  Evaluators can also upload their old test flights from the template and see them score
+ 557.88- 560.78  then analyzed like real ones.
+ 561.62- 567.72  Responsible by design, passenger names never leave the system, bookings are stored without
+ 567.72- 571.32  names and only flight facts go to the AI.
+ 572.56- 581.02  The AI writes words, the engine computes numbers and nothing changes in AI line's operation
+ 581.02- 584.52  without a person's approval which is audited.
+ 588.76- 590.30  Let's see how it is built.
+ 591.10- 598.92  Under the hood, the AI line extracts are converted to type, pocket and queried with DuckDB.
+ 600.30- 608.72  Millions of booking rows stored without names, our own recovery engine builds options, Google
+ 608.72- 618.58  OR tools of the seat assignment, let GBM predict delays, Claude writes explanations and writes
+ 618.58- 627.90  the agent, a fast API service and React interface run in Docker on the provided server and they
+ 627.90- 637.26  restart by themselves, every release passes about 200 automated tests and end-to-end browser
+ 637.26- 639.90  tests before and after deployment.
+ 642.28- 649.62  So, in minutes instead of hours, the team sees the whole 7-day impact, picks the recovery
+ 649.62- 656.88  that fits today, priority protects the passengers who need it most and tells them clearly with
+ 656.88- 664.68  AI explaining every step and people making every decision that is recovered.
+ 665.46- 665.74  Thank you.
